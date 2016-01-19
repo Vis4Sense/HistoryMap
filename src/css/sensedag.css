@@ -1,0 +1,85 @@
+.sm-sensedag .node {
+	display: inline-block;
+	border-radius: 6px;
+    padding: 3px;
+    box-shadow: 0 0 8px #777;
+}
+
+.sm-sensedag .node:hover {
+    transition: box-shadow .25s ease-in-out;
+}
+
+.sm-sensedag .node.hovered {
+    box-shadow: 0 0 8px cyan;
+}
+
+.sm-sensedag .node.move:hover {
+    box-shadow: 0 0 8px green;
+}
+
+.sm-sensedag .node.connect:hover {
+    box-shadow: 0 0 8px red;
+}
+
+.sm-sensedag .node.move {
+	cursor: move;
+}
+
+.sm-sensedag .node.connect {
+	cursor: e-resize;
+}
+
+.sm-sensedag .node.candidate {
+	background-color: #777;
+	color: white;
+	font-family: Georgia;
+	font-size: 1.2em;
+	border: none;
+	padding: 0 4px;
+	border-radius: 0;
+}
+
+.sm-sensedag .link path {
+	fill: none;
+	stroke-width: 2px;
+	stroke: #bbb;
+}
+
+/* To make icon and label in one line */
+.sm-sensedag .node-icon {
+	max-width: 22px;
+	max-height: 22px;
+	display: inline-block;
+	margin-right: 2px;
+}
+
+.sm-sensedag .candidate .node-icon {
+	max-width: 30px;
+	max-height: 30px;
+	display: block;
+	margin: auto;
+	margin-top: 3px;
+	padding: 0;
+}
+
+/* Action type icon */
+.sm-sensedag .node-icon.fa {
+	color: white;
+	padding: 3px;
+	border-radius: 4px;
+	border: 1px solid black;
+}
+
+.sm-sensedag .node-label {
+	display: inline-block;
+	white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: bottom; /* inline-block and overflow hidden make text move upwards */
+}
+
+.sm-sensedag .cursor-link {
+	stroke-width: 2;
+    stroke: red;
+    shape-rendering: auto;box-shadow: 0 0 8px green;
+}

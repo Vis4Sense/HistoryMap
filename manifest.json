@@ -1,0 +1,50 @@
+{
+    "manifest_version": 2,
+
+    "name": "SenseMap",
+    "description": "Supporting Sensemaking through Analytic Provenance.",
+    "version": "0.1.0",
+
+    "browser_action": {
+        "default_icon": {
+            "19": "logo/logo19.png",
+            "38": "logo/logo38.png"
+        },
+        "default_title": "Open SenseMap"
+    },
+
+    "icons": {
+      "16": "logo/logo16.png",
+      "24": "logo/logo24.png",
+      "48": "logo/logo48.png",
+      "128": "logo/logo128.png"
+   },
+
+    "background": {
+        "page": "src/pages/background.html",
+        "persistent": false
+    },
+
+    "content_scripts": [ {
+        "matches" : ["http://*/*", "https://*/*"],
+        "js": ["src/bower_components/jquery/dist/jquery.min.js", "src/bower_components/bootstrap/dist/js/bootstrap.min.js", "src/bower_components/jquery-ui.min.js", "src/js/content-scripts/highlight.js", "src/js/content-scripts/content.js"],
+        "css": ["src/css/content.css"],
+        "run_at": "document_end"
+    } ],
+
+    "permissions": [
+        "<all_urls>",
+        "chrome://favicon/",
+        "storage",
+        "history",
+        "tabs",
+        "desktopCapture"
+    ],
+
+    "options_ui": {
+        "page": "src/pages/options.html",
+        "chrome_style": true
+    },
+
+    "web_accessible_resources": ["src/css/*.*"]
+}

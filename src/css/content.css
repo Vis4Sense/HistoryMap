@@ -1,0 +1,357 @@
+.sm-page-buttons,
+.sm-highlight-buttons {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    font-weight: normal;
+}
+
+.sm-note {
+    text-align: inherit;
+    text-decoration: inherit;
+    line-height: inherit;
+    font: inherit;
+    color: inherit;
+    display: inline;
+    position: relative;
+    zoom: 1;
+    margin: 0;
+    padding: 0;
+    background-color: yellow;
+}
+
+.sm-note:hover {
+    cursor: pointer;
+}
+
+.sm-note-icon {
+    position: static;
+    display: inline-block;
+}
+
+.sm-btn {
+    font-family: Arial, Helvetica, sans-serif !important;
+    background-color: black;
+    color: white;
+    display: inline-block;
+    margin-bottom: 0;
+    font-weight: normal;
+    text-align: center;
+    vertical-align: middle;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    cursor: pointer;
+    background-image: none;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    padding: 4px 8px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    border-radius: 4px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    text-transform: none;
+}
+.sm-btn:focus,
+.sm-btn:active:focus,
+.sm-btn.active:focus,
+.sm-btn.focus,
+.sm-btn:active.focus,
+.sm-btn.active.focus {
+    outline: thin dotted;
+    outline: 5px auto -webkit-focus-ring-color;
+    outline-offset: -2px;
+}
+.sm-btn:hover,
+.sm-btn:focus,
+.sm-btn.focus {
+    color: #333333;
+    text-decoration: none;
+    background-color:#000 !important;
+}
+.sm-btn:active,
+.sm-btn.active {
+    outline: 0;
+    background-image: none;
+    -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+}
+.sm-btn-default {
+    color: #fff !important;
+    background-color: #575757 !important;
+    border-color: #fff !important;
+}
+.sm-btn-default:hover,
+.sm-btn-default:focus,
+.sm-btn-default.focus,
+.sm-btn-default:active,
+.sm-btn-default.active,
+.open > .dropdown-toggle.sm-btn-default {
+    background-color:#000 !important;
+    color: #fff !important;
+}
+.sm-btn-primary {
+    color: #fff;
+    background-color: #428bca;
+    border-color: #357ebd;
+}
+.sm-btn-primary:hover,
+.sm-btn-primary:focus,
+.sm-btn-primary:active,
+.sm-btn-primary.active,
+.open .dropdown-toggle.sm-btn-primary {
+    color: #fff;
+    background-color: #3276b1;
+    border-color: #285e8e;
+}
+.sm-btn-group,
+.sm-btn-group-vertical {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+}
+.sm-btn-group > .sm-btn,
+.sm-btn-group-vertical > .sm-btn {
+    position: relative;
+    float: left;
+}
+.sm-btn-group > .sm-btn:hover,
+.sm-btn-group-vertical > .sm-btn:hover,
+.sm-btn-group > .sm-btn:focus,
+.sm-btn-group-vertical > .sm-btn:focus,
+.sm-btn-group > .sm-btn:active,
+.sm-btn-group-vertical > .sm-btn:active,
+.sm-btn-group > .sm-btn.active,
+.sm-btn-group-vertical > .sm-btn.active {
+    z-index: 2;
+}
+.sm-btn-group .sm-btn + .sm-btn,
+.sm-btn-group .sm-btn + .sm-btn-group,
+.sm-btn-group .sm-btn-group + .sm-btn,
+.sm-btn-group .sm-btn-group + .sm-btn-group {
+    margin-left: -1px;
+}
+.sm-btn-toolbar {
+    margin-left: -5px;
+}
+.sm-btn-toolbar .sm-btn-group,
+.sm-btn-toolbar .input-group {
+    float: left;
+}
+.sm-btn-toolbar > .sm-btn,
+.sm-btn-toolbar > .sm-btn-group,
+.sm-btn-toolbar > .input-group {
+    margin-left: 5px;
+}
+.sm-btn-group > .sm-btn:not(:first-child):not(:last-child):not(.dropdown-toggle) {
+    border-radius: 0;
+}
+.sm-btn-group > .sm-btn:first-child {
+    margin-left: 0;
+}
+.sm-btn-group > .sm-btn:first-child:not(:last-child):not(.dropdown-toggle) {
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+}
+.sm-btn-group > .sm-btn:last-child:not(:first-child),
+.sm-btn-group > .dropdown-toggle:not(:first-child) {
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+}
+.sm-btn-group > .sm-btn-group {
+    float: left;
+}
+.sm-btn-group > .sm-btn-group:not(:first-child):not(:last-child) > .sm-btn {
+    border-radius: 0;
+}
+.sm-btn-group > .sm-btn-group:first-child > .sm-btn:last-child,
+.sm-btn-group > .sm-btn-group:first-child > .dropdown-toggle {
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+}
+.sm-btn-group > .sm-btn-group:last-child > .sm-btn:first-child {
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+}
+
+.close {
+    float: right;
+    font-size: 21px;
+    font-weight: bold;
+    line-height: 1;
+    color: #000;
+    text-shadow: 0 1px 0 #fff;
+    filter: alpha(opacity=20);
+    opacity: .2;
+}
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+    filter: alpha(opacity=50);
+    opacity: .5;
+}
+button.close {
+    -webkit-appearance: none;
+    padding: 0;
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+}
+
+.sm-modal-open {
+    overflow: hidden;
+}
+.sm-modal {
+    display: none;
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1040;
+    -webkit-overflow-scrolling: touch;
+    outline: 0;
+}
+.sm-modal textarea {
+    font-family: Arial, Helvetica, sans-serif !important;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1.2;
+    padding: 3px;
+}
+.sm-modal.fade .sm-modal-dialog {
+    -webkit-transform: translate(0, -25%);
+    -ms-transform: translate(0, -25%);
+    -o-transform: translate(0, -25%);
+    transform: translate(0, -25%);
+    -webkit-transition: -webkit-transform 0.3s ease-out;
+    -o-transition: -o-transform 0.3s ease-out;
+    transition: transform 0.3s ease-out;
+}
+.sm-modal.in .sm-modal-dialog {
+    -webkit-transform: translate(0, 0);
+    -ms-transform: translate(0, 0);
+    -o-transform: translate(0, 0);
+    transform: translate(0, 0);
+}
+.sm-modal-open .sm-modal {
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+.sm-modal-dialog {
+    position: relative;
+    width: auto;
+    margin: 10px;
+}
+.sm-modal-content {
+    position: relative;
+    background-color: #ffffff;
+    border: 1px solid #999999;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+    -webkit-background-clip: padding-box;
+          background-clip: padding-box;
+    outline: 0;
+}
+.sm-modal .sm-btn {
+    font-family: Arial, Helvetica, sans-serif !important;
+    font-size: 14px;
+    padding: 6px 12px;
+}
+.sm-modal-header .close {
+    margin-top: -2px;
+}
+.sm-modal-title {
+    margin: 0;
+    line-height: 1.42857143;
+}
+.sm-modal-body {
+    position: relative;
+    padding: 15px;
+}
+.sm-modal-footer {
+    padding: 15px;
+    text-align: right;
+    border-top: 1px solid #e5e5e5;
+}
+.sm-modal-footer .sm-btn + .sm-btn {
+    margin-left: 5px;
+    margin-bottom: 0;
+}
+.sm-modal-footer .sm-btn-group .sm-btn + .sm-btn {
+    margin-left: -1px;
+}
+.sm-modal-footer .sm-btn-block + .sm-btn-block {
+    margin-left: 0;
+}
+.sm-modal-scrollbar-measure {
+    position: absolute;
+    top: -9999px;
+    width: 50px;
+    height: 50px;
+    overflow: scroll;
+}
+@media (min-width: 768px) {
+    .sm-modal-dialog {
+        width: 600px;
+        margin: 30px auto;
+    }
+    .sm-modal-content {
+        -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    }
+    .sm-modal-sm {
+        width: 300px;
+    }
+}
+@media (min-width: 992px) {
+    .sm-modal-lg {
+        width: 900px;
+    }
+}
+.clearfix:before,
+.clearfix:after,
+.sm-modal-footer:before,
+.sm-modal-footer:after {
+    content: " ";
+    display: table;
+}
+.clearfix:after,
+.sm-modal-footer:after {
+    clear: both;
+}
+.center-block {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+.pull-right {
+    float: right !important;
+}
+.pull-left {
+    float: left !important;
+}
+.hide {
+    display: none !important;
+}
+.show {
+    display: block !important;
+}
+.invisible {
+    visibility: hidden;
+}
+
+.sm-relevant-img {
+    border-radius: 0;
+    border: none;
+}
+
+.sm-img-sensed {
+    box-shadow: 0 0 20px red;
+}
