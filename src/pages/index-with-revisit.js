@@ -7,11 +7,12 @@ $(function() {
         name = '', // Set to one of the participants below
         participants = {
             p1: "data/p1.json",
-            p2: 'data/latest.json'
+            p2: "data/p2.json"
         };
 
     var sensedag,
         lastActiveItem,
+        lastAddItemTime,
         lastSearchAction,
         timeoutId, // To prevent redraw multiple times
         ignoredUrls = [ "chrome://", "chrome-extension://", "chrome-devtools://", "view-source:", "google.co.uk/url", "google.com/url", "localhost://" ],
@@ -63,6 +64,22 @@ $(function() {
                 hostname: "twitter.",
                 pathnames: [ "/search" ],
                 reg: /\Wq=([\w%+]*)/i
+            }, { // http://www.amazon.com/s/ref=nb_sb_noss_1?url=search-alias%3Daps&field-keywords=visualization
+                hostname: "www.amazon.",
+                pathnames: [ "/s" ],
+                reg: /\Wfield-keywords=([\w%+]*)/i
+            }, { // http://www.ebay.co.uk/sch/i.html?_from=R40&_trksid=p2050601.m570.l1313.TR0.TRC0.H0.Xvisualization.TRS0&_nkw=visualization&_sacat=0
+                hostname: "www.ebay.",
+                pathnames: [ "/sch"],
+                reg: /\W_nkw=([\w%+]*)/i
+            }, {
+                hostname: "www.booking.",
+                pathnames: [ "/"],
+                reg: /\Wss=([\w%+]*)/i
+            }, {
+                hostname: "www.expedia.",
+                pathnames: [ "/"],
+                reg: /\Wdestination=([\w%+]*)/i
             }
         ],
         locationSearchTemplates = [
@@ -89,7 +106,7 @@ $(function() {
                 labelFunc: getGoogleDirection
             }
         ],
-        timeFormat = d3.time.format("%Y-%m-%d %H:%M:%S"),
+        timeFormat = d3.time.format("%Y-%m-%d_%H-%M-%S"),
         followByBrowseActions = [ "search", "location", "place", "dir", "revisit", "link", "type", "bookmark", "unknown" ],
         embeddedTypes = [ "highlight", "note", "filter" ],
         visitedPages = {}, // Stores whether a page is visited
@@ -103,9 +120,10 @@ $(function() {
         updateVis();
         schedulePageReadingUpdate();
         wheelHorizontalScroll();
+        syncWithTabs();
     };
 
-    createContextMenus();
+    // Capture sensemaking actions
     respondToContentScript();
     respondToTabActivated();
     respondToTabUpdated();
@@ -128,9 +146,18 @@ $(function() {
     });
 
     function loadDataFile(json) {
+        // Acually, shouldn't save them in the first place
         allNodes = json;
+        allNodes.forEach(function(d) {
+            delete d.transcript;
+            delete d.customTranscript;
+            delete d.zoomLevel;
+        });
+
         buildWorkspace();
-        buildHierarchy(allNodes, true);
+
+        // Automatic infer links if not existed
+        buildHierarchy(allNodes);
     }
 
     /**
@@ -139,20 +166,9 @@ $(function() {
     function buildWorkspace() {
         // This lookup keeps track of all visited pages to sync. between the vis and opening tabs and consider revisiting.
         visitedPages = {};
+
         allNodes.forEach(n => {
             visitedPages[removeHash(n.url)] = 1;
-        });
-
-        // This lookup provides mapping from the id of the tab to the data itself
-        tabIdToDataItemLookup = {};
-        chrome.tabs.query({}, tabs => {
-            tabs.forEach(t => {
-                var n = data.nodes.find(n => removeHash(n.url) === removeHash(t.url));
-                if (n) {
-                    tabIdToDataItemLookup[t.id] = n;
-                    if (t.active) n.highlighted = true;
-                }
-            });
         });
     }
 
@@ -167,14 +183,16 @@ $(function() {
         c.parent = p;
     };
 
-    // Convert flat list of nodes to parent-children network, then redraw the vis.
-    function buildHierarchy(allNodes, noRedraw) {
+    // Convert flat list of nodes to parent-children network
+    function buildHierarchy(allNodes) {
         // Init
         allNodes.forEach(n => {
             delete n.parent;
             delete n.children;
             delete n.links;
         });
+
+        var currentSource = allNodes[0];
 
         // - Build parent-child relationship first
         allNodes.forEach(function(d, i) {
@@ -186,23 +204,30 @@ $(function() {
                 if (source) {
                     addLink(source, d);
                 } else {
-                    console.log('could not find the source of ' + d.text);
+                    console.log(d);
                 }
             }
 
             // If the action type of an item is embedded, add it as a child of the containing page
             if (embeddedTypes.includes(d.type)) {
-                var source = allNodes.find(d2 => d2.id === d.from);
-                if (source) {
-                    addChild(source, d);
-                } else {
-                    console.log('could not find the source of ' + d.text);
+                addChild(currentSource, d);
+            } else if (d.type !== 'revisit') {
+                currentSource = d;
+            } else {
+                // If the action type is 'revisit', remove it so that it's only shown once.
+                // Also, if there're any embedded actions after that, set their parent to the item it's revisited.
+                for (var j = 0; j < i; j++) { // The revisited item is the first one having the same url
+                    if (allNodes[j].url === d.url) {
+                        currentSource = allNodes[j];
+                        if (currentSource.parent) currentSource = currentSource.parent;
+                        break;
+                    }
                 }
             }
         });
 
-        // - Ignore child nodes
-        data.nodes = allNodes.filter(n => !n.parent);
+        // - Ignore child and revisit nodes
+        data.nodes = allNodes.filter(n => !n.parent && n.type !== 'revisit');
 
         // Specific for test data: add two semantic links
         if (name === 'p1') {
@@ -228,52 +253,11 @@ $(function() {
         data.nodes.forEach(n => { n.closed = true; });
         chrome.tabs.query({}, tabs => {
             tabs.forEach(t => {
-                var n = allNodes.find(n => n.url === t.url);
-                if (n) {
-                    n.closed = false;
-                    if (n.parent) n.parent.closed = false;
-                }
+                var n = data.nodes.find(n => removeHash(n.url) === removeHash(t.url));
+                if (n) n.closed = false;
             });
 
             redraw();
-        });
-
-        if (!noRedraw) redraw(true);
-    }
-
-    function createContextMenus() {
-        chrome.contextMenus.removeAll();
-
-        // To highlight selected text
-        chrome.contextMenus.create( {
-            id: "sm-highlight",
-            title: "Highlight",
-            contexts: ["selection"]
-        });
-
-        chrome.contextMenus.onClicked.addListener(function(info, tab) {
-            switch (info.menuItemId) {
-                case "sm-highlight": highlightSelection(tab); break;
-            }
-        });
-    }
-
-    function highlightSelection(tab) {
-        chrome.tabs.sendMessage(tab.id, { type: "highlightSelection" }, function(d) {
-            var time = new Date();
-            var item = {
-                id: +time,
-                time: time,
-                url: tab.url,
-                favIconUrl: tab.favIconUrl,
-                text: d.text,
-                type: 'highlight',
-                path: d.path,
-                classId: d.classId,
-                from: tabIdToDataItemLookup[tab.id].id
-            };
-            allNodes.push(item);
-            buildHierarchy(allNodes);
         });
     }
 
@@ -297,24 +281,51 @@ $(function() {
                     }
                 }
             } else { // Data change, redraw group
-                var itemIndex;
-                if (request.type === "noted") {
-                    itemIndex = getItemIndex(tab.url, "classId", request.data.classId);
-                    var item = allNodes[itemIndex];
-                    item.text = request.data.text;
-                    item.type = 'note';
-                } else if (request.type === "highlightRemoved") {
-                    itemIndex = getItemIndex(tab.url, "classId", request.classId);
-                    allNodes.splice(itemIndex, 1);
-                }
+                if (request.type === "highlighted" || request.type === "noted") {
+                    var item, itemIndex;
+                    if (request.type === "highlighted") {
+                        item = createNewItem(tab);
+                        item.path = request.data.path;
+                        item.type = "highlight";
+                    } else {
+                        // New item option
+                        itemIndex = getItemIndex(tab.url, "classId", request.data.classId);
+                        item = createNewItem(tab);
+                        item.path = allNodes[itemIndex].path;
+                        item.type = "note";
 
-                buildHierarchy(allNodes);
+                        // New item or replace?
+                        // itemIndex = getItemIndex(tab.url, "classId", request.data.classId);
+                        // item = allNodes[itemIndex];
+                        // item.type = "note";
+                    }
+
+                    item.classId = request.data.classId;
+                    item.text = request.data.text;
+
+                    buildHierarchy(allNodes);
+                    redraw(true);
+                } else if (request.type === "highlightRemoved") {
+                    var itemIndex = getItemIndex(tab.url, "classId", request.classId);
+                    var item = allNodes[itemIndex];
+                    allNodes.splice(itemIndex, 1);
+                    addChange({ id: +new Date(), action: item.type === "highlight" ? "remove-highlight" : "remove-note", index: itemIndex }, false);
+                    redraw(true);
+                }
             }
         });
     }
 
     function isBrowsingType(type) {
         return followByBrowseActions.indexOf(type) !== -1;
+    }
+
+    function createNewItem(tab) {
+        var item = { time: new Date(), url: tab.url, text: tab.title, favIconUrl: tab.favIconUrl };
+        item.id = +item.time;
+        allNodes.push(item);
+
+        return item;
     }
 
     function getItemIndex(value1, name2, value2) {
@@ -327,21 +338,19 @@ $(function() {
         return -1;
     }
 
-    function removeHash(_url, forced) {
+    function removeHash(_url) {
         // Remove hash as it's an anchor. A page can have many anchors, thus different url, but still one page.
         // However, removing is not correct in this case:
         // https://www.google.co.uk/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=other%20search%20engines
         // Solution: store all full urls and compare each of them with the address. Not have time to do it now.
-        if (forced) {
-            var url;
-            try {
-                url = new URL(_url);
-            } finally {
-                return url ? url.origin + url.pathname : _url;
-            }
-        } else {
-            return _url;
-        }
+        // var url;
+        // try {
+        //     url = new URL(_url);
+        // } finally {
+        //     return url ? url.origin + url.pathname : _url;
+        // }
+
+        return _url;
     }
 
     function isTabIgnored(tab) {
@@ -358,22 +367,16 @@ $(function() {
                 var tab = tabs[0];
         		if (tab.status !== "complete" || isTabIgnored(tab)) return;
 
-                allNodes.forEach(n => {
-                    n.highlighted = n.url === tab.url;
-                    if (n.highlighted && n.parent) n.parent.highlighted = true;
-                });
-
-                addFirstTimeVisitPage(tab);
-                redraw();
+                addItemRoot(tab);
             });
         });
     }
 
     function respondToTabClosed() {
         chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
-            var n = tabIdToDataItemLookup[tabId];
-            if (n) {
-                n.closed = true;
+            var itemIndex = getItemIndex(tabIdToDataItemLookup[tabId]);
+            if (itemIndex !== -1) {
+                allNodes[itemIndex].closed = true;
                 redraw();
             }
         });
@@ -461,18 +464,13 @@ $(function() {
     }
 
     function addFirstTimeVisitPage(tab) {
-        if (visitedPages[removeHash(tab.url)]) return;
-
-        visitedPages[removeHash(tab.url)] = 1;
-
         var searchAction = getSearchAction(tab);
         var type = searchAction ? searchAction.type : tabRelationshipTypes[tab.url + "-" + tab.id];
         type = type || 'unknown';
 
         if (type === 'link') {
             chrome.tabs.sendMessage(tab.id, { type: "askReferrer" }, function(response) {
-                // referrer only return the path, excluding the hash. So just guess the latest one could be the most likely one.
-                var referral = allNodes.slice().reverse().find(n => n.url.startsWith(response) && !embeddedTypes.includes(n.type));
+                var referral = allNodes.slice().reverse().find(n => n.url.startsWith(response));
                 addItem(tab, type, referral);
             });
         } else {
@@ -483,6 +481,11 @@ $(function() {
     function addItem(tab, type, referral) {
         if (!listening) return;
 
+        // Less than 1s, it must be some redirect, don't add it?
+        // console.log(new Date() - lastAddItemTime);
+        // if (lastAddItemTime && (new Date() - lastAddItemTime < 2000)) return;
+
+        console.log(checkSearchRedirect(tab))
         if (!checkSearchRedirect(tab)) return;
 
         var searchAction = getSearchAction(tab);
@@ -495,15 +498,16 @@ $(function() {
 
         if (searchAction && searchAction.label === "___one end empty___") return;
 
-        var item = merged ? lastActiveItem : { time: new Date(), url: tab.url, text: searchAction ? searchAction.label : tab.title, type: type, favIconUrl: tab.favIconUrl, highlighted: true };
+        var item = merged ? lastActiveItem : { time: new Date(), url: tab.url, text: searchAction ? searchAction.label : tab.title, type: type, favIconUrl: tab.favIconUrl };
+        lastAddItemTime = item.time;
         if (!merged) item.id = +item.time;
         if (isBrowsingType(type)) item.endTime = new Date(+item.time + 1000);
 
         // Check if the current item having the same url but the params are different with the previous one.
         // If yes, a heuristic that the current item is from the same page with different params. Classify it as a filtering.
         if (lastActiveItem) {
-            var currentUrl = removeHash(tab.url, true);
-            var prevUrl = removeHash(lastActiveItem.url, true);
+            var currentUrl = removeHash(tab.url);
+            var prevUrl = removeHash(lastActiveItem.url);
             if (currentUrl === prevUrl) {
                 var filters = [];
                 var url = new URL(tab.url);
@@ -548,8 +552,6 @@ $(function() {
                 if (filters.length) {
                     item.type = 'filter';
                     item.text = filters.join('; ');
-                    item.from = (lastActiveItem.from ? allNodes.find(n => n.id === lastActiveItem.from) : lastActiveItem).id;
-                    delete item.endTime;
                 }
             }
         }
@@ -559,29 +561,22 @@ $(function() {
         if (!merged) {
             allNodes.push(item);
             if (referral) item.from = referral.id;
-
-            // Record to use later in finding url of closing page
-            tabIdToDataItemLookup[tab.id] = item;
         }
 
         buildHierarchy(allNodes);
+
+        redraw(true);
     }
 
     function respondToTabUpdated() {
+        // When tab is already activated
         chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
             if (!listening) return;
 
             if (tab.status !== "complete" || isTabIgnored(tab)) return;
 
-            if (changeInfo && changeInfo.favIconUrl) {
-                console.log('add favIconUrl');
-                var item = tabIdToDataItemLookup[tabId];
-                if (item) {
-                    item.favIconUrl = changeInfo.favIconUrl;
-                    redraw();
-                    return;
-                }
-            }
+            // Page can be reloaded when faviconurl is changed from content script. Detect and ignore it.
+            if (changeInfo && _.size(changeInfo) === 1 && changeInfo.favIconUrl) return;
 
             // Record how to open this page. It doesn't need to be active.
             chrome.history.getVisits({ url: tab.url }, function(results) {
@@ -600,25 +595,33 @@ $(function() {
                     tabRelationshipTypes[tab.url + "-" + tab.id] = "link";
                 }
 
-                if (tab.active) {
-                    // The new tab will be highlighted
-                    allNodes.forEach(n => { n.highlighted = false; });
-
-                    // Get the tab again to get the favIconUrl
-                    chrome.tabs.query({ active: true }, tabs => {
-                        if (tabs.length) addFirstTimeVisitPage(tabs[0]);
-                    });
-                }
+                if (tab.active) addItemRoot(tab);
             });
+
+            // Record to use later in finding url of closing page
+            tabIdToDataItemLookup[tabId] = tab.url;
         });
+    }
+
+    function addItemRoot(tab) {
+        // When a tab is activated, add a new item
+        //  if the page has been opened before, set it as 'revisit'
+        //  if not, set the page relationship as how it's opened (tabRelationshipTypes)
+
+        if (visitedPages[removeHash(tab.url)]) {
+            addItem(tab, "revisit");
+        } else {
+            addFirstTimeVisitPage(tab);
+            visitedPages[removeHash(tab.url)] = 1;
+        }
     }
 
     function buildVis() {
         sensedag = sm.vis.sensedag()
             .label(d => d.text)
             .icon(d => d.favIconUrl)
-            // .on("itemHovered", onItemHovered)
-            // .on("itemUnhovered", onItemUnhovered)
+            .on("itemHovered", onItemHovered)
+            .on("itemUnhovered", onItemUnhovered)
             .on("itemClicked", jumpTo);
 
         // Register to update vis when the window is resized
@@ -651,7 +654,7 @@ $(function() {
             var date = timeFormat(new Date());
             var saveData = allNodes.map(cleanData);
             $(this).attr("download", date + "_provenance.json")
-                .attr("href", URL.createObjectURL(new Blob([JSON.stringify(saveData, null, 4)])));
+                .attr("href", URL.createObjectURL(new Blob([JSON.stringify(saveData)])));
         });
 
         $("#btnLoad").change(function(e) {
@@ -682,6 +685,7 @@ $(function() {
         var count = 1,
             intervalId = setInterval(() => {
                 buildHierarchy(allNodes.slice(0, count));
+                redraw(true);
                 count++;
 
                 if (count > allNodes.length) {
@@ -794,6 +798,34 @@ $(function() {
                 this.scrollLeft -= e.clientX - prevX;
                 prevX = e.clientX;
                 e.preventDefault();
+            }
+        });
+    }
+
+    function syncWithTabs() {
+        chrome.tabs.onActivated.addListener(function(activeInfo) {
+            chrome.tabs.query({ lastFocusedWindow: true, active: true }, function(details) {
+                if (!details.length) return;
+
+                var tab = details[0];
+                allNodes.forEach(n => {
+                    n.highlighted = removeHash(n.url) === removeHash(tab.url);
+                    console.log(n.highlighted);
+                });
+
+                redraw();
+            });
+        });
+
+        chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+            if (!listening) return;
+
+            if (tab.status !== "complete" || isTabIgnored(tab)) return;
+
+            if (tab.active) {
+                allNodes.forEach(n => {
+                    n.highlighted = n.url === tab.url;
+                });
             }
         });
     }

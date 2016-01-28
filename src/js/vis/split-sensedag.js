@@ -20,7 +20,7 @@ sm.vis.sensedag = function() {
         maxZoomLevel = 2,
         minZoomLevel = 0.2,
         zoomStep = 0.1,
-        panExtent = [ 0, 1, 0, 1 ],
+        panExtent = [ 0, 1 ],
         defaultMaxWidth = 150,
         temporalGap = 15, // a gap between 2 nodes to indicate that the later starts after the former
         rowGap = 10, // vertical gap between 2 rows
@@ -46,7 +46,7 @@ sm.vis.sensedag = function() {
     var colorScale = d3.scale.category10()
             .domain([ 'search', 'location', 'dir', 'highlight', 'note', 'filter' ])
             .range([ '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#e377c2' ]),
-        searchTypes = [ 'search', 'location', 'dir' ],
+        relTypes = [ 'link', 'revisit', 'bookmark', 'type' ],
         iconClassLookup = { search: 'fa-search', location: 'fa-globe', dir: 'fa-street-view', highlight: 'fa-paint-brush',
             note: 'fa-file-text-o', filter: 'fa-filter'
         };
@@ -60,10 +60,8 @@ sm.vis.sensedag = function() {
     };
     var drag = d3.behavior.drag()
         .on('dragstart', function(d) {
-            if (d3.event.sourceEvent.which === 1) dragging = true;
+            dragging = true;
         }).on('drag', function(d) {
-            if (!dragging) return;
-
             if (connecting) {
                 // Draw a link from the node center to the current mouse position
                 cursorLink.classed('hide', false);
@@ -82,8 +80,6 @@ sm.vis.sensedag = function() {
                     }
                 });
             } else {
-                this.moveToFront();
-
                 // Update position of the dragging node
                 updateDragPosition(d);
                 d3.select(this).attr('transform', 'translate(' + Math.round(d.x) + ',' + Math.round(d.y) + ')');
@@ -128,7 +124,7 @@ sm.vis.sensedag = function() {
         linkKey = d => key(d.source) + '-' + key(d.target);
 
     // Others
-    var dispatch = d3.dispatch('itemHovered', 'itemUnhovered', 'itemClicked');
+    var dispatch = d3.dispatch('itemClicked');
 
     /**
      * Main entry of the module.
@@ -159,12 +155,12 @@ sm.vis.sensedag = function() {
 
         var links = linkContainer.selectAll('.link').data(data.links, linkKey);
         links.enter().call(enterLinks);
-        links.exit().transition().style("opacity", 0).remove();
+        links.exit().remove();
 
         var nodes = nodeContainer.selectAll('.node-container').data(data.nodes, key);
         nodes.enter().call(enterNodes);
         nodes.call(updateNodes);
-        nodes.exit().transition().style("opacity", 0).remove();
+        nodes.exit().remove();
 
         // Layout DAG
         computeLayout(function() {
@@ -181,7 +177,7 @@ sm.vis.sensedag = function() {
             update();
         });
 
-        sm.addPan(container, panExtent);
+        sm.addHorizontalPan(container, panExtent);
     }
 
     function computeLayout(callback) {
@@ -197,7 +193,6 @@ sm.vis.sensedag = function() {
 
             var g = layout.vertices(data.nodes).edges(data.links).compute();
             panExtent[1] = Math.max(0, g.width - width + margin.left + margin.right);
-            panExtent[3] = Math.max(0, g.height - height + margin.top + margin.bottom);
 
             callback();
         });
@@ -216,12 +211,11 @@ sm.vis.sensedag = function() {
         container.call(drag);
 
         var div = container.append('xhtml:div').attr('class', 'node')
+            .attr('title', label)
             .on('click', function(d) {
                 if (d3.event.defaultPrevented) return;
                 dispatch.itemClicked(d);
-            }).on('mouseenter', dispatch.itemHovered)
-            .on('mouseleave', dispatch.itemUnhovered)
-            .on('mousemove', function() {
+            }).on('mousemove', function(d) {
                 // Don't revaluate status when the node is being dragged
                 if (dragging) return;
 
@@ -234,18 +228,12 @@ sm.vis.sensedag = function() {
                 d3.select(this).classed('move', !connecting);
             });
 
-        var parent = div.append('xhtml:div').attr('class', 'parent')
-            .attr('title', label);
-
         // Icon
-        parent.append('xhtml:img').attr('class', 'node-icon');
-        parent.append('xhtml:div').attr('class', 'node-icon fa fa-fw');
+        div.append('xhtml:img').attr('class', 'node-icon');
+        div.append('xhtml:div').attr('class', 'node-icon fa');
 
         // Text
-        parent.append('xhtml:div').attr('class', 'node-label');
-
-        // Children
-        div.append('xhtml:div').attr('class', 'children');
+        div.append('xhtml:div').attr('class', 'node-label');
     }
 
     /**
@@ -253,61 +241,22 @@ sm.vis.sensedag = function() {
      */
     function updateNodes(selection) {
         selection.each(function(d) {
-            var container = d3.select(this).select('.parent');
+            var container = d3.select(this).select('.node');
 
             // Content type: normal finding or candidate
             container.classed('candidate', candidate(d));
 
-            var typeVisible = searchTypes.includes(type(d));
-            container.select('img.node-icon').attr('src', icon)
-                .classed('hide', typeVisible);
-            container.select('div.node-icon')
-                .classed('hide', !typeVisible)
-                .classed(iconClassLookup[type(d)], true)
+            // Icon: only either favicon or action type is visible
+            // If action type is relationship (link, type), show favIcon is more meaningful
+            var imgVisible = !type(d) || relTypes.includes(type(d));
+            container.select('img.node-icon').attr('src', icon).classed('hide', !imgVisible);
+            container.select('div.node-icon').classed(iconClassLookup[type(d)], true).classed('hide', imgVisible)
                 .style('background-color', colorScale(type(d)));
-
-            // Status
-            d3.select(this).classed('closed', d.closed);
-            d3.select(this).select('.node').classed('highlighted', d.highlighted);
 
             // Text
             container.select('.node-label').text(label)
                 .style('max-width', defaultMaxWidth * zoomLevel + 'px');
-
-            if (d.children) updateChildren(d3.select(this).select('.children'), d);
-            container.classed('has-children', d.children);
-            d3.select(this).select('.children').classed('hide', !d.children);
         });
-    }
-
-    function updateChildren(container, d) {
-        // Enter
-        var subItems = container.selectAll(".sub-node").data(d.children, key);
-        var enterItems = subItems.enter().append("div").attr("class", "sub-node")
-            .attr('title', label)
-            .on('click', function(d) {
-                dispatch.itemClicked(d);
-                d3.event.stopPropagation();
-            });
-
-        // - Icon
-        enterItems.append('xhtml:div').attr('class', 'node-icon fa fa-fw');
-
-        // - Text
-        enterItems.append('xhtml:div').attr('class', 'node-label');
-
-        // Update
-        subItems.each(function(d2) {
-            d3.select(this).select('.node-icon')
-                .classed(iconClassLookup.note + ' ' + iconClassLookup.highlight, false)  // reset first
-                .classed(iconClassLookup[type(d2)], true)
-                .style('background-color', colorScale(type(d2)));
-        });
-        subItems.select(".node-label").text(label)
-            .style('max-width', (defaultMaxWidth - 10) * zoomLevel + 'px');
-
-        // Exit
-        subItems.exit().transition().style("opacity", 0).remove();
     }
 
     /**

@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="SenseMap supports online sensemaking.">
         <meta name="author" content="phongvis - Phong Nguyen">
-        <title>SenseMap - Timeline View</title>
+        <title>SenseMap</title>
 
         <link rel="icon" href="../../logo/logo16.png">
 		<link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap-sm.min.css">
@@ -19,10 +19,11 @@
                 overflow: hidden;
             }
 
-            .sm-sensemap-container, .sm-provenance-container {
+            .sm-sensemap-container {
                 overflow: hidden;
                 position: relative;
-                margin: 2px;
+                width: 100%;
+                height: 100%;
             }
 
             #loadToolbar .btn {
@@ -40,7 +41,6 @@
 
     <body>
         <svg class="sm-sensemap-container"></svg>
-        <div class="sm-provenance-container"></div>
         <div class='hide'>
             <a id="btnSave"></a>
             <input id="btnLoad" type="file">
@@ -50,14 +50,13 @@
         <script src="../bower_components/jquery-ui.min.js"></script>
         <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
         <script src="../bower_components/lodash/lodash.min.js"></script>
-        <script src="../bower_components/d3/d3.min.js"></script>
+        <script src="../bower_components/d3/d3.js"></script>
         <script src="../bower_components/dagre.js"></script>
 
         <script src="../js/core.js"></script>
         <script src="../js/misc/sugar.js"></script>
         <script src="../js/misc/widgets.js"></script>
         <script src="../js/layout/dag.js"></script>
-        <script src="../js/vis/sensepath2.js"></script>
         <script src="../js/vis/sensedag.js"></script>
         <script src="index.js"></script>
     </body>

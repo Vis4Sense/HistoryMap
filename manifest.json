@@ -7,17 +7,13 @@
 
     "browser_action": {
         "default_icon": {
-            "19": "logo/logo19.png",
-            "38": "logo/logo38.png"
+            "19": "logo/sm-logo-19.png"
         },
         "default_title": "Open SenseMap"
     },
 
     "icons": {
-      "16": "logo/logo16.png",
-      "24": "logo/logo24.png",
-      "48": "logo/logo48.png",
-      "128": "logo/logo128.png"
+      "128": "logo/sm-logo-128.png"
    },
 
     "background": {
@@ -38,7 +34,7 @@
         "storage",
         "history",
         "tabs",
-        "desktopCapture"
+        "contextMenus"
     ],
 
     "options_ui": {

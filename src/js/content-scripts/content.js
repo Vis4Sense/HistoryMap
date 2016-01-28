@@ -2,41 +2,16 @@ $(function() {
     // Only run when the background page opened
     chrome.runtime.sendMessage({ type: "backgroundOpened" }, function(response) {
         if (response) {
-            augmentSelections();
-            loadHighlights();
-            respondSubItemClicked();
+            setTimeout(loadHighlights, 1000);
             completePendingTask();
-            respondHighlightRemoved();
+            respondExtension();
 
             console.log("SensePath: content script loaded");
         }
     });
 });
 
-/**
- * Adds highlight/take notes for selection.
- */
-function augmentSelections() {
-    // Always highlight without displaying option
-    $("body").mouseup(function(e) {
-        var activeElement = document.activeElement;
-        var tagName = activeElement.tagName.toLowerCase();
-        if (tagName === "textarea") return;
-        if (tagName === "input" && activeElement.getAttribute("type") === "text") return;
-
-        var selection = getSelection();
-        if (!selection || selection.type !== "Range") return;
-
-        var classId = "sm-" + (+new Date());
-        var h = $.highlight(selection, classId);
-        h.classId = classId;
-        selection.empty();
-
-        // Tell the extension
-        chrome.runtime.sendMessage({ type: "highlighted", data: h });
-        chrome.runtime.sendMessage({ type: "clipboardCopied", data: h.text });
-    });
-}
+var intervalId; // for alerting tab
 
 /**
  * Loads existing highlights to the page.
@@ -56,15 +31,69 @@ function loadHighlights() {
     });
 }
 
-/**
- * Will scroll to the sub-item.
- */
-function respondSubItemClicked() {
+function respondExtension() {
     chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         if (request.type === "scrollToElement") {
             scrollTo(request);
+        } else if (request.type === "removeHighlight") {
+            // Remove highlight by replacing 'mark' node with 'text' node
+            $("." + request.classId).each(function() {
+                // 'Remove' appended to the end of the node because button is added into markNode. Get only text node.
+                var texts = $(this).contents().filter(function() { return this.nodeType === 3; });
+                if (texts.length) {
+                    this.parentNode.insertBefore(document.createTextNode(texts[0].textContent), this);
+                    this.parentNode.removeChild(this);
+                }
+
+                // One of them can be the note icon
+                if ($(this).hasClass("sm-note-icon")) {
+                    $(this).remove();
+                }
+            });
+        } else if (request.type === 'alertTab') {
+            var count = 11;
+
+            intervalId = setInterval(function() {
+                var favIconUrl = count % 2 ? chrome.extension.getURL("src/css/dummy-icon.png") : request.icon;
+                var title = count % 2 ? '' : request.title;
+                setIcon(favIconUrl, title);
+
+                if (!count) clearInterval(intervalId);
+
+                count--;
+            }, 250);
+        } else if (request.type === 'stopAlertTab') {
+            clearInterval(intervalId);
+            setIcon(request.icon, request.title);
+        } else if (request.type === 'askReferrer') {
+            sendResponse(document.referrer);
+        } else if (request.type === 'highlightSelection') {
+            highlightSelection(sendResponse);
         }
     });
+}
+
+function highlightSelection(sendResponse) {
+    var selection = getSelection();
+    if (!selection || selection.type !== "Range") return;
+    sendResponse($.highlight(selection));
+    selection.empty();
+}
+
+function setIcon(favIconUrl, title) {
+    var link = document.querySelector('link[rel=icon]') || document.querySelector("link[rel='shortcut icon']");
+
+    if (link) {
+        link.href = favIconUrl;
+    } else {
+        link = document.createElement('link');
+        link.type = 'image/png';
+        link.rel = 'shortcut icon';
+        link.href = favIconUrl;
+        document.getElementsByTagName('head')[0].appendChild(link);
+    }
+
+    document.title = title || '.';
 }
 
 function scrollTo(request) {
@@ -101,27 +130,6 @@ function completePendingTask() {
     chrome.runtime.sendMessage({ type: "taskRequested" }, function(response) {
         if (response) {
             scrollTo(response);
-        }
-    });
-}
-
-function respondHighlightRemoved() {
-    chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-        if (request.type === "removeHighlight") {
-            // Remove highlight by replacing 'mark' node with 'text' node
-            $("." + request.classId).each(function() {
-                // 'Remove' appended to the end of the node because button is added into markNode. Get only text node.
-                var texts = $(this).contents().filter(function() { return this.nodeType === 3; });
-                if (texts.length) {
-                    this.parentNode.insertBefore(document.createTextNode(texts[0].textContent), this);
-                    this.parentNode.removeChild(this);
-                }
-
-                // One of them can be the note icon
-                if ($(this).hasClass("sm-note-icon")) {
-                    $(this).remove();
-                }
-            });
         }
     });
 }

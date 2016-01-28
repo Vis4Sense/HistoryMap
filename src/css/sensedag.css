@@ -1,24 +1,16 @@
+.sm-sensedag .node-container.closed {
+	/*opacity: 0.5;*/
+}
+
 .sm-sensedag .node {
 	display: inline-block;
 	border-radius: 6px;
-    padding: 3px;
     box-shadow: 0 0 8px #777;
+    background-color: white;
 }
 
-.sm-sensedag .node:hover {
-    transition: box-shadow .25s ease-in-out;
-}
-
-.sm-sensedag .node.hovered {
-    box-shadow: 0 0 8px cyan;
-}
-
-.sm-sensedag .node.move:hover {
-    box-shadow: 0 0 8px green;
-}
-
-.sm-sensedag .node.connect:hover {
-    box-shadow: 0 0 8px red;
+.sm-sensedag .closed .node {
+	border: 1px solid gray;
 }
 
 .sm-sensedag .node.move {
@@ -29,6 +21,25 @@
 	cursor: e-resize;
 }
 
+.sm-sensedag .node:hover {
+    transition: box-shadow .25s ease-in-out;
+}
+
+.sm-sensedag .closed .node:hover {
+    box-shadow: none !important;
+    border-color: magenta;
+}
+
+.sm-sensedag .node.hovered {
+    box-shadow: 0 0 8px cyan;
+}
+
+.sm-sensedag .node.move:hover,
+.sm-sensedag .node.connect:hover,
+.sm-sensedag .node.highlighted {
+    box-shadow: 0 0 8px magenta;
+}
+
 .sm-sensedag .node.candidate {
 	background-color: #777;
 	color: white;
@@ -37,6 +48,10 @@
 	border: none;
 	padding: 0 4px;
 	border-radius: 0;
+}
+
+.sm-sensedag .node-label:hover {
+	color: magenta;
 }
 
 .sm-sensedag .link path {
@@ -50,7 +65,7 @@
 	max-width: 22px;
 	max-height: 22px;
 	display: inline-block;
-	margin-right: 2px;
+	margin: 0 3px 0 2px;
 }
 
 .sm-sensedag .candidate .node-icon {
@@ -67,7 +82,8 @@
 	color: white;
 	padding: 3px;
 	border-radius: 4px;
-	border: 1px solid black;
+	width: 1.4em;
+	margin: 1px 3px 1px 0;
 }
 
 .sm-sensedag .node-label {
@@ -82,4 +98,18 @@
 	stroke-width: 2;
     stroke: red;
     shape-rendering: auto;box-shadow: 0 0 8px green;
+}
+
+.sm-sensedag .parent {
+	padding: 3px;
+}
+
+.sm-sensedag .parent.has-children {
+	font-weight: bold;
+	border-bottom: 1px solid gray;
+}
+
+.sm-sensedag .children {
+	padding: 3px;
+	padding-left: 13px;
 }

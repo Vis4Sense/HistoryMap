@@ -85,6 +85,61 @@ sm.addHorizontalPan = function(container, extent) {
 };
 
 /**
+ * Adds key arrow to pan to the given SVG node.
+ * Adds Shift + mouse move to pan.
+ */
+sm.addPan = function(container, extent) {
+    var pan = function(offsetX, offsetY) {
+        var t = d3.transform(container.attr("transform"));
+        t.translate[0] = Math.max(-extent[1], Math.min(extent[0], t.translate[0] + offsetX));
+        t.translate[1] = Math.max(-extent[3], Math.min(extent[2], t.translate[1] + offsetY));
+        container.attr("transform", "translate(" + t.translate + ")");
+    };
+
+    // Key
+    document.addEventListener("keydown", function(e) {
+        var offsetX = e.keyCode === 37 ? 120 : e.keyCode === 39 ? -120 : 0;
+        var offsetY = e.keyCode === 38 ? 120 : e.keyCode === 40 ? -120 : 0;
+        pan(offsetX, offsetY);
+    });
+
+    // Add invisible rectangle covering the entire space to listen to mouse event.
+    // Otherwise, only zoom when mouse-overing visible items.
+    var readyToPan = false,
+        prevX, prevY,
+        parent = d3.select(container.node().parentNode);
+    var rect = parent.insert("rect", ":first-child")
+        .attr("width", "100%")
+        .attr("height", "100%")
+        .style("fill", "none")
+        .style("pointer-events", "all");
+
+    // Only pan when dragging left-button mouse and holding Shift, or dragging on a void space
+    parent.on("mousedown", function() {
+        if (d3.event.which === 1 && (d3.event.shiftKey || d3.event.target === rect.node())) {
+            readyToPan = true;
+            prevX = d3.event.clientX;
+            prevY = d3.event.clientY;
+        }
+    }).on("mouseup", function() {
+        readyToPan = false;
+    }).on("mouseout", function() {
+        readyToPan = false;
+    }).on("mousemove", function() {
+        if (readyToPan) {
+            if (Math.abs(d3.event.clientX - prevX) > Math.abs(d3.event.clientY - prevY)) {
+                pan(d3.event.clientX - prevX, 0);
+            } else {
+                pan(0, d3.event.clientY - prevY);
+            }
+            prevX = d3.event.clientX;
+            prevY = d3.event.clientY;
+            d3.event.preventDefault();
+        }
+    });
+};
+
+/**
  * Adds an arrow-head marker defs to the given SVG node.
  */
 sm.createArrowHeadMarker = function(parent, id, fillColor) {
@@ -115,6 +170,7 @@ sm.checkImagesLoaded = function(nodes, callback) {
         });
 
         if (loaded) {
+            // TODO: it runs twice now!
             // Stop checking
             clearInterval(id);
             callback();

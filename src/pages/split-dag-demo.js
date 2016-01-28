@@ -67,7 +67,8 @@ $(function() {
     // Run first time to build the vis
     if (dataPath) {
         d3.json(dataPath, function(_data) {
-            var allNodes = _data.data.map(function(d) {
+            // Nodes
+            data.nodes = _data.data.map(function(d) {
                 return {
                     id: d.id,
                     label: d.text,
@@ -79,7 +80,81 @@ $(function() {
                 };
             });
 
-            buildHierarchy(allNodes);
+            // Links
+            var embeddedTypes = [ "highlight", "note", "filter" ];
+            var currentSource = data.nodes[0];
+            var addChild = function(p, c) {
+                if (!p.children) p.children = [];
+                p.children.push(c);
+            };
+
+            // - Build parent-child relationship first
+            var willRemoveIndices = [];
+            data.nodes.forEach(function(d, i) {
+                if (!i) return;
+
+                // Add page linking as a type of link
+                if (d.type === 'link') {
+                    // If empty link ('from' is undefined), use the previous item as the parent
+                    addChild(d.from ? (data.nodes.find(d2 => d2.id === d.from) || currentSource) : currentSource, d);
+                }
+
+                // If the action type of an item is embedded, add it as a child of the containing page
+                if (embeddedTypes.includes(d.type)) {
+                    addChild(currentSource, d);
+                } else {
+                    currentSource = d;
+                }
+
+                // If the action type is 'revisit', remove it so that it's only shown once.
+                // Also, if there're any embedded actions after that, set their parent to the item it's revisited.
+                if (d.type === 'revisit') {
+                    for (var j = 0; j < i; j++) { // The revisited item is the first one having the same url
+                        if (data.nodes[j].url === d.url) {
+                            willRemoveIndices.push(i);
+                            currentSource = data.nodes[j];
+                            break;
+                        }
+                    }
+                }
+            });
+
+            // - Remove revisited items
+            willRemoveIndices.reverse().forEach(function(i) {
+                data.nodes.splice(i, 1);
+            });
+
+            // - This data yields overlap
+            // data.nodes.splice(0, 4);
+            // data.nodes.splice(3, 1);
+            // data.nodes.splice(5, 1);
+            // data.nodes.splice(6, 1);
+            // data.nodes.splice(9);
+
+            // this has 3 classes
+            // data.nodes.splice(13);
+
+            // data.nodes.splice(0, 4);
+            // data.nodes.splice(3, 1);
+            // data.nodes.splice(5, 1);
+            // data.nodes.splice(16);
+
+            data.nodes.splice(33);
+
+            // data.nodes.forEach((n, i) => {
+            //     console.log(i + '\t' + n.label);
+            // });
+
+            // - Then add to the link list
+            data.links = [];
+            data.nodes.forEach(function(d) {
+                if (d.children) {
+                    d.children.forEach(function(c) {
+                        if (data.nodes.includes(c)) data.links.push({ source: d, target: c });
+                    });
+                }
+            });
+
             updateVis();
         });
     } else {
@@ -105,77 +180,5 @@ $(function() {
 
     function redraw() {
         d3.select(".sm-dag-demo").datum(data).call(dag);
-    }
-
-    function addLink(p, c) {
-        if (!p.links) p.links = [];
-        p.links.push(c);
-    };
-
-    function addChild(p, c) {
-        if (!p.children) p.children = [];
-        p.children.push(c);
-        c.parent = p;
-    };
-
-    // Convert flat list of nodes to parent-children network
-    function buildHierarchy(allNodes) {
-        // Init
-        allNodes.forEach(n => {
-            delete n.parent;
-            delete n.children;
-            delete n.links;
-        });
-
-        var embeddedTypes = [ "highlight", "note", "filter" ];
-        var currentSource = allNodes[0];
-
-        // - Build parent-child relationship first
-        allNodes.forEach(function(d, i) {
-            if (!i) return;
-
-            // Add page linking as a type of link
-            if (d.type === 'link') {
-                addLink(allNodes.find(d2 => d2.id === d.from) || currentSource, d);
-            }
-
-            // If the action type of an item is embedded, add it as a child of the containing page
-            if (embeddedTypes.includes(d.type)) {
-                addChild(currentSource, d);
-            } else if (d.type !== 'revisit') {
-                currentSource = d;
-            } else {
-                // If the action type is 'revisit', remove it so that it's only shown once.
-                // Also, if there're any embedded actions after that, set their parent to the item it's revisited.
-                for (var j = 0; j < i; j++) { // The revisited item is the first one having the same url
-                    if (allNodes[j].url === d.url) {
-                        currentSource = allNodes[j];
-                        if (currentSource.parent) currentSource = currentSource.parent;
-                        break;
-                    }
-                }
-            }
-        });
-
-        // - Ignore child and revisit nodes
-        data.nodes = allNodes.filter(n => !n.parent && n.type !== 'revisit');
-
-        // - Two semantic links
-        var tv = data.nodes.find(n => n.label.startsWith('trivago.es'));
-        var ri = data.nodes.find(n => n.label.startsWith('the river inn hotel'));
-        var gh = data.nodes.find(n => n.label.startsWith('Grand Hyatt Washington washington dc'));
-
-        if (tv && ri) addLink(tv, ri);
-        if (tv && gh) addLink(tv, gh);
-
-        // - Then add to the link list
-        data.links = [];
-        data.nodes.forEach(function(d) {
-            if (d.links) {
-                d.links.forEach(function(c) {
-                    if (data.nodes.includes(c)) data.links.push({ source: d, target: c });
-                });
-            }
-        });
     }
 });

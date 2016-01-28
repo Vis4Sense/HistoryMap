@@ -229,7 +229,7 @@ sm.vis.sensepath = function() {
 
         // Always reset. Need it in live capture mode
         data.forEach(function(d) {
-            delete d.children;
+            delete d._children;
             d.orphanRevisit = false;
         });
 
@@ -243,7 +243,7 @@ sm.vis.sensepath = function() {
                         for (var j = i - 1; j >= 0; j--) {
                             if (!data[j].excluded && url(data[j]) === url(d)) {
                                 // If the node is not separate, use its parent
-                                var n = data[j].parent || data[j];
+                                var n = data[j]._parent || data[j];
                                 n.next = d;
                                 d.prev = n;
                                 startGroup = false;
@@ -259,11 +259,11 @@ sm.vis.sensepath = function() {
                         d.orphanRevisit = true; // To make sure that it's always included as a nonembedded item eventhough it's a revisit
                     }
                     parentItem = d;
-                    parentItem.children = null;
+                    parentItem._children = null;
                 } else {
-                    if (!parentItem.children) parentItem.children = [];
-                    parentItem.children.push(d);
-                    d.parent = parentItem;
+                    if (!parentItem._children) parentItem._children = [];
+                    parentItem._children.push(d);
+                    d._parent = parentItem;
                 }
             } else {
                 if (isSeparate(d)) {
@@ -273,7 +273,7 @@ sm.vis.sensepath = function() {
                         for (var j = i - 1; j >= 0; j--) {
                             if (!data[j].excluded && url(data[j]) === url(d)) {
                                 // If the node is not separate, use its parent
-                                var n = data[j].parent || data[j];
+                                var n = data[j]._parent || data[j];
                                 n.next = d;
                                 d.prev = n;
                                 break;
@@ -285,9 +285,9 @@ sm.vis.sensepath = function() {
 
                     parentItem = d;
                 } else {
-                    if (!parentItem.children) parentItem.children = [];
-                    parentItem.children.push(d);
-                    d.parent = parentItem;
+                    if (!parentItem._children) parentItem._children = [];
+                    parentItem._children.push(d);
+                    d._parent = parentItem;
                 }
             }
         });
@@ -437,16 +437,16 @@ sm.vis.sensepath = function() {
     }
 
     function computeLayoutEmbeddedItems() {
-        // d.children includes all embedded items
+        // d._children includes all embedded items
         // d.allChildren includes all embedded items of all revisits as well
         var recursiveAdd = function(root, item) {
-            if (item.children) item.children.forEach(function(d) {
+            if (item._children) item._children.forEach(function(d) {
                 d.root = root;
                 root.allChildren.push(d);
             });
             if (item.next) recursiveAdd(root, item.next);
         };
-        nonEmbeddedDataWithoutRevisits.filter(function(d) { return d.children; }).forEach(function(item) {
+        nonEmbeddedDataWithoutRevisits.filter(function(d) { return d._children; }).forEach(function(item) {
             item.allChildren = [];
             recursiveAdd(item, item);
         });
@@ -456,14 +456,14 @@ sm.vis.sensepath = function() {
             var accumSum = 0;
             var prevParent = item;
             item.allChildren.forEach(function(d, i) {
-                if (prevParent !== d.parent) {
+                if (prevParent !== d._parent) {
                     accumSum += endTime(prevParent) - time(prevParent);
                 }
-                d.x = (time(d) - time(d.parent) + accumSum) / item.totalTime * item.width;
+                d.x = (time(d) - time(d._parent) + accumSum) / item.totalTime * item.width;
                 d.width = item.width - d.x;
                 d.level = level++;
                 d.row = item.row;
-                prevParent = d.parent;
+                prevParent = d._parent;
             });
 
             // The width of a sub-item is also constrained by the starting position of the next sub-item
@@ -531,7 +531,7 @@ sm.vis.sensepath = function() {
             points.push({ x: target.x, y: target.y - yOffset });
         } else {
             // Find if there's any obstacle right below
-            var obstacle = _.find(data.filter(function(d) { return !d.parent && d.row === sourceRow + 1}), function(d) {
+            var obstacle = _.find(data.filter(function(d) { return !d._parent && d.row === sourceRow + 1}), function(d) {
                 return d.x <= source.x && source.x <= d.x + d.width;
             });
             var newSource;
@@ -546,7 +546,7 @@ sm.vis.sensepath = function() {
                 newSource = { x: x, y: obstacle.y + obstacle.height };
             } else {
                 // Recursive call with new source point
-                var anyNextRowItem = data.filter(function(d) { return !d.parent && d.row === sourceRow + 1; })[0];
+                var anyNextRowItem = data.filter(function(d) { return !d._parent && d.row === sourceRow + 1; })[0];
                 if (anyNextRowItem) {
                     newSource = { x: source.x, y: anyNextRowItem.y + anyNextRowItem.height };
                 } else {
@@ -576,8 +576,8 @@ sm.vis.sensepath = function() {
         }
 
         var atSecond = "";
-        if (!isSeparate(d) && d.parent) {
-            atSecond = Math.round((time(d) - time(d.parent)) / 1000);
+        if (!isSeparate(d) && d._parent) {
+            atSecond = Math.round((time(d) - time(d._parent)) / 1000);
         }
 
         var t = d.customTranscript;
@@ -620,7 +620,7 @@ sm.vis.sensepath = function() {
             .attr("value", minTimeFilter)
             .on("input", function() {
                 minTimeFilter = this.value;
-                d3.select(this.parentNode).select("output").node().value = "≥" + this.value + "s";
+                d3.select(this._parentNode).select("output").node().value = "≥" + this.value + "s";
                 blurWillBeRemovedItems();
             }).on("change", function() {
                 dataChanged = true;
@@ -660,7 +660,7 @@ sm.vis.sensepath = function() {
     }
 
     function handleContainerEvents() {
-        d3.select(_container.node().parentNode).on("click", function() {
+        d3.select(_container.node()._parentNode).on("click", function() {
             // If click on other elements and propagates to the container
             if (d3.event.target !== this) return;
 
@@ -721,7 +721,7 @@ sm.vis.sensepath = function() {
             leftMouseDown = false;
 
             if (brushing) {
-                dispatch.itemsSelected(data.filter(function(d) { return d.selected || d.parent && d.parent.selected; }).sort(function(a, b) { return d3.ascending(+time(a), +time(b))}));
+                dispatch.itemsSelected(data.filter(function(d) { return d.selected || d._parent && d._parent.selected; }).sort(function(a, b) { return d3.ascending(+time(a), +time(b))}));
             }
 
             parent.classed("crosshair", false);
@@ -794,8 +794,8 @@ sm.vis.sensepath = function() {
         // Item
         fullData.forEach(function(d) {
             d.excluded = endTime(d) && endTime(d) - time(d) < minTimeFilter * 1000;
-            if (d.children) {
-                d.children.forEach(function(d2) { d2.excluded = d.excluded; });
+            if (d._children) {
+                d._children.forEach(function(d2) { d2.excluded = d.excluded; });
             }
         });
         itemContainer.selectAll(".sm-sensepath-item").each(function(d) {
@@ -1019,7 +1019,7 @@ sm.vis.sensepath = function() {
             container.attr("title", d.transcript);
 
             // Trim text of title in text view when it has actions
-            // container.select(".sm-sensepath-item-text").classed("hide", !isImageView() && isSeparate(d) && d.children || d.iconOnly);
+            // container.select(".sm-sensepath-item-text").classed("hide", !isImageView() && isSeparate(d) && d._children || d.iconOnly);
             // Don't simply hide page's title when it has children. Trim it right before the first child appears.
             container.select(".sm-sensepath-item-text").classed("hide", d.iconOnly);
 
@@ -1033,10 +1033,10 @@ sm.vis.sensepath = function() {
                 .style("height", Math.round(d.height + 2) + "px")
                 .select("img").style("height", Math.round(d.height) + 0.5 + "px");
 
-            if (d.children) {
+            if (d._children) {
                 updateSubItems(container, d);
                 container.select(".sm-sensepath-item-text")
-                    .style('max-width', d.children[0].x + "px")
+                    .style('max-width', d._children[0].x + "px")
             }
 
             // Background shows revisits
@@ -1308,8 +1308,8 @@ sm.vis.sensepath = function() {
         delete d.width;
         delete d.height;
         delete d.maxWidth;
-        delete d.children;
-        delete d.parent;
+        delete d._children;
+        delete d._parent;
         delete d.iconOnly;
         delete d.selected;
         delete d.excluded;

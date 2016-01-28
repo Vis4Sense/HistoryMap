@@ -8,10 +8,9 @@ sm.layout.dag = function() {
         n, // vertices.length
         allVertices, // include dummy vertices
         layers, // vertices group by layer
-        centers, // center points of layers
         width, height, // constrained size
         direction = 'lr', // tb, bt, lr, rl
-        align = 'ul', // ul, ur, dl, dr
+        align = '', // ul, ur, dl, dr
         maxVerticesPerLayer = 4,
         layering = 'simplex', // longest/cg/simplex
         ordering = 'bary', // adjacent/bary
@@ -37,7 +36,6 @@ sm.layout.dag = function() {
             v.outEdges = [];
         });
 
-        // Convert source and target of edges to data objects
         edges.forEach(e => {
             e.source.outEdges.push(e);
             e.target.inEdges.push(e);
@@ -48,6 +46,21 @@ sm.layout.dag = function() {
     }
 
     function assignLayers() {
+        // All layering algorithms will place single-vertex dags into the first/last layer,
+        // which makes the graph very high. To save space, link all of them together
+        // to make a single long line.
+        var singleNodeDags = vertices.filter(v => !v.outEdges.length && !v.inEdges.length);
+        if (singleNodeDags.length) {
+            singleNodeDags.reduce((p, c) => {
+                var e = { source: p, target: c, dummy: true };
+                edges.push(e);
+                p.outEdges.push(e);
+                c.inEdges.push(e);
+
+                return c;
+            });
+        }
+
         if (layering === 'longest') longestPath();
         if (layering === 'cg') coffmanGraham();
         if (layering === 'simplex') simplex();
@@ -108,7 +121,7 @@ sm.layout.dag = function() {
 
             // Label the minimal one
             unlabels[0].pi = i;
-            // console.log(unlabels[0].label + '\t' + i);
+            // console.log(unlabels[0].text + '\t' + i);
         }
 
         // All vertices already assigned to the current layer
@@ -159,7 +172,7 @@ sm.layout.dag = function() {
                         // Reduce if connecting
                         if (a[i][k]) {
                             a[i][k].reduced = true;
-                            // console.log('remove ' + vertices[i].label + '\t' + vertices[k].label);
+                            // console.log('remove ' + vertices[i].text + '\t' + vertices[k].text);
                         }
 
                         m[i][k] = false;
@@ -205,6 +218,7 @@ sm.layout.dag = function() {
         var g = new dagre.graphlib.Graph();
 
         // Set an object for the graph label
+        // Always 'rl' to make the ranking the same as our convention: source rank > target rank
         g.setGraph({ rankdir: direction, ranksep: layerSep, nodesep: vertexSep });
 
         // Default to assigning a new object as a label for each new edge.
@@ -228,11 +242,13 @@ sm.layout.dag = function() {
             n.layer = ranks.indexOf(n.layer);
         });
 
-        // dagre gives source layer < target layer. So revert it to the normal convention that source layer > target layer.
-        var maxLayer = d3.max(vertices, v => v.layer);
-        vertices.forEach(n => {
-            n.layer = maxLayer - n.layer;
-        });
+        // dagre gives the layering in the opposite way of my convention, so revert it
+        if (direction === 'lr' || direction === 'tb') {
+            var maxLayer = d3.max(vertices, v => v.layer);
+            vertices.forEach(n => {
+                n.layer = maxLayer - n.layer;
+            });
+        }
     }
 
     function addDummyVertices() {
@@ -269,6 +285,8 @@ sm.layout.dag = function() {
     }
 
     function orderVertices() {
+        if (!layers.length) return;
+
         // bary twice and iterative adjacent
         ordering = 'bary';
         sweepGraph(true, true);
@@ -409,7 +427,7 @@ sm.layout.dag = function() {
         // Show order
         L2.forEach((v, i) => { v.order = i; });
 
-        // L2.forEach(v => { console.log(v.label + ': bary=' + v.bary + ', order=' + v.order); });
+        // L2.forEach(v => { console.log(v.text + ': bary=' + v.bary + ', order=' + v.order); });
     }
 
     /*
@@ -419,6 +437,11 @@ sm.layout.dag = function() {
         markType1Conflicts();
 
         // Set predecessor
+        allVertices.forEach(v => {
+            delete v.pred;
+            delete v.succ;
+        });
+
         layers.forEach(vertices => {
             vertices.reduce((p, c) => {
                 c.pred = p;
@@ -542,9 +565,10 @@ sm.layout.dag = function() {
         // Size for each block
         allVertices.forEach(v => {
             if (v.root === v) {
+                v.blockSize = -Number.POSITIVE_INFINITY;
                 var w = v; // Go down its aligned vertices
                 do {
-                    v.blockSize = isHori() ? Math.max(v.height, w.height) : Math.max(v.width, w.width);
+                    v.blockSize = isHori() ? Math.max(v.blockSize, w.height) : Math.max(v.blockSize, w.width);
                     w = w.align;
                 } while (w !== v); // Complete a cycle
             }
@@ -564,10 +588,10 @@ sm.layout.dag = function() {
         });
 
         // Check sink of class
-        // allVertices.filter(v => v === v.root && v === v.sink).forEach(v => { console.log(v.label); });
-        allVertices.forEach(v => {
-            v.classLabel = v.root.sink.label;
-        });
+        // allVertices.filter(v => v === v.root && v === v.sink).forEach(v => { console.log(v.text); });
+        // allVertices.forEach(v => {
+        //     v.classLabel = v.root.sink.text;
+        // });
 
         // Absolute coordinates
         allVertices.forEach(v => {
@@ -578,7 +602,7 @@ sm.layout.dag = function() {
         });
 
         // Check coordinates
-        // allVertices.forEach(v => { console.log(v.label + ':\t' + v.x); });
+        // allVertices.forEach(v => { console.log(v.text + ':\t' + v.x); });
 
         // Save the computed x to combine later
         allVertices.forEach(v => {
@@ -587,7 +611,7 @@ sm.layout.dag = function() {
     }
 
     function shiftDelta(s, delta) {
-        console.log('shift: [' + delta + '] ' + s.label);
+        // console.log('shift: [' + delta + '] ' + s.text);
 
         if (s.shift < Number.POSITIVE_INFINITY) {
             s.shift += delta;
@@ -600,11 +624,14 @@ sm.layout.dag = function() {
         });
     }
 
+    var level = 0;
+
     /**
      * Assigns horizontal coordinate for the roots of blocks.
      */
     function placeBlock(v, hori) {
-        // console.log('placing: ' + v.label);
+        // console.log(_.times(level, () => '\t').join('') + 'placing: ' + v.text);
+        // level++;
 
         // Root will be shifted later.
         // Non-root are always undefined.
@@ -623,7 +650,7 @@ sm.layout.dag = function() {
 
                 var gap = v.blockSize / 2 + u.blockSize / 2 + vertexSep;
                 if (v.sink !== u.sink) { // Different classes
-                    console.log('different class: ' + v.label + ' --- ' + u.label);
+                    // console.log('different class: ' + v.text + ' --- ' + u.text);
 
                     // Shift u's dependent sinks as well
                     var newShift = Math.min(u.sink.shift, v.x - u.x - gap);
@@ -639,7 +666,8 @@ sm.layout.dag = function() {
             w = w.align;
         } while (w !== v); // Complete a cycle
 
-        // console.log('placed: ' + v.label);
+        // level--;
+        // console.log(_.times(level, () => '\t').join('') + 'placed: ' + v.text);
     }
 
     function runOneAlignment() {
@@ -674,7 +702,7 @@ sm.layout.dag = function() {
                 v[x] -= delta;
             });
         });
-
+//
         // // Test: after aligning
         // alignmentSizes.forEach(s => {
         //     var x = s.verti + s.hori;
@@ -688,6 +716,7 @@ sm.layout.dag = function() {
         allVertices.forEach(v => {
             var theFour = _.sortBy([ v.upleft, v.upright, v.downleft, v.downright ]);
             v.x = (theFour[1] + theFour[2]) / 2;
+            // v.x = d3.mean(theFour);
         });
     }
 
@@ -708,13 +737,13 @@ sm.layout.dag = function() {
     function setVerticalCoordinate() {
         // The center of each layer.
         var lastBoundary = -layerSep;
-        centers = layers.map((vertices, i) => {
+        var myLayers = direction === 'tb' || direction === 'lr' ? layers.slice().reverse() : layers;
+        var centers = myLayers.map(vertices => {
             var s = isHori() ? d3.max(vertices, v => v.width) : d3.max(vertices, v => v.height);
             lastBoundary += layerSep + s;
             return lastBoundary - s / 2;
         });
 
-        // Make it upside down so that the source is at the top
         if (direction === 'tb' || direction === 'lr') centers.reverse();
 
         layers.forEach(vertices => {
@@ -750,8 +779,8 @@ sm.layout.dag = function() {
         // Find the location of the tips
         var layerTips = layers.map(vertices => {
             return {
-                outPos: d3.max(vertices, getOutPos),
-                inPos: d3.min(vertices, getInPos),
+                outPos: direction === 'lr' || direction === 'tb' ? d3.max(vertices, getOutPos) : d3.min(vertices, getOutPos),
+                inPos: direction === 'lr' || direction === 'tb' ? d3.min(vertices, getInPos) : d3.max(vertices, getInPos)
             }
         });
 
@@ -835,10 +864,10 @@ sm.layout.dag = function() {
                         c2 = { x: layerTips[e.target.layer].inPos, y: p1.y + scaleIn(j) };
                         c3 = { x: p1.x + (direction === 'rl' ? p1.width : 0), y: c2.y };
                     } else {
-                        c0 = { x: p0.x + scaleOut(i), y: p0.y + p0.height };
+                        c0 = { x: p0.x + scaleOut(i), y: p0.y + (direction === 'tb' ? p0.height : 0) };
                         c1 = { x: c0.x, y: layerTips[v.layer].outPos + deltas[i] * 2 };
                         c2 = { x: p1.x + scaleIn(j), y: layerTips[e.target.layer].inPos };
-                        c3 = { x: c2.x, y: p1.y };
+                        c3 = { x: c2.x, y: p1.y + (direction === 'bt' ? p1.height : 0)};
                     }
 
                     // Assign and replace later so that new vertices don't affect the process
@@ -889,6 +918,10 @@ sm.layout.dag = function() {
         return { x: x + sx, y: y + sy };
     }
 
+    function removeDummyEdges() {
+        _.remove(edges, e => e.dummy);
+    }
+
     /**
      * Computes the layout.
      */
@@ -898,8 +931,12 @@ sm.layout.dag = function() {
         addDummyVertices();
         orderVertices();
         assignCoordinates();
+        removeDummyEdges();
 
-        return { width: d3.max(allVertices, v => v.x + v.width / 2 ) };
+        return {
+            width: d3.max(allVertices, v => v.x + v.width) || 0,
+            height: d3.max(allVertices, v => v.y + v.height) || 0
+        };
     };
 
     /**

@@ -10,13 +10,11 @@
     text-decoration: inherit;
     line-height: inherit;
     font: inherit;
-    color: inherit;
     display: inline;
     position: relative;
     zoom: 1;
     margin: 0;
     padding: 0;
-    background-color: yellow;
 }
 
 .sm-note:hover {
@@ -175,7 +173,7 @@
     border-top-left-radius: 0;
 }
 
-.close {
+.sm-modal .close {
     float: right;
     font-size: 21px;
     font-weight: bold;
@@ -185,15 +183,15 @@
     filter: alpha(opacity=20);
     opacity: .2;
 }
-.close:hover,
-.close:focus {
+.sm-modal .close:hover,
+.sm-modal .close:focus {
     color: #000;
     text-decoration: none;
     cursor: pointer;
     filter: alpha(opacity=50);
     opacity: .5;
 }
-button.close {
+.sm-modal button.close {
     -webkit-appearance: none;
     padding: 0;
     cursor: pointer;
@@ -315,35 +313,35 @@ button.close {
         width: 900px;
     }
 }
-.clearfix:before,
-.clearfix:after,
+.sm-modal .clearfix:before,
+.sm-modal .clearfix:after,
 .sm-modal-footer:before,
 .sm-modal-footer:after {
     content: " ";
     display: table;
 }
-.clearfix:after,
+.sm-modal .clearfix:after,
 .sm-modal-footer:after {
     clear: both;
 }
-.center-block {
+.sm-modal .center-block {
     display: block;
     margin-left: auto;
     margin-right: auto;
 }
-.pull-right {
+.sm-modal .pull-right {
     float: right !important;
 }
-.pull-left {
+.sm-modal .pull-left {
     float: left !important;
 }
-.hide {
+.sm-modal .hide {
     display: none !important;
 }
-.show {
+.sm-modal .show {
     display: block !important;
 }
-.invisible {
+.sm-modal .invisible {
     visibility: hidden;
 }
 
