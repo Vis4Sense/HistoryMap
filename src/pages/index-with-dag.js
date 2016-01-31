@@ -1,24 +1,21 @@
 $(function() {
     // Data
-    var data = {}, // The data will be passed to the vis
-        allNodes = [], // All nodes added in temporal order including 'revisit' and 'child' nodes
-        pendingTasks = {}, // For jumping to a node when its page isn't ready yet
-        visitedPages = {}, // Stores whether a page is visited
-        tabRelationshipTypes = {}, // Stores how a tab is opened (revisit/link/type/bookmark)
-        tabIdToDataItemLookup = {},
-        name = '', // For quick test/analysis: preload data to save time loading files in the interface
-        datasets = {
+    var pendingTasks = {}, // For jumping to a note
+        data = {},
+        allNodes = [],
+        // For quick test/analysis: preload data to save time loading files in the interface
+        name = '', // Set to one of the participants below
+        participants = {
             p1: "data/p1.json",
             p2: 'data/latest.json'
         };
 
-    // Vis and options
-    var sensenav;
-        showBrowser = true,
-        listening = true;
-
-    // Templates for automatic action extraction
-    var getGoogleLocation = function(url, pathname) {
+    var sensedag,
+        lastActiveItem,
+        lastSearchAction,
+        timeoutId, // To prevent redraw multiple times
+        ignoredUrls = [ "chrome://", "chrome-extension://", "chrome-devtools://", "view-source:", "google.co.uk/url", "google.com/url", "localhost://" ],
+        getGoogleLocation = function(url, pathname) {
             var trimUrl = url.pathname.substr(pathname.length + 1);
             return decodeURIComponent(trimUrl.substr(0, trimUrl.indexOf("/"))).replace(/\+/g, ' ');
         }, getOSMLocation = function(url) {
@@ -73,11 +70,13 @@ $(function() {
                 hostname: 'www.google.',
                 pathname: '/maps/search',
                 labelFunc: getGoogleLocation
-            }, {
+            },
+            {
                 hostname: 'www.google.',
                 pathname: '/maps/place',
                 labelFunc: getGoogleLocation
-            }, {
+            },
+            {
                 hostname: 'www.openstreetmap.',
                 pathname: '/search',
                 labelFunc: getOSMLocation
@@ -89,44 +88,44 @@ $(function() {
                 pathname: '/maps/dir',
                 labelFunc: getGoogleDirection
             }
-        ];
+        ],
+        timeFormat = d3.time.format("%Y-%m-%d %H:%M:%S"),
+        followByBrowseActions = [ "search", "location", "place", "dir", "revisit", "link", "type", "bookmark", "unknown" ],
+        embeddedTypes = [ "highlight", "note", "filter" ],
+        visitedPages = {}, // Stores whether a page is visited
+        tabRelationshipTypes = {}, // Stores how a tab is opened (revisit/link/type/bookmark)
+        tabIdToDataItemLookup = {},
+        showBrowser = true,
+        listening = true;
 
-    function run() {
-        createContextMenus();
-
-        // Read options from saved settings
-        chrome.storage.sync.get(null, function(items) {
-            // Always listening now for easy testing
-            listening = true;
-
-            if (name) {
-                // Load data
-                d3.json(datasets[name], function(json) {
-                    loadDataFile(json);
-                    main();
-                });
-            } else {
-                main();
-            }
-        });
-    }
-
-    function main() {
-        sm.provenance.browser()
-            .actions(allNodes)
-            .capture()
-            .on('dataChanged', () => {
-                buildHierarchy(allNodes);
-                redraw(true);
-            });
-
+    var main = function() {
         buildVis();
         updateVis();
         schedulePageReadingUpdate();
         wheelHorizontalScroll();
     };
 
-    run();
+    createContextMenus();
+    respondToContentScript();
+    respondToTabActivated();
+    respondToTabUpdated();
+    respondToTabClosed();
+
+    // Read options from saved settings
+    chrome.storage.sync.get(null, function(items) {
+        // Always listening now for easy testing
+        listening = true;
+
+        if (name) {
+            // Load data
+            d3.json(participants[name], function(json) {
+                loadDataFile(json);
+                main();
+            });
+        } else {
+            main();
+        }
+    });
 
     function loadDataFile(json) {
         allNodes = json;
@@ -160,7 +159,6 @@ $(function() {
     function addLink(p, c) {
         if (!p.links) p.links = [];
         p.links.push(c);
-        c.sup = p;
     };
 
     function addChild(p, c) {
@@ -173,10 +171,9 @@ $(function() {
     function buildHierarchy(allNodes, noRedraw) {
         // Init
         allNodes.forEach(n => {
-            delete n.children;
             delete n.parent;
+            delete n.children;
             delete n.links;
-            delete n.sup;
         });
 
         // - Build parent-child relationship first
@@ -189,17 +186,17 @@ $(function() {
                 if (source) {
                     addLink(source, d);
                 } else {
-                    // console.log('could not find the source of ' + d.text);
+                    console.log('could not find the source of ' + d.text);
                 }
             }
 
             // If the action type of an item is embedded, add it as a child of the containing page
-            if (isEmbeddedType(d.type)) {
+            if (embeddedTypes.includes(d.type)) {
                 var source = allNodes.find(d2 => d2.id === d.from);
                 if (source) {
                     addChild(source, d);
                 } else {
-                    // console.log('could not find the source of ' + d.text);
+                    console.log('could not find the source of ' + d.text);
                 }
             }
         });
@@ -317,13 +314,7 @@ $(function() {
     }
 
     function isBrowsingType(type) {
-        var followByBrowseActions = [ "search", "location", "place", "dir", "revisit", "link", "type", "bookmark", "unknown" ];
-        return followByBrowseActions.includes(type);
-    }
-
-    function isEmbeddedType(type) {
-        var embeddedTypes = [ "highlight", "note", "filter" ];
-        return embeddedTypes.includes(type);
+        return followByBrowseActions.indexOf(type) !== -1;
     }
 
     function getItemIndex(value1, name2, value2) {
@@ -351,6 +342,10 @@ $(function() {
         } else {
             return _url;
         }
+    }
+
+    function isTabIgnored(tab) {
+        return ignoredUrls.some(function(url) { return tab.url.indexOf(url) !== -1; });
     }
 
     function respondToTabActivated() {
@@ -477,17 +472,13 @@ $(function() {
         if (type === 'link') {
             chrome.tabs.sendMessage(tab.id, { type: "askReferrer" }, function(response) {
                 // referrer only return the path, excluding the hash. So just guess the latest one could be the most likely one.
-                var referral = allNodes.slice().reverse().find(n => n.url.startsWith(response) && !isEmbeddedType(n.type));
+                var referral = allNodes.slice().reverse().find(n => n.url.startsWith(response) && !embeddedTypes.includes(n.type));
                 addItem(tab, type, referral);
             });
         } else {
             addItem(tab, type);
         }
     }
-
-    // To detect filter action and record time spent on each page
-    var lastActiveItem,
-        lastSearchAction;
 
     function addItem(tab, type, referral) {
         if (!listening) return;
@@ -576,12 +567,58 @@ $(function() {
         buildHierarchy(allNodes);
     }
 
-    var timeoutId; // To prevent redraw multiple times
+    function respondToTabUpdated() {
+        chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+            if (!listening) return;
+
+            if (tab.status !== "complete" || isTabIgnored(tab)) return;
+
+            if (changeInfo && changeInfo.favIconUrl) {
+                console.log('add favIconUrl');
+                var item = tabIdToDataItemLookup[tabId];
+                if (item) {
+                    item.favIconUrl = changeInfo.favIconUrl;
+                    redraw();
+                    return;
+                }
+            }
+
+            // Record how to open this page. It doesn't need to be active.
+            chrome.history.getVisits({ url: tab.url }, function(results) {
+                if (!results || !results.length) return;
+
+                // The latest one contains information about the just completely loaded page
+                var visitItem = results[0];
+                var bookmarkTypes = [ "auto_bookmark" ];
+                var typedTypes = [ "typed", "generated", "keyword", "keyword_generated" ];
+
+                if (bookmarkTypes.indexOf(visitItem.transition) !== -1) {
+                    tabRelationshipTypes[tab.url + "-" + tab.id] = "bookmark";
+                } else if (typedTypes.indexOf(visitItem.transition) !== -1) {
+                    tabRelationshipTypes[tab.url + "-" + tab.id] = "type";
+                } else {
+                    tabRelationshipTypes[tab.url + "-" + tab.id] = "link";
+                }
+
+                if (tab.active) {
+                    // The new tab will be highlighted
+                    allNodes.forEach(n => { n.highlighted = false; });
+
+                    // Get the tab again to get the favIconUrl
+                    chrome.tabs.query({ active: true }, tabs => {
+                        if (tabs.length) addFirstTimeVisitPage(tabs[0]);
+                    });
+                }
+            });
+        });
+    }
 
     function buildVis() {
-        sensenav = sm.vis.sensedag()
+        sensedag = sm.vis.sensedag()
             .label(d => d.text)
             .icon(d => d.favIconUrl)
+            // .on("itemHovered", onItemHovered)
+            // .on("itemUnhovered", onItemUnhovered)
             .on("itemClicked", jumpTo);
 
         // Register to update vis when the window is resized
@@ -610,7 +647,6 @@ $(function() {
         });
 
         // Settings
-        var timeFormat = d3.time.format("%Y-%m-%d %H:%M:%S");
         $("#btnSave").click(function() {
             var date = timeFormat(new Date());
             var saveData = allNodes.map(cleanData);
@@ -712,12 +748,12 @@ $(function() {
     }
 
     function updateVis() {
-        sensenav.width(window.innerWidth).height(window.innerHeight);
+        sensedag.width(window.innerWidth).height(window.innerHeight);
         redraw();
     }
 
     function redraw(dataChanged) {
-        d3.select(".sm-sensemap-container").datum(data).call(sensenav);
+        d3.select(".sm-sensemap-container").datum(data).call(sensedag);
     }
 
     function schedulePageReadingUpdate() {

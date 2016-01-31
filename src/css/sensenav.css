@@ -1,46 +1,47 @@
-.sm-sensedag .node-container.closed {
+.sm-sensenav .node-container.closed {
 	/*opacity: 0.5;*/
 }
 
-.sm-sensedag .node {
+.sm-sensenav .node {
 	display: inline-block;
 	border-radius: 6px;
     box-shadow: 0 0 8px #777;
     background-color: white;
+    cursor: pointer;
 }
 
-.sm-sensedag .closed .node {
+.sm-sensenav .closed .node {
 	border: 1px solid gray;
 }
 
-.sm-sensedag .node.move {
+.sm-sensenav .node.move {
 	cursor: move;
 }
 
-.sm-sensedag .node.connect {
+.sm-sensenav .node.connect {
 	cursor: e-resize;
 }
 
-.sm-sensedag .node:hover {
+.sm-sensenav .node:hover {
     transition: box-shadow .25s ease-in-out;
 }
 
-.sm-sensedag .closed .node:hover {
+.sm-sensenav .closed .node:hover {
     box-shadow: none !important;
     border-color: magenta;
 }
 
-.sm-sensedag .node.hovered {
+.sm-sensenav .node.hovered {
     box-shadow: 0 0 8px cyan;
 }
 
-.sm-sensedag .node.move:hover,
-.sm-sensedag .node.connect:hover,
-.sm-sensedag .node.highlighted {
+.sm-sensenav .node.move:hover,
+.sm-sensenav .node.connect:hover,
+.sm-sensenav .node.highlighted {
     box-shadow: 0 0 8px magenta;
 }
 
-.sm-sensedag .node.candidate {
+.sm-sensenav .node.candidate {
 	background-color: #777;
 	color: white;
 	font-family: Georgia;
@@ -50,25 +51,25 @@
 	border-radius: 0;
 }
 
-.sm-sensedag .node-label:hover {
+.sm-sensenav .node-label:hover {
 	color: magenta;
 }
 
-.sm-sensedag .link path {
+.sm-sensenav .link path {
 	fill: none;
 	stroke-width: 2px;
 	stroke: #bbb;
 }
 
 /* To make icon and label in one line */
-.sm-sensedag .node-icon {
+.sm-sensenav .node-icon {
 	max-width: 22px;
 	max-height: 22px;
 	display: inline-block;
 	margin: 0 3px 0 2px;
 }
 
-.sm-sensedag .candidate .node-icon {
+.sm-sensenav .candidate .node-icon {
 	max-width: 30px;
 	max-height: 30px;
 	display: block;
@@ -78,7 +79,7 @@
 }
 
 /* Action type icon */
-.sm-sensedag .node-icon.fa {
+.sm-sensenav .node-icon.fa {
 	color: white;
 	padding: 3px;
 	border-radius: 4px;
@@ -86,7 +87,7 @@
 	margin: 1px 3px 1px 0;
 }
 
-.sm-sensedag .node-label {
+.sm-sensenav .node-label {
 	display: inline-block;
 	white-space: nowrap;
     overflow: hidden;
@@ -94,22 +95,23 @@
     vertical-align: bottom; /* inline-block and overflow hidden make text move upwards */
 }
 
-.sm-sensedag .cursor-link {
+.sm-sensenav .cursor-link {
 	stroke-width: 2;
     stroke: red;
-    shape-rendering: auto;box-shadow: 0 0 8px green;
+    shape-rendering: auto;
+    box-shadow: 0 0 8px green;
 }
 
-.sm-sensedag .parent {
+.sm-sensenav .parent {
 	padding: 3px;
 }
 
-.sm-sensedag .parent.has-children {
+.sm-sensenav .parent.has-children {
 	font-weight: bold;
 	border-bottom: 1px solid gray;
 }
 
-.sm-sensedag .children {
+.sm-sensenav .children {
 	padding: 3px;
-	padding-left: 13px;
+	padding-left: 5px;
 }

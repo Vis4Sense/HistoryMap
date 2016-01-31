@@ -6,7 +6,7 @@ $(function() {
         visitedPages = {}, // Stores whether a page is visited
         tabRelationshipTypes = {}, // Stores how a tab is opened (revisit/link/type/bookmark)
         tabIdToDataItemLookup = {},
-        name = '', // For quick test/analysis: preload data to save time loading files in the interface
+        name = 'p2', // For quick test/analysis: preload data to save time loading files in the interface
         datasets = {
             p1: "data/p1.json",
             p2: 'data/latest.json'
@@ -93,6 +93,10 @@ $(function() {
 
     function run() {
         createContextMenus();
+        respondToContentScript();
+        respondToTabActivated();
+        respondToTabUpdated();
+        respondToTabClosed();
 
         // Read options from saved settings
         chrome.storage.sync.get(null, function(items) {
@@ -112,14 +116,6 @@ $(function() {
     }
 
     function main() {
-        sm.provenance.browser()
-            .actions(allNodes)
-            .capture()
-            .on('dataChanged', () => {
-                buildHierarchy(allNodes);
-                redraw(true);
-            });
-
         buildVis();
         updateVis();
         schedulePageReadingUpdate();
@@ -189,7 +185,7 @@ $(function() {
                 if (source) {
                     addLink(source, d);
                 } else {
-                    // console.log('could not find the source of ' + d.text);
+                    console.log('could not find the source of ' + d.text);
                 }
             }
 
@@ -199,7 +195,7 @@ $(function() {
                 if (source) {
                     addChild(source, d);
                 } else {
-                    // console.log('could not find the source of ' + d.text);
+                    console.log('could not find the source of ' + d.text);
                 }
             }
         });
@@ -351,6 +347,11 @@ $(function() {
         } else {
             return _url;
         }
+    }
+
+    function isTabIgnored(tab) {
+        var ignoredUrls = [ "chrome://", "chrome-extension://", "chrome-devtools://", "view-source:", "google.co.uk/url", "google.com/url", "localhost://" ];
+        return ignoredUrls.some(url => tab.url.includes(url));
     }
 
     function respondToTabActivated() {
@@ -574,6 +575,52 @@ $(function() {
         }
 
         buildHierarchy(allNodes);
+    }
+
+    function respondToTabUpdated() {
+        chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+            if (!listening) return;
+
+            if (tab.status !== "complete" || isTabIgnored(tab)) return;
+
+            if (changeInfo && changeInfo.favIconUrl) {
+                console.log('add favIconUrl');
+                var item = tabIdToDataItemLookup[tabId];
+                if (item) {
+                    item.favIconUrl = changeInfo.favIconUrl;
+                    redraw();
+                    return;
+                }
+            }
+
+            // Record how to open this page. It doesn't need to be active.
+            chrome.history.getVisits({ url: tab.url }, function(results) {
+                if (!results || !results.length) return;
+
+                // The latest one contains information about the just completely loaded page
+                var visitItem = results[0];
+                var bookmarkTypes = [ "auto_bookmark" ];
+                var typedTypes = [ "typed", "generated", "keyword", "keyword_generated" ];
+
+                if (bookmarkTypes.indexOf(visitItem.transition) !== -1) {
+                    tabRelationshipTypes[tab.url + "-" + tab.id] = "bookmark";
+                } else if (typedTypes.indexOf(visitItem.transition) !== -1) {
+                    tabRelationshipTypes[tab.url + "-" + tab.id] = "type";
+                } else {
+                    tabRelationshipTypes[tab.url + "-" + tab.id] = "link";
+                }
+
+                if (tab.active) {
+                    // The new tab will be highlighted
+                    allNodes.forEach(n => { n.highlighted = false; });
+
+                    // Get the tab again to get the favIconUrl
+                    chrome.tabs.query({ active: true }, tabs => {
+                        if (tabs.length) addFirstTimeVisitPage(tabs[0]);
+                    });
+                }
+            });
+        });
     }
 
     var timeoutId; // To prevent redraw multiple times

@@ -87,6 +87,7 @@ sm.addHorizontalPan = function(container, extent) {
 /**
  * Adds key arrow to pan to the given SVG node.
  * Adds Shift + mouse move to pan.
+ * Adds wheel mouse to pan vertically.
  */
 sm.addPan = function(container, extent) {
     var pan = function(offsetX, offsetY) {
@@ -136,6 +137,11 @@ sm.addPan = function(container, extent) {
             prevY = d3.event.clientY;
             d3.event.preventDefault();
         }
+    });
+
+    // Wheel
+    parent.on('wheel', function() {
+        pan(0, d3.event.wheelDelta);
     });
 };
 

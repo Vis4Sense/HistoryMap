@@ -1,58 +1,12 @@
 $(function() {
-    var dataPath = "data/p1.json";
-    // dataPath = undefined;
-    var data = {
-        nodes: [
-            { id: "wbhq", label: "World Bank Headquarters", icon: "https://www.google.com/images/branding/product/ico/maps_32dp.ico" },
-            { id: "tri", label: "trivagoes - 4 stars hotels", icon: "http://ie2.trivago.com/images/layoutimages/favicon_moon/favicon_16x16.ico" },
-            { id: "hyatt", label: "Grand Hyatt", icon: "http://grandwashington.hyatt.com/favicon.ico", candidate: true },
-            { id: "hyatt-loc", label: "Grand Hyatt location", icon: "https://www.google.com/images/branding/product/ico/maps_32dp.ico" },
-            { id: "inn", label: "River Inn hotel", icon: "http://www.theriverinn.com/favicon.ico", candidate: true },
-            { id: "inn-loc", label: "River Inn location", icon: "https://www.google.com/images/branding/product/ico/maps_32dp.ico" },
-            { id: "inn-note", label: "crappy gym", icon: "http://www.7ideas.com/static/img/favicon.ico"},
-            { id: "booking", label: "booking.com", icon: "http://q-ec.bstatic.com/static/img/b25logo/favicon/ebc77706da3aae4aee7b05dadf182390f0d26d11.ico" },
-            { id: "hyatt-price", label: "so expensive", icon: "http://q-ec.bstatic.com/static/img/b25logo/favicon/ebc77706da3aae4aee7b05dadf182390f0d26d11.ico" },
-            { id: "hyatt-hl", label: "Grand Hyatt Washington", icon: "http://ie2.trivago.com/images/layoutimages/favicon_moon/favicon_16x16.ico" },
-            { id: "inn-hl", label: "Galería de \"The River Inn\"", icon: "http://www.7ideas.com/static/img/favicon.ico" },
-            { id: "hyatt-hl1", label: "reviews", icon: "https://ssl.gstatic.com/s2/oz/images/faviconr3.ico" },
-            { id: "hyatt-hl2", label: "checked in and asked about construction. was told it won't s", icon: "https://ssl.gstatic.com/s2/oz/images/faviconr3.ico" },
-            { id: "hyatt-hl3", label: "m. it started at 6 am! and it was loud! I can't believe a hotel brand like the hyatt would do this to their guests. asked for the manager to call and had to call 4 times to get a return call. apologies and offer of a new room. terrible", icon: "https://ssl.gstatic.com/s2/oz/images/faviconr3.ico" },
-            { id: "hyatt-hl4", label: "Horrible guest service!!! Stayed last night and I had a $157 Hyatt Gift Card to use towards my stay, when I checked out their system didn't swiped it correctly the front desk person told me not to worry and that t", icon: "https://ssl.gstatic.com/s2/oz/images/faviconr3.ico" },
-            { id: "hyatt-hl5", label: "Their accounting service is horrible. My invoice from their hotel was $50 dollars different than that of what is displayed on my bank statement. Customer service is horrible I have been on hold for 30 minutes and counting. I will not stay at a", icon: "https://ssl.gstatic.com/s2/oz/images/faviconr3.ico" },
-            { id: "hyatt-hl6", label: "r. Staff was rud", icon: "https://ssl.gstatic.com/s2/oz/images/faviconr3.ico" },
-            { id: "hyatt-hl7", label: "re Hyatt Platinum Members and have stayed here before, but were a little disappointed with how understaffed and overworked the working staff were. ", icon: "https://ssl.gstatic.com/s2/oz/images/faviconr3.ico" },
-            { id: "hyatt-hl8", label: "on't stay while under construction, very noisy, very smelly, trip hazards everywhere.", icon: "https://ssl.gstatic.com/s2/oz/images/faviconr3.ico" }
-        ],
-        links: [
-            { source: "wbhq", target: "hyatt-loc" },
-            { source: "wbhq", target: "inn-loc" },
-            { source: "tri", target: "hyatt" },
-            { source: "tri", target: "inn" },
-            { source: "hyatt", target: "hyatt-loc" },
-            { source: "inn", target: "inn-loc" },
-            { source: "inn", target: "inn-note" },
-            { source: "inn", target: "inn-hl" },
-            { source: "booking", target: "hyatt" },
-            { source: "tri", target: "hyatt-loc" },
-            { source: "hyatt", target: "hyatt-price" },
-            { source: "hyatt", target: "hyatt-hl" },
-            { source: "hyatt", target: "hyatt-hl1" },
-            { source: "hyatt", target: "hyatt-hl2" },
-            { source: "hyatt", target: "hyatt-hl3" },
-            { source: "hyatt", target: "hyatt-hl4" },
-            { source: "hyatt", target: "hyatt-hl5" },
-            { source: "hyatt", target: "hyatt-hl6" },
-            { source: "hyatt", target: "hyatt-hl7" },
-            { source: "hyatt-hl1", target: "hyatt-hl4" },
-            { source: "hyatt-hl1", target: "hyatt-hl5" },
-            { source: "hyatt-hl2", target: "hyatt-hl6" },
-            { source: "hyatt-hl6", target: "hyatt-hl7" },
-            { source: "hyatt", target: "hyatt-hl8" }
-        ]
-    };
+    var dataPath = "data/latest.json",
+        embeddedTypes = [ "highlight", "note", "filter" ],
+        data = {};
 
     // Instantiate vis
-    var dag = sm.vis.sensedag();
+    var dag = sm.vis.senseforest()
+        .label(d => d.text)
+        .icon(d => d.favIconUrl);
 
     // Update the vis
     var updateVis = function() {
@@ -65,36 +19,10 @@ $(function() {
     };
 
     // Run first time to build the vis
-    if (dataPath) {
-        d3.json(dataPath, function(_data) {
-            var allNodes = _data.data.map(function(d) {
-                return {
-                    id: d.id,
-                    label: d.text,
-                    icon: d.favIconUrl,
-                    time: new Date(d.time),
-                    type: d.type,
-                    url: d.url,
-                    from: d.from
-                };
-            });
-
-            buildHierarchy(allNodes);
-            updateVis();
-        });
-    } else {
-        // Convert source and target of links to nodes rather ids
-        var dict = {};
-        data.nodes.forEach(n => {
-            dict[n.id] = n;
-        });
-        data.links.forEach(l => {
-            l.source = dict[l.source];
-            l.target = dict[l.target];
-        });
-
+    d3.json(dataPath, function(data) {
+        buildHierarchy(data);
         updateVis();
-    }
+    });
 
     // Rebuild vis when the window is resized
     var id;
@@ -110,6 +38,7 @@ $(function() {
     function addLink(p, c) {
         if (!p.links) p.links = [];
         p.links.push(c);
+        c.sup = p;
     };
 
     function addChild(p, c) {
@@ -118,17 +47,15 @@ $(function() {
         c.parent = p;
     };
 
-    // Convert flat list of nodes to parent-children network
-    function buildHierarchy(allNodes) {
+    // Convert flat list of nodes to parent-children network, then redraw the vis.
+    function buildHierarchy(allNodes, noRedraw) {
         // Init
         allNodes.forEach(n => {
-            delete n.parent;
             delete n.children;
+            delete n.parent;
             delete n.links;
+            delete n.sup;
         });
-
-        var embeddedTypes = [ "highlight", "note", "filter" ];
-        var currentSource = allNodes[0];
 
         // - Build parent-child relationship first
         allNodes.forEach(function(d, i) {
@@ -136,37 +63,37 @@ $(function() {
 
             // Add page linking as a type of link
             if (d.type === 'link') {
-                addLink(allNodes.find(d2 => d2.id === d.from) || currentSource, d);
+                var source = allNodes.find(d2 => d2.id === d.from);
+                if (source) {
+                    addLink(source, d);
+                } else {
+                    console.log('could not find the source of ' + d.text);
+                }
             }
 
             // If the action type of an item is embedded, add it as a child of the containing page
             if (embeddedTypes.includes(d.type)) {
-                addChild(currentSource, d);
-            } else if (d.type !== 'revisit') {
-                currentSource = d;
-            } else {
-                // If the action type is 'revisit', remove it so that it's only shown once.
-                // Also, if there're any embedded actions after that, set their parent to the item it's revisited.
-                for (var j = 0; j < i; j++) { // The revisited item is the first one having the same url
-                    if (allNodes[j].url === d.url) {
-                        currentSource = allNodes[j];
-                        if (currentSource.parent) currentSource = currentSource.parent;
-                        break;
-                    }
+                var source = allNodes.find(d2 => d2.id === d.from);
+                if (source) {
+                    addChild(source, d);
+                } else {
+                    console.log('could not find the source of ' + d.text);
                 }
             }
         });
 
-        // - Ignore child and revisit nodes
-        data.nodes = allNodes.filter(n => !n.parent && n.type !== 'revisit');
+        // - Ignore child nodes
+        data.nodes = allNodes.filter(n => !n.parent);
 
-        // - Two semantic links
-        var tv = data.nodes.find(n => n.label.startsWith('trivago.es'));
-        var ri = data.nodes.find(n => n.label.startsWith('the river inn hotel'));
-        var gh = data.nodes.find(n => n.label.startsWith('Grand Hyatt Washington washington dc'));
+        // Specific for test data: add two semantic links
+        if (name === 'p1') {
+            var tv = data.nodes.find(n => n.text.startsWith('trivago.es'));
+            var ri = data.nodes.find(n => n.text.startsWith('the river inn hotel'));
+            var gh = data.nodes.find(n => n.text.startsWith('Grand Hyatt Washington washington dc'));
 
-        if (tv && ri) addLink(tv, ri);
-        if (tv && gh) addLink(tv, gh);
+            if (tv && ri) addLink(tv, ri);
+            if (tv && gh) addLink(tv, gh);
+        }
 
         // - Then add to the link list
         data.links = [];

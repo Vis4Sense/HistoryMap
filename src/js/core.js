@@ -7,6 +7,7 @@ var sm = function() {
         // host: "http://localhost/",
         vis: {},
         layout: {},
+        provenance: {},
         misc: {}
     };
 

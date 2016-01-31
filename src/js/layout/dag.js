@@ -9,8 +9,9 @@ sm.layout.dag = function() {
         allVertices, // include dummy vertices
         layers, // vertices group by layer
         width, height, // constrained size
+        label = d => d.label,
         direction = 'lr', // tb, bt, lr, rl
-        align = '', // ul, ur, dl, dr
+        align = 'ul', // ul, ur, dl, dr
         maxVerticesPerLayer = 4,
         layering = 'simplex', // longest/cg/simplex
         ordering = 'bary', // adjacent/bary
@@ -121,7 +122,7 @@ sm.layout.dag = function() {
 
             // Label the minimal one
             unlabels[0].pi = i;
-            // console.log(unlabels[0].text + '\t' + i);
+            // console.log(label(unlabels[0]) + '\t' + i);
         }
 
         // All vertices already assigned to the current layer
@@ -172,7 +173,7 @@ sm.layout.dag = function() {
                         // Reduce if connecting
                         if (a[i][k]) {
                             a[i][k].reduced = true;
-                            // console.log('remove ' + vertices[i].text + '\t' + vertices[k].text);
+                            // console.log('remove ' + label(vertices[i]) + '\t' + label(vertices[k]));
                         }
 
                         m[i][k] = false;
@@ -427,7 +428,7 @@ sm.layout.dag = function() {
         // Show order
         L2.forEach((v, i) => { v.order = i; });
 
-        // L2.forEach(v => { console.log(v.text + ': bary=' + v.bary + ', order=' + v.order); });
+        // L2.forEach(v => { console.log(label(v) + ': bary=' + v.bary + ', order=' + v.order); });
     }
 
     /*
@@ -588,9 +589,9 @@ sm.layout.dag = function() {
         });
 
         // Check sink of class
-        // allVertices.filter(v => v === v.root && v === v.sink).forEach(v => { console.log(v.text); });
+        // allVertices.filter(v => v === v.root && v === v.sink).forEach(v => { console.log(label(v)); });
         // allVertices.forEach(v => {
-        //     v.classLabel = v.root.sink.text;
+        //     v.classLabel = label(v.root.sink);
         // });
 
         // Absolute coordinates
@@ -602,7 +603,7 @@ sm.layout.dag = function() {
         });
 
         // Check coordinates
-        // allVertices.forEach(v => { console.log(v.text + ':\t' + v.x); });
+        // allVertices.forEach(v => { console.log(label(v) + ':\t' + v.x); });
 
         // Save the computed x to combine later
         allVertices.forEach(v => {
@@ -611,7 +612,7 @@ sm.layout.dag = function() {
     }
 
     function shiftDelta(s, delta) {
-        // console.log('shift: [' + delta + '] ' + s.text);
+        // console.log('shift: [' + delta + '] ' + label(s));
 
         if (s.shift < Number.POSITIVE_INFINITY) {
             s.shift += delta;
@@ -630,7 +631,7 @@ sm.layout.dag = function() {
      * Assigns horizontal coordinate for the roots of blocks.
      */
     function placeBlock(v, hori) {
-        // console.log(_.times(level, () => '\t').join('') + 'placing: ' + v.text);
+        // console.log(_.times(level, () => '\t').join('') + 'placing: ' + label(v));
         // level++;
 
         // Root will be shifted later.
@@ -650,7 +651,7 @@ sm.layout.dag = function() {
 
                 var gap = v.blockSize / 2 + u.blockSize / 2 + vertexSep;
                 if (v.sink !== u.sink) { // Different classes
-                    // console.log('different class: ' + v.text + ' --- ' + u.text);
+                    console.log('different class: ' + label(v) + ' --- ' + label(u));
 
                     // Shift u's dependent sinks as well
                     var newShift = Math.min(u.sink.shift, v.x - u.x - gap);
@@ -667,7 +668,7 @@ sm.layout.dag = function() {
         } while (w !== v); // Complete a cycle
 
         // level--;
-        // console.log(_.times(level, () => '\t').join('') + 'placed: ' + v.text);
+        // console.log(_.times(level, () => '\t').join('') + 'placed: ' + label(v));
     }
 
     function runOneAlignment() {
@@ -759,7 +760,6 @@ sm.layout.dag = function() {
             })
         });
     }
-
 
     function assignEdgePoints() {
         function getOutPos(v) {
@@ -972,6 +972,15 @@ sm.layout.dag = function() {
     module.height = function(value) {
         if (!arguments.length) return height;
         height = value;
+        return this;
+    };
+
+    /**
+     * Sets/gets the label accessor.
+     */
+    module.label = function(value) {
+        if (!arguments.length) return label;
+        label = value;
         return this;
     };
 
