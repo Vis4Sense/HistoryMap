@@ -4,23 +4,33 @@
 sm.provenance.browser = function() {
     var module = {};
 
-    var actions, // The input/output array of actions
+    var actions = [], // The input/output array of actions
         listening,
-        urlToActionLookup = {}; // url -> true if the page was visited and captured
+        provAction = sm.provenance.action(),
+        prevUrl, // The url of the last action
+        urlToActionLookup = {}, // url -> action (data object) if the page was visited (first visit) and captured
+        tabIdToActionLookup = {}; // tabId -> action
 
     var dispatch = d3.dispatch('dataChanged');
 
-    chrome.tabs.onUpdated.addListener(onTabUpdated);
-    chrome.tabs.onActivated.addListener(onTabActivated);
-    chrome.tabs.onRemoved.addListener(onTabRemoved);
-    chrome.runtime.onMessage.addListener(onMessageReceived);
+    function init() {
+        chrome.tabs.onUpdated.addListener(onTabUpdated);
+        chrome.tabs.onActivated.addListener(onTabActivated);
+        chrome.tabs.onRemoved.addListener(onTabRemoved);
+        chrome.runtime.onMessage.addListener(onMessageReceived);
+        createContextMenus();
+        // updatePageEndTime();
+    }
+
+    init();
 
     // Couldn't distinguish between auto reload and normal first load.
     // I don't want to include auto reload page. So, don't capture revisit here at all.
     // If the user opens a revisit page, accept a known bug that it's not captured.
     function onTabUpdated(tabId, changeInfo, tab) {
-        if (!listening || isTabIgnored(tab) || !isTabComplete(tab)) return;
+        if (!listening || isTabIgnored(tab) || isTabInComplete(tab)) return;
 
+        // Either add new action or update it (with favIconUrl)
         var action = urlToActionLookup[tab.url];
         if (action) {
             // After a tab is complete, 'favIconUrl' can still be updated.
@@ -33,82 +43,112 @@ sm.provenance.browser = function() {
         }
     }
 
-    function isTabComplete(tab) {
-        return tab.status === 'complete';
+    function isTabInComplete(tab) {
+        return tab.status !== 'complete';
     }
 
     function isTabIgnored(tab) {
-        var ignoredUrls = [ "chrome://", "chrome-extension://", "chrome-devtools://", "view-source:", "google.co.uk/url", "google.com/url", "localhost://" ];
+        var ignoredUrls = [ 'chrome://', 'chrome-extension://', 'chrome-devtools://', 'view-source:', 'google.co.uk/url', 'google.com/url', 'localhost://' ];
         return ignoredUrls.some(url => tab.url.includes(url));
     }
 
     function addAction(tab) {
-        getVisitType(tab.url, type => {
-            createNewAction(tab, type);
-        });
+        // Action is more important than visit type
+        var action = provAction.extract(prevUrl && new URL(prevUrl), new URL(tab.url));
+        if (action) {
+            if (action !== 'skip') {
+                var prevAction = urlToActionLookup[prevUrl];
+                var a = createNewAction(tab, action.type, action.label);
+                // Set the original page of the filter
+                if (action.type === 'filter' && prevAction) {
+                    a.from = prevAction.type === 'filter' ? prevAction.from : prevAction.id;
+                }
+            }
+        } else {
+            getVisitType(tab.url, tab.id, (type, referrer) => {
+                createNewAction(tab, type, undefined, referrer);
+            });
+        }
     }
 
     function addRevisitAction(tab) {
         createNewAction(tab, 'revisit');
     }
 
-    function getVisitType(url, callback) {
+    function getVisitType(url, tabId, callback) {
         chrome.history.getVisits({ url: url }, results => {
             if (!results || !results.length) return;
 
             // The latest one contains information about the just completely loaded page
             var visitTransition = results[0].transition,
-                bookmarkTypes = [ "auto_bookmark" ],
-                typedTypes = [ "typed", "generated", "keyword", "keyword_generated" ],
+                bookmarkTypes = [ 'auto_bookmark' ],
+                typedTypes = [ 'typed', 'generated', 'keyword', 'keyword_generated' ],
                 type = bookmarkTypes.includes(visitTransition) ? 'bookmark' :
                     typedTypes.includes(visitTransition) ? 'type' : 'link';
 
-            callback(type);
+            // Find the referrer
+            if (type === 'link') {
+                chrome.tabs.sendMessage(tabId, { type: 'askReferrer' }, function(response) {
+                    // referrer only return the path, excluding the hash. So just guess the latest one could be the most likely one.
+                    var embeddedTypes = [ 'highlight', 'note', 'filter' ],
+                        referrer = actions.slice().reverse().find(a => a.url.startsWith(response) && !embeddedTypes.includes(a.type));
+                    callback(type, referrer);
+                });
+            } else {
+                callback(type);
+            }
         });
     }
 
-    function createNewAction(tab, type) {
+    function createNewAction(tab, type, text, referrer, path, classId) {
         // Still need to check the last time before creating a new action
         // because two updates can happen in a very short time, thus the second one
         // happens even before a new action is added in the first update
-        if (type === 'revisit') {
-            var originalAction = urlToActionLookup[tab.url];
-            console.log('create revisit: ' + tab.url);
-            var time = new Date(),
-                action = {
-                    id: +time,
-                    time: time,
-                    url: originalAction.url,
-                    text: originalAction.text,
-                    type: type,
-                    favIconUrl: originalAction.favIconUrl,
-                    from: originalAction.id
-                };
+        var action,
+            originalAction = urlToActionLookup[tab.url];
 
-            actions.push(action);
-            dispatch.dataChanged();
+        if (type === 'revisit') {
+            console.log('create revisit: ' + tab.url);
+            action = createActionObject(originalAction.url, originalAction.text, type, originalAction.favIconUrl, originalAction);
+            dispatch.dataChanged(type);
+        } else if (type === 'highlight') {
+            action = createActionObject(tab.url, text, type, undefined, referrer, path, classId);
+            dispatch.dataChanged(type);
         } else {
-            if (urlToActionLookup[tab.url]) {
+            if (originalAction) {
                 console.log('update in new: ' + tab.url);
                 updateAction(tab);
             } else {
                 console.log('create new: ' + tab.url);
-                var time = new Date(),
-                    action = {
-                    id: +time,
-                    time: time,
-                    url: tab.url,
-                    text: tab.title || tab.url || '',
-                    type: type,
-                    favIconUrl: tab.favIconUrl,
-                    seen: tab.active
-                };
-
-                actions.push(action);
+                action = createActionObject(tab.url, text || tab.title || tab.url || '', type, tab.favIconUrl, referrer);
+                action.seen = tab.active;
                 urlToActionLookup[tab.url] = action; // Maintain the first visit
-                dispatch.dataChanged();
+                dispatch.dataChanged(type);
             }
         }
+
+        if (action) prevUrl = action.url;
+
+        return action;
+    }
+
+    function createActionObject(url, text, type, favIconUrl, referrer, path, classId) {
+        var time = new Date(),
+            action = {
+                id: +time,
+                time: time,
+                url: url,
+                text: text,
+                type: type
+            };
+        if (favIconUrl) action.favIconUrl = favIconUrl;
+        if (referrer) action.from = referrer.id;
+        if (path) action.path = path;
+        if (classId) action.classId = classId;
+
+        actions.push(action);
+
+        return action;
     }
 
     function updateAction(tab) {
@@ -118,18 +158,19 @@ sm.provenance.browser = function() {
         // The only practical update I've seen!
         if (tab.favIconUrl && tab.favIconUrl !== action.favIconUrl) {
             action.favIconUrl = tab.favIconUrl;
-            dispatch.dataChanged();
+            dispatch.dataChanged('update');
         }
     }
 
     function onTabActivated(activeInfo) {
         if (!listening) return;
 
-        chrome.tabs.query({ windowId: activeInfo.windowId, active: true }, function(tabs) {
+        // Either add a 'revisit' action or a normal action (happen when switch to a tab which was opened before the extension)
+        chrome.tabs.query({ windowId: activeInfo.windowId, active: true }, tabs => {
             if (!tabs.length) return;
 
             var tab = tabs[0];
-            if (isTabIgnored(tab) || !isTabComplete(tab)) return;
+            if (isTabIgnored(tab) || isTabInComplete(tab)) return;
 
             var action = urlToActionLookup[tab.url];
             if (action) {
@@ -147,11 +188,83 @@ sm.provenance.browser = function() {
     }
 
     function onTabRemoved(tabId, removeInfo) {
-
+        var n = tabIdToActionLookup[tabId];
+        if (n) {
+            n.closed = true;
+            dispatch.dataChanged('tabClosed');
+        }
     }
 
     function onMessageReceived(request, sender, sendResponse) {
+        if (request.type === 'noted') {
+            var action = actions.find(a => a.url === sender.tab.url && a.classId === request.data.classId);
+            action.text = request.data.text;
+            action.type = 'note';
+        } else if (request.type === 'highlightRemoved') {
+            _.remove(actions, a => a.url === sender.tab.url && a.classId === request.classId);
+        }
 
+        dispatch.dataChanged(request.type);
+    }
+
+    function updatePageEndTime() {
+        // After every a fix amount of seconds,
+        // - gets the currently active tab in the browser
+        // - updates reading time of the 'currently stored' active tab
+        setInterval(() => {
+            // Get active tab
+            chrome.tabs.query({ active: true }, tabs => {
+                tabs.forEach(tab => {
+                    if (isTabIgnored(tab) || isTabInComplete(tab)) return;
+
+                    var action = urlToActionLookup[tab.url];
+                    if (action) {
+                        action.endTime = new Date();
+                        dispatch.dataChanged('endTime');
+                    }
+                });
+            });
+        }, 1000);
+    }
+
+    function createContextMenus() {
+        // why remove all? todo
+        chrome.contextMenus.removeAll();
+
+        // To highlight selected text
+        chrome.contextMenus.create( {
+            id: 'sm-highlight',
+            title: 'Highlight',
+            contexts: ['selection']
+        });
+
+        chrome.contextMenus.onClicked.addListener((info, tab) => {
+            if (info.menuItemId === 'sm-highlight') {
+                chrome.tabs.sendMessage(tab.id, { type: 'highlightSelection' }, d => {
+                    createNewAction(tab, 'highlight', d.text, urlToActionLookup[tab.url], d.path, d.classId);
+                });
+            }
+        });
+    }
+
+    function buildLookups() {
+        // Build lookup using loaded actions
+        urlToActionLookup = {};
+        actions.forEach(action => {
+            urlToActionLookup[action.url] = action;
+        });
+
+        // Build lookup using opening tabs
+        tabIdToActionLookup = {};
+        chrome.tabs.query({}, tabs => {
+            tabs.forEach(t => {
+                var n = actions.find(n => n.url === t.url);
+                if (n) {
+                    tabIdToActionLookup[t.id] = n;
+                    if (t.active) n.highlighted = true;
+                }
+            });
+        });
     }
 
     /**
@@ -160,6 +273,7 @@ sm.provenance.browser = function() {
     module.actions = function(value) {
         if (!arguments.length) return actions;
         actions = value;
+        buildLookups();
         return this;
     };
 

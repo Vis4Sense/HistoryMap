@@ -27,12 +27,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	    // Resize current window
 		chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {
-			left: 0, top: 0, width: screen.width / 2, height: fullHeight
+			left: 0, top: 0, width: screen.width / 2 - 200, height: fullHeight
 		});
 
 		// Timeline: always show
 		chrome.windows.create({
-	    	url: chrome.extension.getURL(page), type: "popup", left: screen.width / 2, top: 0, width: screen.width / 2, height: fullHeight
+	    	url: chrome.extension.getURL(page), type: "popup", left: screen.width / 2 - 200, top: 0, width: screen.width / 2 + 200, height: fullHeight - 500
 	    });
 
 		// Listen to content script
