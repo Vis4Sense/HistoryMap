@@ -26,7 +26,7 @@ sm.provenance.browser = function() {
 
     // Couldn't distinguish between auto reload and normal first load.
     // I don't want to include auto reload page. So, don't capture revisit here at all.
-    // If the user opens a revisit page, accept a known bug that it's not captured.
+    // If the user opens a revisited page, accept a known bug that it's not captured.
     function onTabUpdated(tabId, changeInfo, tab) {
         if (!listening || isTabIgnored(tab) || isTabInComplete(tab)) return;
 
@@ -37,6 +37,22 @@ sm.provenance.browser = function() {
             if (!action.favIconUrl) {
                 console.log('update after new: ' + tab.url);
                 updateAction(tab);
+            }
+
+            if (action.closed) {
+                action.closed = false;
+                dispatch.dataChanged('tabOpened');
+            }
+
+            if (tab.active) {
+                action.seen = true;
+                actions.forEach(a => {
+                    a.highlighted = action === a;
+                });
+                dispatch.dataChanged('highlighted');
+
+                // Capture a snapshot if not yet
+                if (!action.image) takeSnapshot(tab.windowId, action);
             }
         } else {
             addAction(tab);
@@ -80,7 +96,7 @@ sm.provenance.browser = function() {
             if (!results || !results.length) return;
 
             // The latest one contains information about the just completely loaded page
-            var visitTransition = results[0].transition,
+            var visitTransition = _.last(results).transition,
                 bookmarkTypes = [ 'auto_bookmark' ],
                 typedTypes = [ 'typed', 'generated', 'keyword', 'keyword_generated' ],
                 type = bookmarkTypes.includes(visitTransition) ? 'bookmark' :
@@ -90,14 +106,17 @@ sm.provenance.browser = function() {
             if (type === 'link') {
                 chrome.tabs.sendMessage(tabId, { type: 'askReferrer' }, function(response) {
                     // referrer only return the path, excluding the hash. So just guess the latest one could be the most likely one.
-                    var embeddedTypes = [ 'highlight', 'note', 'filter' ],
-                        referrer = actions.slice().reverse().find(a => a.url.startsWith(response) && !embeddedTypes.includes(a.type));
+                    var referrer = response ? actions.slice().reverse().find(a => a.url.startsWith(response) && !isEmbeddedType(a.type)) : null;
                     callback(type, referrer);
                 });
             } else {
                 callback(type);
             }
         });
+    }
+
+    function isEmbeddedType(type) {
+        return [ 'highlight', 'note', 'filter' ].includes(type);
     }
 
     function createNewAction(tab, type, text, referrer, path, classId) {
@@ -108,26 +127,36 @@ sm.provenance.browser = function() {
             originalAction = urlToActionLookup[tab.url];
 
         if (type === 'revisit') {
-            console.log('create revisit: ' + tab.url);
             action = createActionObject(originalAction.url, originalAction.text, type, originalAction.favIconUrl, originalAction);
             dispatch.dataChanged(type);
-        } else if (type === 'highlight') {
+        } else if (type === 'highlight' || type === 'filter') {
             action = createActionObject(tab.url, text, type, undefined, referrer, path, classId);
+            urlToActionLookup[tab.url] = action;
             dispatch.dataChanged(type);
         } else {
             if (originalAction) {
-                console.log('update in new: ' + tab.url);
                 updateAction(tab);
             } else {
-                console.log('create new: ' + tab.url);
                 action = createActionObject(tab.url, text || tab.title || tab.url || '', type, tab.favIconUrl, referrer);
-                action.seen = tab.active;
+                action.seen = action.highlighted = tab.active;
                 urlToActionLookup[tab.url] = action; // Maintain the first visit
                 dispatch.dataChanged(type);
+
+                // Page snapshot
+                if (tab.active) takeSnapshot(tab.windowId, action);
             }
         }
 
-        if (action) prevUrl = action.url;
+        if (action) {
+            prevUrl = action.url;
+
+            // Only the newly created tab is active
+            if (tab.active) {
+                actions.forEach(a => {
+                    a.highlighted = action === a;
+                });
+            }
+        }
 
         return action;
     }
@@ -139,16 +168,44 @@ sm.provenance.browser = function() {
                 time: time,
                 url: url,
                 text: text,
-                type: type
+                type: type,
+                showImage: true
             };
         if (favIconUrl) action.favIconUrl = favIconUrl;
         if (referrer) action.from = referrer.id;
         if (path) action.path = path;
         if (classId) action.classId = classId;
 
+        if (!isEmbeddedType(type)) {
+            // End time
+            action.endTime = action.id + 1;
+        }
+
         actions.push(action);
 
         return action;
+    }
+
+    function takeSnapshot(windowId, action) {
+        captureWindow(windowId, function(dataUrl) {
+            if (!action.image) {
+                action.image = dataUrl;
+                dispatch.dataChanged('snapshot');
+            }
+        });
+    }
+
+    function captureWindow(windowId, callback) {
+        // In some pages, tab.status can be complete first, then use ajax to load content.
+        // So, need to wait a bit (not really know how much) before capturing.
+        setTimeout(function() {
+            chrome.tabs.captureVisibleTab(windowId, { format: "png" }, function(dataUrl) {
+                if (!dataUrl) return;
+
+                // Resize image because only need thumbnail size
+                sm.resizeImage(dataUrl, 192, 150, callback);
+            });
+        }, 1000);
     }
 
     function updateAction(tab) {
@@ -180,7 +237,17 @@ sm.provenance.browser = function() {
                     addRevisitAction(tab);
                 } else {
                     action.seen = true;
+                    dispatch.dataChanged('seen');
                 }
+
+                // Capture a snapshot if not yet
+                if (!action.image) takeSnapshot(activeInfo.windowId, action);
+
+                // Highlight the active page
+                actions.forEach(a => {
+                    a.highlighted = action === a;
+                });
+                dispatch.dataChanged('highlighted');
             } else {
                 addAction(tab);
             }
@@ -200,11 +267,11 @@ sm.provenance.browser = function() {
             var action = actions.find(a => a.url === sender.tab.url && a.classId === request.data.classId);
             action.text = request.data.text;
             action.type = 'note';
+            dispatch.dataChanged(request.type);
         } else if (request.type === 'highlightRemoved') {
             _.remove(actions, a => a.url === sender.tab.url && a.classId === request.classId);
+            dispatch.dataChanged(request.type);
         }
-
-        dispatch.dataChanged(request.type);
     }
 
     function updatePageEndTime() {
@@ -247,33 +314,42 @@ sm.provenance.browser = function() {
         });
     }
 
-    function buildLookups() {
+    function buildLookups(callback) {
         // Build lookup using loaded actions
+        var duplicateUrlTypes = [ 'highlight', 'note', 'revisit' ];
         urlToActionLookup = {};
         actions.forEach(action => {
-            urlToActionLookup[action.url] = action;
+            if (!duplicateUrlTypes.includes(action.type)) {
+                urlToActionLookup[action.url] = action;
+                action.closed = true;
+            }
         });
 
         // Build lookup using opening tabs
         tabIdToActionLookup = {};
         chrome.tabs.query({}, tabs => {
             tabs.forEach(t => {
-                var n = actions.find(n => n.url === t.url);
+                var n = urlToActionLookup[t.url];
                 if (n) {
                     tabIdToActionLookup[t.id] = n;
-                    if (t.active) n.highlighted = true;
+                    n.closed = false;
+                    if (t.active) {
+                        n.highlighted = n.seen = true;
+                    }
                 }
             });
+
+            callback();
         });
     }
 
     /**
      * Sets/gets the capturing actions.
      */
-    module.actions = function(value) {
+    module.actions = function(value, callback) {
         if (!arguments.length) return actions;
         actions = value;
-        buildLookups();
+        buildLookups(callback);
         return this;
     };
 

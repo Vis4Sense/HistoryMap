@@ -15,6 +15,7 @@ sm.layout.forest = function() {
         parent = d => d.parent,
         time = d => d.time,
         label = d => d.label,
+        isIndented = false,
         depthSep = 30,
         siblingSep = 10,
         nonSiblingSep = 15,
@@ -56,7 +57,7 @@ sm.layout.forest = function() {
         });
     }
 
-    function setCoordinate() {
+    function computeIndentedTreeLayout() {
         // Nodes
         var offset = 0;
         dfsRoots(n => {
@@ -75,7 +76,7 @@ sm.layout.forest = function() {
         });
     }
 
-    function useTree() {
+    function computeNormalTreeLayout() {
         init();
         buildGraph();
         runMXLayout();
@@ -165,9 +166,12 @@ sm.layout.forest = function() {
      */
     module.compute = function() {
         order();
-        // setCoordinate();
 
-        useTree();
+        if (isIndented) {
+            computeIndentedTreeLayout();
+        } else {
+            computeNormalTreeLayout();
+        }
 
         // The vis width and height
         return {

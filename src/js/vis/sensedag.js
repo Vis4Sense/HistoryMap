@@ -10,6 +10,7 @@ sm.vis.sensedag = function() {
         icon = d => d.icon,
         type = d => d.type,
         time = d => d.time, // Expect a Date object
+        image = d => d.image,
         candidate = d => d.candidate;
 
     // Rendering options
@@ -19,7 +20,7 @@ sm.vis.sensedag = function() {
         minZoomLevel = 0.2,
         zoomStep = 0.1,
         panExtent = [ 0, 1, 0, 1 ],
-        defaultMaxWidth = 150,
+        defaultMaxWidth = 200,
         rowGap = 10, // vertical gap between 2 rows
         rowHeight, // all nodes have the same height
         rowHeightIncludeGap,
@@ -64,8 +65,8 @@ sm.vis.sensedag = function() {
                 // Draw a link from the node center to the current mouse position
                 cursorLink.classed('hide', false);
                 cursorLink
-                    .attr("x1", d.x + d.width / 2).attr("y1", d.y + d.height / 2)
-                    .attr("x2", d3.event.x).attr("y2", d3.event.y);
+                    .attr('x1', d.x + d.width / 2).attr('y1', d.y + d.height / 2)
+                    .attr('x2', d3.event.x).attr('y2', d3.event.y);
 
                 // Don't know why mouse over other nodes doesn't work. Have to do it manually
                 var self = this;
@@ -146,7 +147,7 @@ sm.vis.sensedag = function() {
                 .append('g').attr('class', 'sm-sensenav');
             linkContainer = container.append('g').attr('class', 'links');
             nodeContainer = container.append('g').attr('class', 'nodes');
-            cursorLink = container.append("line").attr("class", "cursor-link hide").attr('marker-end', 'url(#arrow-marker-cursor)');
+            cursorLink = container.append('line').attr('class', 'cursor-link hide').attr('marker-end', 'url(#arrow-marker-cursor)');
 
             zoomPan();
             sm.createArrowHeadMarker(self, 'arrow-marker', '#bbb');
@@ -160,12 +161,12 @@ sm.vis.sensedag = function() {
 
         var links = linkContainer.selectAll('.link').data(data.links, linkKey);
         links.enter().call(enterLinks);
-        links.exit().transition().style("opacity", 0).remove();
+        links.exit().transition().style('opacity', 0).remove();
 
         var nodes = nodeContainer.selectAll('.node-container').data(data.nodes, key);
         nodes.enter().call(enterNodes);
         nodes.call(updateNodes);
-        nodes.exit().transition().style("opacity", 0).remove();
+        nodes.exit().transition().style('opacity', 0).remove();
 
         // Layout DAG
         computeLayout(function() {
@@ -231,19 +232,23 @@ sm.vis.sensedag = function() {
                 var pad = 6;
                 connecting = rect.right - pad < d3.event.x || rect.left + pad > d3.event.x ||
                     rect.top + pad > d3.event.y || rect.bottom - pad < d3.event.y;
-                d3.select(this).classed('connect', connecting);
-                d3.select(this).classed('move', !connecting);
+                d3.select(this).classed('connect', connecting)
+                    .classed('move', !connecting);
             });
 
         var parent = div.append('xhtml:div').attr('class', 'parent')
             .attr('title', label);
 
         // Icon
-        parent.append('xhtml:img').attr('class', 'node-icon');
-        parent.append('xhtml:div').attr('class', 'node-icon fa fa-fw');
+        var titleDiv = parent.append('xhtml:div');
+        titleDiv.append('xhtml:img').attr('class', 'node-icon');
+        titleDiv.append('xhtml:div').attr('class', 'node-icon fa fa-fw');
 
         // Text
-        parent.append('xhtml:div').attr('class', 'node-label');
+        titleDiv.append('xhtml:div').attr('class', 'node-label');
+
+        // Snapshot
+        parent.append('xhtml:img').attr('class', 'node-snapshot img-responsive center-block');
 
         // Children
         div.append('xhtml:div').attr('class', 'children');
@@ -267,24 +272,40 @@ sm.vis.sensedag = function() {
                 .classed(iconClassLookup[type(d)], true)
                 .style('background-color', colorScale(type(d)));
 
+            // Different appearance with/out snapshot
+            container.select('div').classed('node-title', image(d));
+
             // Status
-            d3.select(this).classed('closed', d.closed);
-            d3.select(this).select('.node').classed('highlighted', d.highlighted);
+            d3.select(this).classed('closed', d.closed)
+                .select('.node').classed('highlighted', d.highlighted)
+                .classed('not-seen', !d.seen);
 
             // Text
-            container.select('.node-label').text(label)
-                .style('max-width', defaultMaxWidth * zoomLevel + 'px');
+            container.select('.node-label').text(label);
+
+            // Snapshot
+            container.select('img.node-snapshot').attr('src', image);
 
             if (d.children) updateChildren(d3.select(this).select('.children'), d);
             container.classed('has-children', d.children);
             d3.select(this).select('.children').classed('hide', !d.children);
+
+            setMaxWidthText(this);
         });
+    }
+
+    function setMaxWidthText(self) {
+        var containerWidth = defaultMaxWidth * zoomLevel;
+        d3.select(self).select('.node').style('max-width', containerWidth + 'px');
+
+        d3.select(self).selectAll('.node-label')
+            .style('max-width', containerWidth - 35 + 'px');
     }
 
     function updateChildren(container, d) {
         // Enter
-        var subItems = container.selectAll(".sub-node").data(d.children, key);
-        var enterItems = subItems.enter().append("div").attr("class", "sub-node")
+        var subItems = container.selectAll('.sub-node').data(d.children, key);
+        var enterItems = subItems.enter().append('div').attr('class', 'sub-node')
             .attr('title', label)
             .on('click', function(d) {
                 dispatch.itemClicked(d);
@@ -304,11 +325,11 @@ sm.vis.sensedag = function() {
                 .classed(iconClassLookup[type(d2)], true)
                 .style('background-color', colorScale(type(d2)));
         });
-        subItems.select(".node-label").text(label)
+        subItems.select('.node-label').text(label)
             .style('max-width', (defaultMaxWidth - 10) * zoomLevel + 'px');
 
         // Exit
-        subItems.exit().transition().style("opacity", 0).remove();
+        subItems.exit().transition().style('opacity', 0).remove();
     }
 
     /**

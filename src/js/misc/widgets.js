@@ -163,28 +163,6 @@ sm.createArrowHeadMarker = function(parent, id, fillColor) {
 };
 
 /**
- * Periodically check if all images are loaded. If yes, invoke the given callback.
- */
-sm.checkImagesLoaded = function(nodes, callback) {
-    var id = setInterval(function() {
-        var loaded = true;
-        nodes.each(function(d) {
-            var img = d3.select(this).select("img");
-            if (img.attr("src") && img.style("width") === "0px") {
-                loaded = false;
-            }
-        });
-
-        if (loaded) {
-            // TODO: it runs twice now!
-            // Stop checking
-            clearInterval(id);
-            callback();
-        }
-    });
-};
-
-/**
  * Shows a modal dialog.
  */
 sm.modal = function(head, body, draggable, x, y) {

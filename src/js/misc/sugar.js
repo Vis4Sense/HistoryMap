@@ -134,3 +134,58 @@ sm.fetchPageTitle = function(url, callback) {
         }
     });
 };
+
+/**
+ * Periodically check if all images are loaded. If yes, invoke the given callback.
+ */
+sm.checkImagesLoaded = function(nodes, callback) {
+    var maxIterations = 10; // Max number of times checking images to prevent waiting too long
+    var id = setInterval(function() {
+        maxIterations--;
+        var loaded = true;
+        nodes.each(function(d) {
+            var img = d3.select(this).select("img");
+            if (img.attr("src") && img.style("width") === "0px") {
+                loaded = false;
+            }
+        });
+
+        if (loaded || !maxIterations) {
+            // TODO: it runs twice now!
+            // Stop checking
+            clearInterval(id);
+            callback();
+        }
+    }, 1000);
+};
+
+/**
+ * Resizes a given image in a data format and run the callback with the new image.
+ */
+sm.resizeImage = function(dataUrl, maxWidth, maxHeight, callback) {
+    var canvas = document.createElement('canvas'),
+        ctx = canvas.getContext('2d'),
+        img = new Image();
+    img.src = dataUrl;
+    img.onload = function() {
+        var ratio = Math.max(this.width / maxWidth, this.height / maxHeight);
+        ratio = 2;
+        canvas.width = this.width / ratio;
+        canvas.height = this.height / ratio;
+        ctx.drawImage(img, 0, 0, this.width, this.height, 0, 0, canvas.width, canvas.height);
+        callback(canvas.toDataURL('image/png', 1));
+    };
+};
+
+/**
+ * Save data to local file.
+ */
+sm.saveDataToFile = function(filename, data, isDataUrl) {
+    var link = document.createElement('a');
+    document.body.appendChild(link);
+    link.style.display = 'none';
+    link.setAttribute('download', filename);
+    link.setAttribute('href', isDataUrl ? data: URL.createObjectURL(new Blob([JSON.stringify(data, null, 4)])));
+    link.click();
+    document.body.removeChild(link);
+};

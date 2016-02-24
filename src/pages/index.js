@@ -2,11 +2,14 @@ $(function() {
     // Data
     var data = {}, // The data will be passed to the vis
         actions = [], // All actions added in temporal order including 'revisit' and 'child' actions
+        browser = sm.provenance.browser(),
+        startRecordingTime,
         pendingTasks = {}, // For jumping to an action when its page isn't ready yet
         name = '', // For quick test/analysis: preload data to save time loading files in the interface
         datasets = {
-            p1: "data/p1.json",
-            p2: 'data/latest.json'
+            p1: 'data/p1.json',
+            p2: 'data/latest.json',
+            image: 'data/image.json'
         };
 
     // Vis and options
@@ -27,34 +30,40 @@ $(function() {
                     main();
                 });
             } else {
+                startRecordingTime = new Date();
                 main();
             }
         });
     }
 
     function main() {
-        sm.provenance.browser()
-            .actions(actions)
-            .capture()
-            .on('dataChanged', () => {
-                buildHierarchy(actions);
-                redraw(true);
-            });
-
-        buildVis();
-        updateVis();
-        wheelHorizontalScroll();
+        browser.actions(actions, function() {
+            buildVis();
+            updateVis();
+            wheelHorizontalScroll();
+        }).capture()
+        .on('dataChanged', _.throttle(onDataChanged, 1000));
+        // .on('dataChanged', onDataChanged);
     };
+
+    function onDataChanged(p) {
+        console.log(p, +new Date());
+        buildHierarchy(actions);
+        redraw(true);
+    }
 
     run();
 
+    var firstTime = true;
     function loadDataFile(json) {
-        actions = json;
+        actions = json.data;
         buildHierarchy(actions);
 
-        if (sensenav) {
-            sensenav.actions(actions);
-            redraw(true);
+        if (!firstTime) {
+            browser.actions(actions, function() {
+                if (sensenav) redraw(true);
+            });
+            firstTime = false;
         }
     }
 
@@ -72,6 +81,9 @@ $(function() {
 
     // Convert flat list of actions to parent-children network, then redraw the vis.
     function buildHierarchy(actions) {
+        // Ignore 'revisit' actions for navigation
+        _.remove(actions, a => a.type === 'revisit');
+
         // Init
         actions.forEach(n => {
             delete n.children;
@@ -127,23 +139,10 @@ $(function() {
                 });
             }
         });
-
-        // Sync current opening tabs and the vis
-        data.nodes.forEach(n => { n.closed = true; });
-        chrome.tabs.query({}, tabs => {
-            tabs.forEach(t => {
-                var n = actions.find(n => n.url === t.url);
-                if (n) {
-                    n.closed = false;
-                    if (n.parent) n.parent.closed = false;
-                }
-            });
-        });
     }
 
     function isEmbeddedType(type) {
-        var embeddedTypes = [ "highlight", "note", "filter" ];
-        return embeddedTypes.includes(type);
+        return [ 'highlight', 'note', 'filter' ].includes(type);
     }
 
     function respondToContentScript() {
@@ -152,12 +151,12 @@ $(function() {
 
             var tab = sender.tab;
 
-            if (request.type === "dataRequested") {
+            if (request.type === 'dataRequested') {
                 // Get highlights, notes for the requested item
                 var tabData = actions.filter(d => d.url === tab.url);
                 var t = tabData.map(getCoreData);
                 sendResponse(t);
-            } else if (request.type === "taskRequested") {
+            } else if (request.type === 'taskRequested') {
                 if (pendingTasks[tab.id]) {
                     var t = getCoreData(pendingTasks[tab.id]);
                     sendResponse(t);
@@ -167,51 +166,24 @@ $(function() {
         });
     }
 
-    function respondToTabActivated() {
-        chrome.tabs.onActivated.addListener(activeInfo => {
-            if (!listening) return;
-
-        	chrome.tabs.query({ windowId: activeInfo.windowId, active: true }, tabs => {
-                if (!tabs.length) return;
-
-                var tab = tabs[0];
-        		if (tab.status !== "complete" || isTabIgnored(tab)) return;
-
-                actions.forEach(n => {
-                    n.highlighted = n.url === tab.url;
-                    if (n.highlighted && n.parent) n.parent.highlighted = true;
-                });
-
-                addFirstTimeVisitPage(tab);
-                redraw();
-            });
-        });
-    }
-
-    var timeoutId; // To prevent redraw multiple times
-
     function buildVis() {
         sensenav = sm.vis.sensedag()
             .label(d => d.text)
             .icon(d => d.favIconUrl)
-            .on("itemClicked", jumpTo);
+            .on('itemClicked', jumpTo);
 
-        // Register to update vis when the window is resized
-        $(window).resize(() => {
-            clearTimeout(timeoutId);
-            timeoutId = setTimeout(updateVis, 100);
-        });
+        $(window).resize(_.throttle(updateVis, 200));
 
         // Save and Load
-        $(document).on("keydown", function(e) {
+        $(document).on('keydown', function(e) {
             if (!e.metaKey && !e.ctrlKey) return;
 
             var prevent = true;
 
             if (e.keyCode === 83) { // Ctrl + S
-                $("#btnSave").get(0).click();
+                saveFile();
             } else if (e.keyCode === 79) { // Ctrl + O
-                $("#btnLoad").click();
+                $('#btnLoad').click();
             } else if (e.keyCode === 80) { // Ctrl + P
                 replay();
             } else {
@@ -222,15 +194,7 @@ $(function() {
         });
 
         // Settings
-        var timeFormat = d3.time.format("%Y-%m-%d %H:%M:%S");
-        $("#btnSave").click(function() {
-            var date = timeFormat(new Date()),
-                saveData = actions.map(getCoreData);
-            $(this).attr("download", date + "_provenance.json")
-                .attr("href", URL.createObjectURL(new Blob([JSON.stringify(saveData, null, 4)])));
-        });
-
-        $("#btnLoad").change(e => {
+        $('#btnLoad').change(e => {
             sm.readUploadedFile(e, content => {
                 loadDataFile(JSON.parse(content));
                 redraw(true);
@@ -238,8 +202,24 @@ $(function() {
         });
     }
 
+    function saveFile() {
+        // Images: replace dataURL with local files to reduce the size
+        var coreData = actions.map(getCoreData);
+        coreData.filter(d => d.image).forEach(d => {
+            var filename = d.id + '.png';
+            sm.saveDataToFile(filename, d.image, true);
+            d.image = filename;
+        });
+
+        // Main file
+        var timeFormat = d3.time.format('%Y-%m-%d %H:%M:%S'),
+            date = timeFormat(new Date()),
+            filename = date + '_sensemap.json';
+        sm.saveDataToFile(filename, { startRecordingTime: startRecordingTime, data: coreData });
+    }
+
     function getCoreData(d) {
-        return {
+        var action = {
             id: d.id,
             text: d.text,
             url: d.url,
@@ -250,8 +230,16 @@ $(function() {
             classId: d.classId,
             path: d.path,
             image: d.image,
-            from: d.from
+            from: d.from,
+            seen: d.seen
         };
+
+        // Ignore undefined fields
+        _.each(action, (value, key) => {
+            if (value === undefined) delete action.key;
+        });
+
+        return action;
     }
 
     function replay() {
@@ -267,15 +255,6 @@ $(function() {
             }, 1000);
     }
 
-    function doGivenTab (url, callback) {
-        chrome.tabs.query({}, tabs => {
-            var tab = tabs.find(t => t.url === url);
-            if (tab) {
-                callback(tab);
-            }
-        });
-    }
-
     function jumpTo(d) {
         if (showBrowser) {
             chrome.tabs.query({}, tabs => {
@@ -283,7 +262,7 @@ $(function() {
                 if (tab) {
                     // Found it, tell content script to scroll to the element
                     chrome.tabs.update(tab.id, { active: true });
-                    chrome.tabs.sendMessage(tab.id, { type: "scrollToElement", path: d.path, image: d.image });
+                    chrome.tabs.sendMessage(tab.id, { type: 'scrollToElement', path: d.path, image: d.image });
 
                     // Get the tab/window in focused as well
                     chrome.windows.update(tab.windowId, { focused: true });
@@ -305,23 +284,23 @@ $(function() {
     }
 
     function redraw(dataChanged) {
-        d3.select(".sm-sensemap-container").datum(data).call(sensenav);
+        d3.select('.sm-sensemap-container').datum(data).call(sensenav);
     }
 
     function wheelHorizontalScroll() {
         var leftMouseDown = false,
             prevX;
-        $("body").on("wheel", function(e) {
+        $('body').on('wheel', function(e) {
             this.scrollLeft -= e.originalEvent.wheelDelta;
             e.preventDefault();
-        }).on("mousedown", function(e) {
+        }).on('mousedown', function(e) {
             if (e.which === 1) {
                 leftMouseDown = true;
                 prevX = e.clientX;
             }
-        }).on("mouseup", function(e) {
+        }).on('mouseup', function(e) {
             leftMouseDown = false;
-        }).on("mousemove", function(e) {
+        }).on('mousemove', function(e) {
             if (leftMouseDown && e.shiftKey) {
                 this.scrollLeft -= e.clientX - prevX;
                 prevX = e.clientX;

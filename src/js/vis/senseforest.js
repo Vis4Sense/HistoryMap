@@ -9,16 +9,13 @@ sm.vis.senseforest = function() {
         icon = d => d.icon,
         type = d => d.type,
         time = d => d.time, // Expect a Date object
+        image = d => d.image,
         candidate = d => d.candidate;
 
     // Rendering options
     var layout,
-        zoomLevel = 1,
-        maxZoomLevel = 2,
-        minZoomLevel = 0.2,
-        zoomStep = 0.1,
         panExtent = [ 0, 1, 0, 1 ],
-        defaultMaxWidth = 150;
+        defaultMaxWidth = 200;
 
     // Data
     var data,
@@ -34,8 +31,7 @@ sm.vis.senseforest = function() {
         marker; // Arrow head
 
     // d3
-    var diagonal,
-        line = d3.svg.line()
+    var line = d3.svg.line()
             .x(d => d.x)
             .y(d => d.y),
         colorScale = d3.scale.category10()
@@ -72,11 +68,6 @@ sm.vis.senseforest = function() {
 
             sm.createArrowHeadMarker(self, 'arrow-marker', '#bbb');
             sm.addPan(container, panExtent);
-
-            diagonal = d3.svg.diagonal()
-                .projection(function(d) { return [d.y, d.x]; })
-                .source(d => d.points[0])
-                .target(d => d.points[1]);
         }
 
         layout = sm.layout.forest()
@@ -89,14 +80,14 @@ sm.vis.senseforest = function() {
 
         var links = linkContainer.selectAll('.link').data(data.links, linkKey);
         links.enter().call(enterLinks);
-        links.exit().transition().style("opacity", 0).remove();
+        links.exit().transition().style('opacity', 0).remove();
 
         var nodes = nodeContainer.selectAll('.node-container').data(data.nodes, key);
         nodes.enter().call(enterNodes);
         nodes.call(updateNodes);
-        nodes.exit().transition().style("opacity", 0).remove();
+        nodes.exit().transition().style('opacity', 0).remove();
 
-        // Layout DAG
+        // Layout
         computeLayout(function() {
             links.call(updateLinks);
             nodes.call(updateNodePositions);
@@ -138,11 +129,15 @@ sm.vis.senseforest = function() {
             .attr('title', label);
 
         // Icon
-        parent.append('xhtml:img').attr('class', 'node-icon');
-        parent.append('xhtml:div').attr('class', 'node-icon fa fa-fw');
+        var titleDiv = parent.append('xhtml:div');
+        titleDiv.append('xhtml:img').attr('class', 'node-icon');
+        titleDiv.append('xhtml:div').attr('class', 'node-icon fa fa-fw');
 
         // Text
-        parent.append('xhtml:div').attr('class', 'node-label');
+        titleDiv.append('xhtml:div').attr('class', 'node-label');
+
+        // Snapshot
+        parent.append('xhtml:img').attr('class', 'node-snapshot img-responsive center-block');
 
         // Children
         div.append('xhtml:div').attr('class', 'children');
@@ -155,9 +150,6 @@ sm.vis.senseforest = function() {
         selection.each(function(d) {
             var container = d3.select(this).select('.parent');
 
-            // Content type: normal finding or candidate
-            container.classed('candidate', candidate(d));
-
             var typeVisible = searchTypes.includes(type(d));
             container.select('img.node-icon').attr('src', icon)
                 .classed('hide', typeVisible);
@@ -166,24 +158,44 @@ sm.vis.senseforest = function() {
                 .classed(iconClassLookup[type(d)], true)
                 .style('background-color', colorScale(type(d)));
 
+            // Different appearance with/out snapshot
+            container.select('div').classed('node-title', image(d));
+
             // Status
-            d3.select(this).classed('closed', d.closed);
-            d3.select(this).select('.node').classed('highlighted', d.highlighted);
+            d3.select(this).classed('closed', d.closed)
+                .select('.node')
+                    .classed('highlighted', d.highlighted)
+                    .classed('not-seen', !d.seen);
 
             // Text
-            container.select('.node-label').text(label)
-                .style('max-width', defaultMaxWidth * zoomLevel + 'px');
+            container.select('.node-label').text(label);
 
+            // Snapshot
+            container.select('img.node-snapshot')
+                // .classed('hide', !d.showImage)
+                .attr('src', image);
+
+            // Children
             if (d.children) updateChildren(d3.select(this).select('.children'), d);
             container.classed('has-children', d.children);
             d3.select(this).select('.children').classed('hide', !d.children);
+
+            setMaxWidthText(this);
         });
+    }
+
+    function setMaxWidthText(self) {
+        var containerWidth = defaultMaxWidth;
+        d3.select(self).select('.node').style('max-width', containerWidth + 'px');
+
+        d3.select(self).selectAll('.node-label')
+            .style('max-width', containerWidth - 35 + 'px');
     }
 
     function updateChildren(container, d) {
         // Enter
-        var subItems = container.selectAll(".sub-node").data(d.children, key);
-        var enterItems = subItems.enter().append("div").attr("class", "sub-node")
+        var subItems = container.selectAll('.sub-node').data(d.children, key);
+        var enterItems = subItems.enter().append('div').attr('class', 'sub-node')
             .attr('title', label)
             .on('click', function(d) {
                 dispatch.itemClicked(d);
@@ -203,11 +215,11 @@ sm.vis.senseforest = function() {
                 .classed(iconClassLookup[type(d2)], true)
                 .style('background-color', colorScale(type(d2)));
         });
-        subItems.select(".node-label").text(label)
-            .style('max-width', defaultMaxWidth * zoomLevel + 'px');
+        subItems.select('.node-label').text(label)
+            .style('max-width', defaultMaxWidth + 'px');
 
         // Exit
-        subItems.exit().transition().style("opacity", 0).remove();
+        subItems.exit().transition().style('opacity', 0).remove();
     }
 
     /**
@@ -243,7 +255,6 @@ sm.vis.senseforest = function() {
 
             // Set data
             container.select('path').attr('d', line(d.points));
-            // container.select('path').attr('d', diagonal);
         });
     }
 
@@ -298,6 +309,15 @@ sm.vis.senseforest = function() {
     module.icon = function(value) {
         if (!arguments.length) return icon;
         icon = value;
+        return this;
+    };
+
+    /**
+     * Sets/gets the image accessor.
+     */
+    module.image = function(value) {
+        if (!arguments.length) return image;
+        image = value;
         return this;
     };
 

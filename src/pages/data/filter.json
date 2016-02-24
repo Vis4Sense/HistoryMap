@@ -1,19 +1,43 @@
-[
+{
+    "startRecordingTime": "2015-03-23T17:43:24Z",
+    "data":[
     {
-        "id": 1454945569949,
-        "text": "Booking.com: Hotels in London. Book your hotel now!",
-        "url": "http://www.booking.com/searchresults.en-gb.html?src=searchresults&ssafas=1&city=-2601889&ssne=London&ssne_untouched=London&error_url=http%3A%2F%2Fwww.booking.com%2Fsearchresults.en-gb.html%3Flabel%3Dgen173nr-15CAEoggJCAlhYSDNiBW5vcmVmaPQBiAEBmAEuuAEEyAEE2AED6AEB%3Bsid%3D0527cca8651467794c416f5f79554592%3Bdcid%3D4%3Bcheckin_monthday%3D18%3Bcheckin_year_month%3D2016-2%3Bcheckout_monthday%3D25%3Bcheckout_year_month%3D2016-2%3Bcity%3D-2601889%3Bclass_interval%3D1%3Bcsflt%3D%257B%257D%3Bdtdisc%3D0%3Bgroup_adults%3D2%3Bgroup_children%3D0%3Bhlrd%3D0%3Bhyb_red%3D0%3Binac%3D0%3Blabel_click%3Dundef%3Bnha_red%3D0%3Bno_rooms%3D1%3Boffset%3D0%3Boffset_unavail%3D1%3Bredirected_from_city%3D0%3Bredirected_from_landmark%3D0%3Bredirected_from_region%3D0%3Breview_score_group%3Dempty%3Broom1%3DA%252CA%3Bsb_price_type%3Dtotal%3Bscore_min%3D0%3Bsi%3Dai%252Cco%252Cci%252Cre%252Cdi%3Bsrc%3Dsearchresults%3Bss%3DLondon%3Bss_all%3D0%3Bssafas%3D1%3Bssb%3Dempty%3Bsshis%3D0%3Bssne%3DLondon%3Bssne_untouched%3DLondon%3Btrack_sas%3D1%26%3B&dcid=4&label=gen173nr-15CAEoggJCAlhYSDNiBW5vcmVmaPQBiAEBmAEuuAEEyAEE2AED6AEB&lang=en-gb&sid=0527cca8651467794c416f5f79554592&si=ai%2Cco%2Cci%2Cre%2Cdi&ss=London&checkin_monthday=18&checkin_year_month=2016-2&checkout_monthday=29&checkout_year_month=2016-2&room1=A%2CA&no_rooms=1&group_adults=2&group_children=0&highlighted_hotels=&highlighted_hotels=&track_sas=1",
-        "type": "link",
-        "time": "2016-02-08T15:32:49.949Z",
-        "favIconUrl": "http://q-ec.bstatic.com/static/img/b25logo/favicon/ebc77706da3aae4aee7b05dadf182390f0d26d11.ico"
+        "id": 1455188301170,
+        "text": "Home | Middlesex University London",
+        "url": "http://www.mdx.ac.uk/",
+        "type": "type",
+        "time": "2016-02-11T10:58:21.170Z",
+        "endTime": 1455188301171,
+        "favIconUrl": "http://www.mdx.ac.uk/__data/assets/image/0017/2393/icon.png?v=0.1.1"
     },
     {
-        "id": 1454945709472,
-        "text": "change 'error_url': from 'http://www.booking.com/searchresults.en-gb.html?label=gen173nr-15CAEoggJCAlhYSDNiBW5vcmVmaPQBiAEBmAEuuAEEyAEE2AED6AEB;sid=0527cca8651467794c416f5f79554592;dcid=4;checkin_monthday=18;checkin_year_month=2016-2;checkout_monthday=25;checkout_year_month=2016-2;city=-2601889;class_interval=1;csflt={};dtdisc=0;group_adults=2;group_children=0;hlrd=0;hyb_red=0;inac=0;label_click=undef;nha_red=0;no_rooms=1;offset=0;offset_unavail=1;redirected_from_city=0;redirected_from_landmark=0;redirected_from_region=0;review_score_group=empty;room1=A,A;sb_price_type=total;score_min=0;si=ai,co,ci,re,di;src=searchresults;ss=London;ss_all=0;ssafas=1;ssb=empty;sshis=0;ssne=London;ssne_untouched=London;track_sas=1&;' to 'http://www.booking.com/searchresults.en-gb.html?label=gen173nr-15CAEoggJCAlhYSDNiBW5vcmVmaPQBiAEBmAEuuAEEyAEE2AED6AEB;sid=0527cca8651467794c416f5f79554592;dcid=4;checkin_monthday=18;checkin_year_month=2016-2;checkout_monthday=29;checkout_year_month=2016-2;city=-2601889;class_interval=1;csflt={};dtdisc=0;group_adults=2;group_children=0;hlrd=0;hyb_red=0;inac=0;label_click=undef;nha_red=0;no_rooms=1;offset=0;offset_unavail=1;redirected_from_city=0;redirected_from_landmark=0;redirected_from_region=0;review_score_group=empty;room1=A,A;sb_price_type=total;score_min=0;si=ai,co,ci,re,di;src=searchresults;ss=London;ss_all=0;ssafas=1;ssb=empty;sshis=0;ssne=London;ssne_untouched=London;track_sas=1&;'; change 'checkout_monthday': from '29' to '23'",
-        "url": "http://www.booking.com/searchresults.en-gb.html?src=searchresults&ssafas=1&city=-2601889&ssne=London&ssne_untouched=London&error_url=http%3A%2F%2Fwww.booking.com%2Fsearchresults.en-gb.html%3Flabel%3Dgen173nr-15CAEoggJCAlhYSDNiBW5vcmVmaPQBiAEBmAEuuAEEyAEE2AED6AEB%3Bsid%3D0527cca8651467794c416f5f79554592%3Bdcid%3D4%3Bcheckin_monthday%3D18%3Bcheckin_year_month%3D2016-2%3Bcheckout_monthday%3D29%3Bcheckout_year_month%3D2016-2%3Bcity%3D-2601889%3Bclass_interval%3D1%3Bcsflt%3D%257B%257D%3Bdtdisc%3D0%3Bgroup_adults%3D2%3Bgroup_children%3D0%3Bhlrd%3D0%3Bhyb_red%3D0%3Binac%3D0%3Blabel_click%3Dundef%3Bnha_red%3D0%3Bno_rooms%3D1%3Boffset%3D0%3Boffset_unavail%3D1%3Bredirected_from_city%3D0%3Bredirected_from_landmark%3D0%3Bredirected_from_region%3D0%3Breview_score_group%3Dempty%3Broom1%3DA%252CA%3Bsb_price_type%3Dtotal%3Bscore_min%3D0%3Bsi%3Dai%252Cco%252Cci%252Cre%252Cdi%3Bsrc%3Dsearchresults%3Bss%3DLondon%3Bss_all%3D0%3Bssafas%3D1%3Bssb%3Dempty%3Bsshis%3D0%3Bssne%3DLondon%3Bssne_untouched%3DLondon%3Btrack_sas%3D1%26%3B&dcid=4&label=gen173nr-15CAEoggJCAlhYSDNiBW5vcmVmaPQBiAEBmAEuuAEEyAEE2AED6AEB&lang=en-gb&sid=0527cca8651467794c416f5f79554592&si=ai%2Cco%2Cci%2Cre%2Cdi&ss=London&checkin_monthday=18&checkin_year_month=2016-2&checkout_monthday=23&checkout_year_month=2016-2&room1=A%2CA&no_rooms=1&group_adults=2&group_children=0&highlighted_hotels=&highlighted_hotels=&track_sas=1",
-        "type": "filter",
-        "time": "2016-02-08T15:35:09.472Z",
-        "favIconUrl": "http://q-ec.bstatic.com/static/img/b25logo/favicon/ebc77706da3aae4aee7b05dadf182390f0d26d11.ico",
-        "from": 1454945569949
+        "id": 1455188303103,
+        "text": "chrome.runtime - Google Chrome",
+        "url": "https://developer.chrome.com/extensions/runtime#type-MessageSender",
+        "type": "link",
+        "time": "2016-02-11T10:58:23.103Z",
+        "endTime": 1455188303104,
+        "favIconUrl": "https://www.google.com/images/icons/product/chrome-32.png",
+        "from": 1455188301170
+    },
+    {
+        "id": 1455188307729,
+        "text": "Home | Middlesex University London",
+        "url": "http://www.mdx.ac.uk/",
+        "type": "revisit",
+        "time": "2016-02-11T10:58:27.729Z",
+        "endTime": 1455188307730,
+        "favIconUrl": "http://www.mdx.ac.uk/__data/assets/image/0017/2393/icon.png?v=0.1.1",
+        "from": 1455188301170
+    },
+    {
+        "id": 1455188309424,
+        "text": "chrome.runtime - Google Chrome",
+        "url": "https://developer.chrome.com/extensions/runtime#type-MessageSender",
+        "type": "revisit",
+        "time": "2016-02-11T10:58:29.424Z",
+        "endTime": 1455188309425,
+        "favIconUrl": "https://www.google.com/images/icons/product/chrome-32.png",
+        "from": 1455188303103
     }
-]
+]}

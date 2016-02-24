@@ -12,6 +12,7 @@
 
 .sm-sensenav .closed .node {
 	border: 1px solid gray;
+	box-shadow: none;
 }
 
 .sm-sensenav .node.move {
@@ -31,14 +32,14 @@
     border-color: magenta;
 }
 
-.sm-sensenav .node.hovered {
-    box-shadow: 0 0 8px cyan;
-}
-
 .sm-sensenav .node.move:hover,
 .sm-sensenav .node.connect:hover,
 .sm-sensenav .node.highlighted {
     box-shadow: 0 0 8px magenta;
+}
+
+.sm-sensenav .node.not-seen {
+	/*box-shadow: 0 0 8px orange;*/
 }
 
 .sm-sensenav .node.candidate {
@@ -49,6 +50,19 @@
 	border: none;
 	padding: 0 4px;
 	border-radius: 0;
+}
+
+.sm-sensenav .node-title {
+	background-color: #eee;
+    margin: -3px -3px 3px -3px;
+    padding: 3px;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+	margin-bottom: 5px;
+}
+
+.sm-sensenav .node-snapshot {
+	max-height: 150px;
 }
 
 .sm-sensenav .node-label:hover {
