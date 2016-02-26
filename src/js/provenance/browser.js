@@ -187,7 +187,7 @@ sm.provenance.browser = function() {
     }
 
     function takeSnapshot(windowId, action) {
-        captureWindow(windowId, function(dataUrl) {
+        captureWindow(windowId, action.url, function(dataUrl) {
             if (!action.image) {
                 action.image = dataUrl;
                 dispatch.dataChanged('snapshot');
@@ -195,16 +195,22 @@ sm.provenance.browser = function() {
         });
     }
 
-    function captureWindow(windowId, callback) {
+    function captureWindow(windowId, url, callback) {
         // In some pages, tab.status can be complete first, then use ajax to load content.
         // So, need to wait a bit (not really know how much) before capturing.
-        // TODO: will have a problem if switching tabs less than 1000ms
         setTimeout(function() {
-            chrome.tabs.captureVisibleTab(windowId, { format: "png" }, function(dataUrl) {
-                if (!dataUrl) return;
+            // Check again if the tab is going to be captured is the same as the tab needs to capture.
+            // Otherwise, if the user stays in a tab less than the waiting amount, wrong tab could be captured.
+            chrome.tabs.query({ windowId: windowId, active: true }, tabs => {
+                if (!tabs.length) return;
+                if (tabs[0].url !== url) return;
 
-                // Resize image because only need thumbnail size
-                sm.resizeImage(dataUrl, 192, 150, callback);
+                chrome.tabs.captureVisibleTab(windowId, { format: "png" }, function(dataUrl) {
+                    if (!dataUrl) return;
+
+                    // Resize image because only need thumbnail size
+                    sm.resizeImage(dataUrl, 192, 150, callback);
+                });
             });
         }, 1000);
     }
