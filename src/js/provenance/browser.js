@@ -329,11 +329,9 @@ sm.provenance.browser = function() {
         // Build lookup using loaded actions
         var duplicateUrlTypes = [ 'highlight', 'note', 'revisit' ];
         urlToActionLookup = {};
-        actions.forEach(action => {
-            if (!duplicateUrlTypes.includes(action.type)) {
-                urlToActionLookup[action.url] = action;
-                action.closed = true;
-            }
+        actions.filter(a => a.url && !duplicateUrlTypes.includes(a.type)).forEach(action => {
+            urlToActionLookup[action.url] = action;
+            action.closed = true;
         });
 
         // Build lookup using opening tabs

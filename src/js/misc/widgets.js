@@ -327,7 +327,7 @@ sm.addBootstrapTooltip = function(selection) {
         .attr('data-container', 'body')
         .attr('data-placement', 'auto')
         .attr('data-html', true)
-        .attr('data-delay', 250)
+        .attr('data-delay', 500)
         .each(function() {
             $(this).tooltip();
         });

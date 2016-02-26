@@ -10,6 +10,7 @@ sm.vis.sensemap = function() {
         type = d => d.type,
         time = d => d.time, // Expect a Date object
         image = d => d.image,
+        favorite = d => d.favorite,
         candidate = d => d.candidate;
 
     // Rendering options
@@ -90,6 +91,9 @@ sm.vis.sensemap = function() {
                     l.points.slice(0, 2).forEach(updateDragPosition);
                     d3.select(document.getElementById(linkKey(l))).attr('d', line(l.points));
                 });
+
+                // Bootstrap tooltip appears even when moving the node => disable it
+                d3.select(this).select('.parent').attr('data-original-title', '');
             }
         }).on('dragend', function(d) {
             dragging = false;
@@ -106,12 +110,18 @@ sm.vis.sensemap = function() {
                         // Add a link from the dragging node to the hovering node if not existed
                         if (data.links.find(l => l.source === d && l.target === d2)) return;
 
-                        data.links.push({ source: d, target: d2 });
-                        update();
+                        var l = { source: d, target: d2 };
+                        data.links.push(l);
+
                         found = true;
+                        update();
+                        dispatch.linkAdded(l);
                     }
                 });
             }
+
+            // Enable tooltip, which is disabled when moving node
+            d3.select(this).select('.parent').attr('data-original-title', buildHTMLTitle(d));
         });
 
     // Key function to bind data
@@ -119,7 +129,7 @@ sm.vis.sensemap = function() {
         linkKey = d => key(d.source) + '-' + key(d.target);
 
     // Others
-    var dispatch = d3.dispatch('itemClicked');
+    var dispatch = d3.dispatch('nodeClicked', 'linkAdded', 'linkRemoved');
 
     /**
      * Main entry of the module.
@@ -214,7 +224,7 @@ sm.vis.sensemap = function() {
         var div = container.append('xhtml:div').attr('class', 'node')
             .on('click', function(d) {
                 if (d3.event.defaultPrevented) return;
-                dispatch.itemClicked(d);
+                dispatch.nodeClicked(d);
             }).on('mousemove', function() {
                 // Don't revaluate status when the node is being dragged
                 if (dragging) return;
@@ -264,7 +274,7 @@ sm.vis.sensemap = function() {
                 .style('background-color', colorScale(type(d)));
 
             // Different appearance with/out snapshot
-            container.select('div').classed('node-title', image(d) && d.favorite);
+            container.select('div').classed('node-title', image(d) && favorite(d));
 
             // Status
             d3.select(this).classed('closed', d.closed)
@@ -277,7 +287,7 @@ sm.vis.sensemap = function() {
             // Snapshot
             container.select('img.node-snapshot')
                 .attr('src', image)
-                .classed('hide', !d.favorite);
+                .classed('hide', !image(d) || !favorite(d));
 
             // Tooltip
             container.attr('data-original-title', buildHTMLTitle(d));
@@ -292,7 +302,7 @@ sm.vis.sensemap = function() {
 
     function buildHTMLTitle(d) {
         var s = '';
-        if (image(d) && !d.favorite) {
+        if (image(d) && !favorite(d)) {
             s += "<img class='node-snapshot img-responsive center-block' src='" + image(d) + "'/>";
         }
 
@@ -317,7 +327,7 @@ sm.vis.sensemap = function() {
         var enterItems = subItems.enter().append('div').attr('class', 'sub-node')
             .call(sm.addBootstrapTooltip)
             .on('click', function(d) {
-                dispatch.itemClicked(d);
+                dispatch.nodeClicked(d);
                 d3.event.stopPropagation();
             });
 

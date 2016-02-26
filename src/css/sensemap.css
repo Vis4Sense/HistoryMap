@@ -64,6 +64,7 @@
 	fill: none;
 	stroke-width: 1.5px;
 	stroke: #6e6e6e;
+	stroke-dasharray: 5,5;
 }
 
 /* To make icon and label in one line */

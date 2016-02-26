@@ -5,16 +5,15 @@ $(function() {
         browser = sm.provenance.browser(),
         startRecordingTime,
         pendingTasks = {}, // For jumping to an action when its page isn't ready yet
-        name = 'p2', // For quick test/analysis: preload data to save time loading files in the interface
+        name = 'test', // For quick test/analysis: preload data to save time loading files in the interface
         datasets = {
-            p1: 'data/p1.json',
-            p2: 'data/latest.json',
-            image: 'data/image.json'
+            test: 'data/2016-02-26 15-06-30_sensemap.json',
+            simple: 'data/simple/sensemap.json',
+            camera: 'data/camera/sensemap.json'
         };
 
     // Vis and options
-    var sensemap,
-        showBrowser = true,
+    var sensemap
         listening = true;
 
     function run() {
@@ -43,7 +42,6 @@ $(function() {
             wheelHorizontalScroll();
         }).capture()
         .on('dataChanged', _.throttle(onDataChanged, 200));
-        // .on('dataChanged', onDataChanged);
     };
 
     function onDataChanged(p) {
@@ -58,6 +56,7 @@ $(function() {
     function loadDataFile(json) {
         actions = json.data;
         buildHierarchy(actions);
+        fixImagePath(actions);
 
         if (!firstTime) {
             browser.actions(actions, function() {
@@ -65,6 +64,17 @@ $(function() {
             });
             firstTime = false;
         }
+    }
+
+    function fixImagePath(actions) {
+        if (!name) return;
+
+        // Make images in the same path as the main data file
+        var path = datasets[name].substr(0, datasets[name].lastIndexOf('/') + 1);
+
+        actions.forEach(d => {
+            d.image = path + d.image;
+        });
     }
 
     function addLink(p, c) {
@@ -117,8 +127,8 @@ $(function() {
             }
         });
 
-        // - Ignore child actions
-        data.nodes = actions.filter(n => !n.parent);
+        // - Ignore child and link actions
+        data.nodes = actions.filter(a => !a.parent && !isNonActionType(a.type));
 
         // Specific for test data: add two semantic links
         if (name === 'p1') {
@@ -132,17 +142,33 @@ $(function() {
 
         // - Then add to the link list
         data.links = [];
-        data.nodes.forEach(d => {
-            if (d.links) {
-                d.links.forEach(c => {
-                    if (data.nodes.includes(c)) data.links.push({ source: d, target: c });
-                });
+        // -- User links
+        actions.filter(a => isNonActionType(a.type)).forEach(a => {
+            if (a.type === 'add-user-link') {
+                data.links.push({ source: getActionById(a.sourceId), target: getActionById(a.targetId), isUserAdded: true });
+            } else if (a.type === 'remove-user-link') {
+
             }
         });
+
+        // -- Automatic links
+        data.nodes.filter(d => d.links).forEach(d => {
+            d.links.forEach(c => {
+                if (data.nodes.includes(c)) data.links.push({ source: d, target: c });
+            });
+        });
+    }
+
+    function getActionById(id) {
+        return actions.find(a => a.id === id);
     }
 
     function isEmbeddedType(type) {
         return [ 'highlight', 'note', 'filter' ].includes(type);
+    }
+
+    function isNonActionType(type) {
+        return [ 'add-user-link', 'remove-user-link' ].includes(type);
     }
 
     function respondToContentScript() {
@@ -170,7 +196,8 @@ $(function() {
         sensemap = sm.vis.sensemap()
             .label(d => d.text)
             .icon(d => d.favIconUrl)
-            .on('itemClicked', jumpTo);
+            .on('nodeClicked', onNodeClicked)
+            .on('linkAdded', onLinkAdded);
 
         $(window).resize(_.throttle(updateVis, 200));
 
@@ -231,7 +258,9 @@ $(function() {
             path: d.path,
             image: d.image,
             from: d.from,
-            seen: d.seen
+            seen: d.seen,
+            sourceId: d.sourceId,
+            targetId: d.targetId
         };
 
         // Ignore undefined fields
@@ -255,27 +284,34 @@ $(function() {
             }, 1000);
     }
 
-    function jumpTo(d) {
-        if (showBrowser) {
-            chrome.tabs.query({}, tabs => {
-                var tab = tabs.find(t => t.url === d.url);
-                if (tab) {
-                    // Found it, tell content script to scroll to the element
-                    chrome.tabs.update(tab.id, { active: true });
-                    chrome.tabs.sendMessage(tab.id, { type: 'scrollToElement', path: d.path, image: d.image });
+    function onNodeClicked(d) {
+        chrome.tabs.query({}, tabs => {
+            var tab = tabs.find(t => t.url === d.url);
+            if (tab) {
+                // Found it, tell content script to scroll to the element
+                chrome.tabs.update(tab.id, { active: true });
+                chrome.tabs.sendMessage(tab.id, { type: 'scrollToElement', path: d.path, image: d.image });
 
-                    // Get the tab/window in focused as well
+                // Get the tab/window in focused as well
+                chrome.windows.update(tab.windowId, { focused: true });
+            } else {
+                // Can't find it, already closed, open new item, request scrolling later on
+                chrome.tabs.create({ url: d.url }, tab => {
                     chrome.windows.update(tab.windowId, { focused: true });
+                    pendingTasks[tab.id] = d;
+                });
+            }
+        });
+    }
 
-                } else {
-                    // Can't find it, already closed, open new item, request scrolling later on
-                    chrome.tabs.create({ url: d.url }, tab => {
-                        chrome.windows.update(tab.windowId, { focused: true });
-                        pendingTasks[tab.id] = d;
-                    });
-                }
-            });
-        }
+    function onLinkAdded(d) {
+        // Add a new link as an action
+        actions.push({
+            type: 'add-user-link',
+            time: new Date(),
+            sourceId: d.source.id,
+            targetId: d.target.id
+        });
     }
 
     function updateVis() {
