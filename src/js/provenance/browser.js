@@ -35,7 +35,7 @@ sm.provenance.browser = function() {
         if (action) {
             // After a tab is complete, 'favIconUrl' can still be updated.
             if (!action.favIconUrl) {
-                console.log('update after new: ' + tab.url);
+                console.log('update: ' + tab.url);
                 updateAction(tab);
             }
 
@@ -198,6 +198,7 @@ sm.provenance.browser = function() {
     function captureWindow(windowId, callback) {
         // In some pages, tab.status can be complete first, then use ajax to load content.
         // So, need to wait a bit (not really know how much) before capturing.
+        // TODO: will have a problem if switching tabs less than 1000ms
         setTimeout(function() {
             chrome.tabs.captureVisibleTab(windowId, { format: "png" }, function(dataUrl) {
                 if (!dataUrl) return;
@@ -226,6 +227,11 @@ sm.provenance.browser = function() {
         chrome.tabs.query({ windowId: activeInfo.windowId, active: true }, tabs => {
             if (!tabs.length) return;
 
+            // Dehighlight all, only highlight the active one later
+            actions.forEach(a => {
+                a.highlighted = false;
+            });
+
             var tab = tabs[0];
             if (isTabIgnored(tab) || isTabInComplete(tab)) return;
 
@@ -244,9 +250,7 @@ sm.provenance.browser = function() {
                 if (!action.image) takeSnapshot(activeInfo.windowId, action);
 
                 // Highlight the active page
-                actions.forEach(a => {
-                    a.highlighted = action === a;
-                });
+                action.highlighted = true;
                 dispatch.dataChanged('highlighted');
             } else {
                 addAction(tab);
@@ -258,6 +262,7 @@ sm.provenance.browser = function() {
         var n = tabIdToActionLookup[tabId];
         if (n) {
             n.closed = true;
+            n.highlighted = false;
             dispatch.dataChanged('tabClosed');
         }
     }

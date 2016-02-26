@@ -5,7 +5,7 @@ $(function() {
         browser = sm.provenance.browser(),
         startRecordingTime,
         pendingTasks = {}, // For jumping to an action when its page isn't ready yet
-        name = '', // For quick test/analysis: preload data to save time loading files in the interface
+        name = 'p2', // For quick test/analysis: preload data to save time loading files in the interface
         datasets = {
             p1: 'data/p1.json',
             p2: 'data/latest.json',
@@ -13,7 +13,7 @@ $(function() {
         };
 
     // Vis and options
-    var sensenav,
+    var sensemap,
         showBrowser = true,
         listening = true;
 
@@ -42,7 +42,7 @@ $(function() {
             updateVis();
             wheelHorizontalScroll();
         }).capture()
-        .on('dataChanged', _.throttle(onDataChanged, 1000));
+        .on('dataChanged', _.throttle(onDataChanged, 200));
         // .on('dataChanged', onDataChanged);
     };
 
@@ -61,7 +61,7 @@ $(function() {
 
         if (!firstTime) {
             browser.actions(actions, function() {
-                if (sensenav) redraw(true);
+                if (sensemap) redraw(true);
             });
             firstTime = false;
         }
@@ -167,7 +167,7 @@ $(function() {
     }
 
     function buildVis() {
-        sensenav = sm.vis.sensedag()
+        sensemap = sm.vis.sensemap()
             .label(d => d.text)
             .icon(d => d.favIconUrl)
             .on('itemClicked', jumpTo);
@@ -279,12 +279,12 @@ $(function() {
     }
 
     function updateVis() {
-        sensenav.width(window.innerWidth).height(window.innerHeight);
+        sensemap.width(window.innerWidth).height(window.innerHeight);
         redraw();
     }
 
     function redraw(dataChanged) {
-        d3.select('.sm-sensemap-container').datum(data).call(sensenav);
+        d3.select('.sm-sensemap-container').datum(data).call(sensemap);
     }
 
     function wheelHorizontalScroll() {

@@ -318,3 +318,17 @@ sm.showSimpleDialog = function(container, title, content, x, y, w, h) {
             d3.select(this.parentNode).remove();
         });
 };
+
+/**
+ * Adds bootstrap tooltip for a d3 selection.
+ */
+sm.addBootstrapTooltip = function(selection) {
+    selection.attr('data-toggle', 'tooltip')
+        .attr('data-container', 'body')
+        .attr('data-placement', 'auto')
+        .attr('data-html', true)
+        .attr('data-delay', 250)
+        .each(function() {
+            $(this).tooltip();
+        });
+}

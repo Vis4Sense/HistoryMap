@@ -11,7 +11,7 @@ sm.layout.dag = function() {
         width, height, // constrained size
         label = d => d.label,
         direction = 'lr', // tb, bt, lr, rl
-        align = 'ul', // ul, ur, dl, dr
+        align = '', // ul, ur, dl, dr
         maxVerticesPerLayer = 4,
         layering = 'simplex', // longest/cg/simplex
         ordering = 'bary', // adjacent/bary
@@ -50,17 +50,18 @@ sm.layout.dag = function() {
         // All layering algorithms will place single-vertex dags into the first/last layer,
         // which makes the graph very high. To save space, link all of them together
         // to make a single long line.
-        var singleNodeDags = vertices.filter(v => !v.outEdges.length && !v.inEdges.length);
-        if (singleNodeDags.length) {
-            singleNodeDags.reduce((p, c) => {
-                var e = { source: p, target: c, dummy: true };
-                edges.push(e);
-                p.outEdges.push(e);
-                c.inEdges.push(e);
+        // Note: sensemap's design emphasizes consistent top to bottom is for temporal
+        // var singleNodeDags = vertices.filter(v => !v.outEdges.length && !v.inEdges.length);
+        // if (singleNodeDags.length) {
+        //     singleNodeDags.reduce((p, c) => {
+        //         var e = { source: p, target: c, dummy: true };
+        //         edges.push(e);
+        //         p.outEdges.push(e);
+        //         c.inEdges.push(e);
 
-                return c;
-            });
-        }
+        //         return c;
+        //     });
+        // }
 
         if (layering === 'longest') longestPath();
         if (layering === 'cg') coffmanGraham();
@@ -651,7 +652,7 @@ sm.layout.dag = function() {
 
                 var gap = v.blockSize / 2 + u.blockSize / 2 + vertexSep;
                 if (v.sink !== u.sink) { // Different classes
-                    console.log('different class: ' + label(v) + ' --- ' + label(u));
+                    // console.log('different class: ' + label(v) + ' --- ' + label(u));
 
                     // Shift u's dependent sinks as well
                     var newShift = Math.min(u.sink.shift, v.x - u.x - gap);

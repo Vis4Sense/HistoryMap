@@ -151,12 +151,11 @@ sm.checkImagesLoaded = function(nodes, callback) {
         });
 
         if (loaded || !maxIterations) {
-            // TODO: it runs twice now!
             // Stop checking
             clearInterval(id);
             callback();
         }
-    }, 1000);
+    }, 100);
 };
 
 /**

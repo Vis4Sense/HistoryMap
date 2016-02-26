@@ -1,0 +1,121 @@
+.sm-sensemap .node-container.closed {
+	/*opacity: 0.5;*/
+}
+
+.sm-sensemap .node {
+	display: inline-block;
+    background-color: white;
+    color: black;
+	border: 1px solid #6e6e6e;
+    border-radius: 6px;
+}
+
+.sm-sensemap .closed .node {
+}
+
+.sm-sensemap .node.move {
+	cursor: move;
+}
+
+.sm-sensemap .node.connect {
+	cursor: e-resize;
+}
+
+.sm-sensemap .node:hover,
+.sm-sensemap .node.hovered {
+	background-color: #1abc9c !important; /* overrides such as highlighted */
+}
+
+.sm-sensemap .node.highlighted {
+    background-color: #f1c40f;
+}
+
+.sm-sensemap .node.not-seen {
+	/*border-color: orange;*/
+}
+
+.sm-sensemap .node.candidate {
+	background-color: #777;
+	color: white;
+	font-family: Georgia;
+	font-size: 1.2em;
+	border: none;
+	padding: 0 4px;
+	border-radius: 0;
+}
+
+.sm-sensemap .node-title {
+	margin: -3px -3px 3px -3px;
+    padding: 3px;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+	margin-bottom: 5px;
+}
+
+.sm-sensemap .node-snapshot {
+	max-height: 150px;
+}
+
+.sm-sensemap .node-label:hover {
+	color: #fff;
+}
+
+.sm-sensemap .link path {
+	fill: none;
+	stroke-width: 1.5px;
+	stroke: #6e6e6e;
+}
+
+/* To make icon and label in one line */
+.sm-sensemap .node-icon {
+	max-width: 22px;
+	max-height: 22px;
+	display: inline-block;
+	margin: 0 3px 0 2px;
+}
+
+.sm-sensemap .candidate .node-icon {
+	max-width: 30px;
+	max-height: 30px;
+	display: block;
+	margin: auto;
+	margin-top: 3px;
+	padding: 0;
+}
+
+/* Action type icon */
+.sm-sensemap .node-icon.fa {
+	color: white;
+	padding: 3px;
+	border-radius: 4px;
+	width: 1.4em;
+	margin: 1px 3px 1px 0;
+}
+
+.sm-sensemap .node-label {
+	display: inline-block;
+	white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: bottom; /* inline-block and overflow hidden make text move upwards */
+}
+
+.sm-sensemap .cursor-link {
+	stroke-width: 2;
+    stroke: red;
+    shape-rendering: auto;
+}
+
+.sm-sensemap .parent {
+	padding: 3px;
+}
+
+.sm-sensemap .parent.has-children {
+	font-weight: bold;
+	border-bottom: 1px solid #6e6e6e;
+}
+
+.sm-sensemap .children {
+	padding: 3px;
+	padding-left: 5px;
+}
