@@ -325,7 +325,7 @@ sm.showSimpleDialog = function(container, title, content, x, y, w, h) {
 sm.addBootstrapTooltip = function(selection) {
     selection.attr('data-toggle', 'tooltip')
         .attr('data-container', 'body')
-        .attr('data-placement', 'auto')
+        .attr('data-placement', 'auto bottom')
         .attr('data-html', true)
         .attr('data-delay', 500)
         .each(function() {

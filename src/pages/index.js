@@ -7,7 +7,7 @@ $(function() {
         pendingTasks = {}, // For jumping to an action when its page isn't ready yet
         name = 'test', // For quick test/analysis: preload data to save time loading files in the interface
         datasets = {
-            test: 'data/2016-02-26 15-06-30_sensemap.json',
+            test: 'data/2016-02-28 21-04-18_sensemap.json',
             simple: 'data/simple/sensemap.json',
             camera: 'data/camera/sensemap.json'
         };
@@ -73,7 +73,7 @@ $(function() {
         var path = datasets[name].substr(0, datasets[name].lastIndexOf('/') + 1);
 
         actions.forEach(d => {
-            d.image = path + d.image;
+            if (d.image) d.image = path + d.image;
         });
     }
 
@@ -144,10 +144,12 @@ $(function() {
         data.links = [];
         // -- User links
         actions.filter(a => isNonActionType(a.type)).forEach(a => {
-            if (a.type === 'add-user-link') {
+            if (a.type === 'remove-node') {
+                _.remove(data.nodes, n => n.id === a.id);
+            } if (a.type === 'add-user-link') {
                 data.links.push({ source: getActionById(a.sourceId), target: getActionById(a.targetId), isUserAdded: true });
             } else if (a.type === 'remove-user-link') {
-
+                _.remove(data.links, l => l.source.id === a.sourceId && l.target.id === a.targetId);
             }
         });
 
@@ -168,7 +170,7 @@ $(function() {
     }
 
     function isNonActionType(type) {
-        return [ 'add-user-link', 'remove-user-link' ].includes(type);
+        return [ 'remove-node', 'add-user-link', 'remove-user-link' ].includes(type);
     }
 
     function respondToContentScript() {
@@ -197,7 +199,9 @@ $(function() {
             .label(d => d.text)
             .icon(d => d.favIconUrl)
             .on('nodeClicked', onNodeClicked)
-            .on('linkAdded', onLinkAdded);
+            .on('nodeRemoved', onNodeRemoved)
+            .on('linkAdded', onLinkAdded)
+            .on('linkRemoved', onLinkRemoved);
 
         $(window).resize(_.throttle(updateVis, 200));
 
@@ -246,29 +250,15 @@ $(function() {
     }
 
     function getCoreData(d) {
-        var action = {
-            id: d.id,
-            text: d.text,
-            url: d.url,
-            type: d.type,
-            time: d.time,
-            endTime: d.endTime,
-            favIconUrl: d.favIconUrl,
-            classId: d.classId,
-            path: d.path,
-            image: d.image,
-            from: d.from,
-            seen: d.seen,
-            sourceId: d.sourceId,
-            targetId: d.targetId
-        };
+        var c = {},
+            fields = [ 'id', 'text', 'url', 'type', 'time', 'endTime', 'favIconUrl',
+                'classId', 'path', 'image', 'from', 'seen', 'favorite', 'minimized', 'sourceId', 'targetId' ];
 
-        // Ignore undefined fields
-        _.each(action, (value, key) => {
-            if (value === undefined) delete action.key;
+        fields.forEach(f => {
+            if (d[f] !== undefined) c[f] = d[f];
         });
 
-        return action;
+        return c;
     }
 
     function replay() {
@@ -304,10 +294,26 @@ $(function() {
         });
     }
 
+    function onNodeRemoved(d) {
+        actions.push({
+            type: 'remove-node',
+            time: new Date(),
+            id: d.id
+        });
+    }
+
     function onLinkAdded(d) {
-        // Add a new link as an action
         actions.push({
             type: 'add-user-link',
+            time: new Date(),
+            sourceId: d.source.id,
+            targetId: d.target.id
+        });
+    }
+
+    function onLinkRemoved(d) {
+        actions.push({
+            type: 'remove-user-link',
             time: new Date(),
             sourceId: d.source.id,
             targetId: d.target.id

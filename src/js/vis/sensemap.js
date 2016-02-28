@@ -9,9 +9,7 @@ sm.vis.sensemap = function() {
         icon = d => d.icon,
         type = d => d.type,
         time = d => d.time, // Expect a Date object
-        image = d => d.image,
-        favorite = d => d.favorite,
-        candidate = d => d.candidate;
+        image = d => d.image;
 
     // Rendering options
     var layout,
@@ -37,8 +35,7 @@ sm.vis.sensemap = function() {
     var container, // g element containing the entire visualization
         nodeContainer, // g element containing all nodes
         linkContainer, // g element containing all links
-        cursorLink, // to draw a link when moving mouse
-        marker; // For arrow head
+        cursorLink; // to draw a link when moving mouse
 
     // d3
     var line = d3.svg.line()
@@ -51,85 +48,18 @@ sm.vis.sensemap = function() {
         iconClassLookup = { search: 'fa-search', location: 'fa-globe', dir: 'fa-street-view', highlight: 'fa-paint-brush',
             note: 'fa-file-text-o', filter: 'fa-filter'
         };
-    var updateDragPosition = function(d) {
-        d.x += d3.event.dx;
-        d.y += d3.event.dy;
-    };
     var drag = d3.behavior.drag()
-        .on('dragstart', function(d) {
-            if (d3.event.sourceEvent.which === 1) dragging = true;
-        }).on('drag', function(d) {
-            if (!dragging) return;
-
-            if (connecting) {
-                // Draw a link from the node center to the current mouse position
-                cursorLink.classed('hide', false);
-                cursorLink
-                    .attr('x1', d.x + d.width / 2).attr('y1', d.y + d.height / 2)
-                    .attr('x2', d3.event.x).attr('y2', d3.event.y);
-
-                // Don't know why mouse over other nodes doesn't work. Have to do it manually
-                var self = this;
-                nodeContainer.selectAll('.node').each(function() {
-                    d3.select(this).classed('hovered', this.parentNode !== self && this.containsPoint(d3.event.sourceEvent));
-                });
-            } else {
-                this.moveToFront();
-
-                // Update position of the dragging node
-                updateDragPosition(d);
-                d3.select(this).attr('transform', 'translate(' + Math.round(d.x) + ',' + Math.round(d.y) + ')');
-
-                // And also links
-                d.inEdges.forEach(l => {
-                    // Change only the last two points
-                    l.points.slice(l.points.length - 2).forEach(updateDragPosition);
-                    d3.select(document.getElementById(linkKey(l))).attr('d', line(l.points));
-                });
-                d.outEdges.forEach(l => {
-                    // Change only the first two points
-                    l.points.slice(0, 2).forEach(updateDragPosition);
-                    d3.select(document.getElementById(linkKey(l))).attr('d', line(l.points));
-                });
-
-                // Bootstrap tooltip appears even when moving the node => disable it
-                d3.select(this).select('.parent').attr('data-original-title', '');
-            }
-        }).on('dragend', function(d) {
-            dragging = false;
-            d3.select(this).classed('move connect', false);
-            cursorLink.classed('hide', true);
-
-            if (connecting) {
-                var self = this,
-                    found = false;
-                nodeContainer.selectAll('.node').each(function(d2) {
-                    d3.select(this).classed('hovered', false);
-
-                    if (!found && this.parentNode !== self && this.containsPoint(d3.event.sourceEvent)) {
-                        // Add a link from the dragging node to the hovering node if not existed
-                        if (data.links.find(l => l.source === d && l.target === d2)) return;
-
-                        var l = { source: d, target: d2 };
-                        data.links.push(l);
-
-                        found = true;
-                        update();
-                        dispatch.linkAdded(l);
-                    }
-                });
-            }
-
-            // Enable tooltip, which is disabled when moving node
-            d3.select(this).select('.parent').attr('data-original-title', buildHTMLTitle(d));
-        });
+        .on('dragstart', onNodeDragStart)
+        .on('drag', onNodeDrag)
+        .on('dragend', onNodeDragEnd);
 
     // Key function to bind data
     var key = d => d.id,
-        linkKey = d => key(d.source) + '-' + key(d.target);
+        linkKey = d => key(d.source) + '-' + key(d.target),
+        linkHoverKey = d => key(d.source) + '-' + key(d.target) + 'h';
 
     // Others
-    var dispatch = d3.dispatch('nodeClicked', 'linkAdded', 'linkRemoved');
+    var dispatch = d3.dispatch('nodeClicked', 'nodeMinimized', 'nodeRemoved', 'linkAdded', 'linkRemoved');
 
     /**
      * Main entry of the module.
@@ -155,6 +85,7 @@ sm.vis.sensemap = function() {
 
             zoomPan();
             sm.createArrowHeadMarker(self, 'arrow-marker', '#6e6e6e');
+            sm.createArrowHeadMarker(self, 'arrow-marker-hover', '#1abc9c');
             sm.createArrowHeadMarker(self, 'arrow-marker-cursor', 'red');
         }
 
@@ -236,8 +167,18 @@ sm.vis.sensemap = function() {
                     rect.top + pad > d3.event.y || rect.bottom - pad < d3.event.y;
                 d3.select(this).classed('connect', connecting)
                     .classed('move', !connecting);
+            }).on('mouseover', function(d) {
+                if (dragging) return; // When dragging, no need to show menu
+
+                // Enable tooltip, which is disabled when moving node
+                d3.select(this).select('.parent')
+                    .attr('data-original-title', buildHTMLTitle(d));
+                d3.select(this).select('.btn-group').classed('hide', false);
+            }).on('mouseout', function() {
+                d3.select(this).select('.btn-group').classed('hide', true);
             });
 
+        var buttons = div.append('xhtml:div').attr('class', 'btn-group hide');
         var parent = div.append('xhtml:div').attr('class', 'parent').call(sm.addBootstrapTooltip);
 
         // Icon
@@ -253,6 +194,32 @@ sm.vis.sensemap = function() {
 
         // Children
         div.append('xhtml:div').attr('class', 'children');
+
+        // Menu action
+        buttons.append('xhtml:button').attr('class', 'btn btn-default fa fa-star')
+            .attr('title', 'Favorite')
+            .on('click', function(d) {
+                d3.event.stopPropagation();
+                d.favorite = !d.favorite;
+                d3.select(this).attr('title', d.favorite ? 'Unfavorite' : 'Favorite')
+                    .style('color', d.favorite ? '#f39c12' : 'black');
+                update();
+            });
+        buttons.append('xhtml:button').attr('class', 'btn btn-default fa fa-minus')
+            .attr('title', 'Minimize')
+            .on('click', function(d) {
+                d3.event.stopPropagation();
+                d.minimized = true;
+                update();
+            });
+        buttons.append('xhtml:button').attr('class', 'btn btn-default fa fa-remove')
+            .attr('title', 'Remove')
+            .on('click', function(d) {
+                d3.event.stopPropagation();
+                _.remove(data.nodes, d);
+                update();
+                dispatch.nodeRemoved(d);
+            });
     }
 
     /**
@@ -261,9 +228,6 @@ sm.vis.sensemap = function() {
     function updateNodes(selection) {
         selection.each(function(d) {
             var container = d3.select(this).select('.parent');
-
-            // Content type: normal finding or candidate
-            container.classed('candidate', candidate(d));
 
             var typeVisible = searchTypes.includes(type(d));
             container.select('img.node-icon').attr('src', icon)
@@ -274,7 +238,7 @@ sm.vis.sensemap = function() {
                 .style('background-color', colorScale(type(d)));
 
             // Different appearance with/out snapshot
-            container.select('div').classed('node-title', image(d) && favorite(d));
+            container.select('div').classed('node-title', image(d) && d.favorite);
 
             // Status
             d3.select(this).classed('closed', d.closed)
@@ -287,10 +251,7 @@ sm.vis.sensemap = function() {
             // Snapshot
             container.select('img.node-snapshot')
                 .attr('src', image)
-                .classed('hide', !image(d) || !favorite(d));
-
-            // Tooltip
-            container.attr('data-original-title', buildHTMLTitle(d));
+                .classed('hide', !image(d) || !d.favorite);
 
             if (d.children) updateChildren(d3.select(this).select('.children'), d);
             container.classed('has-children', d.children);
@@ -302,7 +263,7 @@ sm.vis.sensemap = function() {
 
     function buildHTMLTitle(d) {
         var s = '';
-        if (image(d) && !favorite(d)) {
+        if (image(d) && !d.favorite) {
             s += "<img class='node-snapshot img-responsive center-block' src='" + image(d) + "'/>";
         }
 
@@ -361,6 +322,16 @@ sm.vis.sensemap = function() {
                 .attr('opacity', 1)
                 .attr('transform', 'translate(' + Math.round(d.x) + ',' + Math.round(d.y) + ')');
 
+            // Align menu to the right side
+            var menu = d3.select(this).select('.btn-group')
+                .style('opacity', 0)
+                .classed('hide', false);
+            var menuRect = menu.node().getBoundingClientRect();
+            menu.style('left', (d.x + d.width > width - menuRect.width ? -menuRect.width : d.width) + 'px')
+                // .style('top', (d.y < menuRect.height ? 25 : -menuRect.height) + 'px')
+                .style('opacity', 1)
+                .classed('hide', true);
+
             // For debugging dag classes
             // d3.select(this).select('.node').style('background-color', classColorScale(d.classLabel));
         });
@@ -373,9 +344,51 @@ sm.vis.sensemap = function() {
         var container = selection.append('g').attr('class', 'link')
             .attr('opacity', 0);
 
+        // Main link
         container.append('path')
             .attr('id', linkKey)
-            .attr('marker-end', 'url(#arrow-marker)');
+            .attr('class', 'main-link')
+            .classed('user-added', d => d.isUserAdded);
+
+        // Dummy link for easy selection
+        container.append('path')
+            .attr('id', linkHoverKey)
+            .attr('class', 'hover-link');
+
+        container.on('mouseover', function() {
+            showLinkMenu(true, this);
+        }).on('mouseout', function() {
+            showLinkMenu(false, this);
+        });
+
+        // Menu action
+        var menuContainer = container.append('foreignObject')
+            .attr('class', 'menu-container')
+            .attr('width', '100%').attr('height', '100%');
+        var buttons = menuContainer.append('xhtml:div').attr('class', 'btn-group hide');
+        buttons.append('xhtml:button').attr('class', 'btn btn-default fa fa-remove')
+            .attr('title', 'Remove')
+            .on('click', function(d) {
+                d3.event.stopPropagation();
+                _.remove(data.links, d);
+                update();
+                console.log(d.id)
+                dispatch.linkRemoved(d);
+            });
+    }
+
+    function showLinkMenu(visible, self) {
+        // Link feedback
+        var parent = d3.select(self.parentNode);
+        parent.select('.main-link').classed('hovered', visible);
+
+        // Menu
+        parent.select('.btn-group').classed('hide', !visible);
+        var menuRect = parent.select('.btn-group').node().getBoundingClientRect(),
+            p = d3.mouse(linkContainer.node()),
+            t = [ p[0] - menuRect.width / 2, p[1] ];
+        parent.select('.menu-container')
+            .attr('transform', 'translate(' + t + ')');
     }
 
     /**
@@ -387,7 +400,7 @@ sm.vis.sensemap = function() {
                 .attr('opacity', 1);
 
             // Set data
-            container.select('path').attr('d', line(roundPoints(d.points)));
+            container.selectAll('path').attr('d', line(roundPoints(d.points)));
         });
     }
 
@@ -398,6 +411,86 @@ sm.vis.sensemap = function() {
         // stroke-width: 1.5px
         return points.map(p => ({ x: Math.round(p.x) - 0.5, y: Math.round(p.y) - 0.5 }));
     }
+
+    function updateDragPosition(d) {
+        d.x += d3.event.dx;
+        d.y += d3.event.dy;
+    }
+
+    function updateLinkDragPosition(d) {
+        d3.select(document.getElementById(linkKey(d))).attr('d', line(roundPoints(d.points)));
+        d3.select(document.getElementById(linkHoverKey(d))).attr('d', line(roundPoints(d.points)));
+    }
+
+    function onNodeDragStart(d) {
+        if (d3.event.sourceEvent.which === 1) dragging = true;
+    }
+
+    function onNodeDrag(d) {
+        if (!dragging) return;
+
+        if (connecting) {
+            // Draw a link from the node center to the current mouse position
+            cursorLink.classed('hide', false);
+            cursorLink
+                .attr('x1', d.x + d.width / 2).attr('y1', d.y + d.height / 2)
+                .attr('x2', d3.event.x).attr('y2', d3.event.y);
+
+            // Don't know why mouse over other nodes doesn't work. Have to do it manually
+            var self = this;
+            nodeContainer.selectAll('.node').each(function() {
+                d3.select(this).classed('hovered', this.parentNode !== self && this.containsPoint(d3.event.sourceEvent));
+            });
+        } else {
+            this.moveToFront();
+
+            // Update position of the dragging node
+            updateDragPosition(d);
+            d3.select(this).attr('transform', 'translate(' + Math.round(d.x) + ',' + Math.round(d.y) + ')');
+
+            // And also links
+            d.inEdges.forEach(l => {
+                // Change only the last two points
+                l.points.slice(l.points.length - 2).forEach(updateDragPosition);
+                updateLinkDragPosition(l);
+            });
+            d.outEdges.forEach(l => {
+                // Change only the first two points
+                l.points.slice(0, 2).forEach(updateDragPosition);
+                updateLinkDragPosition(l);
+            });
+
+            // Bootstrap tooltip appears even when moving the node => disable it
+            d3.select(this).select('.parent').attr('data-original-title', '');
+        }
+    }
+
+    function onNodeDragEnd(d) {
+        dragging = false;
+        d3.select(this).classed('move connect', false);
+        cursorLink.classed('hide', true);
+
+        if (connecting) {
+            var self = this,
+                found = false;
+            nodeContainer.selectAll('.node').each(function(d2) {
+                d3.select(this).classed('hovered', false);
+
+                if (!found && this.parentNode !== self && this.containsPoint(d3.event.sourceEvent)) {
+                    // Add a link from the dragging node to the hovering node if not existed
+                    if (data.links.find(l => l.source === d && l.target === d2)) return;
+
+                    var l = { source: d, target: d2, isUserAdded: true };
+                    data.links.push(l);
+
+                    found = true;
+                    update();
+                    dispatch.linkAdded(l);
+                }
+            });
+        }
+    }
+
 
     /**
      * Sets/gets the width of the control.

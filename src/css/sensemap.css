@@ -23,7 +23,7 @@
 
 .sm-sensemap .node:hover,
 .sm-sensemap .node.hovered {
-	background-color: #1abc9c !important; /* overrides such as highlighted */
+	border-color: #1abc9c;
 }
 
 .sm-sensemap .node.highlighted {
@@ -34,36 +34,40 @@
 	/*border-color: orange;*/
 }
 
-.sm-sensemap .node.candidate {
-	background-color: #777;
-	color: white;
-	font-family: Georgia;
-	font-size: 1.2em;
-	border: none;
-	padding: 0 4px;
-	border-radius: 0;
-}
-
 .sm-sensemap .node-title {
 	margin: -3px -3px 3px -3px;
     padding: 3px;
     border-top-right-radius: 5px;
     border-top-left-radius: 5px;
 	margin-bottom: 5px;
+	font-weight: bold;
 }
 
 .sm-sensemap .node-snapshot {
 	max-height: 150px;
 }
 
-.sm-sensemap .node-label:hover {
-	color: #fff;
-}
-
 .sm-sensemap .link path {
 	fill: none;
-	stroke-width: 1.5px;
 	stroke: #6e6e6e;
+}
+
+.sm-sensemap .link path.main-link {
+	marker-end: url(#arrow-marker);
+	stroke-width: 1.5px;
+}
+
+.sm-sensemap .link path.main-link.hovered {
+	stroke: #1abc9c;
+	marker-end: url(#arrow-marker-hover);
+}
+
+.sm-sensemap .link path.hover-link {
+	opacity: 0;
+	stroke-width: 15px;
+}
+
+.sm-sensemap .link path.user-added {
 	stroke-dasharray: 5,5;
 }
 
@@ -119,4 +123,20 @@
 .sm-sensemap .children {
 	padding: 3px;
 	padding-left: 5px;
+}
+
+/* Node menu */
+.sm-sensemap .node .btn-group {
+	position: fixed;
+	z-index: 1000;
+}
+
+.sm-sensemap .node .btn {
+	padding: 4px 6px;
+	font-size: 18px;
+}
+
+.sm-sensemap .menu-container .btn-group,
+.sm-sensemap .menu-container .btn {
+	position: inherit;
 }

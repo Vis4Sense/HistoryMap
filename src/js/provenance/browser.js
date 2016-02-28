@@ -106,7 +106,7 @@ sm.provenance.browser = function() {
             if (type === 'link') {
                 chrome.tabs.sendMessage(tabId, { type: 'askReferrer' }, function(response) {
                     // referrer only return the path, excluding the hash. So just guess the latest one could be the most likely one.
-                    var referrer = response ? actions.slice().reverse().find(a => a.url.startsWith(response) && !isEmbeddedType(a.type)) : null;
+                    var referrer = response ? actions.slice().reverse().find(a => a.url && a.url.startsWith(response) && !isEmbeddedType(a.type)) : null;
                     callback(type, referrer);
                 });
             } else {
