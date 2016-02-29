@@ -5,7 +5,7 @@ $(function() {
         browser = sm.provenance.browser(),
         startRecordingTime,
         pendingTasks = {}, // For jumping to an action when its page isn't ready yet
-        name = 'test', // For quick test/analysis: preload data to save time loading files in the interface
+        name = 'camera', // For quick test/analysis: preload data to save time loading files in the interface
         datasets = {
             test: 'data/2016-02-29 10-47-39_sensemap.json',
             simple: 'data/simple/sensemap.json',
@@ -144,9 +144,7 @@ $(function() {
         data.links = [];
         // -- User links
         actions.filter(a => isNonActionType(a.type)).forEach(a => {
-            if (a.type === 'remove-node') {
-                _.remove(data.nodes, n => n.id === a.id);
-            } if (a.type === 'add-user-link') {
+            if (a.type === 'add-user-link') {
                 data.links.push({ source: getActionById(a.sourceId), target: getActionById(a.targetId), isUserAdded: true });
             } else if (a.type === 'remove-user-link') {
                 _.remove(data.links, l => l.source.id === a.sourceId && l.target.id === a.targetId);
@@ -199,7 +197,6 @@ $(function() {
             .label(d => d.text)
             .icon(d => d.favIconUrl)
             .on('nodeClicked', onNodeClicked)
-            .on('nodeRemoved', onNodeRemoved)
             .on('linkAdded', onLinkAdded)
             .on('linkRemoved', onLinkRemoved);
 
@@ -251,8 +248,8 @@ $(function() {
 
     function getCoreData(d) {
         var c = {},
-            fields = [ 'id', 'text', 'url', 'type', 'time', 'endTime', 'favIconUrl',
-                'classId', 'path', 'image', 'from', 'seen', 'favorite', 'minimized', 'sourceId', 'targetId' ];
+            fields = [ 'id', 'text', 'url', 'type', 'time', 'endTime', 'favIconUrl', 'image', 'classId', 'path', 'from',
+            'seen', 'favorite', 'minimized', 'removed', 'sourceId', 'targetId' ];
 
         fields.forEach(f => {
             if (d[f] !== undefined) c[f] = d[f];
@@ -268,9 +265,7 @@ $(function() {
                 redraw(true);
                 count++;
 
-                if (count > actions.length) {
-                    clearInterval(intervalId);
-                }
+                if (count > actions.length) clearInterval(intervalId);
             }, 1000);
     }
 
@@ -291,14 +286,6 @@ $(function() {
                     pendingTasks[tab.id] = d;
                 });
             }
-        });
-    }
-
-    function onNodeRemoved(d) {
-        actions.push({
-            type: 'remove-node',
-            time: new Date(),
-            id: d.id
         });
     }
 

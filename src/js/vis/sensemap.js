@@ -13,15 +13,9 @@ sm.vis.sensemap = function() {
 
     // Rendering options
     var layout,
-        zoomLevel = 1,
-        maxZoomLevel = 2,
-        minZoomLevel = 0.2,
-        zoomStep = 0.1,
         panExtent = [ 0, 1, 0, 1 ],
         defaultMaxWidth = 200,
         rowGap = 10, // vertical gap between 2 rows
-        rowHeight, // all nodes have the same height
-        rowHeightIncludeGap,
         dragging = false
         connecting = false;
 
@@ -29,12 +23,17 @@ sm.vis.sensemap = function() {
     var classColorScale = d3.scale.category10();
 
     // Data
-    var data;
+    var data,
+        dataNodes,
+        dataLinks,
+        dataRemovedNodes;
 
     // DOM
     var container, // g element containing the entire visualization
         nodeContainer, // g element containing all nodes
         linkContainer, // g element containing all links
+        removedNodeContainer, // g element containing all removed nodes
+        clipPath,
         cursorLink; // to draw a link when moving mouse
 
     // d3
@@ -59,7 +58,7 @@ sm.vis.sensemap = function() {
         linkHoverKey = d => key(d.source) + '-' + key(d.target) + 'h';
 
     // Others
-    var dispatch = d3.dispatch('nodeClicked', 'nodeMinimized', 'nodeRemoved', 'linkAdded', 'linkRemoved');
+    var dispatch = d3.dispatch('nodeClicked', 'linkAdded', 'linkRemoved');
 
     /**
      * Main entry of the module.
@@ -67,8 +66,6 @@ sm.vis.sensemap = function() {
     function module(selection) {
         selection.each(function(_data) {
             data = _data;
-            data.nodes = data.nodes || [];
-            data.links = data.links || [];
             update(this);
         });
     }
@@ -79,65 +76,98 @@ sm.vis.sensemap = function() {
             container = d3.select(self).append('g')
                 .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
                 .append('g').attr('class', 'sm-sensemap');
-            linkContainer = container.append('g').attr('class', 'links');
-            nodeContainer = container.append('g').attr('class', 'nodes');
-            cursorLink = container.append('line').attr('class', 'cursor-link hide').attr('marker-end', 'url(#arrow-marker-cursor)');
+            linkContainer = container.append('g').attr('class', 'links')
+                .attr('clip-path', 'url(#clip-path)');
+            nodeContainer = container.append('g').attr('class', 'nodes')
+                .attr('clip-path', 'url(#clip-path)');
+            removedNodeContainer = container.append('g').attr('class', 'removed-nodes');
+            removedNodeContainer.append('line');
+            clipPath = d3.select(self).append('clipPath').attr('id', 'clip-path').append('rect');
+            cursorLink = container.append('line').attr('class', 'cursor-link hide');
 
-            zoomPan();
+            sm.addPan([ nodeContainer, linkContainer, cursorLink ], container, panExtent);
             sm.createArrowHeadMarker(self, 'arrow-marker', '#6e6e6e');
             sm.createArrowHeadMarker(self, 'arrow-marker-hover', '#1abc9c');
-            sm.createArrowHeadMarker(self, 'arrow-marker-cursor', 'red');
+            sm.createArrowHeadMarker(self, 'arrow-marker-cursor', '#d52b1e');
         }
+
+        dataNodes = (data.nodes || []).filter(n => !n.removed);
+        dataRemovedNodes = (data.nodes || []).filter(n => n.removed);
+        dataLinks = (data.links || []).filter(l => !l.source.removed && !l.target.removed);
 
         layout = sm.layout.dag()
             .width(width)
             .height(height)
             .label(label);
 
-        var links = linkContainer.selectAll('.link').data(data.links, linkKey);
+        updateClip();
+
+        var links = linkContainer.selectAll('.link').data(dataLinks, linkKey);
         links.enter().call(enterLinks);
         links.exit().transition().style('opacity', 0).remove();
 
-        var nodes = nodeContainer.selectAll('.node-container').data(data.nodes, key);
+        var nodes = nodeContainer.selectAll('.node-container').data(dataNodes, key);
         nodes.enter().call(enterNodes);
         nodes.call(updateNodes);
         nodes.exit().transition().style('opacity', 0).remove();
+
+        var removedNodes = removedNodeContainer.selectAll('.node-container').data(dataRemovedNodes, key);
+        removedNodes.enter().call(enterNodes);
+        removedNodes.call(updateNodes);
+        removedNodes.exit().transition().style('opacity', 0).remove();
 
         // Layout DAG
         computeLayout(function() {
             links.call(updateLinks);
             nodes.call(updateNodePositions);
+            removedNodes.call(updateNodePositions);
         });
     }
 
-    function zoomPan() {
-        // Add invisible rectangle covering the entire space to listen to mouse event.
-        // Otherwise, only zoom when mouse-overing visible items.
-        d3.select(container.node().parentNode).on('wheel', () => {
-            zoomLevel = Math.max(Math.min(d3.event.wheelDelta > 0 ? zoomLevel + zoomStep : zoomLevel - zoomStep, maxZoomLevel), minZoomLevel);
-            update();
-        });
-
-        sm.addPan(container, panExtent);
+    function updateClip() {
+        clipPath.attr('x', 0).attr('y', 0).attr('width', width);
     }
 
     function computeLayout(callback) {
-        sm.checkImagesLoaded(nodeContainer.selectAll('.node-container'), function() {
+        sm.checkImagesLoaded(container.selectAll('.node-container'), function() {
             // Compute how much space each node needs
-            rowHeightIncludeGap = 0;
-            nodeContainer.selectAll('.node').each(function(d) {
+            container.selectAll('.node').each(function(d) {
                 var r = this.getBoundingClientRect();
                 d.width = r.width;
-                rowHeight = d.height = r.height;
-                rowHeightIncludeGap = Math.max(rowHeightIncludeGap, rowHeight + rowGap);
+                d.height = r.height;
             });
 
-            var g = layout.vertices(data.nodes).edges(data.links).compute();
+            // DAG for nodes
+            var g = layout.vertices(dataNodes).edges(dataLinks).compute();
             panExtent[1] = Math.max(0, g.width - width + margin.left + margin.right);
             panExtent[3] = Math.max(0, g.height - height + margin.top + margin.bottom);
 
+            // Linear for removed nodes
+            computeRemovedNodesLayout();
+
             callback();
         });
+    }
+
+    function computeRemovedNodesLayout() {
+        var x = 0;
+        dataRemovedNodes.sort((a, b) => d3.ascending(time(a), time(b)))
+            .forEach(n => {
+                n.x = x;
+                x += n.width + 20;
+                n.y = 0;
+            });
+
+        var removedNodesHeight = dataRemovedNodes.length ? d3.max(dataRemovedNodes, n => n.height) : 0,
+            nodesHeight = height - margin.top - margin.bottom - removedNodesHeight;
+        clipPath.attr('height', nodesHeight - (dataRemovedNodes.length ? margin.top * 3 : 0));
+        removedNodeContainer.attr('transform', 'translate(0, ' + nodesHeight + ')')
+            .select('line')
+                .classed('hide', !dataRemovedNodes.length)
+                .attr('x1', -margin.left)
+                .attr('y1', -margin.top * 2)
+                .attr('x2', width)
+                .attr('y2', -margin.top * 2);
     }
 
     /**
@@ -154,8 +184,17 @@ sm.vis.sensemap = function() {
 
         var container = fo.append('xhtml:div').attr('class', 'node')
             .on('click', function(d) {
-                if (d3.event.defaultPrevented) return;
-                dispatch.nodeClicked(d);
+                if (d.minimized) {
+                    d.minimized = false;
+                    update();
+                    $(this).tooltip('hide');
+                } else if (d.removed) {
+                    d.removed = false;
+                    update();
+                } else {
+                    if (d3.event.defaultPrevented) return;
+                    dispatch.nodeClicked(d);
+                }
             }).on('mousemove', function(d) {
                 // Don't revaluate status when the node is being dragged
                 if (dragging) return;
@@ -164,10 +203,10 @@ sm.vis.sensemap = function() {
                 var rect = this.getBoundingClientRect(),
                     pad = 6,
                     isOnEdge = rect.right - pad < d3.event.x || rect.left + pad > d3.event.x || rect.top + pad > d3.event.y || rect.bottom - pad < d3.event.y;
-                connecting = !d.minimized && isOnEdge;
+                connecting = !d.minimized && !d.removed && isOnEdge;
                 d3.select(this).classed('connect', connecting);
-            }).on('mouseover', function() {
-                d3.select(this).select('.btn-group').classed('hide', dragging);
+            }).on('mouseover', function(d) {
+                d3.select(this).select('.btn-group').classed('hide', dragging || d.minimized || d.removed);
             }).on('mouseout', function() {
                 d3.select(this).select('.btn-group').classed('hide', true);
             }).call(sm.addBootstrapTooltip);
@@ -198,17 +237,13 @@ sm.vis.sensemap = function() {
                 d3.select(this).attr('title', d.favorite ? 'Unfavorite' : 'Favorite')
                     .style('color', d.favorite ? '#f39c12' : 'black');
                 update();
+                $(this.parentNode.parentNode).tooltip('hide');
             });
-        menu.append('xhtml:button').attr('class', 'btn btn-default fa')
-            .classed('fa-minus', d => !d.minimized)
-            .classed('fa-plus', d => d.minimized)
-            .attr('title', d => d.minimized ? 'Restore' : 'Minimize')
+        menu.append('xhtml:button').attr('class', 'btn btn-default fa fa-minus')
+            .attr('title', 'Minimize')
             .on('click', function(d) {
                 d3.event.stopPropagation();
-                d.minimized = !d.minimized;
-                d3.select(this).classed('fa-minus', !d.minimized)
-                    .classed('fa-plus', d.minimized)
-                    .attr('title', d => d.minimized ? 'Restore' : 'Minimize');
+                d.minimized = true;
                 update();
                 $(this.parentNode.parentNode).tooltip('hide');
             });
@@ -216,9 +251,9 @@ sm.vis.sensemap = function() {
             .attr('title', 'Remove')
             .on('click', function(d) {
                 d3.event.stopPropagation();
-                _.remove(data.nodes, d);
+                d.removed = true;
                 update();
-                dispatch.nodeRemoved(d);
+                $(this.parentNode.parentNode).tooltip('hide');
             });
 
         // Children
@@ -230,16 +265,18 @@ sm.vis.sensemap = function() {
      */
     function updateNodes(selection) {
         selection.each(function(d) {
-            d3.select(this).selectAll('.parent, .children').classed('hide', d.minimized);
             d3.select(this).select('.node').classed('mini', d.minimized);
+            d3.select(this).selectAll('.parent, .children').classed('hide', d.minimized);
 
             // Status
-            d3.select(this).classed('closed', d.closed)
-                .select('.node').classed('highlighted', d.highlighted)
-                .classed('not-seen', !d.seen);
+            d3.select(this).select('.node')
+                .classed('not-seen', !d.seen)
+                .classed('closed', d.closed)
+                .classed('highlighted', d.highlighted)
+                .classed('removed', d.removed);
 
             // Tooltip
-            d3.select(this).select('.node').attr('data-original-title', buildHTMLTitle(d));
+            d3.select(this).select('.node').attr('data-original-title', d.removed ? '' : buildHTMLTitle(d));
 
             if (!d.minimized) {
                 var typeVisible = searchTypes.includes(type(d)),
@@ -261,10 +298,11 @@ sm.vis.sensemap = function() {
                 container.select('img.node-snapshot')
                     .attr('src', image)
                     .classed('hide', !image(d) || !d.favorite);
+                d3.select(this).select('.node').classed('favorite', d.favorite && !image(d));
 
-                if (d.children) updateChildren(d3.select(this).select('.children'), d);
-                container.classed('has-children', d.children);
-                d3.select(this).select('.children').classed('hide', !d.children);
+                if (d.children && !d.minimized && !d.removed) updateChildren(d3.select(this).select('.children'), d);
+                container.classed('has-children', d.children && !d.removed);
+                d3.select(this).select('.children').classed('hide', !d.children || d.removed);
 
                 setMaxWidthText(this);
             }
@@ -285,11 +323,9 @@ sm.vis.sensemap = function() {
     }
 
     function setMaxWidthText(self) {
-        var containerWidth = defaultMaxWidth * zoomLevel;
-        d3.select(self).select('.node').style('max-width', containerWidth + 'px');
-
+        d3.select(self).select('.node').style('max-width', defaultMaxWidth + 'px');
         d3.select(self).selectAll('.node-label')
-            .style('max-width', containerWidth - 35 + 'px');
+            .style('max-width', defaultMaxWidth - 35 + 'px');
     }
 
     function updateChildren(container, d) {
@@ -317,7 +353,7 @@ sm.vis.sensemap = function() {
                     .style('background-color', colorScale(type(d2)));
             });
         subItems.select('.node-label').text(label)
-            .style('max-width', (defaultMaxWidth - 10) * zoomLevel + 'px');
+            .style('max-width', (defaultMaxWidth - 10) + 'px');
 
         // Exit
         subItems.exit().transition().style('opacity', 0).remove();
@@ -390,13 +426,12 @@ sm.vis.sensemap = function() {
         // Link feedback
         d3.select(self).select('.main-link').classed('hovered', visible);
 
-        // Menu
+        // Menu: show it at the middle of the link
         d3.select(self).select('.btn-group').classed('hide', !visible);
-        var menuRect = d3.select(self).select('.btn-group').node().getBoundingClientRect(),
-            p = d3.mouse(linkContainer.node()),
-            t = [ p[0] - menuRect.width / 2, p[1] ];
-        d3.select(self).select('.menu-container')
-            .attr('transform', 'translate(' + t + ')');
+        var d = d3.select(self).datum().points,
+            m = d.length / 2,
+            t = [ (d[m].x + d[m - 1].x) / 2 - 10, (d[m].y + d[m - 1].y) / 2 ];
+        d3.select(self).select('.menu-container').attr('transform', 'translate(' + t + ')');
     }
 
     /**
@@ -431,7 +466,7 @@ sm.vis.sensemap = function() {
     }
 
     function onNodeDragStart(d) {
-        if (d3.event.sourceEvent.which === 1) dragging = true;
+        if (d3.event.sourceEvent.which === 1 && !d.minimized && !d.removed) dragging = true;
     }
 
     function onNodeDrag(d) {
@@ -499,7 +534,6 @@ sm.vis.sensemap = function() {
             });
         }
     }
-
 
     /**
      * Sets/gets the width of the control.

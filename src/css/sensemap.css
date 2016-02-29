@@ -1,7 +1,3 @@
-.sm-sensemap .node-container.closed {
-	/*opacity: 0.5;*/
-}
-
 .sm-sensemap .node {
 	display: inline-block;
     background-color: white;
@@ -15,25 +11,40 @@
     width: 12px;
     height: 12px;
     margin-bottom: 5px;
+    cursor: pointer;
 }
 
-.sm-sensemap .closed .node {
+.sm-sensemap .node.closed {
+}
+
+.sm-sensemap .node.removed {
+	cursor: pointer;
 }
 
 .sm-sensemap .node.connect {
 	cursor: e-resize;
 }
 
+.sm-sensemap .node:hover,
 .sm-sensemap .node.hovered {
 	border-color: #1abc9c;
 }
 
+.sm-sensemap .node.mini:hover,
+.sm-sensemap .node.mini.hovered {
+	background-color: #1abc9c;
+}
+
 .sm-sensemap .node.highlighted {
+    background-color: #1abc9c;
+}
+
+.sm-sensemap .node.favorite {
     background-color: #f1c40f;
 }
 
 .sm-sensemap .node.not-seen {
-	/*border-color: orange;*/
+	border-style: dashed;
 }
 
 .sm-sensemap .node-title {
@@ -70,7 +81,8 @@
 }
 
 .sm-sensemap .link path.user-added {
-	stroke-dasharray: 5,5;
+	stroke: #d52b1e;
+	marker-end: url(#arrow-marker-cursor);
 }
 
 /* To make icon and label in one line */
@@ -108,9 +120,10 @@
 }
 
 .sm-sensemap .cursor-link {
-	stroke-width: 2;
-    stroke: red;
+	stroke-width: 1.5px;
+    stroke: #d52b1e;
     shape-rendering: auto;
+    marker-end: url(#arrow-marker-cursor);
 }
 
 .sm-sensemap .parent {
@@ -133,7 +146,8 @@
 	z-index: 1000;
 }
 
-.sm-sensemap .node .btn {
+.sm-sensemap .node .btn,
+.sm-sensemap .link .btn {
 	padding: 4px 6px;
 	font-size: 18px;
 }
@@ -141,4 +155,9 @@
 .sm-sensemap .menu-container .btn-group,
 .sm-sensemap .menu-container .btn {
 	position: inherit;
+}
+
+.sm-sensemap .removed-nodes line {
+	stroke: #6e6e6e;
+	stroke-dasharray: 10,10;
 }

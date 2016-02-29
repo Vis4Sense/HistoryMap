@@ -89,12 +89,14 @@ sm.addHorizontalPan = function(container, extent) {
  * Adds Shift + mouse move to pan.
  * Adds wheel mouse to pan vertically.
  */
-sm.addPan = function(container, extent) {
+sm.addPan = function(containers, parent, extent) {
     var pan = function(offsetX, offsetY) {
-        var t = d3.transform(container.attr("transform"));
-        t.translate[0] = Math.max(-extent[1], Math.min(extent[0], t.translate[0] + offsetX));
-        t.translate[1] = Math.max(-extent[3], Math.min(extent[2], t.translate[1] + offsetY));
-        container.attr("transform", "translate(" + t.translate + ")");
+        containers.forEach(container => {
+            var t = d3.transform(container.attr("transform"));
+            t.translate[0] = Math.max(-extent[1], Math.min(extent[0], t.translate[0] + offsetX));
+            t.translate[1] = Math.max(-extent[3], Math.min(extent[2], t.translate[1] + offsetY));
+            container.attr("transform", "translate(" + t.translate + ")");
+        });
     };
 
     // Key
@@ -108,12 +110,11 @@ sm.addPan = function(container, extent) {
     // Otherwise, only zoom when mouse-overing visible items.
     var readyToPan = false,
         prevX, prevY,
-        parent = d3.select(container.node().parentNode);
-    var rect = parent.insert("rect", ":first-child")
-        .attr("width", "100%")
-        .attr("height", "100%")
-        .style("fill", "none")
-        .style("pointer-events", "all");
+        rect = parent.insert("rect", ":first-child")
+            .attr("width", "100%")
+            .attr("height", "100%")
+            .style("fill", "none")
+            .style("pointer-events", "all");
 
     // Only pan when dragging left-button mouse and holding Shift, or dragging on a void space
     parent.on("mousedown", function() {
@@ -327,7 +328,6 @@ sm.addBootstrapTooltip = function(selection) {
         .attr('data-container', 'body')
         .attr('data-placement', 'auto bottom')
         .attr('data-html', true)
-        .attr('data-delay', 500)
         .each(function() {
             $(this).tooltip();
         });
