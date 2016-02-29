@@ -144,42 +144,39 @@ sm.vis.sensemap = function() {
      * Does stuff when new nodes added (usually called when 'enter').
      */
     function enterNodes(selection) {
-        var container = selection.append('foreignObject')
+        var fo = selection.append('foreignObject')
             .attr('class', 'node-container')
             .attr('width', '100%').attr('height', '100%')
             .attr('opacity', 0);
 
         // Apply drag onto the 'foreignObject'
-        container.call(drag);
+        fo.call(drag);
 
-        var div = container.append('xhtml:div').attr('class', 'node')
+        var container = fo.append('xhtml:div').attr('class', 'node')
             .on('click', function(d) {
                 if (d3.event.defaultPrevented) return;
                 dispatch.nodeClicked(d);
-            }).on('mousemove', function() {
+            }).on('mousemove', function(d) {
                 // Don't revaluate status when the node is being dragged
                 if (dragging) return;
 
                 // If mouse is close to the node edges, then 'connect' mode; otherwise, 'move'
-                var rect = this.getBoundingClientRect();
-                var pad = 6;
-                connecting = rect.right - pad < d3.event.x || rect.left + pad > d3.event.x ||
-                    rect.top + pad > d3.event.y || rect.bottom - pad < d3.event.y;
-                d3.select(this).classed('connect', connecting)
-                    .classed('move', !connecting);
-            }).on('mouseover', function(d) {
-                if (dragging) return; // When dragging, no need to show menu
-
-                // Enable tooltip, which is disabled when moving node
-                d3.select(this).select('.parent')
-                    .attr('data-original-title', buildHTMLTitle(d));
-                d3.select(this).select('.btn-group').classed('hide', false);
+                var rect = this.getBoundingClientRect(),
+                    pad = 6,
+                    isOnEdge = rect.right - pad < d3.event.x || rect.left + pad > d3.event.x || rect.top + pad > d3.event.y || rect.bottom - pad < d3.event.y;
+                connecting = !d.minimized && isOnEdge;
+                d3.select(this).classed('connect', connecting);
+            }).on('mouseover', function() {
+                d3.select(this).select('.btn-group').classed('hide', dragging);
             }).on('mouseout', function() {
                 d3.select(this).select('.btn-group').classed('hide', true);
-            });
+            }).call(sm.addBootstrapTooltip);
 
-        var buttons = div.append('xhtml:div').attr('class', 'btn-group hide');
-        var parent = div.append('xhtml:div').attr('class', 'parent').call(sm.addBootstrapTooltip);
+        var menu = container.append('xhtml:div').attr('class', 'btn-group hide')
+            .on('mouseover', function() { // Hide tooltip because tooltip is associated with the parent
+                $(this.parentNode).tooltip('hide');
+            });
+        var parent = container.append('xhtml:div').attr('class', 'parent');
 
         // Icon
         var titleDiv = parent.append('xhtml:div');
@@ -192,11 +189,8 @@ sm.vis.sensemap = function() {
         // Snapshot
         parent.append('xhtml:img').attr('class', 'node-snapshot img-responsive center-block');
 
-        // Children
-        div.append('xhtml:div').attr('class', 'children');
-
         // Menu action
-        buttons.append('xhtml:button').attr('class', 'btn btn-default fa fa-star')
+        menu.append('xhtml:button').attr('class', 'btn btn-default fa fa-star')
             .attr('title', 'Favorite')
             .on('click', function(d) {
                 d3.event.stopPropagation();
@@ -205,14 +199,20 @@ sm.vis.sensemap = function() {
                     .style('color', d.favorite ? '#f39c12' : 'black');
                 update();
             });
-        buttons.append('xhtml:button').attr('class', 'btn btn-default fa fa-minus')
-            .attr('title', 'Minimize')
+        menu.append('xhtml:button').attr('class', 'btn btn-default fa')
+            .classed('fa-minus', d => !d.minimized)
+            .classed('fa-plus', d => d.minimized)
+            .attr('title', d => d.minimized ? 'Restore' : 'Minimize')
             .on('click', function(d) {
                 d3.event.stopPropagation();
-                d.minimized = true;
+                d.minimized = !d.minimized;
+                d3.select(this).classed('fa-minus', !d.minimized)
+                    .classed('fa-plus', d.minimized)
+                    .attr('title', d => d.minimized ? 'Restore' : 'Minimize');
                 update();
+                $(this.parentNode.parentNode).tooltip('hide');
             });
-        buttons.append('xhtml:button').attr('class', 'btn btn-default fa fa-remove')
+        menu.append('xhtml:button').attr('class', 'btn btn-default fa fa-remove')
             .attr('title', 'Remove')
             .on('click', function(d) {
                 d3.event.stopPropagation();
@@ -220,6 +220,9 @@ sm.vis.sensemap = function() {
                 update();
                 dispatch.nodeRemoved(d);
             });
+
+        // Children
+        container.append('xhtml:div').attr('class', 'children');
     }
 
     /**
@@ -227,37 +230,44 @@ sm.vis.sensemap = function() {
      */
     function updateNodes(selection) {
         selection.each(function(d) {
-            var container = d3.select(this).select('.parent');
-
-            var typeVisible = searchTypes.includes(type(d));
-            container.select('img.node-icon').attr('src', icon)
-                .classed('hide', typeVisible);
-            container.select('div.node-icon')
-                .classed('hide', !typeVisible)
-                .classed(iconClassLookup[type(d)], true)
-                .style('background-color', colorScale(type(d)));
-
-            // Different appearance with/out snapshot
-            container.select('div').classed('node-title', image(d) && d.favorite);
+            d3.select(this).selectAll('.parent, .children').classed('hide', d.minimized);
+            d3.select(this).select('.node').classed('mini', d.minimized);
 
             // Status
             d3.select(this).classed('closed', d.closed)
                 .select('.node').classed('highlighted', d.highlighted)
                 .classed('not-seen', !d.seen);
 
-            // Text
-            container.select('.node-label').text(label);
+            // Tooltip
+            d3.select(this).select('.node').attr('data-original-title', buildHTMLTitle(d));
 
-            // Snapshot
-            container.select('img.node-snapshot')
-                .attr('src', image)
-                .classed('hide', !image(d) || !d.favorite);
+            if (!d.minimized) {
+                var typeVisible = searchTypes.includes(type(d)),
+                    container = d3.select(this).select('.parent');
+                container.select('img.node-icon').attr('src', icon)
+                    .classed('hide', typeVisible);
+                container.select('div.node-icon')
+                    .classed('hide', !typeVisible)
+                    .classed(iconClassLookup[type(d)], true)
+                    .style('background-color', colorScale(type(d)));
 
-            if (d.children) updateChildren(d3.select(this).select('.children'), d);
-            container.classed('has-children', d.children);
-            d3.select(this).select('.children').classed('hide', !d.children);
+                // Different appearance with/out snapshot
+                container.select('div').classed('node-title', image(d) && d.favorite);
 
-            setMaxWidthText(this);
+                // Text
+                container.select('.node-label').text(label);
+
+                // Snapshot
+                container.select('img.node-snapshot')
+                    .attr('src', image)
+                    .classed('hide', !image(d) || !d.favorite);
+
+                if (d.children) updateChildren(d3.select(this).select('.children'), d);
+                container.classed('has-children', d.children);
+                d3.select(this).select('.children').classed('hide', !d.children);
+
+                setMaxWidthText(this);
+            }
         });
     }
 
@@ -365,29 +375,27 @@ sm.vis.sensemap = function() {
         var menuContainer = container.append('foreignObject')
             .attr('class', 'menu-container')
             .attr('width', '100%').attr('height', '100%');
-        var buttons = menuContainer.append('xhtml:div').attr('class', 'btn-group hide');
-        buttons.append('xhtml:button').attr('class', 'btn btn-default fa fa-remove')
-            .attr('title', 'Remove')
-            .on('click', function(d) {
-                d3.event.stopPropagation();
-                _.remove(data.links, d);
-                update();
-                console.log(d.id)
-                dispatch.linkRemoved(d);
-            });
+        menuContainer.append('xhtml:div').attr('class', 'btn-group hide')
+            .append('xhtml:button').attr('class', 'btn btn-default fa fa-remove')
+                .attr('title', 'Remove')
+                .on('click', function(d) {
+                    d3.event.stopPropagation();
+                    _.remove(data.links, d);
+                    update();
+                    dispatch.linkRemoved(d);
+                });
     }
 
     function showLinkMenu(visible, self) {
         // Link feedback
-        var parent = d3.select(self.parentNode);
-        parent.select('.main-link').classed('hovered', visible);
+        d3.select(self).select('.main-link').classed('hovered', visible);
 
         // Menu
-        parent.select('.btn-group').classed('hide', !visible);
-        var menuRect = parent.select('.btn-group').node().getBoundingClientRect(),
+        d3.select(self).select('.btn-group').classed('hide', !visible);
+        var menuRect = d3.select(self).select('.btn-group').node().getBoundingClientRect(),
             p = d3.mouse(linkContainer.node()),
             t = [ p[0] - menuRect.width / 2, p[1] ];
-        parent.select('.menu-container')
+        d3.select(self).select('.menu-container')
             .attr('transform', 'translate(' + t + ')');
     }
 
@@ -461,13 +469,14 @@ sm.vis.sensemap = function() {
             });
 
             // Bootstrap tooltip appears even when moving the node => disable it
-            d3.select(this).select('.parent').attr('data-original-title', '');
+            $(d3.select(this).select('.node').node()).tooltip('hide');
+            d3.select(this).select('.btn-group').classed('hide', true);
         }
     }
 
     function onNodeDragEnd(d) {
         dragging = false;
-        d3.select(this).classed('move connect', false);
+        d3.select(this).classed('connect', false);
         cursorLink.classed('hide', true);
 
         if (connecting) {

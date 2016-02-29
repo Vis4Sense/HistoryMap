@@ -10,18 +10,20 @@
     border-radius: 6px;
 }
 
-.sm-sensemap .closed .node {
+.sm-sensemap .node.mini {
+	background-color: #6e6e6e;
+    width: 12px;
+    height: 12px;
+    margin-bottom: 5px;
 }
 
-.sm-sensemap .node.move {
-	cursor: move;
+.sm-sensemap .closed .node {
 }
 
 .sm-sensemap .node.connect {
 	cursor: e-resize;
 }
 
-.sm-sensemap .node:hover,
 .sm-sensemap .node.hovered {
 	border-color: #1abc9c;
 }

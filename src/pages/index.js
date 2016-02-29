@@ -7,13 +7,13 @@ $(function() {
         pendingTasks = {}, // For jumping to an action when its page isn't ready yet
         name = 'test', // For quick test/analysis: preload data to save time loading files in the interface
         datasets = {
-            test: 'data/2016-02-28 21-04-18_sensemap.json',
+            test: 'data/2016-02-29 10-47-39_sensemap.json',
             simple: 'data/simple/sensemap.json',
             camera: 'data/camera/sensemap.json'
         };
 
     // Vis and options
-    var sensemap
+    var sensemap,
         listening = true;
 
     function run() {
