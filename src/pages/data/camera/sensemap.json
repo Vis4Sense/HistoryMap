@@ -8,7 +8,8 @@
         "type": "search",
         "time": "2016-01-26T13:05:56.357Z",
         "endTime": 1453813559787,
-        "favIconUrl": "https://www.google.co.uk/images/branding/product/ico/googleg_lodp.ico"
+        "favIconUrl": "https://www.google.co.uk/images/branding/product/ico/googleg_lodp.ico",
+        "seen": true
     },
     {
         "id": 1453813562416,
@@ -18,7 +19,8 @@
         "time": "2016-01-26T13:06:02.416Z",
         "endTime": 1453813738778,
         "favIconUrl": "https://i.kinja-img.com/gawker-media/image/upload/s--O07tru6M--/c_fill,fl_progressive,g_center,h_80,q_80,w_80/fdj3buryz5nuzyf2k620.png",
-        "from": 1453813556357
+        "from": 1453813556357,
+        "seen": true
     },
     {
         "id": 1453813589919,
@@ -170,7 +172,8 @@
         "favIconUrl": "https://i.kinja-img.com/gawker-media/image/upload/s--O07tru6M--/c_fill,fl_progressive,g_center,h_80,q_80,w_80/fdj3buryz5nuzyf2k620.png",
         "classId": "sm-1453815835187",
         "path": "/HTML[1]/BODY[1]/DIV[5]/SECTION[1]/DIV[1]/SECTION[1]/DIV[3]/ARTICLE[1]/DIV[1]/DIV[1]/DIV[1]/P[20]/text()[2]|376|/HTML[1]/BODY[1]/DIV[5]/SECTION[1]/DIV[1]/SECTION[1]/DIV[3]/ARTICLE[1]/DIV[1]/DIV[1]/DIV[1]/P[20]/text()[2]|445",
-        "from": 1453813562416
+        "from": 1453813562416,
+        "seen": true
     },
     {
         "id": 1453815962936,
@@ -224,7 +227,8 @@
         "time": "2016-01-26T14:04:21.450Z",
         "endTime": 1453817114290,
         "favIconUrl": "http://www.amazon.com/favicon.ico",
-        "from": 1453813562416
+        "from": 1453813562416,
+        "removed": true
     },
     {
         "id": 1453817995146,
@@ -233,7 +237,8 @@
         "type": "link",
         "time": "2016-01-26T14:19:55.146Z",
         "endTime": 1453818207938,
-        "from": 1453813556357
+        "from": 1453813556357,
+        "seen": true
     },
     {
         "id": 1453818127768,
@@ -255,7 +260,8 @@
         "favIconUrl": "http://www.snaphappymom.com/wp-content/themes/genesis/images/favicon.ico",
         "classId": "sm-1453818193390",
         "path": "/HTML[1]/BODY[1]/DIV[1]/DIV[2]/DIV[1]/MAIN[1]/ARTICLE[1]/DIV[1]/P[14]/text()[1]|0|/HTML[1]/BODY[1]/DIV[1]/DIV[2]/DIV[1]/MAIN[1]/ARTICLE[1]/DIV[1]/P[14]/text()[1]|98",
-        "from": 1453817995146
+        "from": 1453817995146,
+        "seen": true
     },
     {
         "id": 1453818211573,
@@ -265,7 +271,8 @@
         "time": "2016-01-26T14:23:31.573Z",
         "endTime": 1453818291935,
         "favIconUrl": "http://www.amazon.com/favicon.ico",
-        "from": 1453822102568
+        "from": 1453822102568,
+        "seen": true
     },
     {
         "id": 1453818292760,
@@ -318,7 +325,8 @@
         "time": "2016-01-26T14:59:01.856Z",
         "endTime": 1453820342856,
         "favIconUrl": "http://www.exposureguide.com/favicon.ico",
-        "from": 1453813556357
+        "from": 1453813556357,
+        "seen": true
     },
     {
         "id": 1453820343161,
@@ -328,7 +336,8 @@
         "time": "2016-01-26T14:59:03.161Z",
         "endTime": 1453821193762,
         "favIconUrl": "http://www.ronmartblog.com/favicon.ico",
-        "from": 1453813556357
+        "from": 1453813556357,
+        "seen": true
     },
     {
         "id": 1453820368488,
@@ -393,7 +402,8 @@
         "time": "2016-01-26T15:13:14.148Z",
         "endTime": 1453821240764,
         "favIconUrl": "http://www.ronmartblog.com/favicon.ico",
-        "from": 1453820343161
+        "from": 1453820343161,
+        "seen": true
     },
     {
         "id": 1453821241536,
@@ -403,7 +413,8 @@
         "time": "2016-01-26T15:14:01.536Z",
         "endTime": 1453821476749,
         "favIconUrl": "http://www.ronmartblog.com/favicon.ico",
-        "from": 1453820343161
+        "from": 1453820343161,
+        "seen": true
     },
     {
         "id": 1453821477093,

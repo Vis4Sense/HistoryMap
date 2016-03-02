@@ -93,8 +93,8 @@ sm.addPan = function(containers, parent, extent) {
     var pan = function(offsetX, offsetY) {
         containers.forEach(container => {
             var t = d3.transform(container.attr("transform"));
-            t.translate[0] = Math.max(-extent[1], Math.min(extent[0], t.translate[0] + offsetX));
-            t.translate[1] = Math.max(-extent[3], Math.min(extent[2], t.translate[1] + offsetY));
+            t.translate[0] = Math.round(Math.max(-extent[1], Math.min(extent[0], t.translate[0] + offsetX)));
+            t.translate[1] = Math.round(Math.max(-extent[3], Math.min(extent[2], t.translate[1] + offsetY)));
             container.attr("transform", "translate(" + t.translate + ")");
         });
     };
@@ -129,11 +129,7 @@ sm.addPan = function(containers, parent, extent) {
         readyToPan = false;
     }).on("mousemove", function() {
         if (readyToPan) {
-            if (Math.abs(d3.event.clientX - prevX) > Math.abs(d3.event.clientY - prevY)) {
-                pan(d3.event.clientX - prevX, 0);
-            } else {
-                pan(0, d3.event.clientY - prevY);
-            }
+            pan(d3.event.clientX - prevX, d3.event.clientY - prevY);
             prevX = d3.event.clientX;
             prevY = d3.event.clientY;
             d3.event.preventDefault();
@@ -142,7 +138,8 @@ sm.addPan = function(containers, parent, extent) {
 
     // Wheel
     parent.on('wheel', function() {
-        pan(0, d3.event.wheelDelta);
+        pan(-d3.event.deltaX, -d3.event.deltaY);
+        d3.event.stopPropagation();
     });
 };
 

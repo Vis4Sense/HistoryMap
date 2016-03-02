@@ -1,15 +1,17 @@
 $(function() {
     // Data
-    var data = {}, // The data will be passed to the vis
+    var data = { nodes: [], links: [] }, // The data will be passed to the vis
         actions = [], // All actions added in temporal order including 'revisit' and 'child' actions
         browser = sm.provenance.browser(),
         startRecordingTime,
         pendingTasks = {}, // For jumping to an action when its page isn't ready yet
-        name = 'camera', // For quick test/analysis: preload data to save time loading files in the interface
+        name = 'remove', // For quick test/analysis: preload data to save time loading files in the interface
         datasets = {
             test: 'data/2016-02-29 10-47-39_sensemap.json',
             simple: 'data/simple/sensemap.json',
-            camera: 'data/camera/sensemap.json'
+            camera: 'data/camera/sensemap.json',
+            remove: 'data/remove-test/sensemap.json',
+            ugly: 'data/ugly-simple-link/sensemap.json'
         };
 
     // Vis and options
@@ -73,7 +75,7 @@ $(function() {
         var path = datasets[name].substr(0, datasets[name].lastIndexOf('/') + 1);
 
         actions.forEach(d => {
-            if (d.image) d.image = path + d.image;
+            if (d.image && !d.image.startsWith('http')) d.image = path + d.image;
         });
     }
 
@@ -130,32 +132,33 @@ $(function() {
         // - Ignore child and link actions
         data.nodes = actions.filter(a => !a.parent && !isNonActionType(a.type));
 
-        // Specific for test data: add two semantic links
-        if (name === 'p1') {
-            var tv = data.nodes.find(n => n.text.startsWith('trivago.es'));
-            var ri = data.nodes.find(n => n.text.startsWith('the river inn hotel'));
-            var gh = data.nodes.find(n => n.text.startsWith('Grand Hyatt Washington washington dc'));
-
-            if (tv && ri) addLink(tv, ri);
-            if (tv && gh) addLink(tv, gh);
-        }
-
-        // - Then add to the link list
-        data.links = [];
-        // -- User links
+        // - Node attribute
         actions.filter(a => isNonActionType(a.type)).forEach(a => {
-            if (a.type === 'add-user-link') {
-                data.links.push({ source: getActionById(a.sourceId), target: getActionById(a.targetId), isUserAdded: true });
-            } else if (a.type === 'remove-user-link') {
-                _.remove(data.links, l => l.source.id === a.sourceId && l.target.id === a.targetId);
-            }
+            var n = getActionById(a.id);
+            if (a.type === 'remove-node' && n) n.removed = true;
+            if (a.type === 'renode' && n) n.removed = false;
+            if (a.type === 'favorite-node' && n) n.favorite = true;
+            if (a.type === 'unfavorite-node' && n) n.favorite = false;
+            if (a.type === 'minimize-node' && n) n.minimized = true;
+            if (a.type === 'restore-node' && n) n.minimized = false;
         });
 
+        // - Then add to the link list
         // -- Automatic links
         data.nodes.filter(d => d.links).forEach(d => {
             d.links.forEach(c => {
-                if (data.nodes.includes(c)) data.links.push({ source: d, target: c });
+                if (data.nodes.includes(c)) {
+                    if (!getLinkByIds(d.id, c.id)) data.links.push({ source: d, target: c });
+                }
             });
+        });
+
+        // -- User links
+        actions.filter(a => isNonActionType(a.type)).forEach(a => {
+            var l = getLinkByIds(a.sourceId, a.targetId);
+            if (a.type === 'add-link' && !l) data.links.push({ source: getActionById(a.sourceId), target: getActionById(a.targetId), isUserAdded: true });
+            if (a.type === 'remove-link' && l) l.removed = true;
+            if (a.type === 'relink' && l) l.removed = false;
         });
     }
 
@@ -163,12 +166,17 @@ $(function() {
         return actions.find(a => a.id === id);
     }
 
+    function getLinkByIds(sourceId, targetId) {
+        return data.links.find(l => l.source.id === sourceId && l.target.id === targetId);
+    }
+
     function isEmbeddedType(type) {
         return [ 'highlight', 'note', 'filter' ].includes(type);
     }
 
     function isNonActionType(type) {
-        return [ 'remove-node', 'add-user-link', 'remove-user-link' ].includes(type);
+        return [ 'remove-node', 'renode', 'favorite-node', 'unfavorite-node',
+            'minimize-node', 'restore-node', 'add-link', 'remove-link', 'relink' ].includes(type);
     }
 
     function respondToContentScript() {
@@ -197,8 +205,15 @@ $(function() {
             .label(d => d.text)
             .icon(d => d.favIconUrl)
             .on('nodeClicked', onNodeClicked)
-            .on('linkAdded', onLinkAdded)
-            .on('linkRemoved', onLinkRemoved);
+            .on('nodeRemoved', d => onNodeHandled('remove-node', d))
+            .on('renoded', d => onNodeHandled('renode', d))
+            .on('nodeFavorite', d => onNodeHandled('favorite-node', d))
+            .on('nodeUnfavorite', d => onNodeHandled('unfavorite-node', d))
+            .on('nodeMinimized', d => onNodeHandled('minimize-node', d))
+            .on('nodeRestored', d => onNodeHandled('restore-node', d))
+            .on('linkAdded', d => onLinkHandled('add-link', d))
+            .on('linkRemoved', d => onLinkHandled('remove-link', d))
+            .on('relinked', d => onLinkHandled('relink', d));
 
         $(window).resize(_.throttle(updateVis, 200));
 
@@ -249,7 +264,7 @@ $(function() {
     function getCoreData(d) {
         var c = {},
             fields = [ 'id', 'text', 'url', 'type', 'time', 'endTime', 'favIconUrl', 'image', 'classId', 'path', 'from',
-            'seen', 'favorite', 'minimized', 'removed', 'sourceId', 'targetId' ];
+            'seen', 'favorite', 'minimized', 'removed', 'removedTime', 'sourceId', 'targetId' ];
 
         fields.forEach(f => {
             if (d[f] !== undefined) c[f] = d[f];
@@ -289,21 +304,20 @@ $(function() {
         });
     }
 
-    function onLinkAdded(d) {
+    function onNodeHandled(type, d) {
         actions.push({
-            type: 'add-user-link',
-            time: new Date(),
-            sourceId: d.source.id,
-            targetId: d.target.id
+            type: type,
+            id: d.id,
+            time: new Date()
         });
     }
 
-    function onLinkRemoved(d) {
+    function onLinkHandled(type, d) {
         actions.push({
-            type: 'remove-user-link',
-            time: new Date(),
+            type: type,
             sourceId: d.source.id,
-            targetId: d.target.id
+            targetId: d.target.id,
+            time: new Date()
         });
     }
 

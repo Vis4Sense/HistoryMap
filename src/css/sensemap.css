@@ -85,6 +85,15 @@
 	marker-end: url(#arrow-marker-cursor);
 }
 
+.sm-sensemap .link path.removed {
+	marker-end: none;
+	cursor: pointer;
+}
+
+.sm-sensemap .link path.main-link.removed.hovered {
+	marker-end: none;
+}
+
 /* To make icon and label in one line */
 .sm-sensemap .node-icon {
 	max-width: 22px;
@@ -143,7 +152,6 @@
 /* Node menu */
 .sm-sensemap .node .btn-group {
 	position: fixed;
-	z-index: 1000;
 }
 
 .sm-sensemap .node .btn,
@@ -160,4 +168,10 @@
 .sm-sensemap .removed-nodes line {
 	stroke: #6e6e6e;
 	stroke-dasharray: 10,10;
+}
+
+/* Overwrite bootstrap tooltip */
+.tooltip.in {
+	opacity: 1 !important;
+	filter: alpha(opacity=100) !important;
 }

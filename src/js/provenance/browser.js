@@ -19,7 +19,7 @@ sm.provenance.browser = function() {
         chrome.tabs.onRemoved.addListener(onTabRemoved);
         chrome.runtime.onMessage.addListener(onMessageReceived);
         createContextMenus();
-        // updatePageEndTime();
+        updatePageEndTime();
     }
 
     init();
@@ -298,7 +298,7 @@ sm.provenance.browser = function() {
                     var action = urlToActionLookup[tab.url];
                     if (action) {
                         action.endTime = new Date();
-                        dispatch.dataChanged('endTime');
+                        // dispatch.dataChanged('endTime');
                     }
                 });
             });
@@ -306,14 +306,20 @@ sm.provenance.browser = function() {
     }
 
     function createContextMenus() {
-        // why remove all? todo
         chrome.contextMenus.removeAll();
 
         // To highlight selected text
-        chrome.contextMenus.create( {
+        chrome.contextMenus.create({
             id: 'sm-highlight',
             title: 'Highlight',
             contexts: ['selection']
+        });
+
+        // To save image
+        chrome.contextMenus.create({
+            id: 'sm-save-image',
+            title: 'Set as Page Image',
+            contexts: ['image']
         });
 
         chrome.contextMenus.onClicked.addListener((info, tab) => {
@@ -321,6 +327,13 @@ sm.provenance.browser = function() {
                 chrome.tabs.sendMessage(tab.id, { type: 'highlightSelection' }, d => {
                     createNewAction(tab, 'highlight', d.text, urlToActionLookup[tab.url], d.path, d.classId);
                 });
+            } else if (info.menuItemId === 'sm-save-image') {
+                // Overwrite existing image
+                var action = urlToActionLookup[tab.url];
+                if (action) {
+                    action.image = info.srcUrl;
+                    dispatch.dataChanged('image');
+                }
             }
         });
     }
