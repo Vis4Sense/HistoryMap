@@ -285,6 +285,8 @@ $(function() {
     }
 
     function onNodeClicked(d) {
+        onNodeClicked('click-node', d);
+
         chrome.tabs.query({}, tabs => {
             var tab = tabs.find(t => t.url === d.url);
             if (tab) {

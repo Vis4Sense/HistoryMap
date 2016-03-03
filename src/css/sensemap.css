@@ -94,6 +94,11 @@
 	marker-end: none;
 }
 
+.sm-sensemap .link path.main-link.removed.hovered.temp-link {
+	stroke-dasharray: 5,5;
+	marker-end: url(#arrow-marker-hover);
+}
+
 /* To make icon and label in one line */
 .sm-sensemap .node-icon {
 	max-width: 22px;

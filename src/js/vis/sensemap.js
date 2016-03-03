@@ -458,8 +458,6 @@ sm.vis.sensemap = function() {
             .attr('class', 'hover-link')
             .on('click', function(d) {
                 if (d.removed) {
-                    // TODO: wrong when new data come
-                    // wrong with long lent
                     d.removed = false;
                     d3.event.stopPropagation();
                     update();
@@ -467,9 +465,9 @@ sm.vis.sensemap = function() {
                 }
             });
 
-        container.on('mouseover', function() {
+        container.on('mouseover', function(d) {
             showLinkMenu(true, this);
-        }).on('mouseout', function() {
+        }).on('mouseout', function(d) {
             showLinkMenu(false, this);
         });
 
@@ -483,9 +481,10 @@ sm.vis.sensemap = function() {
                 .on('click', function(d) {
                     d3.event.stopPropagation();
                     d.removed = true;
+                    d.showRemovedLink = false;
+                    d3.select(this.parentNode).classed('hide', true);
                     update();
                     dispatch.linkRemoved(d);
-                    d3.select(this.parentNode).classed('hide', true);
                 });
 
         container.append('title');
@@ -496,11 +495,18 @@ sm.vis.sensemap = function() {
         d3.select(self).select('.main-link').classed('hovered', visible);
 
         // Menu: show it at the middle of the link
-        d3.select(self).select('.btn-group').classed('hide', !visible || d3.select(self).datum().removed);
-        var d = d3.select(self).datum().points,
-            m = d.length / 2,
-            t = [ d.length % 2 ? d[m - 0.5].x : (d[m].x + d[m - 1].x) / 2 - 10, d.length % 2 ? d[m - 0.5]. y : (d[m].y + d[m - 1].y) / 2 ];
+        var d = d3.select(self).datum(),
+            m = d.points.length / 2,
+            t = [ d.points.length % 2 ? d.points[m - 0.5].x : (d.points[m].x + d.points[m - 1].x) / 2 - 10,
+                d.points.length % 2 ? d.points[m - 0.5]. y : (d.points[m].y + d.points[m - 1].y) / 2 ];
+        d3.select(self).select('.btn-group').classed('hide', !visible || d.removed);
         d3.select(self).select('.menu-container').attr('transform', 'translate(' + t + ')');
+
+        // Show removed link
+        if (d.removed) {
+            d.showRemovedLink = visible;
+            d3.select(self).select('.main-link').attr('d', line(roundPoints(d))).classed('temp-link', visible);
+        }
     }
 
     /**
@@ -514,7 +520,8 @@ sm.vis.sensemap = function() {
 
             // Set data
             container.selectAll('path').attr('d', line(roundPoints(d)))
-                .classed('removed', d.removed);
+                .classed('removed', d.removed)
+                .classed('temp-link', d.showRemovedLink);
 
             container.select('title').text(d.removed ? 'Relink' : '');
         });
@@ -526,7 +533,7 @@ sm.vis.sensemap = function() {
     function roundPoints(d) {
         // stroke-width: 1.5px
         var points = d.points;
-        if (d.removed) {
+        if (d.removed && !d.showRemovedLink) {
             points = d.points.slice(0, 2);
             points[1].x = points[0].x + 10;
         }
