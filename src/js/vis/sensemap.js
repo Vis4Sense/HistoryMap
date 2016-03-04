@@ -325,7 +325,7 @@ sm.vis.sensemap = function() {
             d3.select(this).select('.node')
                 .classed('not-seen', !d.seen)
                 .classed('closed', d.closed)
-                .classed('highlighted', d.highlighted)
+                .classed('highlighted', d.highlighted || isChildHighlighted(d))
                 .classed('removed', d.removed);
 
             // Tooltip
@@ -360,6 +360,12 @@ sm.vis.sensemap = function() {
                 setMaxWidthText(this);
             }
         });
+    }
+
+    function isChildHighlighted(d) {
+        if (!d.children || !d.children.length) return false;
+
+        return d.children.some(c => c.highlighted);
     }
 
     function buildHTMLTitle(d) {

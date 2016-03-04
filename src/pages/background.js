@@ -18,20 +18,24 @@ document.addEventListener('DOMContentLoaded', function () {
 		var dockHeight = 40, // Mac
 			menuBarHeight = 29, // Mac
 			titleBarHeight = 22, // When height is set to window, it sets the innerHeight rather than the outerHeight
-			// smHeight = 210,
-			smHeight = 0,
-			smTop = screen.height - smHeight - dockHeight,
+			smTop = screen.height - dockHeight,
 			browserHeight = smTop - menuBarHeight,
-			fullHeight = browserHeight - titleBarHeight; // Height of other windows such as video or text
+			fullHeight = browserHeight - titleBarHeight,
+			debugging = false;
 
 	    // Resize current window
 		chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {
-			left: 0, top: 0, width: screen.width / 2 - 200, height: fullHeight
+			left: 0, top: 0, width: screen.width / 2 - (debugging ? 200 : 0), height: fullHeight
 		});
 
 		// Timeline: always show
 		chrome.windows.create({
-	    	url: chrome.extension.getURL(page), type: "popup", left: screen.width / 2 - 200, top: 0, width: screen.width / 2 + 200, height: fullHeight - 500
+	    	url: chrome.extension.getURL(page),
+	    	type: "popup",
+	    	left: screen.width / 2 - (debugging ? 200 : 0),
+	    	top: 0,
+	    	width: screen.width / 2 + (debugging ? 200 : 0),
+	    	height: fullHeight - (debugging ? 500 : 0)
 	    });
 
 		// Listen to content script

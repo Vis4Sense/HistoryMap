@@ -11,11 +11,11 @@ sm.layout.dag = function() {
         width, height, // constrained size
         label = d => d.label,
         direction = 'lr', // tb, bt, lr, rl
-        align = '', // ul, ur, dl, dr
+        align = 'dl', // ul, ur, dl, dr
+        incremental = false, // keep the graph as stable as possible
         maxVerticesPerLayer = 4,
         layering = 'simplex', // longest/cg/simplex
         ordering = 'bary', // adjacent/bary
-        minLength = 1, // for network simplex layering, the minimum layers in between of two edge's nodes, normally 1
         vertexSep = 15, // space between two sibling vertices
         layerSep = 40, // space between two consecutive layers
         tipLength = 16;
@@ -289,6 +289,11 @@ sm.layout.dag = function() {
     function orderVertices() {
         if (!layers.length) return;
 
+        if (incremental) {
+            orderVerticesByTime();
+            return;
+        }
+
         // bary twice and iterative adjacent
         ordering = 'bary';
         sweepGraph(true, true);
@@ -314,6 +319,14 @@ sm.layout.dag = function() {
             numCrossings = itNumCrossings;
             count++;
         } while (count < 20); // Just in case of any infinitive loop
+    }
+
+    function orderVerticesByTime() {
+        layers.forEach(layer => {
+            layer.forEach((v, i) => {
+                v.order = i;
+            });
+        });
     }
 
     function countCrossings() {

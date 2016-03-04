@@ -131,7 +131,7 @@ sm.provenance.browser = function() {
             dispatch.dataChanged(type);
         } else if (type === 'highlight' || type === 'filter') {
             action = createActionObject(tab.url, text, type, undefined, referrer, path, classId);
-            urlToActionLookup[tab.url] = action;
+            if (type === 'filter') urlToActionLookup[tab.url] = action;
             dispatch.dataChanged(type);
         } else {
             if (originalAction) {
@@ -325,7 +325,7 @@ sm.provenance.browser = function() {
         chrome.contextMenus.onClicked.addListener((info, tab) => {
             if (info.menuItemId === 'sm-highlight') {
                 chrome.tabs.sendMessage(tab.id, { type: 'highlightSelection' }, d => {
-                    createNewAction(tab, 'highlight', d.text, urlToActionLookup[tab.url], d.path, d.classId);
+                    if (d) createNewAction(tab, 'highlight', d.text, urlToActionLookup[tab.url], d.path, d.classId);
                 });
             } else if (info.menuItemId === 'sm-save-image') {
                 // Overwrite existing image

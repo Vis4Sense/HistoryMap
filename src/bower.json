@@ -19,6 +19,7 @@
     "bootstrap": "~3.3.1",
     "fontawesome": "~4.4.0",
     "d3": "~3.4.13",
-    "lodash": "~3.10.1"
+    "lodash": "~3.10.1",
+    "jszip": "Stuk/jszip#^2.5.0"
   }
 }

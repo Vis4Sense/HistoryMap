@@ -5,8 +5,9 @@ $(function() {
         browser = sm.provenance.browser(),
         startRecordingTime,
         pendingTasks = {}, // For jumping to an action when its page isn't ready yet
-        name = 'remove', // For quick test/analysis: preload data to save time loading files in the interface
+        name = 'z', // For quick test/analysis: preload data to save time loading files in the interface
         datasets = {
+            z: 'data/20160304124518-sensemap.zip',
             test: 'data/2016-02-29 10-47-39_sensemap.json',
             simple: 'data/simple/sensemap.json',
             camera: 'data/camera/sensemap.json',
@@ -26,8 +27,8 @@ $(function() {
 
             if (name) {
                 // Load data
-                d3.json(datasets[name], json => {
-                    loadDataFile(json);
+                JSZipUtils.getBinaryContent(datasets[name], (err, data) => {
+                    loadDataFile(data);
                     main();
                 });
             } else {
@@ -55,10 +56,11 @@ $(function() {
     run();
 
     var firstTime = true;
-    function loadDataFile(json) {
-        actions = json.data;
+    function loadDataFile(content) {
+        var zip = new JSZip(content);
+        actions = JSON.parse(zip.file('sensemap.json').asText()).data;
         buildHierarchy(actions);
-        fixImagePath(actions);
+        replaceRelativePathWithDataURI(zip);
 
         if (!firstTime) {
             browser.actions(actions, function() {
@@ -68,14 +70,17 @@ $(function() {
         }
     }
 
-    function fixImagePath(actions) {
-        if (!name) return;
+    function replaceRelativePathWithDataURI(zip) {
+        _.forEach(zip.files, f => {
+            if (f.dir || f.name === 'sensemap.json') return;
 
-        // Make images in the same path as the main data file
-        var path = datasets[name].substr(0, datasets[name].lastIndexOf('/') + 1);
-
-        actions.forEach(d => {
-            if (d.image && !d.image.startsWith('http')) d.image = path + d.image;
+            var a = actions.find(a => a.image === f.name.split('/')[1]);
+            if (a) {
+                // Don't use blob: it makes it unable to resave image file
+                // a.image = URL.createObjectURL(new Blob([zip.file(f.name).asArrayBuffer()], { type : 'image/png' }));
+                var bf = zip.file(f.name).asArrayBuffer();
+                a.image = 'data:image/png;base64,' + btoa([].reduce.call(new Uint8Array(bf), (p, c) => p + String.fromCharCode(c), ''));
+            }
         });
     }
 
@@ -224,7 +229,7 @@ $(function() {
             var prevent = true;
 
             if (e.keyCode === 83) { // Ctrl + S
-                saveFile();
+                saveWorkspace();
             } else if (e.keyCode === 79) { // Ctrl + O
                 $('#btnLoad').click();
             } else if (e.keyCode === 80) { // Ctrl + P
@@ -239,26 +244,32 @@ $(function() {
         // Settings
         $('#btnLoad').change(e => {
             sm.readUploadedFile(e, content => {
-                loadDataFile(JSON.parse(content));
+                loadDataFile(content);
                 redraw(true);
-            });
+            }, true);
         });
     }
 
-    function saveFile() {
-        // Images: replace dataURL with local files to reduce the size
+    function saveWorkspace() {
+        var zip = new JSZip();
+
+        // Images: replace dataURL with local files to reduce the size of main file
         var coreData = actions.map(getCoreData);
         coreData.filter(d => d.image).forEach(d => {
-            var filename = d.id + '.png';
-            sm.saveDataToFile(filename, d.image, true);
-            d.image = filename;
+            if (d.image.startsWith('data')) {
+                var filename = d.id + '.png';
+                // base64 data doesn't have 'data:image/png;base64,'
+                zip.folder('images').file(filename, d.image.split('base64,')[1], { base64: true });
+                d.image = filename;
+            }
         });
 
         // Main file
-        var timeFormat = d3.time.format('%Y-%m-%d %H:%M:%S'),
-            date = timeFormat(new Date()),
-            filename = date + '_sensemap.json';
-        sm.saveDataToFile(filename, { startRecordingTime: startRecordingTime, data: coreData });
+        zip.file('sensemap.json', JSON.stringify({ startRecordingTime: startRecordingTime, data: coreData }, null, 4));
+
+        // Zip and download
+        var filename = d3.time.format('%Y%m%d%H%M%S')(new Date()) + '-sensemap.zip';
+        sm.saveDataToFile(filename, zip.generate({ type: 'blob' }), false, true);
     }
 
     function getCoreData(d) {
@@ -285,7 +296,7 @@ $(function() {
     }
 
     function onNodeClicked(d) {
-        onNodeClicked('click-node', d);
+        onNodeHandled('click-node', d);
 
         chrome.tabs.query({}, tabs => {
             var tab = tabs.find(t => t.url === d.url);

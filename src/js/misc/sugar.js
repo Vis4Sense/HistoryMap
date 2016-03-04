@@ -35,11 +35,15 @@ sm.getQueryStringFromSearch = function(s) {
 /**
  * Read the content of the uploaded file.
  */
-sm.readUploadedFile = function(e, callback) {
+sm.readUploadedFile = function(e, callback, isBinary) {
     var f = e.target.files[0];
     if (f) {
         var reader = new FileReader();
-        reader.readAsText(f);
+        if (isBinary) {
+            reader.readAsArrayBuffer(f);
+        } else {
+            reader.readAsText(f);
+        }
         reader.onload = function(e) {
             callback(e.target.result);
         };
@@ -179,12 +183,12 @@ sm.resizeImage = function(dataUrl, maxWidth, maxHeight, callback) {
 /**
  * Save data to local file.
  */
-sm.saveDataToFile = function(filename, data, isDataUrl) {
+sm.saveDataToFile = function(filename, data, isDataUrl, isBlob) {
     var link = document.createElement('a');
     document.body.appendChild(link);
     link.style.display = 'none';
     link.setAttribute('download', filename);
-    link.setAttribute('href', isDataUrl ? data: URL.createObjectURL(new Blob([JSON.stringify(data, null, 4)])));
+    link.setAttribute('href', isDataUrl ? data: URL.createObjectURL(isBlob ? data : new Blob([JSON.stringify(data, null, 4)])));
     link.click();
     document.body.removeChild(link);
 };
