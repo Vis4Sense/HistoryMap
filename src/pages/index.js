@@ -5,20 +5,16 @@ $(function() {
         browser = sm.provenance.browser(),
         startRecordingTime,
         pendingTasks = {}, // For jumping to an action when its page isn't ready yet
-        closeConfirmation = false,
-        name = 'camera', // For quick test/analysis: preload data to save time loading files in the interface
-        datasets = {
-            complex: 'data/complex.json',
-            wrong: 'data/wrong.json',
-            inner: 'data/inner.json',
-            z: 'data/20160304164424-sensemap.zip',
-            camera: 'data/camera.zip',
-            ugly: 'data/ugly-simple-link.zip'
-        };
+        closeConfirmation = true,
+        datasetName = '';
+        // datasetName = 'data/20160308215918-sensemap.zip';
 
     // Vis and options
     var sensemap,
         listening = true;
+
+    respondToContentScript();
+    run();
 
     function run() {
         // Read options from saved settings
@@ -26,15 +22,15 @@ $(function() {
             // Always listening now for easy testing
             listening = true;
 
-            if (name) {
+            if (datasetName) {
                 // Load data
-                if (datasets[name].endsWith('.json')) {
-                    d3.json(datasets[name], data => {
+                if (datasetName.endsWith('.json')) {
+                    d3.json(datasetName, data => {
                         loadWorkspace(data, true);
                         main();
                     });
                 } else {
-                    JSZipUtils.getBinaryContent(datasets[name], (err, data) => {
+                    JSZipUtils.getBinaryContent(datasetName, (err, data) => {
                         loadWorkspace(data);
                         main();
                     });
@@ -46,13 +42,17 @@ $(function() {
         });
 
         initSettings();
+
+        d3.select('body').on('mouseover', function() {
+            chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {
+                focused: true
+            });
+        });
     }
 
     function initSettings() {
         // Show/hide settings
-        d3.select('#bars').on('click', function() {
-            d3.select('.btn-toolbar').classed('hide', !d3.select('.btn-toolbar').classed('hide'));
-        });
+        d3.select('#bars').on('click', toggleToolbar);
 
         d3.select('#btnNew').on('click', () => {
             actions = [];
@@ -60,20 +60,34 @@ $(function() {
             data.links = [];
             browser.actions(actions, function() {
                 redraw(true);
+                toggleToolbar();
             });
         });
 
-        d3.select('#btnSave').on('click', saveWorkspace);
+        d3.select('#btnSave').on('click', function() {
+            saveWorkspace();
+            toggleToolbar();
+        });
 
+        $('#btnLoad').click(e => {
+            $(this).val(null);
+        });
         $('#btnLoad').change(e => {
             sm.readUploadedFile(e, content => {
-                loadWorkspace(content);
+                loadWorkspace(content, false, true);
                 redraw(true);
+                toggleToolbar();
             }, true);
+        });
+
+        d3.select('#btnReplay').on('click', function() {
+            replay(1000);
+            toggleToolbar();
         });
 
         d3.select('#btnFrezze').on('click', function() {
             sensemap.frozen(true);
+            toggleToolbar();
         });
 
         // Need confirmation when close/reload sensemap
@@ -82,6 +96,10 @@ $(function() {
                 return "All unsaved data will be gone if you close this window.";
             };
         }
+    }
+
+    function toggleToolbar() {
+        d3.select('.btn-toolbar').classed('hide', !d3.select('.btn-toolbar').classed('hide'));
     }
 
     function main() {
@@ -94,15 +112,12 @@ $(function() {
     };
 
     function onDataChanged(p) {
-        console.log(p, +new Date());
+        // console.log(p, +new Date());
         buildHierarchy(actions);
         redraw(true);
     }
 
-    run();
-
-    var firstTime = true;
-    function loadWorkspace(content, isJson) {
+    function loadWorkspace(content, isJson, external) {
         var zip;
 
         if (isJson) {
@@ -117,11 +132,10 @@ $(function() {
 
         if (!isJson) replaceRelativePathWithDataURI(zip);
 
-        if (!firstTime) {
+        if (external) {
             browser.actions(actions, function() {
                 if (sensemap) redraw(true);
             });
-            firstTime = false;
         }
     }
 
@@ -195,12 +209,18 @@ $(function() {
         // - Node attribute
         actions.filter(a => isNonActionType(a.type)).forEach(a => {
             var n = getActionById(a.id);
-            if (a.type === 'remove-node' && n) n.removed = true;
-            if (a.type === 'renode' && n) n.removed = false;
-            if (a.type === 'favorite-node' && n) n.favorite = true;
-            if (a.type === 'unfavorite-node' && n) n.favorite = false;
-            if (a.type === 'minimize-node' && n) n.minimized = true;
-            if (a.type === 'restore-node' && n) n.minimized = false;
+            if (!n) return;
+
+            if (a.type === 'remove-node') n.removed = true;
+            if (a.type === 'renode') n.removed = false;
+            if (a.type === 'favorite-node') n.favorite = true;
+            if (a.type === 'unfavorite-node') n.favorite = false;
+            if (a.type === 'minimize-node') n.minimized = true;
+            if (a.type === 'restore-node') n.minimized = false;
+            if (a.type === 'move-node') { // Not working, will be overwritten by layout
+                n.x = a.x;
+                n.y = a.y;
+            }
         });
 
         // - Then add to the link list
@@ -217,7 +237,7 @@ $(function() {
         actions.filter(a => isNonActionType(a.type)).forEach(a => {
             var l = getLinkByIds(a.sourceId, a.targetId);
             if (a.type === 'add-link' && !l) data.links.push({ source: getActionById(a.sourceId), target: getActionById(a.targetId), isUserAdded: true });
-            if (a.type === 'remove-link' && !l) _.remove(data.links, l);
+            if (a.type === 'remove-link' && l) _.remove(data.links, l);
             if (a.type === 'hide-link' && l) l.hidden = true;
             if (a.type === 'relink' && l) l.hidden = false;
         });
@@ -237,7 +257,7 @@ $(function() {
 
     function isNonActionType(type) {
         return [ 'click-node', 'remove-node', 'renode', 'favorite-node', 'unfavorite-node',
-            'minimize-node', 'restore-node', 'add-link', 'remove-link', 'hide-link', 'relink' ].includes(type);
+            'minimize-node', 'restore-node', 'move-node', 'add-link', 'remove-link', 'hide-link', 'relink' ].includes(type);
     }
 
     function respondToContentScript() {
@@ -248,13 +268,10 @@ $(function() {
 
             if (request.type === 'dataRequested') {
                 // Get highlights, notes for the requested item
-                var tabData = actions.filter(d => d.url === tab.url);
-                var t = tabData.map(getCoreData);
-                sendResponse(t);
+                sendResponse(actions.filter(d => d.url === tab.url).map(getCoreData));
             } else if (request.type === 'taskRequested') {
                 if (pendingTasks[tab.id]) {
-                    var t = getCoreData(pendingTasks[tab.id]);
-                    sendResponse(t);
+                    sendResponse(getCoreData(pendingTasks[tab.id]));
                     delete pendingTasks[tab.id];
                 }
             }
@@ -272,6 +289,7 @@ $(function() {
             .on('nodeUnfavorite', d => onNodeHandled('unfavorite-node', d))
             .on('nodeMinimized', d => onNodeHandled('minimize-node', d))
             .on('nodeRestored', d => onNodeHandled('restore-node', d))
+            .on('nodeMoved', d => onNodeMoved('move-node', d))
             .on('linkAdded', d => onLinkHandled('add-link', d))
             .on('linkRemoved', d => onLinkHandled('remove-link', d))
             .on('linkHidden', d => onLinkHandled('hide-link', d))
@@ -314,15 +332,20 @@ $(function() {
         return c;
     }
 
-    function replay() {
-        var count = 1,
-            intervalId = setInterval(() => {
-                buildHierarchy(actions.slice(0, count));
-                redraw(true);
-                count++;
+    function replay(timeStep) {
+        data.links = [];
 
-                if (count > actions.length) clearInterval(intervalId);
-            }, 1000);
+        var count = 1,
+            relevantActions = actions.filter(a => a.type !== 'click-node');
+
+        var intervalId = setInterval(() => {
+            console.log(relevantActions[count].type);
+            buildHierarchy(relevantActions.slice(0, count));
+            redraw(true);
+            count++;
+
+            if (count === relevantActions.length) clearInterval(intervalId);
+        }, timeStep);
     }
 
     function onNodeClicked(d) {
@@ -352,6 +375,16 @@ $(function() {
             type: type,
             id: d.id,
             time: new Date()
+        });
+    }
+
+    function onNodeMoved(d) {
+        actions.push({
+            type: 'move-node',
+            id: d.id,
+            time: new Date(),
+            x: d.x,
+            y: d.y
         });
     }
 

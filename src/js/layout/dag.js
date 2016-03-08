@@ -263,7 +263,10 @@ sm.layout.dag = function() {
         edges.forEach(e => {
             // Note: source layer > target layer
             var span = e.source.layer - e.target.layer;
-            if (span === 1) return;
+            if (span === 1) {
+                e.dummyVertices = [];
+                return;
+            }
 
             // Replace edge(u, v) with a path (u=v_1, ... v_span=v)
             e.dummyVertices = _.range(1, span).map(i => ({ dummy: true, layer: e.source.layer - i, width: 0, height: 0, label: dummyCount++ }));

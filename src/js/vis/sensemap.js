@@ -62,7 +62,7 @@ sm.vis.sensemap = function() {
 
     // Others
     var dispatch = d3.dispatch('nodeClicked', 'nodeRemoved', 'renoded', 'nodeFavorite', 'nodeUnfavorite', 'nodeMinimized',
-        'nodeRestored', 'linkAdded', 'linkRemoved', 'linkHidden', 'relinked');
+        'nodeRestored', 'nodeMoved', 'linkAdded', 'linkRemoved', 'linkHidden', 'relinked');
 
     /**
      * Main entry of the module.
@@ -398,6 +398,7 @@ sm.vis.sensemap = function() {
             .on('click', function(d) {
                 if (d3.event.defaultPrevented) return;
                 dispatch.nodeClicked(d);
+                d3.event.stopPropagation(); // Prevent click fired in parent
             });
 
         // - Icon
@@ -418,7 +419,7 @@ sm.vis.sensemap = function() {
             .style('max-width', (defaultMaxWidth - 10) + 'px');
 
         // Exit
-        subItems.exit().transition().duration(500).style('opacity', 0).remove();
+        subItems.exit().style('opacity', 0).remove();
     }
 
     /**
@@ -427,7 +428,7 @@ sm.vis.sensemap = function() {
     function updateNodePositions(selection) {
         selection.each(function(d) {
             d3.select(this).transition().duration(500)
-                .attr('opacity', 1)
+                .attr('opacity', d.closed ? 0.6 : 1)
                 .attr('transform', 'translate(' + roundPoint(d) + ')');
 
             // Align menu to the right side
@@ -534,7 +535,7 @@ sm.vis.sensemap = function() {
      */
     function updateLinks(selection) {
         selection.each(function(d) {
-            d3.select(this).transition().duration(500).attr('opacity', 1);
+            d3.select(this).transition().duration(500).attr('opacity', d.target.closed ? 0.6 : 1);
 
             var container = d3.select(this);
 
@@ -650,6 +651,8 @@ sm.vis.sensemap = function() {
                     dispatch.linkAdded(l);
                 }
             });
+        } else {
+            dispatch.nodeMoved(d);
         }
     }
 

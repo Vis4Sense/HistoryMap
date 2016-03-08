@@ -36,7 +36,7 @@
 }
 
 .sm-sensemap .node.highlighted {
-    background-color: #1abc9c;
+    background-color: #1abc9c !important;
 }
 
 .sm-sensemap .node.favorite {

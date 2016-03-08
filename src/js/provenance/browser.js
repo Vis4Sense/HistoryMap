@@ -30,18 +30,25 @@ sm.provenance.browser = function() {
     function onTabUpdated(tabId, changeInfo, tab) {
         if (!listening || isTabIgnored(tab) || isTabInComplete(tab)) return;
 
+        // Close status
+        actions.forEach(a => {
+            a.closed = true;
+        });
+        chrome.tabs.query({}, tabs => {
+            tabs.forEach(t => {
+                var n = urlToActionLookup[t.url];
+                if (n) {
+                    n.closed = false;
+                }
+            });
+        });
+
         // Either add new action or update it (with favIconUrl)
         var action = urlToActionLookup[tab.url];
         if (action) {
             // After a tab is complete, 'favIconUrl' can still be updated.
             if (!action.favIconUrl) {
-                console.log('update: ' + tab.url);
                 updateAction(tab);
-            }
-
-            if (action.closed) {
-                action.closed = false;
-                dispatch.dataChanged('tabOpened');
             }
 
             if (tab.active) {
@@ -140,6 +147,7 @@ sm.provenance.browser = function() {
                 action = createActionObject(tab.url, text || tab.title || tab.url || '', type, tab.favIconUrl, referrer);
                 action.seen = action.highlighted = tab.active;
                 urlToActionLookup[tab.url] = action; // Maintain the first visit
+                tabIdToActionLookup[tab.id] = action;
                 dispatch.dataChanged(type);
 
                 // Page snapshot
@@ -151,7 +159,7 @@ sm.provenance.browser = function() {
             prevUrl = action.url;
 
             // Only the newly created tab is active
-            if (tab.active) {
+            if (tab.active && !isEmbeddedType(type)) {
                 actions.forEach(a => {
                     a.highlighted = action === a;
                 });
@@ -231,15 +239,21 @@ sm.provenance.browser = function() {
 
         // Either add a 'revisit' action or a normal action (happen when switch to a tab which was opened before the extension)
         chrome.tabs.query({ windowId: activeInfo.windowId, active: true }, tabs => {
-            if (!tabs.length) return;
-
             // Dehighlight all, only highlight the active one later
             actions.forEach(a => {
                 a.highlighted = false;
             });
 
+            if (!tabs.length) {
+                dispatch.dataChanged('highlighted');
+                return;
+            }
+
             var tab = tabs[0];
-            if (isTabIgnored(tab) || isTabInComplete(tab)) return;
+            if (isTabIgnored(tab) || isTabInComplete(tab)) {
+                dispatch.dataChanged('highlighted');
+                return;
+            }
 
             var action = urlToActionLookup[tab.url];
             if (action) {
