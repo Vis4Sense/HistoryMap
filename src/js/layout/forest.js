@@ -8,10 +8,10 @@ sm.layout.forest = function() {
     var key = d => d.id,
         linkKey = d => key(d.source) + "-" + key(d.target);
 
-    var nodes, links,
+    var vertices, edges,
         roots,
         width, height,
-        children = d => d.children,
+        children = d => d.links,
         parent = d => d.parent,
         time = d => d.time,
         label = d => d.label,
@@ -46,11 +46,11 @@ sm.layout.forest = function() {
     }
 
     /**
-     * Earlier nodes are shown first. Also set the depth for each node.
+     * Earlier vertices are shown first. Also set the depth for each node.
      */
     function order() {
         var timeSort = (a, b) => d3.ascending(time(a), time(b));
-        roots = nodes.filter(n => !parent(n)).sort(timeSort);
+        roots = vertices.filter(n => !parent(n)).sort(timeSort);
         dfsRoots(d => {
             d.depth = parent(d) ? parent(d).depth + 1 : 0;
             if (children(d)) children(d).sort();
@@ -67,7 +67,7 @@ sm.layout.forest = function() {
         });
 
         // Links
-        links.forEach(l => {
+        edges.forEach(l => {
             // Need to set a list of points to represent a path from the source to the target.
             var p1 = { x: l.source.x + depthSep / 3, y: l.source.y }; // Bottom of the source
             var p3 = { x: l.target.x, y: l.target.y + l.target.height / 2 }; // Left of the target
@@ -101,10 +101,10 @@ sm.layout.forest = function() {
         layout.nodeDistance = 6;
 
         nodeDict = {}, linkDict = {};
-        nodes.forEach(d => {
+        vertices.forEach(d => {
             nodeDict[key(d)] = graph.insertVertex(parentNode, null, '', 0, 0, d.width, d.height);
         });
-        links.forEach(d => {
+        edges.forEach(d => {
             linkDict[linkKey(d)] = graph.insertEdge(parentNode, null, '', nodeDict[key(d.source)], nodeDict[key(d.target)]);
         });
     }
@@ -116,7 +116,7 @@ sm.layout.forest = function() {
     }
 
     function setNodeCoordinate() {
-        nodes.forEach(d => {
+        vertices.forEach(d => {
             var m = nodeDict[key(d)].geometry;
             d.x = m.x;
             d.y = m.y;
@@ -124,21 +124,21 @@ sm.layout.forest = function() {
     }
 
     function setLinkCoordinate() {
-        var layers = _.toArray(_.groupBy(nodes, n => n.depth)),
-            layerWidths = layers.map(nodes => d3.max(nodes, n => n.width));
+        var layers = _.toArray(_.groupBy(vertices, n => n.depth)),
+            layerWidths = layers.map(vertices => d3.max(vertices, n => n.width));
 
         // Make the 'link' object accessible from its source
-        nodes.forEach(n => {
-            n._links = [];
+        vertices.forEach(n => {
+            n._edges = [];
         });
-        links.forEach(l => {
-            l.source._links.push(l);
+        edges.forEach(l => {
+            l.source._edges.push(l);
         });
 
-        nodes.forEach(n => {
-            if (!n._links.length) return;
+        vertices.forEach(n => {
+            if (!n._edges.length) return;
 
-            // For each node, we want to distribute the contacting points of outgoing links along the boundary rather than always in the center
+            // For each node, we want to distribute the contacting points of outgoing edges along the boundary rather than always in the center
             var scale = d3.scale.ordinal()
                 .domain(_.range(children(n).length))
                 .rangePoints([ 0, n.height ], 1);
@@ -151,7 +151,7 @@ sm.layout.forest = function() {
                 deltas[i] = l - i - 1;
             }
 
-            n._links.forEach((l, i) => {
+            n._edges.forEach((l, i) => {
                 var p1 = { x: l.source.x + l.source.width, y: l.source.y + scale(i) },
                     p2 = { x: p1.x + headLength / 2 + deltas[i] * 2, y: p1.y },
                     p4 = { x: l.target.x, y: l.target.y + l.target.height / 2 },
@@ -175,26 +175,26 @@ sm.layout.forest = function() {
 
         // The vis width and height
         return {
-            width: d3.max(nodes, n => n.x + n.width) || 0,
-            height: d3.max(nodes, n => n.y + n.height) || 0
+            width: d3.max(vertices, n => n.x + n.width) || 0,
+            height: d3.max(vertices, n => n.y + n.height) || 0
         };
     };
 
     /**
-     * Sets/gets data input: a list nodes.
+     * Sets/gets data input: a list vertices.
      */
-    module.nodes = function(value) {
-        if (!arguments.length) return nodes;
-        nodes = value;
+    module.vertices = function(value) {
+        if (!arguments.length) return vertices;
+        vertices = value;
         return this;
     };
 
     /**
-     * Sets/gets data input: a list links.
+     * Sets/gets data input: a list edges.
      */
-    module.links = function(value) {
-        if (!arguments.length) return links;
-        links = value;
+    module.edges = function(value) {
+        if (!arguments.length) return edges;
+        edges = value;
         return this;
     };
 
@@ -253,7 +253,7 @@ sm.layout.forest = function() {
     };
 
     /**
-     * Sets/gets gap separated between sibling nodes.
+     * Sets/gets gap separated between sibling vertices.
      */
     module.siblingSep = function(value) {
         if (!arguments.length) return siblingSep;
@@ -262,7 +262,7 @@ sm.layout.forest = function() {
     };
 
     /**
-     * Sets/gets gap separated between non-sibling nodes.
+     * Sets/gets gap separated between non-sibling vertices.
      */
     module.nonSiblingSep = function(value) {
         if (!arguments.length) return nonSiblingSep;

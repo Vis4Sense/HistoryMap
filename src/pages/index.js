@@ -5,14 +5,15 @@ $(function() {
         browser = sm.provenance.browser(),
         startRecordingTime,
         pendingTasks = {}, // For jumping to an action when its page isn't ready yet
-        name = 'z', // For quick test/analysis: preload data to save time loading files in the interface
+        closeConfirmation = false,
+        name = 'camera', // For quick test/analysis: preload data to save time loading files in the interface
         datasets = {
-            z: 'data/20160304124518-sensemap.zip',
-            test: 'data/2016-02-29 10-47-39_sensemap.json',
-            simple: 'data/simple/sensemap.json',
-            camera: 'data/camera/sensemap.json',
-            remove: 'data/remove-test/sensemap.json',
-            ugly: 'data/ugly-simple-link/sensemap.json'
+            complex: 'data/complex.json',
+            wrong: 'data/wrong.json',
+            inner: 'data/inner.json',
+            z: 'data/20160304164424-sensemap.zip',
+            camera: 'data/camera.zip',
+            ugly: 'data/ugly-simple-link.zip'
         };
 
     // Vis and options
@@ -27,15 +28,60 @@ $(function() {
 
             if (name) {
                 // Load data
-                JSZipUtils.getBinaryContent(datasets[name], (err, data) => {
-                    loadDataFile(data);
-                    main();
-                });
+                if (datasets[name].endsWith('.json')) {
+                    d3.json(datasets[name], data => {
+                        loadWorkspace(data, true);
+                        main();
+                    });
+                } else {
+                    JSZipUtils.getBinaryContent(datasets[name], (err, data) => {
+                        loadWorkspace(data);
+                        main();
+                    });
+                }
             } else {
                 startRecordingTime = new Date();
                 main();
             }
         });
+
+        initSettings();
+    }
+
+    function initSettings() {
+        // Show/hide settings
+        d3.select('#bars').on('click', function() {
+            d3.select('.btn-toolbar').classed('hide', !d3.select('.btn-toolbar').classed('hide'));
+        });
+
+        d3.select('#btnNew').on('click', () => {
+            actions = [];
+            data.nodes = [];
+            data.links = [];
+            browser.actions(actions, function() {
+                redraw(true);
+            });
+        });
+
+        d3.select('#btnSave').on('click', saveWorkspace);
+
+        $('#btnLoad').change(e => {
+            sm.readUploadedFile(e, content => {
+                loadWorkspace(content);
+                redraw(true);
+            }, true);
+        });
+
+        d3.select('#btnFrezze').on('click', function() {
+            sensemap.frozen(true);
+        });
+
+        // Need confirmation when close/reload sensemap
+        if (closeConfirmation) {
+            window.onbeforeunload = function() {
+                return "All unsaved data will be gone if you close this window.";
+            };
+        }
     }
 
     function main() {
@@ -56,11 +102,20 @@ $(function() {
     run();
 
     var firstTime = true;
-    function loadDataFile(content) {
-        var zip = new JSZip(content);
-        actions = JSON.parse(zip.file('sensemap.json').asText()).data;
+    function loadWorkspace(content, isJson) {
+        var zip;
+
+        if (isJson) {
+            actions = content.data;
+        } else {
+            zip = new JSZip(content);
+            actions = JSON.parse(zip.file('sensemap.json').asText()).data;
+        }
+
+        data.links = [];
         buildHierarchy(actions);
-        replaceRelativePathWithDataURI(zip);
+
+        if (!isJson) replaceRelativePathWithDataURI(zip);
 
         if (!firstTime) {
             browser.actions(actions, function() {
@@ -162,8 +217,9 @@ $(function() {
         actions.filter(a => isNonActionType(a.type)).forEach(a => {
             var l = getLinkByIds(a.sourceId, a.targetId);
             if (a.type === 'add-link' && !l) data.links.push({ source: getActionById(a.sourceId), target: getActionById(a.targetId), isUserAdded: true });
-            if (a.type === 'remove-link' && l) l.removed = true;
-            if (a.type === 'relink' && l) l.removed = false;
+            if (a.type === 'remove-link' && !l) _.remove(data.links, l);
+            if (a.type === 'hide-link' && l) l.hidden = true;
+            if (a.type === 'relink' && l) l.hidden = false;
         });
     }
 
@@ -180,8 +236,8 @@ $(function() {
     }
 
     function isNonActionType(type) {
-        return [ 'remove-node', 'renode', 'favorite-node', 'unfavorite-node',
-            'minimize-node', 'restore-node', 'add-link', 'remove-link', 'relink' ].includes(type);
+        return [ 'click-node', 'remove-node', 'renode', 'favorite-node', 'unfavorite-node',
+            'minimize-node', 'restore-node', 'add-link', 'remove-link', 'hide-link', 'relink' ].includes(type);
     }
 
     function respondToContentScript() {
@@ -218,36 +274,10 @@ $(function() {
             .on('nodeRestored', d => onNodeHandled('restore-node', d))
             .on('linkAdded', d => onLinkHandled('add-link', d))
             .on('linkRemoved', d => onLinkHandled('remove-link', d))
+            .on('linkHidden', d => onLinkHandled('hide-link', d))
             .on('relinked', d => onLinkHandled('relink', d));
 
         $(window).resize(_.throttle(updateVis, 200));
-
-        // Save and Load
-        $(document).on('keydown', function(e) {
-            if (!e.metaKey && !e.ctrlKey) return;
-
-            var prevent = true;
-
-            if (e.keyCode === 83) { // Ctrl + S
-                saveWorkspace();
-            } else if (e.keyCode === 79) { // Ctrl + O
-                $('#btnLoad').click();
-            } else if (e.keyCode === 80) { // Ctrl + P
-                replay();
-            } else {
-                prevent = false;
-            }
-
-            if (prevent) e.preventDefault();
-        });
-
-        // Settings
-        $('#btnLoad').change(e => {
-            sm.readUploadedFile(e, content => {
-                loadDataFile(content);
-                redraw(true);
-            }, true);
-        });
     }
 
     function saveWorkspace() {

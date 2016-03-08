@@ -9,10 +9,11 @@ sm.vis.sensemap = function() {
         icon = d => d.icon,
         type = d => d.type,
         time = d => d.time, // Expect a Date object
-        image = d => d.image;
+        image = d => d.image,
+        frozen = false; // Stop running the layout
 
     // Rendering options
-    var layout,
+    var layout = sm.layout.dag(),
         panExtent = [ 0, 1, 0, 1 ],
         removedPanExtent = [ 0, 1 ],
         defaultMaxWidth = 200,
@@ -61,7 +62,7 @@ sm.vis.sensemap = function() {
 
     // Others
     var dispatch = d3.dispatch('nodeClicked', 'nodeRemoved', 'renoded', 'nodeFavorite', 'nodeUnfavorite', 'nodeMinimized',
-        'nodeRestored', 'linkAdded', 'linkRemoved', 'relinked');
+        'nodeRestored', 'linkAdded', 'linkRemoved', 'linkHidden', 'relinked');
 
     /**
      * Main entry of the module.
@@ -80,8 +81,8 @@ sm.vis.sensemap = function() {
                 .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
                 .append('g').attr('class', 'sm-sensemap');
             container = parentContainer.append('g').attr('clip-path', 'url(#clip-path)');
-            linkContainer = container.append('g').attr('class', 'links');
             nodeContainer = container.append('g').attr('class', 'nodes');
+            linkContainer = container.append('g').attr('class', 'links');
             removedNodeContainer = d3.select(container.node().parentNode).append('g').attr('class', 'removed-nodes');
             removedNodeContainer.append('line');
             clipPath = d3.select(self).append('clipPath').attr('id', 'clip-path').append('rect');
@@ -98,8 +99,7 @@ sm.vis.sensemap = function() {
         dataRemovedNodes = (data.nodes || []).filter(n => n.removed);
         dataLinks = (data.links || []).filter(l => !l.source.removed && !l.target.removed);
 
-        layout = sm.layout.dag()
-            .width(width)
+        layout.width(width)
             .height(height)
             .label(label);
 
@@ -107,17 +107,17 @@ sm.vis.sensemap = function() {
 
         var links = linkContainer.selectAll('.link').data(dataLinks, linkKey);
         links.enter().call(enterLinks);
-        links.exit().transition().style('opacity', 0).remove();
+        links.exit().transition().duration(500).style('opacity', 0).remove();
 
         var nodes = nodeContainer.selectAll('.node-container').data(dataNodes, key);
         nodes.enter().call(enterNodes);
         nodes.call(updateNodes);
-        nodes.exit().transition().style('opacity', 0).remove();
+        nodes.exit().transition().duration(500).style('opacity', 0).remove();
 
         var removedNodes = removedNodeContainer.selectAll('.node-container').data(dataRemovedNodes, key);
         removedNodes.enter().call(enterNodes);
         removedNodes.call(updateNodes);
-        removedNodes.exit().transition().style('opacity', 0).remove();
+        removedNodes.exit().transition().duration(500).style('opacity', 0).remove();
 
         // Layout DAG
         computeLayout(function() {
@@ -159,9 +159,15 @@ sm.vis.sensemap = function() {
             });
 
             // DAG for nodes
-            var g = layout.vertices(dataNodes).edges(dataLinks).compute();
-            panExtent[1] = Math.max(0, g.width - width + margin.left + margin.right);
-            panExtent[3] = g.height - height + margin.top + margin.bottom + 1;
+            layout.vertices(dataNodes).edges(dataLinks);
+
+            if (frozen) {
+                layout.update();
+            } else {
+                var g = layout.compute();
+                panExtent[1] = Math.max(0, g.width - width + margin.left + margin.right);
+                panExtent[3] = g.height - height + margin.top + margin.bottom + 1;
+            }
 
             // Linear for removed nodes
             computeRemovedNodesLayout();
@@ -228,17 +234,16 @@ sm.vis.sensemap = function() {
                 if (d.minimized) {
                     d.minimized = false;
                     update();
-                    $(this).tooltip('hide');
                     dispatch.nodeRestored(d);
                 } else if (d.removed) {
                     d.removed = false;
                     update();
-                    $(this).tooltip('hide');
                     dispatch.renoded(d);
                 } else {
                     if (d3.event.defaultPrevented) return;
                     dispatch.nodeClicked(d);
                 }
+                $(d3.select(this).select('.parent').node()).tooltip('hide');
             }).on('mousemove', function(d) {
                 // Don't revaluate status when the node is being dragged
                 if (dragging) return;
@@ -253,13 +258,11 @@ sm.vis.sensemap = function() {
                 d3.select(this).select('.btn-group').classed('hide', dragging || d.minimized || d.removed);
             }).on('mouseout', function() {
                 d3.select(this).select('.btn-group').classed('hide', true);
-            }).call(sm.addBootstrapTooltip);
-
-        var menu = container.append('xhtml:div').attr('class', 'btn-group hide')
-            .on('mouseover', function() { // Hide tooltip because tooltip is associated with the parent
-                $(this.parentNode).tooltip('hide');
             });
-        var parent = container.append('xhtml:div').attr('class', 'parent');
+
+        var menu = container.append('xhtml:div').attr('class', 'btn-group hide');
+        var parent = container.append('xhtml:div').attr('class', 'parent')
+            .call(sm.addBootstrapTooltip);
 
         // Icon
         var titleDiv = parent.append('xhtml:div');
@@ -281,7 +284,6 @@ sm.vis.sensemap = function() {
                 d3.select(this).attr('title', d.favorite ? 'Unfavorite' : 'Favorite')
                     .style('color', d.favorite ? '#f39c12' : 'black');
                 update();
-                $(this.parentNode.parentNode).tooltip('hide');
 
                 if (d.favorite) {
                     dispatch.nodeFavorite(d);
@@ -295,7 +297,6 @@ sm.vis.sensemap = function() {
                 d3.event.stopPropagation();
                 d.minimized = true;
                 update();
-                $(this.parentNode.parentNode).tooltip('hide');
                 dispatch.nodeMinimized(d);
             });
         menu.append('xhtml:button').attr('class', 'btn btn-default fa fa-remove')
@@ -305,7 +306,6 @@ sm.vis.sensemap = function() {
                 d.removed = true;
                 d.removedTime = new Date();
                 update();
-                $(this.parentNode.parentNode).tooltip('hide');
                 dispatch.nodeRemoved(d);
             });
 
@@ -329,7 +329,7 @@ sm.vis.sensemap = function() {
                 .classed('removed', d.removed);
 
             // Tooltip
-            d3.select(this).select('.node').attr('data-original-title', buildHTMLTitle(d));
+            d3.select(this).select('.parent').attr('data-original-title', buildHTMLTitle(d));
 
             if (!d.minimized) {
                 var typeVisible = searchTypes.includes(type(d)),
@@ -396,8 +396,8 @@ sm.vis.sensemap = function() {
         var enterItems = subItems.enter().append('div').attr('class', 'sub-node')
             .call(sm.addBootstrapTooltip)
             .on('click', function(d) {
+                if (d3.event.defaultPrevented) return;
                 dispatch.nodeClicked(d);
-                d3.event.stopPropagation();
             });
 
         // - Icon
@@ -418,7 +418,7 @@ sm.vis.sensemap = function() {
             .style('max-width', (defaultMaxWidth - 10) + 'px');
 
         // Exit
-        subItems.exit().transition().style('opacity', 0).remove();
+        subItems.exit().transition().duration(500).style('opacity', 0).remove();
     }
 
     /**
@@ -426,7 +426,7 @@ sm.vis.sensemap = function() {
      */
     function updateNodePositions(selection) {
         selection.each(function(d) {
-            d3.select(this).transition()
+            d3.select(this).transition().duration(500)
                 .attr('opacity', 1)
                 .attr('transform', 'translate(' + roundPoint(d) + ')');
 
@@ -463,8 +463,8 @@ sm.vis.sensemap = function() {
             .attr('id', linkHoverKey)
             .attr('class', 'hover-link')
             .on('click', function(d) {
-                if (d.removed) {
-                    d.removed = false;
+                if (d.hidden) {
+                    d.hidden = false;
                     d3.event.stopPropagation();
                     update();
                     dispatch.relinked(d);
@@ -478,20 +478,31 @@ sm.vis.sensemap = function() {
         });
 
         // Menu action
-        var menuContainer = container.append('foreignObject')
+        var menu = container.append('foreignObject')
             .attr('class', 'menu-container')
-            .attr('width', '100%').attr('height', '100%');
-        menuContainer.append('xhtml:div').attr('class', 'btn-group hide')
-            .append('xhtml:button').attr('class', 'btn btn-default fa fa-remove')
-                .attr('title', 'Remove')
-                .on('click', function(d) {
-                    d3.event.stopPropagation();
-                    d.removed = true;
-                    d.showRemovedLink = false;
-                    d3.select(this.parentNode).classed('hide', true);
-                    update();
-                    dispatch.linkRemoved(d);
-                });
+            .attr('width', '100%').attr('height', '100%')
+            .append('xhtml:div').attr('class', 'btn-group hide');
+
+        menu.append('xhtml:button').attr('class', 'btn btn-default fa fa-remove')
+            .attr('title', 'Remove')
+            .on('click', function(d) {
+                d3.event.stopPropagation();
+                d3.select(this.parentNode).classed('hide', true);
+                _.remove(data.links, d);
+                update();
+                dispatch.linkRemoved(d);
+            });
+
+        menu.append('xhtml:button').attr('class', 'btn btn-default fa fa-eye-slash')
+            .attr('title', 'Hide')
+            .on('click', function(d) {
+                d3.event.stopPropagation();
+                d.hidden = true;
+                d.showHiddenLink = false;
+                d3.select(this.parentNode).classed('hide', true);
+                update();
+                dispatch.linkHidden(d);
+            });
 
         container.append('title');
     }
@@ -500,17 +511,20 @@ sm.vis.sensemap = function() {
         // Link feedback
         d3.select(self).select('.main-link').classed('hovered', visible);
 
-        // Menu: show it at the middle of the link
-        var d = d3.select(self).datum(),
-            m = d.points.length / 2,
-            t = [ d.points.length % 2 ? d.points[m - 0.5].x : (d.points[m].x + d.points[m - 1].x) / 2 - 10,
-                d.points.length % 2 ? d.points[m - 0.5]. y : (d.points[m].y + d.points[m - 1].y) / 2 ];
-        d3.select(self).select('.btn-group').classed('hide', !visible || d.removed);
+        var d = d3.select(self).datum();
+        d3.select(self).select('.btn-group').classed('hide', !visible || d.hidden);
+
+        // Menu: show it at the middle of the link : sometimes, menu disappear along the way
+        var m = d.points.length / 2,
+            w = d3.select(self).select('.btn-group').node().getBoundingClientRect().width / 2,
+            t = [ d.points.length % 2 ? d.points[m - 0.5].x : (d.points[m].x + d.points[m - 1].x) / 2 - w,
+                d.points.length % 2 ? d.points[m - 0.5]. y : (d.points[m].y + d.points[m - 1].y) / 2 - w ];
+
         d3.select(self).select('.menu-container').attr('transform', 'translate(' + t + ')');
 
-        // Show removed link
-        if (d.removed) {
-            d.showRemovedLink = visible;
+        // Show hidden link
+        if (d.hidden) {
+            d.showHiddenLink = visible;
             d3.select(self).select('.main-link').attr('d', line(roundPoints(d))).classed('temp-link', visible);
         }
     }
@@ -520,16 +534,18 @@ sm.vis.sensemap = function() {
      */
     function updateLinks(selection) {
         selection.each(function(d) {
-            d3.select(this).transition().attr('opacity', 1);
+            d3.select(this).transition().duration(500).attr('opacity', 1);
 
             var container = d3.select(this);
 
             // Set data
-            container.selectAll('path').attr('d', line(roundPoints(d)))
-                .classed('removed', d.removed)
-                .classed('temp-link', d.showRemovedLink);
+            container.selectAll('path').transition().duration(500).attr('d', line(roundPoints(d)));
 
-            container.select('title').text(d.removed ? 'Relink' : '');
+            container.selectAll('path')
+                .classed('hidden', d.hidden)
+                .classed('temp-link', d.showHiddenLink);
+
+            container.select('title').text(d.hidden ? 'Relink' : '');
         });
     }
 
@@ -539,7 +555,7 @@ sm.vis.sensemap = function() {
     function roundPoints(d) {
         // stroke-width: 1.5px
         var points = d.points;
-        if (d.removed && !d.showRemovedLink) {
+        if (d.hidden && !d.showHiddenLink) {
             points = d.points.slice(0, 2);
             points[1].x = points[0].x + 10;
         }
@@ -562,7 +578,10 @@ sm.vis.sensemap = function() {
     }
 
     function onNodeDragStart(d) {
-        if (d3.event.sourceEvent.which === 1 && !d.minimized && !d.removed) dragging = true;
+        if (d3.event.sourceEvent.which === 1 && !d.removed) {
+            dragging = true;
+            d3.event.sourceEvent.stopPropagation();
+        }
     }
 
     function onNodeDrag(d) {
@@ -600,7 +619,10 @@ sm.vis.sensemap = function() {
             });
 
             // Bootstrap tooltip appears even when moving the node => disable it
-            $(d3.select(this).select('.node').node()).tooltip('hide');
+            $(d3.select(this).select('.parent').node()).tooltip('hide');
+            d3.select(this).selectAll('.sub-node').each(function() {
+                $(this).tooltip('hide');
+            });
             d3.select(this).select('.btn-group').classed('hide', true);
         }
     }
@@ -673,6 +695,15 @@ sm.vis.sensemap = function() {
     module.icon = function(value) {
         if (!arguments.length) return icon;
         icon = value;
+        return this;
+    };
+
+    /**
+     * Sets/gets the frozen status.
+     */
+    module.frozen = function(value) {
+        if (!arguments.length) return frozen;
+        frozen = value;
         return this;
     };
 

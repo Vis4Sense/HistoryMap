@@ -85,16 +85,17 @@
 	marker-end: url(#arrow-marker-cursor);
 }
 
-.sm-sensemap .link path.removed {
+.sm-sensemap .link path.hidden {
+	display: block !important;
 	marker-end: none;
 	cursor: pointer;
 }
 
-.sm-sensemap .link path.main-link.removed.hovered {
+.sm-sensemap .link path.main-link.hidden.hovered {
 	marker-end: none;
 }
 
-.sm-sensemap .link path.main-link.removed.hovered.temp-link {
+.sm-sensemap .link path.main-link.hidden.hovered.temp-link {
 	stroke-dasharray: 5,5;
 	marker-end: url(#arrow-marker-hover);
 }

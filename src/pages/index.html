@@ -25,23 +25,30 @@
                 height: 100%;
             }
 
-            #loadToolbar .btn {
-                padding: 2px 4px;
-            }
-
-            #loadToolbar {
+            #settings {
                 position: fixed;
                 float: right;
-                right: 2px;
-                bottom: 2px;
+                right: 5px;
+                top: 5px;
             }
         </style>
     </head>
 
     <body>
         <svg class="sm-sensemap-container"></svg>
-        <div class='hide'>
-            <input id="btnLoad" type="file">
+        <div id='settings'>
+            <div class="btn-toolbar" style="display: inline-block;">
+                <div class="btn-group">
+                    <button id='btnNew' class="btn btn-default fa fa-file-o"> New</button>
+                    <button id="btnSave" class="btn btn-default fa fa-save"> Save</button>
+                    <label class="btn btn-default fa fa-folder-open-o" for="btnLoad">
+                        <input id="btnLoad" type="file" class="hide">Load
+                    </label>
+                </div>
+                <button id='btnPlay' class="btn btn-default fa fa-play"> Replay</button>
+                <button id="btnFrezze" class="btn btn-default fa fa-hand-stop-o"> Frezze</button>
+            </div>
+            <button id="bars" class="btn btn-default fa fa-bars" style="float: right; margin-left: 5px"></button>
         </div>
 
         <script src="../bower_components/jquery/dist/jquery.min.js"></script>
@@ -58,6 +65,7 @@
         <script src="../js/misc/sugar.js"></script>
         <script src="../js/misc/widgets.js"></script>
         <script src="../js/layout/dag.js"></script>
+        <script src="../js/layout/forest.js"></script>
         <script src="../js/vis/sensemap.js"></script>
         <script src="../js/provenance/browser.js"></script>
         <script src="../js/provenance/action.js"></script>

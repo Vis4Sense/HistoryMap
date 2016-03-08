@@ -11,12 +11,12 @@ sm.layout.dag = function() {
         width, height, // constrained size
         label = d => d.label,
         direction = 'lr', // tb, bt, lr, rl
-        align = 'dl', // ul, ur, dl, dr
+        align = '', // ul, ur, dl, dr
         incremental = false, // keep the graph as stable as possible
         maxVerticesPerLayer = 4,
         layering = 'simplex', // longest/cg/simplex
         ordering = 'bary', // adjacent/bary
-        vertexSep = 15, // space between two sibling vertices
+        vertexSep = 10, // space between two sibling vertices
         layerSep = 40, // space between two consecutive layers
         tipLength = 16;
 
@@ -25,6 +25,10 @@ sm.layout.dag = function() {
      */
     function isHori() {
         return direction === 'lr' || direction === 'rl';
+    }
+
+    function isReverse() {
+        return direction === 'lr' || direction === 'tb';
     }
 
     /**
@@ -245,7 +249,7 @@ sm.layout.dag = function() {
         });
 
         // dagre gives the layering in the opposite way of my convention, so revert it
-        if (direction === 'lr' || direction === 'tb') {
+        if (isReverse()) {
             var maxLayer = d3.max(vertices, v => v.layer);
             vertices.forEach(n => {
                 n.layer = maxLayer - n.layer;
@@ -398,8 +402,6 @@ sm.layout.dag = function() {
         var u = L2[i],
             v = L2[i + 1];
 
-        if (u.order >= v.order) console.log('wronggggggg');
-
         // If either of u and v has no edges, there's no crossing
         if (!getNeighbors(u, topToBottom).length || !getNeighbors(v, topToBottom).length) return;
 
@@ -472,7 +474,7 @@ sm.layout.dag = function() {
 
         alignLeftSide();
         setVerticalCoordinate();
-        assignEdgePoints();
+        assignEdgePointsOld();
     }
 
     /**
@@ -589,6 +591,10 @@ sm.layout.dag = function() {
             }
         });
 
+        setPorts();
+
+        innerShift();
+
         // Init
         allVertices.forEach(v => {
             v.sink = v;
@@ -610,7 +616,7 @@ sm.layout.dag = function() {
 
         // Absolute coordinates
         allVertices.forEach(v => {
-            v.x = v.root.x;
+            v.x = v.root.x + v.innerShift;
         });
         allVertices.forEach(v => {
             if (v.root.sink.shift < Number.POSITIVE_INFINITY) v.x += v.root.sink.shift;
@@ -644,7 +650,7 @@ sm.layout.dag = function() {
     /**
      * Assigns horizontal coordinate for the roots of blocks.
      */
-    function placeBlock(v, hori) {
+    function placeBlockOld(v, hori) {
         // console.log(_.times(level, () => '\t').join('') + 'placing: ' + label(v));
         // level++;
 
@@ -683,6 +689,82 @@ sm.layout.dag = function() {
 
         // level--;
         // console.log(_.times(level, () => '\t').join('') + 'placed: ' + label(v));
+    }
+
+    /**
+     * Assigns horizontal coordinate for the roots of blocks.
+     */
+    function placeBlock(v, hori) {
+        // console.log(_.times(level, () => '\t').join('') + 'placing: ' + label(v));
+        // level++;
+
+        // Root will be shifted later.
+        // Non-root are always undefined.
+        v.x = 0;
+        var initial = true,
+            w = v; // Go down its aligned vertices
+
+        do {
+            var b = hori === 'left' ? w.pred : w.succ;
+            if (b) {
+                var u = b.root;
+
+                // Make sure all left blocks are placed.
+                if (u.x === undefined) placeBlock(u, hori);
+
+                if (v.sink === v) v.sink = u.sink;
+
+                if (v.sink !== u.sink) { // Different classes
+                    console.log('different class: ' + label(v) + ' --- ' + label(u));
+
+                    var s = v.x + w.innerShift - u.x - b.innerShift - (isHori() ? b.height : b.width) - vertexSep;
+                    u.sink.shift = Math.min(u.sink.shift, s);
+                } else {
+                    var o = hori === 'left' ? b : w,
+                        gap = b.innerShift - w.innerShift + (isHori() ? o.height : o.width) + vertexSep;
+                    if (initial) {
+                        v.x = hori === 'left' ? u.x + gap : u.x - gap;
+                        initial = false;
+                    } else {
+                        v.x = hori === 'left' ? Math.max(v.x, u.x + gap) : Math.min(v.x, u.x - gap);
+                    }
+                }
+            }
+
+            w = w.align;
+        } while (w !== v); // Complete a cycle
+
+        // level--;
+        // console.log(_.times(level, () => '\t').join('') + 'placed: ' + label(v));
+    }
+
+    function innerShift() {
+        allVertices.forEach(v => {
+            v.innerShift = 0;
+        });
+
+        // allVertices.filter(v => v.root === v).forEach(v => { // Only block roots
+        //     var left = 0, right = 0;
+        //     var q = v, p = q.align; // Go down its aligned vertices
+
+        //     if (q === p) return;
+
+        //     do {
+        //         var e = p.outEdges.find(e => e.target === q);
+        //         var s = p.innerShift - e.portIn + e.portOut;
+        //         q.innerShift = s;
+        //         left = Math.min(left, s);
+        //         right = Math.max(right, s + q.height);
+        //         p = p.align;
+        //         q = q.align;
+        //     } while (p !== v); // Complete a cycle
+
+        //     var w = v; // Go down its aligned vertices
+        //     do {
+        //         w.innerShift -= left;
+        //         w = w.align;
+        //     } while (w !== v); // Complete a cycle
+        // });
     }
 
     function runOneAlignment() {
@@ -737,7 +819,7 @@ sm.layout.dag = function() {
 
     function alignLeftSide() {
         // Make sure the left side of the graph is visible
-        leftMost = d3.min(allVertices, v => v.x - (isHori() ? v.height : v.width) / 2);
+        leftMost = d3.min(allVertices, v => v.x);
         allVertices.forEach(v => {
             v.x -= leftMost;
         });
@@ -749,17 +831,17 @@ sm.layout.dag = function() {
         }
     }
 
-    function setVerticalCoordinate() {
+    function setVerticalCoordinateOld() {
         // The center of each layer.
         var lastBoundary = -layerSep;
-        var myLayers = direction === 'tb' || direction === 'lr' ? layers.slice().reverse() : layers;
+        var myLayers = isReverse() ? layers.slice().reverse() : layers;
         var centers = myLayers.map(vertices => {
             var s = isHori() ? d3.max(vertices, v => v.width) : d3.max(vertices, v => v.height);
             lastBoundary += layerSep + s;
             return lastBoundary - s / 2;
         });
 
-        if (direction === 'tb' || direction === 'lr') centers.reverse();
+        if (isReverse()) centers.reverse();
 
         layers.forEach(vertices => {
             vertices.forEach((v, i) => {
@@ -775,7 +857,60 @@ sm.layout.dag = function() {
         });
     }
 
-    function assignEdgePoints() {
+    function setVerticalCoordinate() {
+        // The center of each layer.
+        var left = 0;
+            lefts = [],
+            widths = [],
+            myLayers = isReverse() ? layers.slice().reverse() : layers;
+
+        myLayers.forEach(vertices => {
+            var s = isHori() ? d3.max(vertices, v => v.width) : d3.max(vertices, v => v.height);
+            widths.push(s);
+            lefts.push(left);
+            left += layerSep + s;
+        });
+
+        if (isReverse()) {
+            widths.reverse();
+            lefts.reverse();
+        }
+
+        layers.forEach(vertices => {
+            vertices.forEach((v, i) => {
+                // Top-left corner
+                if (isHori()) {
+                    v.x = lefts[v.layer] + (widths[v.layer] - v.width) / 2;
+                } else {
+                    v.y = lefts[v.layer] + (widths[v.layer] - v.height) / 2;
+                }
+            })
+        });
+    }
+
+    // Distribute the end point of neighboring edges rather than always in the center
+    function setPorts() {
+        var scaleOut = d3.scale.ordinal(),
+            scaleIn = d3.scale.ordinal();
+
+        vertices.forEach(v => {
+            scaleOut.domain(_.range(v.outEdges.length)).rangePoints([ 0, isHori() ? v.height : v.width ], 1);
+
+            // Increasing as from left to right
+            v.outEdges.sort((a, b) => d3.ascending(a.target.order, b.target.order));
+            v.outEdges.forEach((e, i) => {
+                // Order of this edge's target
+                e.target.inEdges.sort((a, b) => d3.ascending(a.source.order, b.source.order));
+                scaleIn.domain(_.range(e.target.inEdges.length)).rangePoints([ 0, isHori() ? e.target.height : e.target.width ], 1);
+                var j = e.target.inEdges.indexOf(e);
+
+                e.portIn = scaleIn(j);
+                e.portOut = scaleOut(i);
+            });
+        });
+    }
+
+    function assignEdgePointsOld() {
         function getOutPos(v) {
             if (direction === 'lr') return v.x + v.width + tipLength / 2;
             if (direction === 'rl') return v.x - tipLength / 2;
@@ -793,8 +928,8 @@ sm.layout.dag = function() {
         // Find the location of the tips
         var layerTips = layers.map(vertices => {
             return {
-                outPos: direction === 'lr' || direction === 'tb' ? d3.max(vertices, getOutPos) : d3.min(vertices, getOutPos),
-                inPos: direction === 'lr' || direction === 'tb' ? d3.min(vertices, getInPos) : d3.max(vertices, getInPos)
+                outPos: isReverse() ? d3.max(vertices, getOutPos) : d3.min(vertices, getOutPos),
+                inPos: isReverse() ? d3.min(vertices, getInPos) : d3.max(vertices, getInPos)
             }
         });
 
@@ -841,9 +976,6 @@ sm.layout.dag = function() {
         // When tipLength is specified, replace the two end points to 4 other points.
         // These 4 points produce 2 segments, one for each end, parallel with the flow of the graph.
         if (tipLength) {
-            var layerWidths = layers.map(vertices => d3.max(vertices, v => v.width));
-            var layerHeights = layers.map(vertices => d3.max(vertices, v => v.height));
-
             var scaleOut = d3.scale.ordinal(),
                 scaleIn = d3.scale.ordinal();
             vertices.forEach(v => {
@@ -881,6 +1013,114 @@ sm.layout.dag = function() {
                         c0 = { x: p0.x + scaleOut(i), y: p0.y + (direction === 'tb' ? p0.height : 0) };
                         c1 = { x: c0.x, y: layerTips[v.layer].outPos + deltas[i] * 2 };
                         c2 = { x: p1.x + scaleIn(j), y: layerTips[e.target.layer].inPos };
+                        c3 = { x: c2.x, y: p1.y + (direction === 'bt' ? p1.height : 0)};
+                    }
+
+                    // Assign and replace later so that new vertices don't affect the process
+                    e.newPoints = [ c0, c1, c2, c3 ];
+                });
+            });
+
+            // Replace
+            edges.forEach(e => {
+                e.points.splice(0, 1, e.newPoints[0], e.newPoints[1]);
+                e.points.splice(e.points.length - 1, 1, e.newPoints[2], e.newPoints[3]);
+            });
+        }
+    }
+
+    function assignEdgePoints() {
+        function getOutPos(v) {
+            if (direction === 'lr') return v.x + v.width + tipLength / 2;
+            if (direction === 'rl') return v.x - tipLength / 2;
+            if (direction === 'tb') return v.y + v.height + tipLength / 2;
+            if (direction === 'bt') return v.y - tipLength / 2;
+        }
+
+        function getInPos(v) {
+            if (direction === 'lr') return v.x - tipLength;
+            if (direction === 'rl') return v.x + v.width + tipLength;
+            if (direction === 'tb') return v.y - tipLength;
+            if (direction === 'bt') return v.y + v.height + tipLength;
+        }
+
+        // Find the location of the tips
+        var layerTips = layers.map(vertices => {
+            return {
+                outPos: isReverse() ? d3.max(vertices, getOutPos) : d3.min(vertices, getOutPos),
+                inPos: isReverse() ? d3.min(vertices, getInPos) : d3.max(vertices, getInPos)
+            }
+        });
+
+        edges.forEach(e => {
+            // Add two extra dummy points at the two ends to lengthen the straight line
+            // because dummy vertices are in the middle of the layer, it could cross the adjacent nodes
+            if (e.dummyVertices && e.dummyVertices.length) {
+                // The new dummy point is set to the middle of the target layer and the next one
+                var d = e.dummyVertices[0];
+                x = isHori() ? layerTips[d.layer].inPos : d.x;
+                y = isHori() ? d.y : layerTips[d.layer].inPos;
+
+                // Notes: dummy verticess are ordered starting with the target
+                e.dummyVertices.unshift({ x: x, y: y });
+
+                // The second one: source and next layer
+                d = _.last(e.dummyVertices);
+                x = isHori() ? layerTips[d.layer].outPos : d.x;
+                y = isHori() ? d.y : layerTips[d.layer].outPos;
+                e.dummyVertices.push({ x: x, y: y });
+            }
+
+            e.points = [
+                { x: e.source.x, y: e.source.y, width: e.source.width, height: e.source.height },
+                { x: e.target.x, y: e.target.y, width: e.target.width, height: e.target.height }
+            ];
+
+            // Set the path for long edge
+            if (e.dummyVertices) e.points.splice(1, 0, ...e.dummyVertices);
+
+            if (!tipLength) {
+                // Adjust to get the two end points from the rectangle edge
+                e.points[0].x += e.source.width / 2;
+                e.points[0].y += e.source.height / 2;
+                e.points[0] = getRectEdgePoint(e.points[0], e.points[1]);
+
+                var i = e.points.length - 1;
+                e.points[i].x += e.target.width / 2;
+                e.points[i].y += e.target.height / 2;
+                e.points[i] = getRectEdgePoint(e.points[i], e.points[i - 1]);
+            }
+        });
+
+        // When tipLength is specified, replace the two end points to 4 other points.
+        // These 4 points produce 2 segments, one for each end, parallel with the flow of the graph.
+        if (tipLength) {
+            vertices.forEach(v => {
+                // Increasing as from left to right
+                v.outEdges.sort((a, b) => d3.ascending(a.target.order, b.target.order));
+
+                // Make the tips in the middle longer to give bigger angles [0, 1, 2, 2, 1, 0]
+                var n = v.outEdges.length;
+                var deltas = _.range(n);
+                var m = Math.floor((n - 1) / 2);
+                for (var i = m + 1; i < n; i++) {
+                    deltas[i] = n - i - 1;
+                }
+
+                v.outEdges.forEach((e, i) => {
+                    var p0 = e.points[0], // top-left
+                        p1 = _.last(e.points),
+                        c0, c1, c2, c3;
+
+                    if (isHori()) {
+                        c0 = { x: p0.x + (direction === 'lr' ? p0.width : 0), y: p0.y + e.portOut };
+                        c1 = { x: layerTips[v.layer].outPos + deltas[i] * 2, y: c0.y };
+                        c2 = { x: layerTips[e.target.layer].inPos, y: p1.y + e.portIn };
+                        c3 = { x: p1.x + (direction === 'rl' ? p1.width : 0), y: c2.y };
+                    } else {
+                        c0 = { x: p0.x + e.portOut(i), y: p0.y + (direction === 'tb' ? p0.height : 0) };
+                        c1 = { x: c0.x, y: layerTips[v.layer].outPos + deltas[i] * 2 };
+                        c2 = { x: p1.x + e.portIn, y: layerTips[e.target.layer].inPos };
                         c3 = { x: c2.x, y: p1.y + (direction === 'bt' ? p1.height : 0)};
                     }
 
@@ -951,6 +1191,25 @@ sm.layout.dag = function() {
             width: d3.max(allVertices, v => v.x + v.width) || 0,
             height: d3.max(allVertices, v => v.y + v.height) || 0
         };
+    };
+
+    /**
+     * Updates the layout without changing node positions.
+     */
+    module.update = function() {
+        // Add straight edge
+        edges.filter(e => !e.points).forEach(e => {
+            e.source.outEdges.push(e);
+            e.target.inEdges.push(e);
+
+            var p0 = { x: e.source.x + e.source.width, y: e.source.y + e.source.height / 2 },
+                p1 = { x: p0.x + tipLength / 2, y: p0.y },
+                p3 = { x: e.target.x, y: e.target.y + e.target.height / 2 },
+                p2 = { x: p3.x - tipLength, y: p3.y };
+            e.points = [ p0, p1, p2, p3 ];
+
+            // TODO: Adjust tip position
+        });
     };
 
     /**

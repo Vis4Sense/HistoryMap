@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			smTop = screen.height - dockHeight,
 			browserHeight = smTop - menuBarHeight,
 			fullHeight = browserHeight - titleBarHeight,
-			debugging = false;
+			debugging = true;
 
 	    // Resize current window
 		chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {
