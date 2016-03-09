@@ -17,9 +17,10 @@ sm.vis.sensemap = function() {
         panExtent = [ 0, 1, 0, 1 ],
         removedPanExtent = [ 0, 1 ],
         defaultMaxWidth = 200,
-        rowGap = 10, // vertical gap between 2 rows
-        dragging = false
-        connecting = false;
+        dragging = false,
+        brushing = false,
+        connecting = false,
+        closedOpacity = 1;
 
     // For debugging classes in dag algorithm
     var classColorScale = d3.scale.category10();
@@ -28,14 +29,19 @@ sm.vis.sensemap = function() {
     var data,
         dataNodes,
         dataLinks,
-        dataRemovedNodes;
+        curatedDataNodes,
+        curatedDataLinks,
+        removedDataNodes;
 
     // DOM
     var parentContainer, // g element containing the entire visualization
         container, // g element containing the main, non-clipped visualization
         nodeContainer, // g element containing all nodes
-        linkContainer, // g element containing all links
         removedNodeContainer, // g element containing all removed nodes
+        linkContainer, // g element containing all links
+        curatedContainer,
+        curatedNodeContainer,
+        curatedLinkContainer,
         clipPath,
         cursorLink; // to draw a link when moving mouse
 
@@ -43,6 +49,7 @@ sm.vis.sensemap = function() {
     var line = d3.svg.line()
             .x(d => d.x)
             .y(d => d.y),
+        brush = d3.svg.brush(),
         colorScale = d3.scale.category10()
             .domain([ 'search', 'location', 'dir', 'highlight', 'note', 'filter' ])
             .range([ '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#e377c2' ]),
@@ -58,6 +65,7 @@ sm.vis.sensemap = function() {
     // Key function to bind data
     var key = d => d.id,
         linkKey = d => key(d.source) + '-' + key(d.target),
+        linkCuratedKey = d => key(d.source) + '-' + key(d.target) + 'c',
         linkHoverKey = d => key(d.source) + '-' + key(d.target) + 'h';
 
     // Others
@@ -80,24 +88,35 @@ sm.vis.sensemap = function() {
             parentContainer = d3.select(self).append('g')
                 .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
                 .append('g').attr('class', 'sm-sensemap');
-            container = parentContainer.append('g').attr('clip-path', 'url(#clip-path)');
+            container = parentContainer.append('g').attr('class', 'collected-container').attr('clip-path', 'url(#clip-path)');
+            curatedContainer = parentContainer.append('g').attr('class', 'curated-container');
+            removedNodeContainer = parentContainer.append('g').attr('class', 'removed-nodes');
+            clipPath = parentContainer.append('clipPath').attr('id', 'clip-path').append('rect');
+            cursorLink = parentContainer.append('line').attr('class', 'cursor-link hide');
+
+            brushContainer = container.append('g').attr('class', 'brush');
             nodeContainer = container.append('g').attr('class', 'nodes');
             linkContainer = container.append('g').attr('class', 'links');
-            removedNodeContainer = d3.select(container.node().parentNode).append('g').attr('class', 'removed-nodes');
+
+            curatedNodeContainer = curatedContainer.append('g').attr('class', 'nodes');
+            curatedLinkContainer = curatedContainer.append('g').attr('class', 'links');
+
             removedNodeContainer.append('line');
-            clipPath = d3.select(self).append('clipPath').attr('id', 'clip-path').append('rect');
-            cursorLink = container.append('line').attr('class', 'cursor-link hide');
 
             sm.addPan([ nodeContainer, linkContainer, cursorLink ], container, panExtent);
             addRemovedNodesPan(removedPanExtent);
             sm.createArrowHeadMarker(self, 'arrow-marker', '#6e6e6e');
             sm.createArrowHeadMarker(self, 'arrow-marker-hover', '#1abc9c');
             sm.createArrowHeadMarker(self, 'arrow-marker-cursor', '#d52b1e');
+            addBrush();
         }
 
         dataNodes = (data.nodes || []).filter(n => !n.removed);
-        dataRemovedNodes = (data.nodes || []).filter(n => n.removed);
-        dataLinks = (data.links || []).filter(l => !l.source.removed && !l.target.removed);
+        curatedDataNodes = dataNodes.filter(n => n.curated);
+        removedDataNodes = (data.nodes || []).filter(n => n.removed);
+        var visibleLinks = (data.links || []).filter(l => !l.source.removed && !l.target.removed);
+        dataLinks = visibleLinks.filter(l => !l.source.curated || !l.target.curated || !l.userAdded);
+        curatedDataLinks = visibleLinks.filter(l => l.source.curated && l.target.curated);
 
         layout.width(width)
             .height(height)
@@ -114,7 +133,16 @@ sm.vis.sensemap = function() {
         nodes.call(updateNodes);
         nodes.exit().transition().duration(500).style('opacity', 0).remove();
 
-        var removedNodes = removedNodeContainer.selectAll('.node-container').data(dataRemovedNodes, key);
+        var curatedLinks = curatedLinkContainer.selectAll('.link').data(curatedDataLinks, linkKey);
+        curatedLinks.enter().call(enterLinks, true);
+        curatedLinks.exit().transition().duration(500).style('opacity', 0).remove();
+
+        var curatedNodes = curatedNodeContainer.selectAll('.node-container').data(curatedDataNodes, key);
+        curatedNodes.enter().call(enterNodes, true);
+        curatedNodes.call(updateNodes);
+        curatedNodes.exit().transition().duration(500).style('opacity', 0).remove();
+
+        var removedNodes = removedNodeContainer.selectAll('.node-container').data(removedDataNodes, key);
         removedNodes.enter().call(enterNodes);
         removedNodes.call(updateNodes);
         removedNodes.exit().transition().duration(500).style('opacity', 0).remove();
@@ -122,7 +150,9 @@ sm.vis.sensemap = function() {
         // Layout DAG
         computeLayout(function() {
             links.call(updateLinks);
+            curatedLinks.call(updateLinks, true);
             nodes.call(updateNodePositions);
+            curatedNodes.call(updateNodePositions, true);
             removedNodes.call(updateNodePositions);
         });
     }
@@ -149,6 +179,38 @@ sm.vis.sensemap = function() {
         clipPath.attr('x', 0).attr('y', 0).attr('width', width);
     }
 
+    function addBrush() {
+        brush
+            .x(d3.scale.identity().domain([0, width]))
+            .y(d3.scale.identity().domain([0, height]))
+        .on('brushstart', function () {
+            brushing = true;
+        }).on('brush', function () {
+            // Show selecting nodes
+            var brushNode = brushContainer.select('.extent').node();
+            nodeContainer.selectAll('.node').each(function() {
+                d3.select(this).classed('brushed', this.intersect(brushNode));
+            });
+
+            // TODO: highlight links as well
+        }).on('brushend', function () {
+            brushing = false;
+
+            var brushNode = brushContainer.select('.extent').node();
+            nodeContainer.selectAll('.node').each(function(d) {
+                if (this.intersect(brushNode)) {
+                    d.curated = true;
+                }
+            });
+
+            brushContainer.call(brush.clear());
+
+            update();
+        });
+
+        brushContainer.call(brush);
+    }
+
     function computeLayout(callback) {
         sm.checkImagesLoaded(parentContainer.selectAll('.node-container'), function() {
             // Compute how much space each node needs
@@ -169,53 +231,82 @@ sm.vis.sensemap = function() {
                 panExtent[3] = g.height - height + margin.top + margin.bottom + 1;
             }
 
-            // Linear for removed nodes
+            computeCuratedLayout();
             computeRemovedNodesLayout();
+
+            adjustClipPath();
 
             callback();
         });
     }
 
+    function computeCuratedLayout() {
+        // Nodes
+        curatedDataNodes.forEach(n => {
+            n.cx = n.x;
+            n.cy = n.y + 200;
+        });
+
+        // Links
+        curatedDataLinks.forEach(l => {
+            if (l.points) { // Automatic links
+                l.points.forEach(p => {
+                    p.cx = p.x;
+                    p.cy = p.y + 200;
+                });
+            } else {
+
+            }
+        });
+    }
+
     function computeRemovedNodesLayout() {
         // Rearrange container
-        var removedNodesHeight = dataRemovedNodes.length ? d3.max(dataRemovedNodes, n => n.height) : 0,
-            nodesHeight = height - margin.top - margin.bottom - removedNodesHeight,
-            twoPartsGap = dataRemovedNodes.length ? margin.top * 4 : 0;
-            clipPathHeight = nodesHeight - twoPartsGap;
-        clipPath.attr('height', clipPathHeight);
-
-        panExtent[3] = Math.max(0, panExtent[3] + removedNodesHeight + twoPartsGap);
+        var removedNodesHeight = removedDataNodes.length ? d3.max(removedDataNodes, n => n.height) : 0,
+            nodesHeight = height - margin.top - margin.bottom - removedNodesHeight;
 
         // Set location
         var x = 0;
-        dataRemovedNodes.sort((a, b) => d3.descending(+a.removedTime, +b.removedTime))
+        removedDataNodes.sort((a, b) => d3.descending(+a.removedTime, +b.removedTime))
             .forEach(n => {
                 n.x = x;
                 x += n.width + 15;
                 n.y = nodesHeight;
             });
 
-        var removedWidth = dataRemovedNodes.length ? d3.max(dataRemovedNodes, n => n.x + n.width) : 0;
+        var removedWidth = removedDataNodes.length ? d3.max(removedDataNodes, n => n.x + n.width) : 0;
         removedPanExtent[1] = Math.max(0, removedWidth - width + margin.left + margin.right);
 
-        // Update line
-        removedNodeContainer.select('line').classed('hide', !dataRemovedNodes.length)
+        // Dashed line position
+        removedNodeContainer.select('line')
+            .classed('hide', !removedDataNodes.length)
             .attr('x1', -margin.left)
             .attr('y1', nodesHeight - margin.top * 2)
             .attr('x2', Math.max(removedWidth, width))
             .attr('y2', nodesHeight - margin.top * 2);
 
-        // Update covering rect for mouse wheel
+        // Covering rect for mouse wheel
         removedNodeContainer.select('rect')
             .attr('y', nodesHeight - margin.top * 2)
             .attr('width', Math.max(removedWidth, width))
             .attr('height', removedNodesHeight);
     }
 
+    function adjustClipPath() {
+        var removedNodesHeight = removedDataNodes.length ? d3.max(removedDataNodes, n => n.height) : 0,
+            curatedHeight = 0,
+            nodesHeight = height - margin.top - margin.bottom - removedNodesHeight - curatedHeight,
+            gap = removedDataNodes.length ? margin.top * 4 : 0 + curatedDataNodes.length ? margin.top * 4 : 0;
+            clipPathHeight = nodesHeight - gap;
+        clipPath.attr('height', clipPathHeight);
+
+        panExtent[3] = Math.max(0, panExtent[3] + removedNodesHeight + curatedHeight + gap);
+    }
+
     /**
      * Does stuff when new nodes added (usually called when 'enter').
      */
-    function enterNodes(selection) {
+    function enterNodes(selection, curated) {
         var fo = selection.append('foreignObject')
             .attr('class', 'node-container')
             .attr('width', '100%').attr('height', '100%')
@@ -227,10 +318,12 @@ sm.vis.sensemap = function() {
             });
 
         // Apply drag onto the 'foreignObject'
-        fo.call(drag);
+        if (curated) fo.call(drag);
 
         var container = fo.append('xhtml:div').attr('class', 'node')
             .on('click', function(d) {
+                if (d3.event.shiftKey) return;
+
                 if (d.minimized) {
                     d.minimized = false;
                     update();
@@ -243,7 +336,6 @@ sm.vis.sensemap = function() {
                     if (d3.event.defaultPrevented) return;
                     dispatch.nodeClicked(d);
                 }
-                $(d3.select(this).select('.parent').node()).tooltip('hide');
             }).on('mousemove', function(d) {
                 // Don't revaluate status when the node is being dragged
                 if (dragging) return;
@@ -252,12 +344,15 @@ sm.vis.sensemap = function() {
                 var rect = this.getBoundingClientRect(),
                     pad = 6,
                     isOnEdge = rect.right - pad < d3.event.x || rect.left + pad > d3.event.x || rect.top + pad > d3.event.y || rect.bottom - pad < d3.event.y;
-                connecting = !d.minimized && !d.removed && isOnEdge;
+                connecting = !d.minimized && !d.removed && isOnEdge && !brushing && curated;
                 d3.select(this).classed('connect', connecting);
             }).on('mouseover', function(d) {
-                d3.select(this).select('.btn-group').classed('hide', dragging || d.minimized || d.removed);
+                d3.select(this).select('.btn-group').classed('hide', dragging || brushing || d.minimized || d.removed);
+                if (brushing || dragging) {
+                    hideTooltip(this);
+                }
             }).on('mouseout', function() {
-                d3.select(this).select('.btn-group').classed('hide', true);
+                hideMenu(this);
             });
 
         var menu = container.append('xhtml:div').attr('class', 'btn-group hide');
@@ -280,6 +375,7 @@ sm.vis.sensemap = function() {
             .attr('title', 'Favorite')
             .on('click', function(d) {
                 d3.event.stopPropagation();
+                d3.select(this.parentNode).classed('hide', true);
                 d.favorite = !d.favorite;
                 d3.select(this).attr('title', d.favorite ? 'Unfavorite' : 'Favorite')
                     .style('color', d.favorite ? '#f39c12' : 'black');
@@ -295,6 +391,7 @@ sm.vis.sensemap = function() {
             .attr('title', 'Minimize')
             .on('click', function(d) {
                 d3.event.stopPropagation();
+                d3.select(this.parentNode).classed('hide', true);
                 d.minimized = true;
                 update();
                 dispatch.nodeMinimized(d);
@@ -303,6 +400,7 @@ sm.vis.sensemap = function() {
             .attr('title', 'Remove')
             .on('click', function(d) {
                 d3.event.stopPropagation();
+                d3.select(this.parentNode).classed('hide', true);
                 d.removed = true;
                 d.removedTime = new Date();
                 update();
@@ -311,6 +409,17 @@ sm.vis.sensemap = function() {
 
         // Children
         container.append('xhtml:div').attr('class', 'children');
+    }
+
+    function hideMenu(self) {
+        d3.select(self).select('.btn-group').classed('hide', true);
+    }
+
+    function hideTooltip(self) {
+        $(d3.select(self).select('.parent').node()).tooltip('hide');
+        d3.select(self).selectAll('.sub-node').each(function() {
+            $(this).tooltip('hide');
+        });
     }
 
     /**
@@ -396,7 +505,7 @@ sm.vis.sensemap = function() {
         var enterItems = subItems.enter().append('div').attr('class', 'sub-node')
             .call(sm.addBootstrapTooltip)
             .on('click', function(d) {
-                if (d3.event.defaultPrevented) return;
+                if (d3.event.defaultPrevented || d3.event.shiftKey) return;
                 dispatch.nodeClicked(d);
                 d3.event.stopPropagation(); // Prevent click fired in parent
             });
@@ -425,11 +534,11 @@ sm.vis.sensemap = function() {
     /**
      * Separate from updateNodes() because updateNodes() needs to run first to get node sizes.
      */
-    function updateNodePositions(selection) {
+    function updateNodePositions(selection, curated) {
         selection.each(function(d) {
             d3.select(this).transition().duration(500)
-                .attr('opacity', d.closed ? 0.6 : 1)
-                .attr('transform', 'translate(' + roundPoint(d) + ')');
+                .attr('opacity', d.closed ? closedOpacity : 1)
+                .attr('transform', 'translate(' + roundPoint(d, curated) + ')');
 
             // Align menu to the right side
             var menu = d3.select(this).select('.btn-group')
@@ -449,15 +558,17 @@ sm.vis.sensemap = function() {
     /**
      * Does stuff when new links added (usually called when 'enter').
      */
-    function enterLinks(selection) {
+    function enterLinks(selection, curated) {
         var container = selection.append('g').attr('class', 'link')
             .attr('opacity', 0);
 
         // Main link
         container.append('path')
-            .attr('id', linkKey)
+            .attr('id', curated ? linkCuratedKey : linkKey)
             .attr('class', 'main-link')
-            .classed('user-added', d => d.isUserAdded);
+            .classed('user-added', d => d.userAdded);
+
+        if (!curated) return;
 
         // Dummy link for easy selection
         container.append('path')
@@ -513,34 +624,34 @@ sm.vis.sensemap = function() {
         d3.select(self).select('.main-link').classed('hovered', visible);
 
         var d = d3.select(self).datum();
-        d3.select(self).select('.btn-group').classed('hide', !visible || d.hidden);
+        d3.select(self).select('.btn-group').classed('hide', !visible || d.hidden || dragging || brushing);
 
         // Menu: show it at the middle of the link : sometimes, menu disappear along the way
         var m = d.points.length / 2,
             w = d3.select(self).select('.btn-group').node().getBoundingClientRect().width / 2,
-            t = [ d.points.length % 2 ? d.points[m - 0.5].x : (d.points[m].x + d.points[m - 1].x) / 2 - w,
-                d.points.length % 2 ? d.points[m - 0.5]. y : (d.points[m].y + d.points[m - 1].y) / 2 - w ];
+            t = [ d.points.length % 2 ? d.points[m - 0.5].cx : (d.points[m].x + d.points[m - 1].cx) / 2 - w,
+                d.points.length % 2 ? d.points[m - 0.5]. cy : (d.points[m].y + d.points[m - 1].cy) / 2 - w ];
 
         d3.select(self).select('.menu-container').attr('transform', 'translate(' + t + ')');
 
         // Show hidden link
         if (d.hidden) {
             d.showHiddenLink = visible;
-            d3.select(self).select('.main-link').attr('d', line(roundPoints(d))).classed('temp-link', visible);
+            d3.select(self).select('.main-link').attr('d', line(roundPoints(d, true))).classed('temp-link', visible);
         }
     }
 
     /**
      * Does stuff when link updated (usually called when 'update').
      */
-    function updateLinks(selection) {
+    function updateLinks(selection, curated) {
         selection.each(function(d) {
-            d3.select(this).transition().duration(500).attr('opacity', d.target.closed ? 0.6 : 1);
+            d3.select(this).transition().duration(500).attr('opacity', d.target.closed ? closedOpacity : 1);
 
             var container = d3.select(this);
 
             // Set data
-            container.selectAll('path').transition().duration(500).attr('d', line(roundPoints(d)));
+            container.selectAll('path').transition().duration(500).attr('d', line(roundPoints(d, curated)));
 
             container.selectAll('path')
                 .classed('hidden', d.hidden)
@@ -553,36 +664,40 @@ sm.vis.sensemap = function() {
     /**
      * To make the line sharp.
      */
-    function roundPoints(d) {
-        // stroke-width: 1.5px
+    function roundPoints(d, curated) {
         var points = d.points;
+
         if (d.hidden && !d.showHiddenLink) {
             points = d.points.slice(0, 2);
-            points[1].x = points[0].x + 10;
+            points[1].cx = points[0].cx + 10;
         }
 
-        return points.map(p => ({ x: Math.round(p.x) - 0.5, y: Math.round(p.y) - 0.5 }));
+        // stroke-width: 1.5px
+        return points.map(p => ({ x: Math.round(curated ? p.cx : p.x) - 0.5, y: Math.round(curated ? p.cy : p.y) - 0.5 }));
     }
 
-    function roundPoint(p) {
-        return [ Math.round(p.x), Math.round(p.y) ];
+    function roundPoint(d, curated) {
+        return curated ? [ Math.round(d.cx), Math.round(d.cy) ] : [ Math.round(d.x), Math.round(d.y) ];
     }
 
     function updateDragPosition(d) {
-        d.x += d3.event.dx;
-        d.y += d3.event.dy;
+        d.cx += d3.event.dx;
+        d.cy += d3.event.dy;
     }
 
     function updateLinkDragPosition(d) {
-        d3.select(document.getElementById(linkKey(d))).attr('d', line(roundPoints(d)));
-        d3.select(document.getElementById(linkHoverKey(d))).attr('d', line(roundPoints(d)));
+        d3.select(document.getElementById(linkCuratedKey(d))).attr('d', line(roundPoints(d, true)));
+        d3.select(document.getElementById(linkHoverKey(d))).attr('d', line(roundPoints(d, true)));
     }
 
     function onNodeDragStart(d) {
-        if (d3.event.sourceEvent.which === 1 && !d.removed) {
+        if (d3.event.sourceEvent.which === 1 && !d3.event.sourceEvent.shiftKey && !d.removed) {
             dragging = true;
             d3.event.sourceEvent.stopPropagation();
         }
+
+        // Bootstrap tooltip appears even when moving the node => disable it
+        hideTooltip(this);
     }
 
     function onNodeDrag(d) {
@@ -592,20 +707,21 @@ sm.vis.sensemap = function() {
             // Draw a link from the node center to the current mouse position
             cursorLink.classed('hide', false);
             cursorLink
-                .attr('x1', d.x + d.width / 2).attr('y1', d.y + d.height / 2)
+                .attr('x1', d.cx + d.width / 2).attr('y1', d.cy + d.height / 2)
                 .attr('x2', d3.event.x).attr('y2', d3.event.y);
 
             // Don't know why mouse over other nodes doesn't work. Have to do it manually
             var self = this;
-            nodeContainer.selectAll('.node').each(function() {
+            curatedNodeContainer.selectAll('.node').each(function() {
                 d3.select(this).classed('hovered', this.parentNode !== self && this.containsPoint(d3.event.sourceEvent));
             });
         } else {
             this.moveToFront();
+            hideMenu(this);
 
             // Update position of the dragging node
             updateDragPosition(d);
-            d3.select(this).attr('transform', 'translate(' + roundPoint(d) + ')');
+            d3.select(this).attr('transform', 'translate(' + roundPoint(d, true) + ')');
 
             // And also links
             d.inEdges.forEach(l => {
@@ -618,13 +734,6 @@ sm.vis.sensemap = function() {
                 l.points.slice(0, 2).forEach(updateDragPosition);
                 updateLinkDragPosition(l);
             });
-
-            // Bootstrap tooltip appears even when moving the node => disable it
-            $(d3.select(this).select('.parent').node()).tooltip('hide');
-            d3.select(this).selectAll('.sub-node').each(function() {
-                $(this).tooltip('hide');
-            });
-            d3.select(this).select('.btn-group').classed('hide', true);
         }
     }
 
@@ -636,14 +745,14 @@ sm.vis.sensemap = function() {
         if (connecting) {
             var self = this,
                 found = false;
-            nodeContainer.selectAll('.node').each(function(d2) {
+            curatedNodeContainer.selectAll('.node').each(function(d2) {
                 d3.select(this).classed('hovered', false);
 
                 if (!found && this.parentNode !== self && this.containsPoint(d3.event.sourceEvent)) {
                     // Add a link from the dragging node to the hovering node if not existed
                     if (data.links.find(l => l.source === d && l.target === d2)) return;
 
-                    var l = { source: d, target: d2, isUserAdded: true };
+                    var l = { source: d, target: d2, userAdded: true };
                     data.links.push(l);
 
                     found = true;

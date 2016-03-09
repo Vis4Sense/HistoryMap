@@ -1,17 +1,10 @@
 document.addEventListener('DOMContentLoaded', function () {
 	// Called when the browser action is clicked.
 	chrome.browserAction.onClicked.addListener(function() {
-		// Load views based on saved settings
-		chrome.storage.sync.get(null, function(items) {
-			openMainView(items.sensepathMode, items.showBrowser, items.showVideo, items.showText);
-		});
-	});
-
-	function openMainView(sensePathMode, showBrowser, showVideo, showText) {
 		// Get the main view or create if it doesn't exist
 		var page = "src/pages/index.html";
 
-		// Allow a single instance of SensePath
+		// Allow a single instance
 		if (getView(chrome.extension.getURL(page))) return;
 
 		// Note: I'm trying to produce a neat layout based on which views are visible, but have to hardcode a lot.
@@ -21,14 +14,14 @@ document.addEventListener('DOMContentLoaded', function () {
 			smTop = screen.height - dockHeight,
 			browserHeight = smTop - menuBarHeight,
 			fullHeight = browserHeight - titleBarHeight,
-			debugging = false;
+			debugging = true;
 
 	    // Resize current window
 		chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {
 			left: 0, top: 0, width: screen.width / 2 - (debugging ? 200 : 0), height: fullHeight
 		});
 
-		// Timeline: always show
+		// Collection view
 		chrome.windows.create({
 	    	url: chrome.extension.getURL(page),
 	    	type: "popup",
@@ -38,13 +31,23 @@ document.addEventListener('DOMContentLoaded', function () {
 	    	height: fullHeight - (debugging ? 500 : 0)
 	    });
 
+	    // Curation view
+		chrome.windows.create({
+	    	url: chrome.extension.getURL("src/pages/curation.html"),
+	    	type: "popup",
+	    	left: 0,
+	    	top: 0,
+	    	width: screen.width / 2,
+	    	height: fullHeight
+	    });
+
 		// Listen to content script
 		chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 			if (request.type === "backgroundOpened") { // To respond that background page already opened
 				sendResponse(true);
 			}
 		});
-	}
+	});
 
 	function getView(url) {
 		var views = chrome.extension.getViews();

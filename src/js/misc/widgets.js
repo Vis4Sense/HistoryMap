@@ -133,6 +133,7 @@ sm.addPan = function(containers, parent, extent) {
             prevX = d3.event.clientX;
             prevY = d3.event.clientY;
             d3.event.preventDefault();
+            d3.event.stopPropagation();
         }
     });
 
@@ -325,6 +326,7 @@ sm.addBootstrapTooltip = function(selection) {
         .attr('data-container', 'body')
         .attr('data-placement', 'auto bottom')
         .attr('data-html', true)
+        .attr('data-delay', 500)
         .each(function() {
             $(this).tooltip();
         });

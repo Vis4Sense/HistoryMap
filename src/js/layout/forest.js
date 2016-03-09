@@ -17,8 +17,6 @@ sm.layout.forest = function() {
         label = d => d.label,
         isIndented = false,
         depthSep = 30,
-        siblingSep = 10,
-        nonSiblingSep = 15,
         nodeDict, linkDict,
         dummyContainer, // needs for mxClient to run its layout
         graph, // mxClient graph
@@ -249,24 +247,6 @@ sm.layout.forest = function() {
     module.label = function(value) {
         if (!arguments.length) return label;
         label = value;
-        return this;
-    };
-
-    /**
-     * Sets/gets gap separated between sibling vertices.
-     */
-    module.siblingSep = function(value) {
-        if (!arguments.length) return siblingSep;
-        siblingSep = value;
-        return this;
-    };
-
-    /**
-     * Sets/gets gap separated between non-sibling vertices.
-     */
-    module.nonSiblingSep = function(value) {
-        if (!arguments.length) return nonSiblingSep;
-        nonSiblingSep = value;
         return this;
     };
 

@@ -37,10 +37,5 @@
         "contextMenus"
     ],
 
-    "options_ui": {
-        "page": "src/pages/options.html",
-        "chrome_style": true
-    },
-
     "web_accessible_resources": ["src/css/*.*"]
 }
