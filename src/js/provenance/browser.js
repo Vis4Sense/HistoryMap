@@ -135,11 +135,11 @@ sm.provenance.browser = function() {
 
         if (type === 'revisit') {
             action = createActionObject(originalAction.url, originalAction.text, type, originalAction.favIconUrl, originalAction);
-            dispatch.dataChanged(type);
+            dispatch.dataChanged(type, true);
         } else if (type === 'highlight' || type === 'filter') {
             action = createActionObject(tab.url, text, type, undefined, referrer, path, classId);
             if (type === 'filter') urlToActionLookup[tab.url] = action;
-            dispatch.dataChanged(type);
+            dispatch.dataChanged(type, true);
         } else {
             if (originalAction) {
                 updateAction(tab);
@@ -148,7 +148,7 @@ sm.provenance.browser = function() {
                 action.seen = action.highlighted = tab.active;
                 urlToActionLookup[tab.url] = action; // Maintain the first visit
                 tabIdToActionLookup[tab.id] = action;
-                dispatch.dataChanged(type);
+                dispatch.dataChanged(type, true);
 
                 // Page snapshot
                 if (tab.active) takeSnapshot(tab.windowId, action);
@@ -213,11 +213,15 @@ sm.provenance.browser = function() {
                 if (!tabs.length) return;
                 if (tabs[0].url !== url) return;
 
-                chrome.tabs.captureVisibleTab(windowId, { format: "png" }, function(dataUrl) {
-                    if (!dataUrl) return;
+                chrome.windows.get(windowId, function(window) {
+                    if (window.focused) {
+                        chrome.tabs.captureVisibleTab(windowId, { format: "png" }, function(dataUrl) {
+                            if (!dataUrl) return;
 
-                    // Resize image because only need thumbnail size
-                    sm.resizeImage(dataUrl, 192, 150, callback);
+                            // Resize image because only need thumbnail size
+                            sm.resizeImage(dataUrl, 192, 150, callback);
+                        });
+                    }
                 });
             });
         }, 1000);
@@ -295,7 +299,7 @@ sm.provenance.browser = function() {
             dispatch.dataChanged(request.type);
         } else if (request.type === 'highlightRemoved') {
             _.remove(actions, a => a.url === sender.tab.url && a.classId === request.classId);
-            dispatch.dataChanged(request.type);
+            dispatch.dataChanged(request.type, true);
         }
     }
 
@@ -309,10 +313,9 @@ sm.provenance.browser = function() {
                 tabs.forEach(tab => {
                     if (isTabIgnored(tab) || isTabInComplete(tab)) return;
 
-                    var action = urlToActionLookup[tab.url];
+                    var action = _.findLast(actions, a => a.url === tab.url);
                     if (action) {
                         action.endTime = new Date();
-                        // dispatch.dataChanged('endTime');
                     }
                 });
             });
@@ -346,6 +349,7 @@ sm.provenance.browser = function() {
                 var action = urlToActionLookup[tab.url];
                 if (action) {
                     action.image = info.srcUrl;
+                    action.userImage = true;
                     dispatch.dataChanged('image');
                 }
             }

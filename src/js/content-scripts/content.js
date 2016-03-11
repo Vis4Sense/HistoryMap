@@ -5,6 +5,7 @@ $(function() {
             setTimeout(loadHighlights, 1000);
             completePendingTask();
             respondExtension();
+            // focusWhenHovering();
 
             console.log("SensePath: content script loaded");
         }
@@ -18,7 +19,7 @@ var intervalId; // for alerting tab
  */
 function loadHighlights() {
     // Get data from the extension
-    chrome.runtime.sendMessage({ type: "dataRequested" }, function(response) {
+    chrome.runtime.sendMessage({ type: "requestData" }, function(response) {
         if (!response) return;
 
         response.forEach(function(d) {
@@ -127,9 +128,15 @@ function scrollTo(request) {
  * Runs some tasks requested before content script finishes loading.
  */
 function completePendingTask() {
-    chrome.runtime.sendMessage({ type: "taskRequested" }, function(response) {
+    chrome.runtime.sendMessage({ type: "requestTask" }, function(response) {
         if (response) {
             scrollTo(response);
         }
+    });
+}
+
+function focusWhenHovering() {
+    $('body').mouseover(function() {
+        chrome.runtime.sendMessage({ type: "focusWindow" });
     });
 }

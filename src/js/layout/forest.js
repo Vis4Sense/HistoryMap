@@ -98,7 +98,8 @@ sm.layout.forest = function() {
         layout.levelDistance = 30;
         layout.nodeDistance = 6;
 
-        nodeDict = {}, linkDict = {};
+        nodeDict = {};
+        linkDict = {};
         vertices.forEach(d => {
             nodeDict[key(d)] = graph.insertVertex(parentNode, null, '', 0, 0, d.width, d.height);
         });

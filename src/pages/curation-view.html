@@ -18,37 +18,17 @@
                 overflow: hidden;
             }
 
-            .sm-sensemap-container {
+            .sm-curation-container {
                 overflow: hidden;
                 position: relative;
                 width: 100%;
                 height: 100%;
             }
-
-            #settings {
-                position: fixed;
-                float: right;
-                right: 5px;
-                top: 5px;
-            }
         </style>
     </head>
 
     <body>
-        <svg class="sm-sensemap-container"></svg>
-        <div id='settings'>
-            <div class="btn-toolbar hide" style="display: inline-block;">
-                <div class="btn-group">
-                    <button id='btnNew' class="btn btn-default fa fa-file-o"> New</button>
-                    <button id="btnSave" class="btn btn-default fa fa-save"> Save</button>
-                    <label class="btn btn-default fa fa-folder-open-o" for="btnLoad">
-                        <input id="btnLoad" type="file" class="hide">Load
-                    </label>
-                </div>
-                <button id='btnReplay' class="btn btn-default fa fa-play"> Replay</button>
-            </div>
-            <button id="bars" class="btn btn-default fa fa-bars" style="float: right; margin-left: 5px"></button>
-        </div>
+        <svg class="sm-curation-container"></svg>
 
         <script src="../bower_components/jquery/dist/jquery.min.js"></script>
         <script src="../bower_components/jquery-ui.min.js"></script>
@@ -66,8 +46,7 @@
         <script src="../js/layout/dag.js"></script>
         <script src="../js/layout/forest.js"></script>
         <script src="../js/vis/curation.js"></script>
-        <script src="../js/provenance/browser.js"></script>
-        <script src="../js/provenance/action.js"></script>
-        <script src="curation.js"></script>
+        <script src="../js/provenance/mod.js"></script>
+        <script src="curation-view.js"></script>
     </body>
 </html>

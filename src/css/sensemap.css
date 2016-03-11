@@ -2,19 +2,17 @@
 	display: inline-block;
     background-color: white;
     color: black;
-	border: 1px solid #6e6e6e;
+	box-shadow: 0 0 0 1px #6e6e6e, 0 0 0 2px #fff;
     border-radius: 6px;
 }
 
 .sm-sensemap .node.mini {
 	background-color: #6e6e6e;
-    width: 12px;
-    height: 12px;
+    width: 10px;
+    height: 10px;
     margin-bottom: 5px;
     cursor: pointer;
-}
-
-.sm-sensemap .node.closed {
+    box-shadow: 0 0 0 2px #6e6e6e;
 }
 
 .sm-sensemap .node.removed {
@@ -26,13 +24,14 @@
 }
 
 .sm-sensemap .node:hover,
-.sm-sensemap .node.hovered {
-	border-color: #1abc9c;
+.sm-sensemap .node.hovered,
+.sm-sensemap .node.brushed {
+	box-shadow: 0 0 0 2px #1abc9c;
 }
 
 .sm-sensemap .node.mini:hover,
 .sm-sensemap .node.mini.hovered {
-	background-color: #1abc9c;
+	box-shadow: 0 0 0 2px #1abc9c;
 }
 
 .sm-sensemap .node.highlighted {
@@ -70,8 +69,10 @@
 	stroke-width: 1.5px;
 }
 
+.sm-sensemap .link path.main-link.brushed,
 .sm-sensemap .link path.main-link.hovered {
 	stroke: #1abc9c;
+	stroke-width: 2px;
 	marker-end: url(#arrow-marker-hover);
 }
 
@@ -81,23 +82,8 @@
 }
 
 .sm-sensemap .link path.user-added {
-	stroke: #d52b1e;
+	stroke: blue;
 	marker-end: url(#arrow-marker-cursor);
-}
-
-.sm-sensemap .link path.hidden {
-	display: block !important;
-	marker-end: none;
-	cursor: pointer;
-}
-
-.sm-sensemap .link path.main-link.hidden.hovered {
-	marker-end: none;
-}
-
-.sm-sensemap .link path.main-link.hidden.hovered.temp-link {
-	stroke-dasharray: 5,5;
-	marker-end: url(#arrow-marker-hover);
 }
 
 /* To make icon and label in one line */
@@ -136,7 +122,7 @@
 
 .sm-sensemap .cursor-link {
 	stroke-width: 1.5px;
-    stroke: #d52b1e;
+    stroke: blue;
     shape-rendering: auto;
     marker-end: url(#arrow-marker-cursor);
 }
@@ -158,6 +144,7 @@
 /* Node menu */
 .sm-sensemap .node .btn-group {
 	position: fixed;
+	opacity: 0.8;
 }
 
 .sm-sensemap .node .btn,
@@ -186,8 +173,4 @@
 	stroke: #fff;
 	fill-opacity: .125;
   	shape-rendering: crispEdges;
-}
-
-.sm-sensemap .node.brushed {
-	border-color: #d52b1e;
 }

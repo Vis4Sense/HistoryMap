@@ -319,7 +319,7 @@ sm.layout.dag = function() {
         do {
             sweepGraph(topToBottom, !count);
             topToBottom = !topToBottom;
-            var itNumCrossings = countCrossings();
+            itNumCrossings = countCrossings();
             // console.log('#crossings = ' + itNumCrossings);
 
             if (itNumCrossings >= numCrossings) break;
@@ -881,11 +881,12 @@ sm.layout.dag = function() {
 
         layers.forEach(vertices => {
             vertices.forEach((v, i) => {
-                // Top-left corner
                 if (isHori()) {
-                    v.x = lefts[v.layer] + (widths[v.layer] - v.width) / 2;
+                    // v.x = lefts[v.layer] + (widths[v.layer] - v.width) / 2;
+                    v.x = lefts[v.layer];
                 } else {
-                    v.y = lefts[v.layer] + (widths[v.layer] - v.height) / 2;
+                    // v.y = lefts[v.layer] + (widths[v.layer] - v.height) / 2;
+                    v.y = lefts[v.layer];
                 }
             })
         });
@@ -1194,25 +1195,6 @@ sm.layout.dag = function() {
             width: d3.max(allVertices, v => v.x + v.width) || 0,
             height: d3.max(allVertices, v => v.y + v.height) || 0
         };
-    };
-
-    /**
-     * Updates the layout without changing node positions.
-     */
-    module.update = function() {
-        // Add straight edge
-        edges.filter(e => !e.points).forEach(e => {
-            e.source.outEdges.push(e);
-            e.target.inEdges.push(e);
-
-            var p0 = { x: e.source.x + e.source.width, y: e.source.y + e.source.height / 2 },
-                p1 = { x: p0.x + tipLength / 2, y: p0.y },
-                p3 = { x: e.target.x, y: e.target.y + e.target.height / 2 },
-                p2 = { x: p3.x - tipLength, y: p3.y };
-            e.points = [ p0, p1, p2, p3 ];
-
-            // TODO: Adjust tip position
-        });
     };
 
     /**

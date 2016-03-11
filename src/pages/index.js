@@ -1,53 +1,51 @@
 $(function() {
     // Data
-    var data = { nodes: [], links: [] }, // The data will be passed to the vis
+    var data = chrome.extension.getBackgroundPage().data = { nodes: [], links: [] }, // background page allows to share data across views
         actions = [], // All actions added in temporal order including 'revisit' and 'child' actions
         browser = sm.provenance.browser(),
-        startRecordingTime,
+        mod = sm.provenance.mod(),
         pendingTasks = {}, // For jumping to an action when its page isn't ready yet
         closeConfirmation = false,
         // datasetName = '';
-        datasetName = 'data/test1.zip';
+        datasetName = 'data/test3.zip';
 
     // Vis and options
-    var sensemap,
+    var collection,
         listening = true;
 
     respondToContentScript();
     run();
 
     function run() {
-        // Read options from saved settings
-        chrome.storage.sync.get(null, items => {
-            // Always listening now for easy testing
-            listening = true;
+        // Always listening now for easy testing
+        listening = true;
 
-            if (datasetName) {
-                // Load data
-                if (datasetName.endsWith('.json')) {
-                    d3.json(datasetName, data => {
-                        loadWorkspace(data, true);
-                        main();
-                    });
-                } else {
-                    JSZipUtils.getBinaryContent(datasetName, (err, data) => {
-                        loadWorkspace(data);
-                        main();
-                    });
-                }
+        if (datasetName) {
+            // Load data
+            if (datasetName.endsWith('.json')) {
+                d3.json(datasetName, data => {
+                    loadWorkspace(data, true);
+                    main();
+                });
             } else {
-                startRecordingTime = new Date();
-                main();
+                JSZipUtils.getBinaryContent(datasetName, (err, data) => {
+                    loadWorkspace(data);
+                    main();
+                });
             }
-        });
+        } else {
+            main();
+        }
 
         initSettings();
 
-        d3.select('body').on('mouseover', function() {
-            chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {
-                focused: true
-            });
-        });
+        // openCurationView();
+
+        // d3.select('body').on('mouseover', function() {
+        //     chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {
+        //         focused: true
+        //     });
+        // });
     }
 
     function initSettings() {
@@ -59,7 +57,7 @@ $(function() {
             data.nodes = [];
             data.links = [];
             browser.actions(actions, function() {
-                redraw(true);
+                redraw();
                 toggleToolbar();
             });
         });
@@ -75,7 +73,7 @@ $(function() {
         $('#btnLoad').change(e => {
             sm.readUploadedFile(e, content => {
                 loadWorkspace(content, false, true);
-                redraw(true);
+                redraw();
                 toggleToolbar();
             }, true);
         });
@@ -86,11 +84,16 @@ $(function() {
         });
 
         d3.select('#btnFrezze').on('click', function() {
-            sensemap.frozen(true);
+            collection.frozen(true);
             toggleToolbar();
         });
 
-        // Need confirmation when close/reload sensemap
+        d3.select('#btnCurate').on('click', function() {
+            collection.curated(!collection.curated());
+            d3.select(this).text(collection.curated() ? 'Select' : 'Pan');
+        });
+
+        // Need confirmation when close/reload collection
         if (closeConfirmation) {
             window.onbeforeunload = function() {
                 return "All unsaved data will be gone if you close this window.";
@@ -100,6 +103,24 @@ $(function() {
 
     function toggleToolbar() {
         d3.select('.btn-toolbar').classed('hide', !d3.select('.btn-toolbar').classed('hide'));
+    }
+
+    function openCurationView() {
+        var url = chrome.extension.getURL('src/pages/curation-view.html');
+        var view = chrome.extension.getViews().find(v => v.location.href === url);
+
+        if (!view) {
+            chrome.windows.create({
+                url: url,
+                type: "popup",
+                left: 0,
+                top: 0,
+                width: screen.width / 2,
+                height: screen.height
+            }, function() {
+                chrome.runtime.sendMessage({ type: 'data', value: data });
+            });
+        }
     }
 
     function main() {
@@ -112,8 +133,8 @@ $(function() {
 
     function onDataChanged(p) {
         // console.log(p, +new Date());
-        buildHierarchy(actions);
-        redraw(true);
+        mod.mergeActions(actions);
+        redraw();
     }
 
     function loadWorkspace(content, isJson, external) {
@@ -126,14 +147,13 @@ $(function() {
             actions = JSON.parse(zip.file('sensemap.json').asText()).data;
         }
 
-        data.links = [];
-        buildHierarchy(actions);
+        mod.mergeActions(actions);
 
         if (!isJson) replaceRelativePathWithDataURI(zip);
 
         if (external) {
             browser.actions(actions, function() {
-                if (sensemap) redraw(true);
+                if (collection) redraw();
             });
         }
     }
@@ -152,149 +172,43 @@ $(function() {
         });
     }
 
-    function addLink(p, c) {
-        if (!p.links) p.links = [];
-        p.links.push(c);
-        c.sup = p;
-    };
-
-    function addChild(p, c) {
-        if (!p.children) p.children = [];
-        p.children.push(c);
-        c.parent = p;
-    };
-
-    // Convert flat list of actions to parent-children network, then redraw the vis.
-    function buildHierarchy(actions) {
-        // Ignore 'revisit' actions for navigation
-        _.remove(actions, a => a.type === 'revisit');
-
-        // Init
-        actions.forEach(n => {
-            delete n.children;
-            delete n.parent;
-            delete n.links;
-            delete n.sup;
-        });
-
-        // - Build parent-child relationship first
-        actions.forEach((d, i) => {
-            if (!i) return;
-
-            // Add page linking as a type of link
-            if (d.type === 'link') {
-                var source = actions.find(d2 => d2.id === d.from);
-                if (source) {
-                    addLink(source, d);
-                } else {
-                    // console.log('could not find the source of ' + d.text);
-                }
-            }
-
-            // If the action type of an item is embedded, add it as a child of the containing page
-            if (isEmbeddedType(d.type)) {
-                var source = actions.find(d2 => d2.id === d.from);
-                if (source) {
-                    addChild(source, d);
-                } else {
-                    // console.log('could not find the source of ' + d.text);
-                }
-            }
-        });
-
-        // - Ignore child and link actions
-        data.nodes = actions.filter(a => !a.parent && !isNonActionType(a.type));
-
-        // - Node attribute
-        actions.filter(a => isNonActionType(a.type)).forEach(a => {
-            var n = getActionById(a.id);
-            if (!n) return;
-
-            if (a.type === 'remove-node') n.removed = true;
-            if (a.type === 'renode') n.removed = false;
-            if (a.type === 'favorite-node') n.favorite = true;
-            if (a.type === 'unfavorite-node') n.favorite = false;
-            if (a.type === 'minimize-node') n.minimized = true;
-            if (a.type === 'restore-node') n.minimized = false;
-            if (a.type === 'move-node') { // Not working, will be overwritten by layout
-                n.x = a.x;
-                n.y = a.y;
-            }
-        });
-
-        // - Then add to the link list
-        // -- Automatic links
-        data.nodes.filter(d => d.links).forEach(d => {
-            d.links.forEach(c => {
-                if (data.nodes.includes(c)) {
-                    if (!getLinkByIds(d.id, c.id)) data.links.push({ source: d, target: c });
-                }
-            });
-        });
-
-        // -- User links
-        actions.filter(a => isNonActionType(a.type)).forEach(a => {
-            var l = getLinkByIds(a.sourceId, a.targetId);
-            if (a.type === 'add-link' && !l) data.links.push({ source: getActionById(a.sourceId), target: getActionById(a.targetId), userAdded: true });
-            if (a.type === 'remove-link' && l) _.remove(data.links, l);
-            if (a.type === 'hide-link' && l) l.hidden = true;
-            if (a.type === 'relink' && l) l.hidden = false;
-        });
-    }
-
-    function getActionById(id) {
-        return actions.find(a => a.id === id);
-    }
-
-    function getLinkByIds(sourceId, targetId) {
-        return data.links.find(l => l.source.id === sourceId && l.target.id === targetId);
-    }
-
-    function isEmbeddedType(type) {
-        return [ 'highlight', 'note', 'filter' ].includes(type);
-    }
-
-    function isNonActionType(type) {
-        return [ 'click-node', 'remove-node', 'renode', 'favorite-node', 'unfavorite-node',
-            'minimize-node', 'restore-node', 'curate-node', 'move-node', 'add-link', 'remove-link', 'hide-link', 'relink' ].includes(type);
-    }
-
     function respondToContentScript() {
         chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             if (!listening) return;
 
             var tab = sender.tab;
 
-            if (request.type === 'dataRequested') {
+            if (request.type === 'requestData') {
                 // Get highlights, notes for the requested item
                 sendResponse(actions.filter(d => d.url === tab.url).map(getCoreData));
-            } else if (request.type === 'taskRequested') {
+            } else if (request.type === 'requestTask') {
                 if (pendingTasks[tab.id]) {
                     sendResponse(getCoreData(pendingTasks[tab.id]));
                     delete pendingTasks[tab.id];
                 }
+            } else if (request.type === 'focusWindow') {
+                chrome.windows.update(tab.windowId, { focused: true });
+            } else if (request.type === 'redraw') {
+                redraw(true);
+            } else if (request.type === 'actionAdded') {
+                onActionAdded(request.value);
             }
         });
     }
 
     function buildVis() {
-        sensemap = sm.vis.sensemap()
+        collection = sm.vis.collection()
             .label(d => d.text)
-            .icon(d => d.favIconUrl)
+            .icon(d => d.favIconUrl);
+
+        mod.on('redrawn', redraw)
+            .on('actionAdded', onActionAdded)
             .on('nodeClicked', onNodeClicked)
-            .on('nodeRemoved', d => onNodeHandled('remove-node', d))
-            .on('renoded', d => onNodeHandled('renode', d))
-            .on('nodeFavorite', d => onNodeHandled('favorite-node', d))
-            .on('nodeUnfavorite', d => onNodeHandled('unfavorite-node', d))
-            .on('nodeMinimized', d => onNodeHandled('minimize-node', d))
-            .on('nodeRestored', d => onNodeHandled('restore-node', d))
-            .on('nodeMoved', d => onNodeMoved('move-node', d))
-            .on('linkAdded', d => onLinkHandled('add-link', d))
-            .on('linkRemoved', d => onLinkHandled('remove-link', d))
-            .on('linkHidden', d => onLinkHandled('hide-link', d))
-            .on('relinked', d => onLinkHandled('relink', d));
+            .handleEvents(collection);
 
         $(window).resize(_.throttle(updateVis, 200));
+
+        d3.select('#btnCurate').text(collection.curated() ? 'Select' : 'Pan');
     }
 
     function saveWorkspace() {
@@ -312,7 +226,7 @@ $(function() {
         });
 
         // Main file
-        zip.file('sensemap.json', JSON.stringify({ startRecordingTime: startRecordingTime, data: coreData }, null, 4));
+        zip.file('sensemap.json', JSON.stringify({ data: coreData }, null, 4));
 
         // Zip and download
         var filename = d3.time.format('%Y%m%d%H%M%S')(new Date()) + '-sensemap.zip';
@@ -332,24 +246,35 @@ $(function() {
     }
 
     function replay(timeStep) {
-        data.links = [];
-
         var count = 1,
-            relevantActions = actions.filter(a => a.type !== 'click-node');
+            relevantActions = actions.filter(a => a.type !== 'click-node' && a.type !== 'revisit');
 
         var intervalId = setInterval(() => {
             console.log(relevantActions[count].type);
-            buildHierarchy(relevantActions.slice(0, count));
-            redraw(true);
+            mod.mergeActions(relevantActions.slice(0, count));
+            redraw();
             count++;
 
             if (count === relevantActions.length) clearInterval(intervalId);
         }, timeStep);
     }
 
-    function onNodeClicked(d) {
-        onNodeHandled('click-node', d);
+    function updateVis() {
+        collection.width(window.innerWidth).height(window.innerHeight);
+        redraw();
+    }
 
+    function redraw(external) {
+        d3.select('.sm-collection-container').datum(data).call(collection);
+
+        if (!external) chrome.runtime.sendMessage({ type: 'redraw' });
+    }
+
+    function onActionAdded(d) {
+        actions.push(d);
+    }
+
+    function onNodeClicked(d) {
         chrome.tabs.query({}, tabs => {
             var tab = tabs.find(t => t.url === d.url);
             if (tab) {
@@ -367,41 +292,5 @@ $(function() {
                 });
             }
         });
-    }
-
-    function onNodeHandled(type, d) {
-        actions.push({
-            type: type,
-            id: d.id,
-            time: new Date()
-        });
-    }
-
-    function onNodeMoved(d) {
-        actions.push({
-            type: 'move-node',
-            id: d.id,
-            time: new Date(),
-            x: d.x,
-            y: d.y
-        });
-    }
-
-    function onLinkHandled(type, d) {
-        actions.push({
-            type: type,
-            sourceId: d.source.id,
-            targetId: d.target.id,
-            time: new Date()
-        });
-    }
-
-    function updateVis() {
-        sensemap.width(window.innerWidth).height(window.innerHeight);
-        redraw();
-    }
-
-    function redraw(dataChanged) {
-        d3.select('.sm-sensemap-container').datum(data).call(sensemap);
     }
 });

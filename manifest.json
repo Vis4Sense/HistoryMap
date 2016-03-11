@@ -2,7 +2,7 @@
     "manifest_version": 2,
 
     "name": "SenseMap",
-    "description": "Supporting Sensemaking through Analytic Provenance.",
+    "description": "SenseMaking with Analytic Provenance",
     "version": "0.3.0",
 
     "browser_action": {

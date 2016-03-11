@@ -12,7 +12,7 @@ sm.provenance.action = function() {
     }, getOSMLocation = function(url) {
         // https://www.openstreetmap.org/search?query=london#map=12/51.5485/-0.2123
         var q = sm.getQueryStringFromSearch(url.search);
-        return q ? q['query'] : q;
+        return q ? q.query : q;
     }, getGoogleDirection = function(url, pathname) {
         // https://www.google.co.uk/maps/dir/The+World+Bank,+1818+H+Street+Northwest,+Washington,+DC+20433,+United+States/1914+Connecticut+Ave+NW,+Washington,+DC+20009,+USA/@38.9078884,-77.052622,15z/data=!4m14!4m13!1m5!1m1!1s0x89b7b7b0d7ea2d85:0x7c0ffdf15a217ec5!2m2!1d-77.042488!2d38.898932!1m5!1m1!1s0x89b7b7cfbe539997:0xf50e91ad60a7f906!2m2!1d-77.0464992!2d38.9162252!3e0
         var trimUrl = url.pathname.substr(pathname.length + 1),
@@ -137,7 +137,7 @@ sm.provenance.action = function() {
      * Checks and returns the searching route if applicable.
      */
     function detectRoute(url) {
-        var url = new URL(url);
+        url = new URL(url);
         for (var i = 0; i < dirSearchTemplates.length; i++) {
             var t = dirSearchTemplates[i];
             if (url.hostname.startsWith(t.hostname) && url.pathname.includes(t.pathname)) {
