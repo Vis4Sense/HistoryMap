@@ -3,7 +3,8 @@
  */
 sm.provenance.mod = function() {
     var module = {},
-        data = chrome.extension.getBackgroundPage().data;
+        data = chrome.extension.getBackgroundPage().data,
+        view = 'name';
 
     var dispatch = d3.dispatch('redrawn', 'actionAdded', 'nodeClicked');
 
@@ -24,7 +25,7 @@ sm.provenance.mod = function() {
             if (!i) return;
 
             // Add page linking as a type of link
-            if (d.type === 'link') {
+            if (d.type === 'link' || isSearchType(d.type)) {
                 var source = actions.find(d2 => d2.id === d.from);
                 if (source) {
                     addLink(source, d);
@@ -92,6 +93,10 @@ sm.provenance.mod = function() {
         return [ 'highlight', 'note', 'filter' ].includes(type);
     }
 
+    function isSearchType(type) {
+        return [ 'search', 'location', 'dir' ].includes(type);
+    }
+
     function addLink(p, c) {
         if (!p.links) p.links = [];
         p.links.push(c);
@@ -123,11 +128,12 @@ sm.provenance.mod = function() {
            .on('nodeUnfavorite', d => onNodeHandled('unfavorite-node', d))
            .on('nodeMinimized', d => onNodeHandled('minimize-node', d))
            .on('nodeRestored', d => onNodeHandled('restore-node', d))
+           .on('nodeHovered', (d, status) => onNodeHovered(d, status))
            .on('linkAdded', d => onLinkHandled('add-link', d))
            .on('linkRemoved', d => onLinkHandled('remove-link', d));
     };
 
-    var redrawTypes = [ ];
+    var redrawTypes = [ 'remove-curation-node' ];
 
     function onNodeHandled(type, d) {
         dispatch.actionAdded({
@@ -139,6 +145,10 @@ sm.provenance.mod = function() {
         if (redrawTypes.includes(type)) dispatch.redrawn();
 
         if (type === 'click-node') dispatch.nodeClicked(d);
+    }
+
+    function onNodeHovered(d, status) {
+        chrome.runtime.sendMessage({ type: 'nodeHovered', value: d.id, view: view, status: status });
     }
 
     function onNodeMoved(d) {
@@ -159,6 +169,31 @@ sm.provenance.mod = function() {
             time: new Date()
         });
     }
+
+    /**
+     * Just get real fields, not the generated one to prevent circular json.
+     */
+    module.getCoreData = function(d) {
+        var c = {},
+            fields = [ 'id', 'text', 'url', 'type', 'time', 'endTime', 'favIconUrl', 'image', 'classId', 'path', 'from',
+                'seen', 'favorite', 'minimized', 'collectionRemoved', 'curationRemoved', 'sourceId', 'targetId',
+                'curated', 'newlyCurated', 'rp', 'rpoints' ];
+
+        fields.forEach(f => {
+            if (d[f] !== undefined) c[f] = d[f];
+        });
+
+        return c;
+    };
+
+    /**
+     * Sets/gets the view name.
+     */
+    module.view = function(value) {
+        if (!arguments.length) return view;
+        view = value;
+        return this;
+    };
 
     // Binds custom events
     d3.rebind(module, dispatch, 'on');

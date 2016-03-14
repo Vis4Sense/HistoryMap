@@ -5,7 +5,7 @@ $(function() {
             setTimeout(loadHighlights, 1000);
             completePendingTask();
             respondExtension();
-            // focusWhenHovering();
+            focusWhenHovering();
 
             console.log("SensePath: content script loaded");
         }

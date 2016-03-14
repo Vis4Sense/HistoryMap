@@ -1,5 +1,5 @@
 /**
- * dag provides a hierarchical layout for an directed acyclic graph.
+ * dag provides a hierarchical layout for a directed acyclic graph.
  */
 sm.layout.dag = function() {
     var module = {};

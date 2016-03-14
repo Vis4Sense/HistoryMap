@@ -6,9 +6,9 @@ $(function() {
     run();
 
     function run() {
-        // d3.select('body').on('mouseover', function() {
-        //     chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, { focused: true });
-        // });
+        d3.select('body').on('mouseover', function() {
+            chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, { focused: true });
+        });
 
         respondToContentScript();
         buildVis();
@@ -19,6 +19,8 @@ $(function() {
         chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             if (request.type === 'redraw') {
                 redraw(true);
+            } else if (request.type === 'nodeHovered' && request.view !== 'curation') {
+                curation.setHovered(request.value, request.status);
             }
         });
     }
@@ -28,7 +30,8 @@ $(function() {
             .label(d => d.text)
             .icon(d => d.favIconUrl);
 
-        mod.on('redrawn', redraw)
+        mod.view('curation')
+            .on('redrawn', redraw)
             .on('actionAdded', onActionAdded)
             .on('nodeClicked', onNodeClicked)
             .handleEvents(curation);
@@ -53,6 +56,6 @@ $(function() {
     }
 
     function onNodeClicked(d) {
-        chrome.runtime.sendMessage({ type: 'actionAdded', value: d });
+        chrome.runtime.sendMessage({ type: 'nodeClicked', value: mod.getCoreData(d) });
     }
 });

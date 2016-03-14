@@ -25,14 +25,14 @@ document.addEventListener('DOMContentLoaded', function () {
 	    });
 
 		// Curation view
-        chrome.windows.create({
-            url: chrome.extension.getURL('src/pages/curation-view.html'),
-            type: "popup",
-            left: 0,
-            top: 0,
-            width: screen.width / 2,
-            height: screen.height - (debugging ? 600 : 0)
-        });
+        // chrome.windows.create({
+        //     url: chrome.extension.getURL('src/pages/curation-view.html'),
+        //     type: "popup",
+        //     left: 0,
+        //     top: 0,
+        //     width: screen.width / 2,
+        //     height: screen.height - (debugging ? 600 : 0)
+        // });
 
 		// Listen to content script
 		chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {

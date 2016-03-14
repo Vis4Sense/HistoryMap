@@ -80,11 +80,22 @@ sm.provenance.browser = function() {
         var action = provAction.extract(prevUrl && new URL(prevUrl), new URL(tab.url));
         if (action) {
             if (action !== 'skip') {
-                var prevAction = urlToActionLookup[prevUrl];
-                var a = createNewAction(tab, action.type, action.label);
-                // Set the original page of the filter
-                if (action.type === 'filter' && prevAction) {
-                    a.from = prevAction.type === 'filter' ? prevAction.from : prevAction.id;
+                if (isSearchType(action.type)) { // Search action can have referrer coming from a link
+                    getVisitType(tab.url, tab.id, (type, referrer) => {
+                        console.log(referrer);
+                        if (type === 'link') {
+                            createNewAction(tab, action.type, action.label, referrer);
+                        } else {
+                            createNewAction(tab, action.type, action.label);
+                        }
+                    });
+                } else {
+                    var prevAction = urlToActionLookup[prevUrl];
+                    var a = createNewAction(tab, action.type, action.label);
+                    // Set the original page of the filter
+                    if (action.type === 'filter' && prevAction) {
+                        a.from = prevAction.type === 'filter' ? prevAction.from : prevAction.id;
+                    }
                 }
             }
         } else {
@@ -124,6 +135,10 @@ sm.provenance.browser = function() {
 
     function isEmbeddedType(type) {
         return [ 'highlight', 'note', 'filter' ].includes(type);
+    }
+
+    function isSearchType(type) {
+        return [ 'search', 'location', 'dir' ].includes(type);
     }
 
     function createNewAction(tab, type, text, referrer, path, classId) {

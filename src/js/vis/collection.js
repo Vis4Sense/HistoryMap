@@ -16,7 +16,7 @@ sm.vis.collection = function() {
     // Rendering options
     var layout = sm.layout.dag(),
         panExtent = [ 0, 1, 0, 1 ],
-        defaultMaxWidth = 200,
+        defaultMaxWidth = 150,
         brushing = false;
 
     // Data
@@ -48,7 +48,7 @@ sm.vis.collection = function() {
 
     // Others
     var dispatch = d3.dispatch('nodeClicked', 'nodeCollectionRemoved', 'nodeCurationRemoved', 'nodeFavorite', 'nodeUnfavorite',
-        'nodeMinimized', 'nodeRestored', 'nodeMoved', 'linkAdded', 'linkRemoved');
+        'nodeMinimized', 'nodeRestored', 'nodeMoved', 'nodeHovered', 'linkAdded', 'linkRemoved', 'curationChanged');
 
     /**
      * Main entry of the module.
@@ -72,7 +72,7 @@ sm.vis.collection = function() {
 
             sm.addPan([ nodeContainer, linkContainer ], container, panExtent);
             sm.createArrowHeadMarker(self, 'arrow-marker', '#6e6e6e');
-            sm.createArrowHeadMarker(self, 'arrow-marker-hover', '#1abc9c');
+            sm.createArrowHeadMarker(self, 'arrow-marker-hover', '#e74c3c');
             addBrush();
         }
 
@@ -83,14 +83,17 @@ sm.vis.collection = function() {
             .height(height)
             .label(label);
 
+        brush.x(d3.scale.identity().domain([0, width]))
+            .y(d3.scale.identity().domain([0, height]));
+
         var links = linkContainer.selectAll('.link').data(dataLinks, linkKey);
         links.enter().call(enterLinks);
-        links.exit().transition().duration(500).style('opacity', 0).remove();
+        links.exit().remove();
 
         var nodes = nodeContainer.selectAll('.node-container').data(dataNodes, key);
         nodes.enter().call(enterNodes);
         nodes.call(updateNodes);
-        nodes.exit().transition().duration(500).style('opacity', 0).remove();
+        nodes.exit().remove();
 
         // Layout DAG
         computeLayout(function() {
@@ -102,8 +105,7 @@ sm.vis.collection = function() {
     }
 
     function addBrush() {
-        brush
-            .x(d3.scale.identity().domain([0, width]))
+        brush.x(d3.scale.identity().domain([0, width]))
             .y(d3.scale.identity().domain([0, height]))
         .on('brushstart', function () {
             brushing = true;
@@ -116,25 +118,36 @@ sm.vis.collection = function() {
             });
 
             linkContainer.selectAll('.link').each(function(l) {
-                d3.select(this).select('path').classed('brushed', l.source.brushed && l.target.brushed);
+                l.brushed = l.source.brushed && l.target.brushed;
+                d3.select(this).select('path').classed('brushed', l.brushed);
             });
         }).on('brushend', function () {
             brushing = false;
+            var changed = false;
 
             // Remove brush effect
-            var brushNode = brushContainer.select('.extent').node();
             nodeContainer.selectAll('.node').each(function(d) {
-                if (d.brushed) d.curated = true;
+                if (d.brushed && !d.curated) {
+                    changed = d.curated = true;
+                    d.newlyCurated = true;
+                    d.curationRemoved = false; // Make sure if this node was removed, it reappears
+                }
                 d3.select(this).classed('brushed', false);
             });
 
             linkContainer.selectAll('.link').each(function(l) {
+                if (l.brushed) {
+                    l.removed = false; // Make sure if this link was removed, it reappears
+                    changed = true;
+                }
                 d3.select(this).select('path').classed('brushed', false);
             });
 
             brushContainer.call(brush.clear());
 
             update();
+
+            if (changed) dispatch.curationChanged();
         });
 
         brushContainer.call(brush);
@@ -168,6 +181,7 @@ sm.vis.collection = function() {
             .attr('opacity', 0);
 
         var container = fo.append('xhtml:div').attr('class', 'node')
+            .attr('title', 'Maximize')
             .on('click', function(d) {
                 if (d3.event.shiftKey) return;
 
@@ -180,7 +194,13 @@ sm.vis.collection = function() {
                     dispatch.nodeClicked(d);
                 }
             }).on('mouseover', function(d) {
-                d3.select(this).select('.btn-group').classed('hide', brushing || d.minimized);
+                var menu = d3.select(this).select('.btn-group');
+                menu.classed('hide', brushing || d.minimized);
+
+                // Align menu to the right side
+                var menuRect = menu.node().getBoundingClientRect(),
+                    nodeRect = this.getBoundingClientRect();
+                menu.style('left', (nodeRect.right > width - menuRect.width ? 1 - menuRect.width : d.width - 1) + 'px');
 
                 // Hide tooltip
                 if (brushing) {
@@ -188,10 +208,19 @@ sm.vis.collection = function() {
                     d3.select(this).selectAll('.sub-node').each(function() {
                         $(this).tooltip('hide');
                     });
+                } else if (d.curated) {
+                    dispatch.nodeHovered(d, true);
                 }
-            }).on('mouseout', function() {
+            }).on('mouseout', function(d) {
                 d3.select(this).select('.btn-group').classed('hide', true);
+
+                if (d.curated) {
+                    dispatch.nodeHovered(d, false);
+                }
             });
+
+        // To indicated if the node is curated
+        container.append('xhtml:div').attr('class', 'node-curated fa fa-check-square hide');
 
         var menu = container.append('xhtml:div').attr('class', 'btn-group hide');
         var parent = container.append('xhtml:div').attr('class', 'parent')
@@ -239,6 +268,7 @@ sm.vis.collection = function() {
             .on('click', function(d) {
                 d3.event.stopPropagation();
                 d3.select(this.parentNode).classed('hide', true);
+                d3.select(this.parentNode.parentNode).classed('hovered', false);
                 d.collectionRemoved = true;
                 update();
                 dispatch.nodeCollectionRemoved(d);
@@ -300,8 +330,6 @@ sm.vis.collection = function() {
     }
 
     function buildHTMLTitle(d) {
-        if (d.minimized) return 'Restore to full size';
-
         var s = '';
         if (image(d) && !d.favorite && !d.userImage) {
             s += "<img class='node-snapshot img-responsive center-block' src='" + image(d) + "'/>";
@@ -361,14 +389,11 @@ sm.vis.collection = function() {
                 .attr('opacity', 1)
                 .attr('transform', 'translate(' + roundPoint(d) + ')');
 
-            // Align menu to the right side
-            var menu = d3.select(this).select('.btn-group')
-                .style('opacity', 0)
-                .classed('hide', false);
-            var menuRect = menu.node().getBoundingClientRect();
-            menu.style('left', (d.x + d.width > width - menuRect.width ? 1 - menuRect.width : d.width - 1) + 'px')
-                .style('opacity', 1)
-                .classed('hide', true);
+            // Curated indication
+            d3.select(this).select('.node-curated')
+                .classed('hide', !d.curated)
+                .style('top', d.minimized ? '-4px' : '-1px')
+                .style('left', (d.minimized ? -3 : d.width - 16) + 'px');
         });
     }
 
@@ -466,6 +491,15 @@ sm.vis.collection = function() {
         curated = value;
         brushContainer.classed('hide', !curated);
         return this;
+    };
+
+    /**
+     * Sets hovering status of the given node.
+     */
+    module.setHovered = function(id, value) {
+        nodeContainer.selectAll('.node').each(function(d) {
+            d3.select(this).classed('hovered', value && key(d) === id);
+        });
     };
 
     // Binds custom events

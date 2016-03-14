@@ -7,7 +7,7 @@ $(function() {
         pendingTasks = {}, // For jumping to an action when its page isn't ready yet
         closeConfirmation = false,
         // datasetName = '';
-        datasetName = 'data/test3.zip';
+        datasetName = 'data/test7.zip';
 
     // Vis and options
     var collection,
@@ -39,13 +39,11 @@ $(function() {
 
         initSettings();
 
-        // openCurationView();
+        openCurationView();
 
-        // d3.select('body').on('mouseover', function() {
-        //     chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {
-        //         focused: true
-        //     });
-        // });
+        d3.select('body').on('mouseover', function() {
+            chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, { focused: true });
+        });
     }
 
     function initSettings() {
@@ -109,7 +107,9 @@ $(function() {
         var url = chrome.extension.getURL('src/pages/curation-view.html');
         var view = chrome.extension.getViews().find(v => v.location.href === url);
 
-        if (!view) {
+        if (view) {
+            view.location.reload();
+        } else {
             chrome.windows.create({
                 url: url,
                 type: "popup",
@@ -117,8 +117,6 @@ $(function() {
                 top: 0,
                 width: screen.width / 2,
                 height: screen.height
-            }, function() {
-                chrome.runtime.sendMessage({ type: 'data', value: data });
             });
         }
     }
@@ -180,10 +178,10 @@ $(function() {
 
             if (request.type === 'requestData') {
                 // Get highlights, notes for the requested item
-                sendResponse(actions.filter(d => d.url === tab.url).map(getCoreData));
+                sendResponse(actions.filter(d => d.url === tab.url).map(mod.getCoreData));
             } else if (request.type === 'requestTask') {
                 if (pendingTasks[tab.id]) {
-                    sendResponse(getCoreData(pendingTasks[tab.id]));
+                    sendResponse(mod.getCoreData(pendingTasks[tab.id]));
                     delete pendingTasks[tab.id];
                 }
             } else if (request.type === 'focusWindow') {
@@ -192,6 +190,10 @@ $(function() {
                 redraw(true);
             } else if (request.type === 'actionAdded') {
                 onActionAdded(request.value);
+            } else if (request.type === 'nodeClicked') {
+                onNodeClicked(request.value);
+            } else if (request.type === 'nodeHovered' && request.view !== 'collection') {
+                collection.setHovered(request.value, request.status);
             }
         });
     }
@@ -199,9 +201,11 @@ $(function() {
     function buildVis() {
         collection = sm.vis.collection()
             .label(d => d.text)
-            .icon(d => d.favIconUrl);
+            .icon(d => d.favIconUrl)
+            .on('curationChanged', onCurationChanged);
 
-        mod.on('redrawn', redraw)
+        mod.view('collection')
+            .on('redrawn', redraw)
             .on('actionAdded', onActionAdded)
             .on('nodeClicked', onNodeClicked)
             .handleEvents(collection);
@@ -215,7 +219,7 @@ $(function() {
         var zip = new JSZip();
 
         // Images: replace dataURL with local files to reduce the size of main file
-        var coreData = actions.map(getCoreData);
+        var coreData = actions.map(mod.getCoreData);
         coreData.filter(d => d.image).forEach(d => {
             if (d.image.startsWith('data')) {
                 var filename = d.id + '.png';
@@ -233,24 +237,11 @@ $(function() {
         sm.saveDataToFile(filename, zip.generate({ type: 'blob' }), false, true);
     }
 
-    function getCoreData(d) {
-        var c = {},
-            fields = [ 'id', 'text', 'url', 'type', 'time', 'endTime', 'favIconUrl', 'image', 'classId', 'path', 'from',
-            'seen', 'favorite', 'minimized', 'removed', 'removedTime', 'sourceId', 'targetId' ];
-
-        fields.forEach(f => {
-            if (d[f] !== undefined) c[f] = d[f];
-        });
-
-        return c;
-    }
-
     function replay(timeStep) {
         var count = 1,
             relevantActions = actions.filter(a => a.type !== 'click-node' && a.type !== 'revisit');
 
         var intervalId = setInterval(() => {
-            console.log(relevantActions[count].type);
             mod.mergeActions(relevantActions.slice(0, count));
             redraw();
             count++;
@@ -268,6 +259,10 @@ $(function() {
         d3.select('.sm-collection-container').datum(data).call(collection);
 
         if (!external) chrome.runtime.sendMessage({ type: 'redraw' });
+    }
+
+    function onCurationChanged() {
+        chrome.runtime.sendMessage({ type: 'redraw' });
     }
 
     function onActionAdded(d) {

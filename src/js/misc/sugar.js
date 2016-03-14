@@ -191,3 +191,37 @@ sm.saveDataToFile = function(filename, data, isDataUrl, isBlob) {
     link.click();
     document.body.removeChild(link);
 };
+
+/*
+ * Finds where a line starting at point ({x, y}) would intersect a rectangle ({x, y, width, height})
+ * if it were pointing at the rectangle's center.
+ */
+sm.getRectEdgePoint = function(rect, point) {
+    var w = rect.width / 2,
+        h = rect.height / 2,
+        x = rect.x + w,
+        y = rect.y + h,
+        dx = point.x - x,
+        dy = point.y - y;
+
+    // The point is exactly the rectangle's center
+    if (!dx && !dy) throw new Error("Not possible to find intersection inside of the rectangle");
+
+    // The line can intersect the rectangle at either of the 4 sides. Find which side then easily work out the intersection.
+    var sx, sy;
+    if (Math.abs(dy) * w > Math.abs(dx) * h) { // Top or bottom side
+        if (dy < 0) { // Top
+            h = -h;
+        }
+        sx = h * dx / dy;
+        sy = h;
+    } else { // Left or right side
+        if (dx < 0) { // Left
+            w = -w;
+        }
+        sx = w;
+        sy = w * dy / dx;
+    }
+
+    return { x: x + sx, y: y + sy };
+};
