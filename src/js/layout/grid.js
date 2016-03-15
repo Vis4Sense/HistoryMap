@@ -37,7 +37,9 @@ sm.layout.grid = function() {
             v.rp.x = v.clone.x + 10;
             v.rp.y = v.clone.y + graphHeight + 10;
         });
-        newEdges.forEach(e => {
+
+        // Compute points for all edges without having rpoints so that it can apply for graph with preloaded data
+        edges.filter(e => !e.rpoints).forEach(e => {
             var centerSource = { x: e.source.rp.x + e.source.rp.width / 2, y: e.source.rp.y + e.source.rp.height / 2 },
                 centerTarget = { x: e.target.rp.x + e.target.rp.width / 2, y: e.target.rp.y + e.target.rp.height / 2 };
             e.rpoints = [ sm.getRectEdgePoint(e.source.rp, centerTarget), sm.getRectEdgePoint(e.target.rp, centerSource) ];

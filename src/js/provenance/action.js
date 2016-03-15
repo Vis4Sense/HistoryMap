@@ -25,7 +25,7 @@ sm.provenance.action = function() {
         {
             hostname: "www.google.",
             pathnames: [ "/", "/webhp", "/search", "/url" ],
-            reg: /\Wq=([\w%+]*)/i
+            reg: /\Wq=([\w%+]*)/ig
         }, {
             hostname: "www.bing.",
             pathnames: [ "/search" ],
@@ -86,7 +86,7 @@ sm.provenance.action = function() {
     function isEmptySearch(url) {
         var hostname = "www.google.",
             pathname = "/webhp",
-            reg = /\Wq=([\w%+]*)/i;
+            reg = /\Wq=([\w%+]*)/ig;
 
         if (url.hostname.startsWith(hostname) && url.pathname.includes(pathname)) {
             var result = url.toString().match(reg);
@@ -107,7 +107,15 @@ sm.provenance.action = function() {
             if (url.hostname.startsWith(t.hostname) && t.pathnames.some(d => url.pathname.includes(d))) {
                 if (t.reg) {
                     var result = url.toString().match(t.reg);
-                    return (!result || !result.length) ? null : { type: 'search', label: decodeURIComponent(result[result.length - 1]).replace(/\+/g, ' ') };
+
+                    if (!result || !result.length) return null;
+
+                    var label = decodeURIComponent(result[result.length - 1]).replace(/\+/g, ' ');
+
+                    // A quick fix for google search when it has both #q and q. Use 'g' to get all occurences, however they include #.
+                    if (t.hostname === 'www.google.') label = label.substr(label.indexOf('=') + 1);
+
+                    return { type: 'search', label: label };
                 } else {
                     var label = t.labelFunc(url, t.pathnames[0]);
                     return label ? { type: 'search', label: label } : null;

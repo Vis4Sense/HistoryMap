@@ -139,7 +139,7 @@ sm.provenance.mod = function() {
         dispatch.actionAdded({
             type: type,
             id: d.id,
-            time: new Date()
+            time: +new Date()
         });
 
         if (redrawTypes.includes(type)) dispatch.redrawn();
@@ -155,7 +155,7 @@ sm.provenance.mod = function() {
         dispatch.actionAdded({
             type: 'move-node',
             id: d.id,
-            time: new Date(),
+            time: +new Date(),
             x: d.x,
             y: d.y
         });
@@ -166,7 +166,7 @@ sm.provenance.mod = function() {
             type: type,
             sourceId: d.source.id,
             targetId: d.target.id,
-            time: new Date()
+            time: +new Date()
         });
     }
 

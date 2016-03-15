@@ -475,15 +475,6 @@ sm.vis.collection = function() {
     };
 
     /**
-     * Sets/gets the frozen status.
-     */
-    module.frozen = function(value) {
-        if (!arguments.length) return frozen;
-        frozen = value;
-        return this;
-    };
-
-    /**
      * Sets/gets the curated status.
      */
     module.curated = function(value) {

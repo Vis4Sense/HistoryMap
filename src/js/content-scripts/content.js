@@ -2,17 +2,33 @@ $(function() {
     // Only run when the background page opened
     chrome.runtime.sendMessage({ type: "backgroundOpened" }, function(response) {
         if (response) {
-            setTimeout(loadHighlights, 1000);
+            // If page uses ajax, we don't know when it's actually complete such as google search result page.
+            // Naively wait one more second.
+            setTimeout(function() {
+                injectLinks();
+                loadHighlights();
+            }, 2000);
+
             completePendingTask();
             respondExtension();
-            focusWhenHovering();
+            // focusWhenHovering();
 
             console.log("SensePath: content script loaded");
         }
     });
 });
 
-var intervalId; // for alerting tab
+/**
+ * Sometimes as in google search result page, the href is different from the openning page! Redirect?
+ */
+function injectLinks() {
+    $('body a').mouseover(function(e) {
+        // Google search result uses 'href'.
+        // this.href returns full urls
+        var values = [ this.href, this.getAttribute('data-href') ].filter(v => v);
+        chrome.runtime.sendMessage({ type: "linkClicked", values: values });
+    });
+}
 
 /**
  * Loads existing highlights to the page.
@@ -51,21 +67,6 @@ function respondExtension() {
                     $(this).remove();
                 }
             });
-        } else if (request.type === 'alertTab') {
-            var count = 11;
-
-            intervalId = setInterval(function() {
-                var favIconUrl = count % 2 ? chrome.extension.getURL("src/css/dummy-icon.png") : request.icon;
-                var title = count % 2 ? '' : request.title;
-                setIcon(favIconUrl, title);
-
-                if (!count) clearInterval(intervalId);
-
-                count--;
-            }, 250);
-        } else if (request.type === 'stopAlertTab') {
-            clearInterval(intervalId);
-            setIcon(request.icon, request.title);
         } else if (request.type === 'askReferrer') {
             sendResponse(document.referrer);
         } else if (request.type === 'highlightSelection') {
@@ -79,22 +80,6 @@ function highlightSelection(sendResponse) {
     if (!selection || selection.type !== "Range") return;
     sendResponse($.highlight(selection));
     selection.empty();
-}
-
-function setIcon(favIconUrl, title) {
-    var link = document.querySelector('link[rel=icon]') || document.querySelector("link[rel='shortcut icon']");
-
-    if (link) {
-        link.href = favIconUrl;
-    } else {
-        link = document.createElement('link');
-        link.type = 'image/png';
-        link.rel = 'shortcut icon';
-        link.href = favIconUrl;
-        document.getElementsByTagName('head')[0].appendChild(link);
-    }
-
-    document.title = title || '.';
 }
 
 function scrollTo(request) {

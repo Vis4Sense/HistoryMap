@@ -7,7 +7,8 @@ document.addEventListener('DOMContentLoaded', function () {
 		// Allow a single instance
 		if (getView(url)) return;
 
-		var debugging = true;
+		// Shared by all views
+		window.debugging = true;
 
 	    // Resize current window
 		chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {
@@ -21,18 +22,10 @@ document.addEventListener('DOMContentLoaded', function () {
 	    	left: screen.width / 2,
 	    	top: 0,
 	    	width: screen.width / 2,
-	    	height: screen.height - (debugging ? 600 : 0)
+	    	height: screen.height - (window.debugging ? 600 : 0)
+	    }, function(w) {
+	    	chrome.windows.update(w.id, { focused: true });
 	    });
-
-		// Curation view
-        // chrome.windows.create({
-        //     url: chrome.extension.getURL('src/pages/curation-view.html'),
-        //     type: "popup",
-        //     left: 0,
-        //     top: 0,
-        //     width: screen.width / 2,
-        //     height: screen.height - (debugging ? 600 : 0)
-        // });
 
 		// Listen to content script
 		chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {

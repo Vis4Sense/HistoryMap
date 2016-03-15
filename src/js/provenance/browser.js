@@ -5,11 +5,12 @@ sm.provenance.browser = function() {
     var module = {};
 
     var actions = [], // The input/output array of actions
-        listening,
+        listening = true,
         provAction = sm.provenance.action(),
         prevUrl, // The url of the last action
         urlToActionLookup = {}, // url -> action (data object) if the page was visited (first visit) and captured
-        tabIdToActionLookup = {}; // tabId -> action
+        tabIdToActionLookup = {}, // tabId -> action
+        urlToReferrerLookup = {}; // url -> its source url
 
     var dispatch = d3.dispatch('dataChanged');
 
@@ -19,6 +20,7 @@ sm.provenance.browser = function() {
         chrome.tabs.onRemoved.addListener(onTabRemoved);
         chrome.runtime.onMessage.addListener(onMessageReceived);
         createContextMenus();
+        addLinkHandler();
         updatePageEndTime();
     }
 
@@ -81,13 +83,8 @@ sm.provenance.browser = function() {
         if (action) {
             if (action !== 'skip') {
                 if (isSearchType(action.type)) { // Search action can have referrer coming from a link
-                    getVisitType(tab.url, tab.id, (type, referrer) => {
-                        console.log(referrer);
-                        if (type === 'link') {
-                            createNewAction(tab, action.type, action.label, referrer);
-                        } else {
-                            createNewAction(tab, action.type, action.label);
-                        }
+                    getVisitType(tab.url, tab.id, type => {
+                        createNewAction(tab, action.type, action.label);
                     });
                 } else {
                     var prevAction = urlToActionLookup[prevUrl];
@@ -99,8 +96,8 @@ sm.provenance.browser = function() {
                 }
             }
         } else {
-            getVisitType(tab.url, tab.id, (type, referrer) => {
-                createNewAction(tab, type, undefined, referrer);
+            getVisitType(tab.url, tab.id, type => {
+                createNewAction(tab, type);
             });
         }
     }
@@ -120,16 +117,7 @@ sm.provenance.browser = function() {
                 type = bookmarkTypes.includes(visitTransition) ? 'bookmark' :
                     typedTypes.includes(visitTransition) ? 'type' : 'link';
 
-            // Find the referrer
-            if (type === 'link') {
-                chrome.tabs.sendMessage(tabId, { type: 'askReferrer' }, function(response) {
-                    // referrer only return the path, excluding the hash. So just guess the latest one could be the most likely one.
-                    var referrer = response ? actions.slice().reverse().find(a => a.url && a.url.startsWith(response) && !isEmbeddedType(a.type)) : null;
-                    callback(type, referrer);
-                });
-            } else {
-                callback(type);
-            }
+            callback(type);
         });
     }
 
@@ -141,7 +129,7 @@ sm.provenance.browser = function() {
         return [ 'search', 'location', 'dir' ].includes(type);
     }
 
-    function createNewAction(tab, type, text, referrer, path, classId) {
+    function createNewAction(tab, type, text, path, classId) {
         // Still need to check the last time before creating a new action
         // because two updates can happen in a very short time, thus the second one
         // happens even before a new action is added in the first update
@@ -152,14 +140,14 @@ sm.provenance.browser = function() {
             action = createActionObject(originalAction.url, originalAction.text, type, originalAction.favIconUrl, originalAction);
             dispatch.dataChanged(type, true);
         } else if (type === 'highlight' || type === 'filter') {
-            action = createActionObject(tab.url, text, type, undefined, referrer, path, classId);
+            action = createActionObject(tab.url, text, type, undefined, path, classId);
             if (type === 'filter') urlToActionLookup[tab.url] = action;
             dispatch.dataChanged(type, true);
         } else {
             if (originalAction) {
                 updateAction(tab);
             } else {
-                action = createActionObject(tab.url, text || tab.title || tab.url || '', type, tab.favIconUrl, referrer);
+                action = createActionObject(tab.url, text || tab.title || tab.url || '', type, tab.favIconUrl);
                 action.seen = action.highlighted = tab.active;
                 urlToActionLookup[tab.url] = action; // Maintain the first visit
                 tabIdToActionLookup[tab.id] = action;
@@ -184,7 +172,7 @@ sm.provenance.browser = function() {
         return action;
     }
 
-    function createActionObject(url, text, type, favIconUrl, referrer, path, classId) {
+    function createActionObject(url, text, type, favIconUrl, path, classId) {
         var time = new Date(),
             action = {
                 id: +time,
@@ -195,13 +183,19 @@ sm.provenance.browser = function() {
                 showImage: true
             };
         if (favIconUrl) action.favIconUrl = favIconUrl;
-        if (referrer) action.from = referrer.id;
         if (path) action.path = path;
         if (classId) action.classId = classId;
 
         if (!isEmbeddedType(type)) {
             // End time
             action.endTime = action.id + 1;
+        }
+
+        // Referrer
+        var rUrl = urlToReferrerLookup[url];
+        if (rUrl) {
+            var r = urlToActionLookup[rUrl];
+            if (r) action.from = r.id;
         }
 
         actions.push(action);
@@ -371,6 +365,16 @@ sm.provenance.browser = function() {
         });
     }
 
+    function addLinkHandler() {
+        chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+            if (request.type === 'linkClicked') {
+                request.values.forEach(v => {
+                    urlToReferrerLookup[v] = sender.tab.url;
+                });
+            }
+        });
+    }
+
     function buildLookups(callback) {
         // Build lookup using loaded actions
         var duplicateUrlTypes = [ 'highlight', 'note', 'revisit' ];
@@ -411,16 +415,8 @@ sm.provenance.browser = function() {
     /**
      * Captures user actions.
      */
-    module.capture = function() {
-        listening = true;
-        return this;
-    };
-
-    /**
-     * Pauses capturing user actions.
-     */
-    module.pause = function() {
-        listening = false;
+    module.capture = function(value) {
+        listening = value;
         return this;
     };
 

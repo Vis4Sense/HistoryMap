@@ -1,14 +1,24 @@
 $(function() {
     // Vis and options
-    var curation,
+    var backgroundPage = chrome.extension.getBackgroundPage(),
+        debugging = backgroundPage.debugging,
+        closeConfirmation = !debugging,
+        curation,
         mod = sm.provenance.mod();
 
     run();
 
     function run() {
-        d3.select('body').on('mouseover', function() {
-            chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, { focused: true });
-        });
+        // d3.select('body').on('mouseover', function() {
+        //     chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, { focused: true });
+        // });
+
+        // Need confirmation when close/reload collection
+        if (closeConfirmation) {
+            window.onbeforeunload = function() {
+                return "All unsaved data will be gone if you close this window.";
+            };
+        }
 
         respondToContentScript();
         buildVis();
@@ -45,7 +55,7 @@ $(function() {
     }
 
     function redraw(external) {
-        var data = chrome.extension.getBackgroundPage().data;
+        var data = backgroundPage.data;
         if (data) d3.select('.sm-curation-container').datum(data).call(curation);
 
         if (!external) chrome.runtime.sendMessage({ type: 'redraw' });

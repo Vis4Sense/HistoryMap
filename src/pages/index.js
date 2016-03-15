@@ -1,25 +1,25 @@
 $(function() {
     // Data
-    var data = chrome.extension.getBackgroundPage().data = { nodes: [], links: [] }, // background page allows to share data across views
+    var backgroundPage = chrome.extension.getBackgroundPage(),
+        data = backgroundPage.data = { nodes: [], links: [] }, // background page allows to share data across views
         actions = [], // All actions added in temporal order including 'revisit' and 'child' actions
         browser = sm.provenance.browser(),
         mod = sm.provenance.mod(),
         pendingTasks = {}, // For jumping to an action when its page isn't ready yet
-        closeConfirmation = false,
-        // datasetName = '';
-        datasetName = 'data/test7.zip';
+        debugging = backgroundPage.debugging,
+        closeConfirmation = !debugging,
+        datasetName = debugging ? 'data/test8.zip' : '',
+        datasetName = '';
 
     // Vis and options
     var collection,
+        curationWindowId,
         listening = true;
 
     respondToContentScript();
     run();
 
     function run() {
-        // Always listening now for easy testing
-        listening = true;
-
         if (datasetName) {
             // Load data
             if (datasetName.endsWith('.json')) {
@@ -39,11 +39,12 @@ $(function() {
 
         initSettings();
 
-        openCurationView();
+        // If open immediately, fontawesome icons don't load!
+        // setTimeout(openCurationView, 1000);
 
-        d3.select('body').on('mouseover', function() {
-            chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, { focused: true });
-        });
+        // d3.select('body').on('mouseover', function() {
+        //     chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, { focused: true });
+        // });
     }
 
     function initSettings() {
@@ -81,14 +82,34 @@ $(function() {
             toggleToolbar();
         });
 
-        d3.select('#btnFrezze').on('click', function() {
-            collection.frozen(true);
+        d3.select('#btnPause').on('click', function() {
+            listening = !listening;
+            var html = listening ? "<i class='fa fa-pause'></i> Pause" : "<i class='fa fa-play'></i> Resume";
+            d3.select(this).html(html);
+            browser.capture(listening);
             toggleToolbar();
         });
 
         d3.select('#btnCurate').on('click', function() {
             collection.curated(!collection.curated());
-            d3.select(this).text(collection.curated() ? 'Select' : 'Pan');
+            d3.select(this).text(collection.curated() ? 'Pan' : 'Select');
+
+            if (collection.curated()) {
+                if (curationWindowId === undefined) {
+                    chrome.windows.create({
+                        url: chrome.extension.getURL('src/pages/curation-view.html'),
+                        type: "popup",
+                        left: 0,
+                        top: 0,
+                        width: screen.width / 2,
+                        height: screen.height
+                    }, function(w) {
+                        curationWindowId = w.id;
+                    });
+                } else {
+                    chrome.windows.update(curationWindowId, { focused: true });
+                }
+            }
         });
 
         // Need confirmation when close/reload collection
@@ -117,6 +138,8 @@ $(function() {
                 top: 0,
                 width: screen.width / 2,
                 height: screen.height
+            }, function(w) {
+                curationWindowId = w.id;
             });
         }
     }
@@ -125,7 +148,7 @@ $(function() {
         browser.actions(actions, function() {
             buildVis();
             updateVis();
-        }).capture()
+        }).capture(listening)
         .on('dataChanged', _.throttle(onDataChanged, 200));
     };
 
@@ -144,6 +167,9 @@ $(function() {
             zip = new JSZip(content);
             actions = JSON.parse(zip.file('sensemap.json').asText()).data;
         }
+
+        // Test test8
+        // actions = actions.slice(0, 56);
 
         mod.mergeActions(actions);
 
@@ -172,8 +198,6 @@ $(function() {
 
     function respondToContentScript() {
         chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-            if (!listening) return;
-
             var tab = sender.tab;
 
             if (request.type === 'requestData') {
@@ -212,7 +236,7 @@ $(function() {
 
         $(window).resize(_.throttle(updateVis, 200));
 
-        d3.select('#btnCurate').text(collection.curated() ? 'Select' : 'Pan');
+        d3.select('#btnCurate').text(collection.curated() ? 'Pan' : 'Select');
     }
 
     function saveWorkspace() {
@@ -262,10 +286,26 @@ $(function() {
     }
 
     function onCurationChanged() {
-        chrome.runtime.sendMessage({ type: 'redraw' });
+        if (curationWindowId === undefined) {
+            chrome.windows.create({
+                url: chrome.extension.getURL('src/pages/curation-view.html'),
+                type: "popup",
+                left: 0,
+                top: 0,
+                width: screen.width / 2,
+                height: screen.height
+            }, function(w) {
+                curationWindowId = w.id;
+                chrome.runtime.sendMessage({ type: 'redraw' });
+            });
+        } else {
+            chrome.windows.update(curationWindowId, { focused: true });
+            chrome.runtime.sendMessage({ type: 'redraw' });
+        }
     }
 
     function onActionAdded(d) {
+        d.time = new Date(d.time);
         actions.push(d);
     }
 
