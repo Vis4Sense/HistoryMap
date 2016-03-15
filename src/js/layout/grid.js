@@ -10,9 +10,11 @@ sm.layout.grid = function() {
         newVertices, newEdges,
         width, height, // constrained size
         graphWidth = 0, graphHeight = 0, // the actual size that the graph has
+        children = d => d.links,
+        parent = d => d.sup,
         label = d => d.label,
         tipLength = 16,
-        layout = sm.layout.dag();
+        layout = sm.layout.forest();
 
     function layoutNewNodes() {
         newVertices = vertices.filter(v => v.newlyCurated);
@@ -20,7 +22,19 @@ sm.layout.grid = function() {
 
         // Use a dag layout for new nodes on cloned objects so that assigned attributes won't overwrite existing ones.
         newVertices.forEach(v => {
-            v.clone = { id: v.id, width: v.rp.width, height: v.rp.height };
+            v.clone = { id: v.id, width: v.rp.width, height: v.rp.height, links: [] };
+        });
+
+        // Setup children/parent for cloned vertices based on original ones
+        newVertices.forEach(v => {
+            if (children(v)) {
+                children(v).forEach(c => {
+                    v.clone.links.push(c.clone);
+                });
+            }
+            if (parent(v)) {
+                v.clone.sup = parent(v).clone;
+            }
         });
 
         var clonedVertices = newVertices.map(v => v.clone);

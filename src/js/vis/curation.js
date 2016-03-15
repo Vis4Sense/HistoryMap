@@ -83,7 +83,7 @@ sm.vis.curation = function() {
 
 
 // Quick test
-    // data.nodes.forEach(n => { n.curated = n.newlyCurated = true; })
+    data.nodes.forEach(n => { n.curated = n.newlyCurated = true; })
 
 
 
@@ -234,6 +234,8 @@ sm.vis.curation = function() {
                 .classed('hide', !typeVisible)
                 .classed(iconClassLookup[type(d)], true)
                 .style('background-color', colorScale(type(d)));
+
+            container.select('div').classed('node-title', image(d));
 
             // Text
             container.select('.node-label').text(label);

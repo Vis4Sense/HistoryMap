@@ -137,17 +137,17 @@ sm.provenance.browser = function() {
             originalAction = urlToActionLookup[tab.url];
 
         if (type === 'revisit') {
-            action = createActionObject(originalAction.url, originalAction.text, type, originalAction.favIconUrl, originalAction);
+            action = createActionObject(tab.id, originalAction.url, originalAction.text, type, originalAction.favIconUrl, originalAction);
             dispatch.dataChanged(type, true);
         } else if (type === 'highlight' || type === 'filter') {
-            action = createActionObject(tab.url, text, type, undefined, path, classId);
+            action = createActionObject(tab.id, tab.url, text, type, undefined, path, classId);
             if (type === 'filter') urlToActionLookup[tab.url] = action;
             dispatch.dataChanged(type, true);
         } else {
             if (originalAction) {
                 updateAction(tab);
             } else {
-                action = createActionObject(tab.url, text || tab.title || tab.url || '', type, tab.favIconUrl);
+                action = createActionObject(tab.id, tab.url, text || tab.title || tab.url || '', type, tab.favIconUrl);
                 action.seen = action.highlighted = tab.active;
                 urlToActionLookup[tab.url] = action; // Maintain the first visit
                 tabIdToActionLookup[tab.id] = action;
@@ -172,7 +172,7 @@ sm.provenance.browser = function() {
         return action;
     }
 
-    function createActionObject(url, text, type, favIconUrl, path, classId) {
+    function createActionObject(tabId, url, text, type, favIconUrl, path, classId) {
         var time = new Date(),
             action = {
                 id: +time,
@@ -192,10 +192,19 @@ sm.provenance.browser = function() {
         }
 
         // Referrer
+        // console.log('find: ' + url);
         var rUrl = urlToReferrerLookup[url];
         if (rUrl) {
             var r = urlToActionLookup[rUrl];
             if (r) action.from = r.id;
+        } else {
+            // Use document.referrer if available. This is less accurate because referrer only return the path excluding hash.
+            chrome.tabs.sendMessage(tabId, { type: 'askReferrer' }, function(response) {
+                if (response) {
+                    var r = _.findLast(actions, a => a.url && a.url === response && !isEmbeddedType(a.type));
+                    if (r) action.from = r.type === 'revisit' ? r.from : r.id;
+                }
+            });
         }
 
         actions.push(action);
@@ -369,6 +378,7 @@ sm.provenance.browser = function() {
         chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             if (request.type === 'linkClicked') {
                 request.values.forEach(v => {
+                    // console.log('received: ' + v);
                     urlToReferrerLookup[v] = sender.tab.url;
                 });
             }

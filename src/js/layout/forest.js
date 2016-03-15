@@ -12,11 +12,9 @@ sm.layout.forest = function() {
         roots,
         width, height,
         children = d => d.links,
-        parent = d => d.parent,
+        parent = d => d.sup,
         time = d => d.time,
         label = d => d.label,
-        isIndented = false,
-        depthSep = 30,
         nodeDict, linkDict,
         dummyContainer, // needs for mxClient to run its layout
         graph, // mxClient graph
@@ -44,42 +42,14 @@ sm.layout.forest = function() {
     }
 
     /**
-     * Earlier vertices are shown first. Also set the depth for each node.
+     * Earlier vertices are shown first.
      */
     function order() {
         var timeSort = (a, b) => d3.ascending(time(a), time(b));
         roots = vertices.filter(n => !parent(n)).sort(timeSort);
         dfsRoots(d => {
-            d.depth = parent(d) ? parent(d).depth + 1 : 0;
             if (children(d)) children(d).sort();
         });
-    }
-
-    function computeIndentedTreeLayout() {
-        // Nodes
-        var offset = 0;
-        dfsRoots(n => {
-            n.x = n.depth * depthSep;
-            n.y = offset;
-            offset += n.height + siblingSep;
-        });
-
-        // Links
-        edges.forEach(l => {
-            // Need to set a list of points to represent a path from the source to the target.
-            var p1 = { x: l.source.x + depthSep / 3, y: l.source.y }; // Bottom of the source
-            var p3 = { x: l.target.x, y: l.target.y + l.target.height / 2 }; // Left of the target
-            var p2 = { x: p1.x, y: p3.y };
-            l.points = [ p1, p2, p3 ];
-        });
-    }
-
-    function computeNormalTreeLayout() {
-        init();
-        buildGraph();
-        runMXLayout();
-        setNodeCoordinate();
-        setLinkCoordinate();
     }
 
     function init() {
@@ -106,6 +76,12 @@ sm.layout.forest = function() {
         edges.forEach(d => {
             linkDict[linkKey(d)] = graph.insertEdge(parentNode, null, '', nodeDict[key(d.source)], nodeDict[key(d.target)]);
         });
+
+        // Virtual edges to roots
+        var root = graph.insertVertex(parentNode, null, '', 0, 0, -layout.levelDistance - 10, -layout.levelDistance - 10);
+        roots.forEach(r => {
+            graph.insertEdge(parentNode, null, '', root, nodeDict[key(r)]);
+        });
     }
 
     function runMXLayout() {
@@ -123,9 +99,6 @@ sm.layout.forest = function() {
     }
 
     function setLinkCoordinate() {
-        var layers = _.toArray(_.groupBy(vertices, n => n.depth)),
-            layerWidths = layers.map(vertices => d3.max(vertices, n => n.width));
-
         // Make the 'link' object accessible from its source
         vertices.forEach(n => {
             n._edges = [];
@@ -158,6 +131,16 @@ sm.layout.forest = function() {
                 l.points = [ p1, p2, p3, p4 ];
             });
         });
+
+        vertices.forEach(n => {
+            delete n._edges;
+        });
+
+        // edges.forEach(e => {
+        //     var centerSource = { x: e.source.x + e.source.width / 2, y: e.source.y + e.source.height / 2 },
+        //         centerTarget = { x: e.target.x + e.target.width / 2, y: e.target.y + e.target.height / 2 };
+        //     e.points = [ sm.getRectEdgePoint(e.source, centerTarget), sm.getRectEdgePoint(e.target, centerSource) ];
+        // });
     }
 
     /**
@@ -165,12 +148,11 @@ sm.layout.forest = function() {
      */
     module.compute = function() {
         order();
-
-        if (isIndented) {
-            computeIndentedTreeLayout();
-        } else {
-            computeNormalTreeLayout();
-        }
+        init();
+        buildGraph();
+        runMXLayout();
+        setNodeCoordinate();
+        setLinkCoordinate();
 
         // The vis width and height
         return {

@@ -14,7 +14,7 @@ sm.vis.collection = function() {
         paused = false; // Suspend collecting
 
     // Rendering options
-    var layout = sm.layout.dag(),
+    var layout = sm.layout.forest(),
         panExtent = [ 0, 1, 0, 1 ],
         defaultMaxWidth = 150,
         brushing = false;

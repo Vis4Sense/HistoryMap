@@ -52,10 +52,6 @@
 .sm-sensemap .node-title {
 	margin: -3px -3px 3px -3px;
     padding: 3px;
-    border-top-right-radius: 5px;
-    border-top-left-radius: 5px;
-	margin-bottom: 5px;
-	font-weight: bold;
 }
 
 .sm-sensemap .node-snapshot {

@@ -8,8 +8,8 @@ $(function() {
         pendingTasks = {}, // For jumping to an action when its page isn't ready yet
         debugging = backgroundPage.debugging,
         closeConfirmation = !debugging,
-        datasetName = debugging ? 'data/test8.zip' : '',
-        datasetName = '';
+        datasetName = debugging ? 'data/test10.zip' : '';
+        // datasetName = '';
 
     // Vis and options
     var collection,
@@ -167,6 +167,11 @@ $(function() {
             zip = new JSZip(content);
             actions = JSON.parse(zip.file('sensemap.json').asText()).data;
         }
+
+        // Convert string date to JS object
+        actions.forEach(a => {
+            a.time = new Date(a.time);
+        });
 
         // Test test8
         // actions = actions.slice(0, 56);
