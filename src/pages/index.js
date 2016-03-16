@@ -196,7 +196,7 @@ $(function() {
             } else if (request.type === 'nodeClicked') {
                 onNodeClicked(request.value);
             } else if (request.type === 'nodeHovered' && request.view !== 'collection') {
-                collection.setHovered(request.value, request.status);
+                collection.setBrushed(request.value, request.status);
             }
         });
     }
@@ -215,7 +215,7 @@ $(function() {
 
         $(window).resize(_.throttle(updateVis, 200));
 
-        d3.select('#btnCurate').text(collection.curated() ? 'Pan' : 'Select');
+        // d3.select('#btnCurate').text(collection.curated() ? 'Pan' : 'Select');
     }
 
     function saveWorkspace() {
@@ -265,17 +265,14 @@ $(function() {
     }
 
     function onCurationChanged(initial) {
-        // Curation view: reload together with collection view
         var url = chrome.extension.getURL('src/pages/curation-view.html');
         var view = chrome.extension.getViews().find(v => v.location.href === url);
 
         if (view) {
-            if (curationWindowId === undefined) { // Happen when reload collection page, don't create new collection, just reload
-                view.location.reload();
-            } else {
+            if (curationWindowId !== undefined) {
                 chrome.windows.update(curationWindowId, { focused: true });
-                chrome.runtime.sendMessage({ type: 'redraw' });
             }
+            chrome.runtime.sendMessage({ type: 'redraw' });
         } else if (!initial) {
             chrome.windows.create({
                 url: chrome.extension.getURL('src/pages/curation-view.html'),

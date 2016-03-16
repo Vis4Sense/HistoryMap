@@ -48,8 +48,8 @@ sm.layout.grid = function() {
         graphHeight = d3.max(vertices, v => v.rp.y + v.rp.height) || 0;
 
         newVertices.forEach(v => {
-            v.rp.x = v.clone.x + 10;
-            v.rp.y = v.clone.y + graphHeight + 10;
+            v.rp.x = v.clone.x;
+            v.rp.y = v.clone.y + graphHeight + (graphHeight ? 20 : 0);
         });
 
         // Compute points for all edges without having rpoints so that it can apply for graph with preloaded data
@@ -117,6 +117,15 @@ sm.layout.grid = function() {
     module.label = function(value) {
         if (!arguments.length) return label;
         label = value;
+        return this;
+    };
+
+    /**
+     * Sets/gets the children accessor.
+     */
+    module.children = function(value) {
+        if (!arguments.length) return children;
+        children = value;
         return this;
     };
 

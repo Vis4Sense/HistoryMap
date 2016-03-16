@@ -33,6 +33,10 @@
 	border: none !important;
 }
 
+.sm-sensemap .node.brushed {
+	background-color: #E8A199 !important;
+}
+
 .sm-sensemap .node.not-seen:hover,
 .sm-sensemap .node.not-seen.hovered,
 .sm-sensemap .node.not-seen.brushed {

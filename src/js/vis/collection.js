@@ -14,10 +14,10 @@ sm.vis.collection = function() {
         paused = false; // Suspend collecting
 
     var ZoomLevel = [
-        { width: 26, numChildren: 0, fontSize: 10 },
-        { width: 100, numChildren: 0, fontSize: 14 },
-        { width: 125, numChildren: 1, fontSize: 16 },
-        { width: 150, numChildren: 2, fontSize: 18 }
+        { width: 26, numChildren: 0 },
+        { width: 100, numChildren: 0 },
+        { width: 125, numChildren: 1 },
+        { width: 150, numChildren: 2 }
     ];
     ZoomLevel.forEach(z => {
         z.maxHeight = z.width / 0.75;
@@ -86,7 +86,7 @@ sm.vis.collection = function() {
             sm.addPan([ nodeContainer, linkContainer ], container, panExtent);
             sm.createArrowHeadMarker(self, 'arrow-marker', '#6e6e6e');
             sm.createArrowHeadMarker(self, 'arrow-marker-hover', '#e74c3c');
-            addBrush();
+            // addBrush();
         }
 
         dataNodes = (data.nodes || []).filter(n => !n.collectionRemoved);
@@ -273,6 +273,25 @@ sm.vis.collection = function() {
                 update();
                 dispatch.nodeMinimized(d);
             });
+        menu.append('xhtml:button').attr('class', 'btn btn-default fa fa-edit')
+            .attr('title', 'Curate')
+            .on('click', function(d) {
+                d3.event.stopPropagation();
+                d3.select(this.parentNode).classed('hide', true);
+
+                if (d.curated) return;
+
+                linkContainer.selectAll('.link').each(function(l) {
+                    // Curate the link if the other end is also curated
+                    // Make sure if this link was removed, it reappears
+                    if (l.source === d && l.target.curated || l.target === d && l.source.curated) l.removed = false;
+                });
+                d.curated = d.newlyCurated = true;
+                d.curationRemoved = false; // Make sure if this node was removed, it reappears
+
+                update();
+                dispatch.curationChanged();
+            });
         menu.append('xhtml:button').attr('class', 'btn btn-default fa fa-remove')
             .attr('title', 'Remove')
             .on('click', function(d) {
@@ -288,7 +307,7 @@ sm.vis.collection = function() {
         var children = container.append('xhtml:div').attr('class', 'children')
             .on('mouseover', function(d) {
                 // Align menu to the right side
-                var menu = d3.select(this).select('.show-all-highlights').classed('hide', false),
+                var menu = d3.select(this).select('.show-all-highlights').classed('hide', d.children && zoomLevel.numChildren >= d.children.length),
                     menuRect = menu.node().getBoundingClientRect(),
                     nodeRect = this.getBoundingClientRect();
                 menu.style('left', (nodeRect.right > width - menuRect.width ? 1 - menuRect.width : d.width - 1) + 'px');
@@ -317,7 +336,8 @@ sm.vis.collection = function() {
             // Status
             d3.select(this).select('.node')
                 .classed('not-seen', !d.seen)
-                .classed('highlighted', isHighlighted(d));
+                .classed('highlighted', isHighlighted(d))
+                .classed('brushed', d.brushed);
 
             // Tooltip
             d3.select(this).select('.parent').attr('data-original-title', buildHTMLTitle(d));
@@ -569,11 +589,12 @@ sm.vis.collection = function() {
     };
 
     /**
-     * Sets hovering status of the given node.
+     * Sets brushing status of the given node.
      */
-    module.setHovered = function(id, value) {
+    module.setBrushed = function(id, value) {
         nodeContainer.selectAll('.node').each(function(d) {
-            d3.select(this).classed('hovered', value && key(d) === id);
+            d.brushed = value && key(d) === id;
+            d3.select(this).classed('brushed', d.brushed);
         });
     };
 

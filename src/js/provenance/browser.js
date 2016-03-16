@@ -172,6 +172,8 @@ sm.provenance.browser = function() {
         return action;
     }
 
+    var lastDate;
+
     function createActionObject(tabId, url, text, type, favIconUrl, path, classId) {
         var time = new Date(),
             action = {
@@ -182,6 +184,7 @@ sm.provenance.browser = function() {
                 type: type,
                 showImage: true
             };
+
         if (favIconUrl) action.favIconUrl = favIconUrl;
         if (path) action.path = path;
         if (classId) action.classId = classId;
@@ -190,6 +193,9 @@ sm.provenance.browser = function() {
             // End time
             action.endTime = action.id + 1;
         }
+
+        if (lastDate && action.id === +lastDate) action.id += 1;
+        lastDate = time;
 
         // Referrer
         // console.log('find: ' + url);

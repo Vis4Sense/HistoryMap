@@ -6,6 +6,7 @@ sm.vis.curation = function() {
     var width = 400, height = 250,
         margin = { top: 5, right: 5, bottom: 5, left: 5 },
         label = d => d.label,
+        children = d => d.rlinks,
         icon = d => d.icon,
         type = d => d.type,
         time = d => d.time, // Expect a Date object
@@ -95,18 +96,18 @@ sm.vis.curation = function() {
             sm.createArrowHeadMarker(self, 'arrow-marker-cursor', 'blue');
         }
 
-
-// Quick test
-    // data.nodes.forEach(n => { n.curated = n.newlyCurated = true; })
-
-
-
         dataNodes = (data.nodes || []).filter(n => n.curated && !n.curationRemoved);
         dataLinks = (data.links || []).filter(l => dataNodes.includes(l.source) && dataNodes.includes(l.target) && !l.removed);
 
+        // Curated nodes may have smaller set of children than the corresponding in collection
+        dataNodes.filter(n => n.links).forEach(n => {
+            n.rlinks = n.links.filter(target => dataNodes.includes(target));
+        });
+
         layout.width(width)
             .height(height)
-            .label(label);
+            .label(label)
+            .children(children);
 
         var links = linkContainer.selectAll('.link').data(dataLinks, linkKey);
         links.enter().call(enterLinks);
@@ -199,7 +200,7 @@ sm.vis.curation = function() {
                 d3.event.stopPropagation();
                 d3.select(this.parentNode).classed('hide', true);
                 d.curationRemoved = true;
-                d.curated = false;
+                d.curated = d.brushed = false;
                 connecting = false;
                 clearTimeout(connectingTimerId);
 
@@ -598,11 +599,11 @@ sm.vis.curation = function() {
     };
 
     /**
-     * Sets hovering status of the given node.
+     * Sets brushing status of the given node.
      */
-    module.setHovered = function(id, value) {
+    module.setBrushed = function(id, value) {
         nodeContainer.selectAll('.node').each(function(d) {
-            d3.select(this).classed('hovered', value && key(d) === id);
+            d3.select(this).classed('brushed', value && key(d) === id);
         });
     };
 

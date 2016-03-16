@@ -20,7 +20,7 @@ $(function() {
             if (request.type === 'redraw') {
                 redraw(true);
             } else if (request.type === 'nodeHovered' && request.view !== 'curation') {
-                curation.setHovered(request.value, request.status);
+                curation.setBrushed(request.value, request.status);
             }
         });
     }

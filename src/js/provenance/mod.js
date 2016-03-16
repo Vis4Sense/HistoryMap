@@ -27,7 +27,7 @@ sm.provenance.mod = function() {
             // Add page linking as a type of link
             if (d.type === 'link' || isSearchType(d.type)) {
                 var source = actions.find(d2 => d2.id === d.from);
-                if (source) {
+                if (source && source !== d) {
                     addLink(source, d);
                 } else {
                     // console.log('could not find the source of ' + d.text);
