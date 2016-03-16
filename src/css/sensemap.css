@@ -4,14 +4,16 @@
     color: black;
 	box-shadow: 0 0 0 1px #6e6e6e, 0 0 0 2px rgba(0,0,0,0);
     border-radius: 3px;
-    transition: all 0.25s ease-in-out;
+    transition: box-shadow 0.25s ease-in-out, border 0.25s ease-in-out, background-color 0.125s ease-in-out;
+    overflow: hidden;
 }
 
 .sm-sensemap .node.mini {
 	background-color: #6e6e6e;
-    width: 10px;
-    height: 10px;
-    margin-bottom: 6px;
+    width: 8px;
+    height: 8px;
+    border-radius: 4px;
+    margin-bottom: 7px;
     cursor: pointer;
     box-shadow: 0 0 0 2px #6e6e6e;
 }
@@ -31,17 +33,28 @@
 	border: none !important;
 }
 
+.sm-sensemap .node.not-seen:hover,
+.sm-sensemap .node.not-seen.hovered,
+.sm-sensemap .node.not-seen.brushed {
+	border: 1px solid #e74c3c !important;
+	box-shadow: none !important;
+}
+
 .sm-sensemap .node.mini:hover,
 .sm-sensemap .node.mini.hovered {
 	box-shadow: 0 0 0 2px #e74c3c;
 }
 
 .sm-sensemap .node.highlighted {
-    background-color: #1abc9c !important;
+    background-color: cyan !important;
 }
 
 .sm-sensemap .node.favorite {
-    background-color: #f1c40f;
+    background-color: #e6e600;
+}
+
+.sm-sensemap .node.favorite .fa-star {
+    color: #e6e600;
 }
 
 .sm-sensemap .node.not-seen {
@@ -50,12 +63,22 @@
 }
 
 .sm-sensemap .node-title {
-	margin: -3px -3px 3px -3px;
+	/*margin: -3px -3px 3px -3px;*/
     padding: 3px;
 }
 
 .sm-sensemap .node-snapshot {
-	max-height: 150px;
+	/* the next 3 lines together with set width, height for .parent to scale and crop image */
+	max-width: 100%;
+  	width: auto;
+  	height: auto;
+	border-bottom-left-radius: 3px;
+	border-bottom-right-radius: 3px;
+}
+
+.sm-sensemap .has-children .node-snapshot {
+	border-bottom-left-radius: 0px;
+	border-bottom-right-radius: 0px;
 }
 
 .sm-sensemap .link path {
@@ -66,6 +89,10 @@
 .sm-sensemap .link path.main-link {
 	marker-end: url(#arrow-marker);
 	stroke-width: 1.5px;
+}
+
+.sm-sensemap .link path.main-link.straight-arrow {
+	marker-end: none;
 }
 
 .sm-sensemap .link path.main-link.brushed,
@@ -87,19 +114,27 @@
 
 /* To make icon and label in one line */
 .sm-sensemap .node-icon {
-	max-width: 22px;
-	max-height: 22px;
+	max-width: 20px;
+	max-height: 20px;
 	display: inline-block;
 	margin-right: 3px;
 }
 
-/* Action type icon */
+/* Action type icon. */
 .sm-sensemap .node-icon.fa {
 	color: white;
 	padding: 3px;
 	border-radius: 4px;
-	width: 1.4em;
+	width: 20px;
+	margin: 0 3px 0 0; /* every 'simple' node has a height of 26px */
+}
+
+.sm-sensemap .children .node-icon.fa {
 	margin: 1px 3px 1px 0;
+}
+
+.sm-sensemap img.node-icon {
+	margin-top: -2px; /* every 'simple' node has a height of 26px */
 }
 
 .sm-sensemap .node-label {
@@ -108,6 +143,10 @@
     overflow: hidden;
     text-overflow: ellipsis;
     vertical-align: bottom; /* inline-block and overflow hidden make text move upwards */
+}
+
+.sm-sensemap .node-label.min-zoom {
+	text-overflow: clip;
 }
 
 .sm-sensemap .cursor-link {
@@ -119,7 +158,7 @@
 }
 
 .sm-sensemap .parent {
-	padding: 3px;
+	overflow: hidden; /* to crop image */
 }
 
 .sm-sensemap .parent.has-children {
@@ -135,8 +174,14 @@
 .sm-sensemap .node .btn-group,
 .sm-sensemap .node-curated {
 	position: fixed;
-	font-size: 18px;
 	color: #2ecc71;
+}
+
+.sm-sensemap .node .btn.show-all-highlights {
+	position: fixed;
+	padding: 2px 4px;
+	font-size: 14px;
+	margin-top: -4px;
 }
 
 .sm-sensemap .node-curated {

@@ -66,7 +66,7 @@ sm.layout.forest = function() {
         layout.useBoundingBox = false;
         layout.edgeRouting = false;
         layout.levelDistance = 30;
-        layout.nodeDistance = 6;
+        layout.nodeDistance = 5;
 
         nodeDict = {};
         linkDict = {};

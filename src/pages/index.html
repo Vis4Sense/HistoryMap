@@ -47,8 +47,21 @@
                 position: fixed;
                 float: right;
                 right: 5px;
-                bottom: 0;
+                bottom: 5px;
                 cursor: pointer;
+                padding: 2px 6px;
+            }
+
+            #groupZoom {
+                position: fixed;
+                float: right;
+                right: 5px;
+                bottom: 35px;
+            }
+
+            #groupZoom .btn {
+                padding: 0px 6px;
+                font-size: 20px;
             }
         </style>
     </head>
@@ -69,7 +82,13 @@
             </div>
             <i id="bars" class="fa fa-bars"></i>
         </div>
-        <div id="btnCurate">Pan</div>
+
+        <button id="btnCurate" class="btn btn-default">Pan</button>
+
+        <div id="groupZoom" class="btn-group-vertical">
+            <button id="btnZoomIn" class="btn btn-default" title="Zoom In"><i class="fa fa-plus"></i></button>
+            <button id='btnZoomOut' class="btn btn-default" title="Zoom Out"><i class="fa fa-minus"></i></button>
+        </div>
 
         <script src="../bower_components/jquery/dist/jquery.min.js"></script>
         <script src="../bower_components/jquery-ui.min.js"></script>

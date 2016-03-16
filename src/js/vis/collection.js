@@ -13,11 +13,24 @@ sm.vis.collection = function() {
         curated = false, // True to switch on selection for curation
         paused = false; // Suspend collecting
 
+    var ZoomLevel = [
+        { width: 26, numChildren: 0, fontSize: 10 },
+        { width: 100, numChildren: 0, fontSize: 14 },
+        { width: 125, numChildren: 1, fontSize: 16 },
+        { width: 150, numChildren: 2, fontSize: 18 }
+    ];
+    ZoomLevel.forEach(z => {
+        z.maxHeight = z.width / 0.75;
+    });
+
     // Rendering options
     var layout = sm.layout.forest(),
         panExtent = [ 0, 1, 0, 1 ],
-        defaultMaxWidth = 150,
-        brushing = false;
+        brushing = false,
+        minZoomIndex = 0,
+        maxZoomIndex = 3,
+        zoomLevelIndex = maxZoomIndex,
+        zoomLevel = ZoomLevel[zoomLevelIndex];
 
     // Data
     var data,
@@ -181,7 +194,6 @@ sm.vis.collection = function() {
             .attr('opacity', 0);
 
         var container = fo.append('xhtml:div').attr('class', 'node')
-            .attr('title', 'Maximize')
             .on('click', function(d) {
                 if (d3.event.shiftKey) return;
 
@@ -194,11 +206,9 @@ sm.vis.collection = function() {
                     dispatch.nodeClicked(d);
                 }
             }).on('mouseover', function(d) {
-                var menu = d3.select(this).select('.btn-group');
-                menu.classed('hide', brushing || d.minimized);
-
                 // Align menu to the right side
-                var menuRect = menu.node().getBoundingClientRect(),
+                var menu = d3.select(this).select('.btn-group').classed('hide', brushing || d.minimized),
+                    menuRect = menu.node().getBoundingClientRect(),
                     nodeRect = this.getBoundingClientRect();
                 menu.style('left', (nodeRect.right > width - menuRect.width ? 1 - menuRect.width : d.width - 1) + 'px');
 
@@ -222,12 +232,12 @@ sm.vis.collection = function() {
         // To indicated if the node is curated
         container.append('xhtml:div').attr('class', 'node-curated fa fa-check-square hide');
 
-        var menu = container.append('xhtml:div').attr('class', 'btn-group hide');
+        var menu = container.append('xhtml:div').attr('class', 'btn-group hide').style('top', '-2px');
         var parent = container.append('xhtml:div').attr('class', 'parent')
             .call(sm.addBootstrapTooltip);
 
         // Icon
-        var titleDiv = parent.append('xhtml:div');
+        var titleDiv = parent.append('xhtml:div').attr('class', 'node-title');
         titleDiv.append('xhtml:img').attr('class', 'node-icon');
         titleDiv.append('xhtml:div').attr('class', 'node-icon fa fa-fw');
 
@@ -235,11 +245,11 @@ sm.vis.collection = function() {
         titleDiv.append('xhtml:div').attr('class', 'node-label');
 
         // Snapshot
-        parent.append('xhtml:img').attr('class', 'node-snapshot img-responsive center-block');
+        parent.append('xhtml:img').attr('class', 'node-snapshot');
 
         // Menu action
         menu.append('xhtml:button').attr('class', 'btn btn-default fa fa-star')
-            .attr('title', 'Favorite')
+            .attr('title', d => d.favorite ? 'Unfavorite' : 'Favorite')
             .on('click', function(d) {
                 d3.event.stopPropagation();
                 d3.select(this.parentNode).classed('hide', true);
@@ -275,7 +285,24 @@ sm.vis.collection = function() {
             });
 
         // Children
-        container.append('xhtml:div').attr('class', 'children');
+        var children = container.append('xhtml:div').attr('class', 'children')
+            .on('mouseover', function(d) {
+                // Align menu to the right side
+                var menu = d3.select(this).select('.show-all-highlights').classed('hide', false),
+                    menuRect = menu.node().getBoundingClientRect(),
+                    nodeRect = this.getBoundingClientRect();
+                menu.style('left', (nodeRect.right > width - menuRect.width ? 1 - menuRect.width : d.width - 1) + 'px');
+            }).on('mouseout', function() {
+                d3.select(this).select('.show-all-highlights').classed('hide', true);
+            });
+        children.append('xhtml:button').attr('class', 'btn btn-default hide show-all-highlights').text('Show All')
+            .on('click', function(d) {
+                d3.event.stopPropagation();
+                d3.select(this).classed('hide', true);
+                d.collectionShowAll = !d.collectionShowAll;
+                d3.select(this).text(d.collectionShowAll ? 'Show Less' : 'Show All');
+                update();
+            });
     }
 
     /**
@@ -283,7 +310,8 @@ sm.vis.collection = function() {
      */
     function updateNodes(selection) {
         selection.each(function(d) {
-            d3.select(this).select('.node').classed('mini', d.minimized);
+            d3.select(this).select('.node').classed('mini', d.minimized)
+                .attr('title', d.minimized ? 'Maximize': '');
             d3.select(this).selectAll('.parent, .children').classed('hide', d.minimized);
 
             // Status
@@ -298,17 +326,22 @@ sm.vis.collection = function() {
                 var typeVisible = searchTypes.includes(type(d)),
                     container = d3.select(this).select('.parent');
                 container.select('img.node-icon').attr('src', icon)
-                    .classed('hide', typeVisible);
+                    .classed('hide', typeVisible || !icon(d));
                 container.select('div.node-icon')
                     .classed('hide', !typeVisible)
                     .classed(iconClassLookup[type(d)], true)
                     .style('background-color', colorScale(type(d)));
 
-                // Different appearance with/out snapshot
-                container.select('div').classed('node-title', image(d) && d.favorite);
+                // Show image only in min zoom
+                if (zoomLevelIndex === minZoomIndex && image(d) && d.favorite) {
+                    container.selectAll('.node-icon').classed('hide', true);
+                }
+                container.select('.node-title').classed('hide', zoomLevelIndex === minZoomIndex && image(d) && d.favorite);
 
                 // Text
-                container.select('.node-label').text(label);
+                container.select('.node-label').text(label)
+                    .classed('min-zoom', zoomLevelIndex === minZoomIndex)
+                    .classed('hide', zoomLevelIndex === minZoomIndex && icon(d));
 
                 // Snapshot
                 container.select('img.node-snapshot')
@@ -317,10 +350,14 @@ sm.vis.collection = function() {
                 d3.select(this).select('.node').classed('favorite', d.favorite);
 
                 if (d.children) updateChildren(d3.select(this).select('.children'), d);
-                container.classed('has-children', d.children);
-                d3.select(this).select('.children').classed('hide', !d.children);
+                container.classed('has-children', d.children && zoomLevel.numChildren);
+                d3.select(this).select('.children').classed('hide', !d.children || !zoomLevel.numChildren);
 
-                setMaxWidthText(this);
+                // Set here first to limit the size before running the layout.
+                // Then set again in nodePositions when images loaded.
+                scaleNode(this);
+            } else {
+                d3.select(this).select('.node').style('width', '8px');
             }
         });
     }
@@ -342,15 +379,55 @@ sm.vis.collection = function() {
         return s;
     }
 
-    function setMaxWidthText(self) {
-        d3.select(self).select('.node').style('max-width', defaultMaxWidth + 'px');
+    /**
+     * Scale image, text according to zoom level.
+     */
+    function scaleNode(self) {
+        var d = d3.select(self).datum(),
+            isMinZoomFavorite = zoomLevelIndex === minZoomIndex && d.favorite && image(d);
+        d3.select(self).select('.node').style('width', (isMinZoomFavorite ? zoomLevel.width * 2 : zoomLevel.width) + 'px');
+
+        scaleText(self);
+        scaleImage(self);
+    }
+
+    /**
+     * Sets max-width for text to get text trimmed. Set for both the node and its children.
+     */
+    function scaleText(self) {
         d3.select(self).selectAll('.node-label')
-            .style('max-width', defaultMaxWidth - 40 + 'px');
+            .each(function(d) {
+                // Available width depends on size of icon
+                var icon = this.parentNode.querySelector('.node-icon:not(.hide)'),
+                    iconWidth = icon ? icon.getBoundingClientRect().width : 0;
+
+                // There are two cases that width is equal to 0: a div or an img without src.
+                // a div with non yet loaded css always has width of 20px.
+                if (!iconWidth && icon && icon.tagName.toLowerCase() === 'div') iconWidth = 20;
+
+                // For any reason makes the icon's width 0, set it to the max 20
+                if (image(d) && !iconWidth) iconWidth = 20;
+
+                var marginPadding = iconWidth ? 12 : 6,
+                    w = zoomLevel.width - iconWidth - marginPadding;
+                d3.select(this).style('max-width', w + 'px');
+            });
+    }
+
+    /**
+     * Sets the height of image, depending on the zoom level.
+     */
+    function scaleImage(self) {
+        var d = d3.select(self).datum(),
+            isMinZoomFavorite = zoomLevelIndex === minZoomIndex && d.favorite && image(d),
+            childrenHeight = self.querySelector('.children').getBoundingClientRect().height,
+            mainHeight = (isMinZoomFavorite ? zoomLevel.maxHeight * 2 : zoomLevel.maxHeight) - childrenHeight;
+        d3.select(self).select('.parent').style('max-height', mainHeight + 'px');
     }
 
     function updateChildren(container, d) {
         // Enter
-        var subItems = container.selectAll('.sub-node').data(d.children, key);
+        var subItems = container.selectAll('.sub-node').data(d.collectionShowAll ? d.children : _.take(d.children, zoomLevel.numChildren), key);
         var enterItems = subItems.enter().append('div').attr('class', 'sub-node')
             .call(sm.addBootstrapTooltip)
             .on('click', function(d) {
@@ -374,7 +451,7 @@ sm.vis.collection = function() {
                     .style('background-color', colorScale(type(d2)));
             });
         subItems.select('.node-label').text(label)
-            .style('max-width', (defaultMaxWidth - 10) + 'px');
+            .style('max-width', (zoomLevel.width - 10) + 'px');
 
         // Exit
         subItems.exit().style('opacity', 0).remove();
@@ -390,10 +467,13 @@ sm.vis.collection = function() {
                 .attr('transform', 'translate(' + roundPoint(d) + ')');
 
             // Curated indication
-            d3.select(this).select('.node-curated')
+            var nc = d3.select(this).select('.node-curated')
                 .classed('hide', !d.curated)
-                .style('top', d.minimized ? '-4px' : '-1px')
-                .style('left', (d.minimized ? -3 : d.width - 16) + 'px');
+                .style('top', d.minimized ? '-3px' : '-1px');
+            var w = nc.node().getBoundingClientRect().width;
+            nc.style('left', (d.minimized ? -2 : d.width - w - 1) + 'px');
+
+            if (!d.minimized) scaleNode(this);
         });
     }
 
@@ -414,6 +494,10 @@ sm.vis.collection = function() {
         selection.each(function(d) {
             d3.select(this).transition().duration(500).attr('opacity', 1);
             d3.select(this).select('path').transition().duration(500).attr('d', line(roundPoints(d)));
+
+            // A straight line goes through minimized node
+            var isThrough = d.target.minimized && d.target.links && d.target.links.some(l => !l.collectionRemoved);
+            d3.select(this).select('path').classed('straight-arrow', isThrough);
         });
     }
 
@@ -491,6 +575,22 @@ sm.vis.collection = function() {
         nodeContainer.selectAll('.node').each(function(d) {
             d3.select(this).classed('hovered', value && key(d) === id);
         });
+    };
+
+    /**
+     * Increase zoom level.
+     */
+    module.zoomIn = function() {
+        zoomLevelIndex = Math.min(maxZoomIndex, zoomLevelIndex + 1);
+        zoomLevel = ZoomLevel[zoomLevelIndex];
+    };
+
+    /**
+     * Reduce zoom level.
+     */
+    module.zoomOut = function() {
+        zoomLevelIndex = Math.max(minZoomIndex, zoomLevelIndex - 1);
+        zoomLevel = ZoomLevel[zoomLevelIndex];
     };
 
     // Binds custom events

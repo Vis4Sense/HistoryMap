@@ -9,20 +9,10 @@ $(function() {
     run();
 
     function run() {
-        // d3.select('body').on('mouseover', function() {
-        //     chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, { focused: true });
-        // });
-
-        // Need confirmation when close/reload collection
-        if (closeConfirmation) {
-            window.onbeforeunload = function() {
-                return "All unsaved data will be gone if you close this window.";
-            };
-        }
-
         respondToContentScript();
         buildVis();
         updateVis();
+        initSettings();
     }
 
     function respondToContentScript() {
@@ -33,6 +23,29 @@ $(function() {
                 curation.setHovered(request.value, request.status);
             }
         });
+    }
+
+    function initSettings() {
+        d3.select('#btnZoomIn').on('click', function() {
+            curation.zoomIn();
+            redraw(true);
+        });
+
+        d3.select('#btnZoomOut').on('click', function() {
+            curation.zoomOut();
+            redraw(true);
+        });
+
+        // Need confirmation when close/reload curation
+        if (closeConfirmation) {
+            window.onbeforeunload = function() {
+                return "All unsaved data will be gone if you close this window.";
+            };
+        }
+
+        // d3.select('body').on('mouseover', function() {
+        //     chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, { focused: true });
+        // });
     }
 
     function buildVis() {

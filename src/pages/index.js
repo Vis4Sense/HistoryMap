@@ -8,7 +8,7 @@ $(function() {
         pendingTasks = {}, // For jumping to an action when its page isn't ready yet
         debugging = backgroundPage.debugging,
         closeConfirmation = !debugging,
-        datasetName = debugging ? 'data/test10.zip' : '';
+        datasetName = debugging ? 'data/representation.zip' : '';
         // datasetName = '';
 
     // Vis and options
@@ -39,12 +39,7 @@ $(function() {
 
         initSettings();
 
-        // If open immediately, fontawesome icons don't load!
-        // setTimeout(openCurationView, 1000);
-
-        // d3.select('body').on('mouseover', function() {
-        //     chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, { focused: true });
-        // });
+        onCurationChanged(true);
     }
 
     function initSettings() {
@@ -94,22 +89,17 @@ $(function() {
             collection.curated(!collection.curated());
             d3.select(this).text(collection.curated() ? 'Pan' : 'Select');
 
-            if (collection.curated()) {
-                if (curationWindowId === undefined) {
-                    chrome.windows.create({
-                        url: chrome.extension.getURL('src/pages/curation-view.html'),
-                        type: "popup",
-                        left: 0,
-                        top: 0,
-                        width: screen.width / 2,
-                        height: screen.height
-                    }, function(w) {
-                        curationWindowId = w.id;
-                    });
-                } else {
-                    chrome.windows.update(curationWindowId, { focused: true });
-                }
-            }
+            if (collection.curated()) onCurationChanged();
+        });
+
+        d3.select('#btnZoomIn').on('click', function() {
+            collection.zoomIn();
+            redraw(true);
+        });
+
+        d3.select('#btnZoomOut').on('click', function() {
+            collection.zoomOut();
+            redraw(true);
         });
 
         // Need confirmation when close/reload collection
@@ -118,30 +108,14 @@ $(function() {
                 return "All unsaved data will be gone if you close this window.";
             };
         }
+
+        // d3.select('body').on('mouseover', function() {
+        //     chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, { focused: true });
+        // });
     }
 
     function toggleToolbar() {
         d3.select('.btn-toolbar').classed('hide', !d3.select('.btn-toolbar').classed('hide'));
-    }
-
-    function openCurationView() {
-        var url = chrome.extension.getURL('src/pages/curation-view.html');
-        var view = chrome.extension.getViews().find(v => v.location.href === url);
-
-        if (view) {
-            view.location.reload();
-        } else {
-            chrome.windows.create({
-                url: url,
-                type: "popup",
-                left: 0,
-                top: 0,
-                width: screen.width / 2,
-                height: screen.height
-            }, function(w) {
-                curationWindowId = w.id;
-            });
-        }
     }
 
     function main() {
@@ -281,7 +255,7 @@ $(function() {
 
     function updateVis() {
         collection.width(window.innerWidth).height(window.innerHeight);
-        redraw();
+        redraw(true);
     }
 
     function redraw(external) {
@@ -290,8 +264,19 @@ $(function() {
         if (!external) chrome.runtime.sendMessage({ type: 'redraw' });
     }
 
-    function onCurationChanged() {
-        if (curationWindowId === undefined) {
+    function onCurationChanged(initial) {
+        // Curation view: reload together with collection view
+        var url = chrome.extension.getURL('src/pages/curation-view.html');
+        var view = chrome.extension.getViews().find(v => v.location.href === url);
+
+        if (view) {
+            if (curationWindowId === undefined) { // Happen when reload collection page, don't create new collection, just reload
+                view.location.reload();
+            } else {
+                chrome.windows.update(curationWindowId, { focused: true });
+                chrome.runtime.sendMessage({ type: 'redraw' });
+            }
+        } else if (!initial) {
             chrome.windows.create({
                 url: chrome.extension.getURL('src/pages/curation-view.html'),
                 type: "popup",
@@ -303,9 +288,6 @@ $(function() {
                 curationWindowId = w.id;
                 chrome.runtime.sendMessage({ type: 'redraw' });
             });
-        } else {
-            chrome.windows.update(curationWindowId, { focused: true });
-            chrome.runtime.sendMessage({ type: 'redraw' });
         }
     }
 

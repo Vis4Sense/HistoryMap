@@ -24,11 +24,29 @@
                 width: 100%;
                 height: 100%;
             }
+
+            #groupZoom {
+                position: fixed;
+                float: right;
+                right: 5px;
+                bottom: 5px;
+            }
+
+            #groupZoom .btn {
+                padding: 0px 6px;
+                font-size: 20px;
+            }
         </style>
     </head>
 
     <body>
         <svg class="sm-curation-container"></svg>
+
+        <div id="groupZoom" class="btn-group-vertical">
+            <button id="btnZoomIn" class="btn btn-default" title="Zoom In"><i class="fa fa-plus"></i></button>
+            <button id='btnZoomOut' class="btn btn-default" title="Zoom Out"><i class="fa fa-minus"></i></button>
+        </div>
+
 
         <script src="../bower_components/jquery/dist/jquery.min.js"></script>
         <script src="../bower_components/jquery-ui.min.js"></script>
