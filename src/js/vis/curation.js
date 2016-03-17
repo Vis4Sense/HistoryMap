@@ -100,7 +100,7 @@ sm.vis.curation = function() {
 
         dataNodes = (data.nodes || []).filter(n => n.curated && !n.curationRemoved);
         dataLinks = (data.links || []).filter(l => dataNodes.includes(l.source) && dataNodes.includes(l.target) && !l.removed);
-console.log(data.nodes)
+
         // Curated nodes may have smaller set of children than the corresponding in collection
         dataNodes.filter(n => n.links).forEach(n => {
             n.rlinks = n.links.filter(target => dataNodes.includes(target));

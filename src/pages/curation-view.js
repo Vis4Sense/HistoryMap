@@ -18,7 +18,6 @@ $(function() {
     function respondToContentScript() {
         chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             if (request.type === 'redraw') {
-                console.log('received', new Date())
                 redraw(true);
             } else if (request.type === 'nodeHovered' && request.view !== 'curation') {
                 curation.setBrushed(request.value, request.status);

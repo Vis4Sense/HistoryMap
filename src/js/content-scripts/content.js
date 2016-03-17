@@ -5,10 +5,11 @@ $(function() {
             // If page uses ajax, we don't know when it's actually complete such as google search result page.
             // Naively wait one more second.
             setTimeout(function() {
-                injectLinks();
                 loadHighlights();
             }, 2000);
 
+            injectLinks();
+            captureActivities();
             completePendingTask();
             respondExtension();
             // focusWhenHovering();
@@ -21,13 +22,21 @@ $(function() {
 /**
  * Sometimes as in google search result page, the href is different from the openning page! Redirect?
  */
+var count = 10, // Don't know when links will be loaded, try 10 times
+    timerId;
 function injectLinks() {
-    $('body a').mouseover(function(e) {
-        // Google search result uses 'href'.
-        // this.href returns full urls
-        var values = [ this.href, this.getAttribute('data-href') ].filter(v => v);
-        chrome.runtime.sendMessage({ type: "linkClicked", values: values });
-    });
+    timerId = setInterval(function() {
+        // To make sure only 1 is bound
+        $('body a').off('click', sendClick);
+        $('body a').on('click', sendClick);
+        count--;
+
+        if (!count) clearInterval(timerId);
+    }, 1000);
+}
+
+function sendClick() {
+    chrome.runtime.sendMessage({ type: "linkClicked" });
 }
 
 /**
@@ -46,6 +55,22 @@ function loadHighlights() {
             }
         });
     });
+}
+
+/**
+ * Captures page activities to be able to infer if the page is idle or not.
+ */
+function captureActivities() {
+    window.addEventListener("focus", handle);
+    window.addEventListener("blur", handle);
+    window.addEventListener("keydown", handle);
+    window.addEventListener("mousewheel", handle);
+    window.addEventListener("mousedown", handle);
+    window.addEventListener("mousemove", handle);
+}
+
+function handle() {
+    chrome.runtime.sendMessage({ type: this.event.type, time: +new Date() });
 }
 
 function respondExtension() {

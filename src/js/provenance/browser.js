@@ -5,16 +5,25 @@ sm.provenance.browser = function() {
     var module = {};
 
     var actions = [], // The input/output array of actions
+        browsingActions = [], // Activities in the browsing pages, not in vis windows
+        browsingActionTypes = [
+            'focus', 'blur', 'keydown', 'mousewheel', 'mousemove', 'mousedown',
+            'col-focus', 'col-blur', 'col-keydown', 'col-mousewheel', 'col-mousemove', 'col-mousedown',
+            'cur-focus', 'cur-blur', 'cur-keydown', 'cur-mousewheel', 'cur-mousemove', 'cur-mousedown'
+        ],
         listening = true,
         provAction = sm.provenance.action(),
         prevUrl, // The url of the last action
+        lastLinkClickedParentUrl,
         urlToActionLookup = {}, // url -> action (data object) if the page was visited (first visit) and captured
         tabIdToActionLookup = {}, // tabId -> action
+        tabIdToParentIdLookup = {},
         urlToReferrerLookup = {}; // url -> its source url
 
     var dispatch = d3.dispatch('dataChanged');
 
     function init() {
+        chrome.tabs.onCreated.addListener(onTabCreated);
         chrome.tabs.onUpdated.addListener(onTabUpdated);
         chrome.tabs.onActivated.addListener(onTabActivated);
         chrome.tabs.onRemoved.addListener(onTabRemoved);
@@ -22,14 +31,38 @@ sm.provenance.browser = function() {
         createContextMenus();
         addLinkHandler();
         updatePageEndTime();
+        listenPageActivities();
     }
 
     init();
+
+    function onTabCreated(tab) {
+        if (lastLinkClickedParentUrl) {
+            var a = urlToActionLookup[lastLinkClickedParentUrl];
+            if (a) tabIdToParentIdLookup[tab.id] = isEmbeddedType(a) ? a.from : a.id;
+            lastLinkClickedParentUrl = undefined;
+        }
+    }
 
     // Couldn't distinguish between auto reload and normal first load.
     // I don't want to include auto reload page. So, don't capture revisit here at all.
     // If the user opens a revisited page, accept a known bug that it's not captured.
     function onTabUpdated(tabId, changeInfo, tab) {
+        if (lastLinkClickedParentUrl) {
+            // We should do it once, but how to check.
+            // Can't use tabId only because a tab can be updated many times if the user
+            // opens new page in the same tab.
+            // Also, we must distinguish between 1st update and others within a single page.
+            // Only 1st update is reliable because it happens almost right after clicking on a link
+            // Solution: delete the link after set.
+            //
+            var a = urlToActionLookup[lastLinkClickedParentUrl];
+            if (a) {
+                tabIdToParentIdLookup[tabId] = isEmbeddedType(a) ? a.from : a.id;
+                lastLinkClickedParentUrl = undefined;
+            }
+        }
+
         if (!listening || isTabIgnored(tab) || isTabInComplete(tab)) return;
 
         // Close status
@@ -140,7 +173,7 @@ sm.provenance.browser = function() {
             action = createActionObject(tab.id, originalAction.url, originalAction.text, type, originalAction.favIconUrl);
             dispatch.dataChanged(type, true);
         } else if (type === 'highlight' || type === 'filter') {
-            action = createActionObject(tab.id, tab.url, text, type, undefined, path, classId, originalAction.from || originalAction.id);
+            action = createActionObject(tab.id, tab.url, text, type, undefined, path, classId, isEmbeddedType(originalAction.type) ? originalAction.from : originalAction.id);
             if (type === 'filter') urlToActionLookup[tab.url] = action;
             dispatch.dataChanged(type, true);
         } else {
@@ -201,20 +234,23 @@ sm.provenance.browser = function() {
         if (from) {
             action.from = from;
         } else {
-            // console.log('find: ' + url);
-            var rUrl = urlToReferrerLookup[url];
-            if (rUrl) {
-                var r = urlToActionLookup[rUrl];
-                if (r) action.from = r.id;
-            } else {
-                // Use document.referrer if available. This is less accurate because referrer only return the path excluding hash.
-                chrome.tabs.sendMessage(tabId, { type: 'askReferrer' }, function(response) {
-                    if (response) {
-                        var r = _.findLast(actions, a => a.url && a.url === response && !isEmbeddedType(a.type));
-                        if (r) action.from = r.type === 'revisit' ? r.from : r.id;
-                    }
-                });
-            }
+            // Method 1:
+            // var rUrl = urlToReferrerLookup[trimProtocol(url)];
+            // if (rUrl) {
+            //     var r = urlToActionLookup[rUrl];
+            //     if (r) action.from = r.id;
+            // } else {
+            //     // Use document.referrer if available. This is less accurate because referrer only return the path excluding hash.
+            //     chrome.tabs.sendMessage(tabId, { type: 'askReferrer' }, function(response) {
+            //         if (response) {
+            //             var r = _.findLast(actions, a => a.url && a.url === response && !isEmbeddedType(a.type));
+            //             if (r) action.from = r.type === 'revisit' ? r.from : r.id;
+            //         }
+            //     });
+            // }
+
+            // Method 2
+            if (tabIdToParentIdLookup[tabId]) action.from = tabIdToParentIdLookup[tabId];
         }
 
         actions.push(action);
@@ -350,6 +386,34 @@ sm.provenance.browser = function() {
         }, 1000);
     }
 
+    var lastUrl, lastTime, lastType;
+    function listenPageActivities() {
+        chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+            if (browsingActionTypes.includes(request.type)) {
+                var a = {
+                    time: request.time,
+                    type: request.type
+                }
+
+                // No need url for two views
+                if (!request.type.startsWith('col-') && !request.type.startsWith('cur-')) {
+                    if (lastUrl !== sender.tab.url) {
+                        lastUrl = a.url = sender.tab.url; // To save space
+                    }
+                }
+
+                // Same event, within 1s, dont capture
+                if (lastType === a.type && a.time - lastTime < 1000) {
+                } else {
+                    browsingActions.push(a);
+
+                    lastTime = a.time;
+                    lastType = a.type;
+                }
+            }
+        });
+    }
+
     function createContextMenus() {
         chrome.contextMenus.removeAll();
 
@@ -386,10 +450,8 @@ sm.provenance.browser = function() {
     function addLinkHandler() {
         chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             if (request.type === 'linkClicked') {
-                request.values.forEach(v => {
-                    // console.log('received: ' + v);
-                    urlToReferrerLookup[v] = sender.tab.url;
-                });
+                console.log('click', +new Date());
+                lastLinkClickedParentUrl = sender.tab.url;
             }
         });
     }
@@ -429,6 +491,13 @@ sm.provenance.browser = function() {
         actions = value;
         buildLookups(callback);
         return this;
+    };
+
+    /**
+     * Sets the capturing browsing activities.
+     */
+    module.browsingActions = function(value) {
+        browsingActions = value;
     };
 
     /**

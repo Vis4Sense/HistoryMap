@@ -5,6 +5,7 @@ $(function() {
         actions = [], // All actions added in temporal order including 'revisit' and 'child' actions
         browser = sm.provenance.browser(),
         mod = sm.provenance.mod(),
+        browsingActions = [],
         pendingTasks = {}, // For jumping to an action when its page isn't ready yet
         debugging = backgroundPage.debugging,
         closeConfirmation = !debugging,
@@ -38,6 +39,7 @@ $(function() {
         }
 
         initSettings();
+        captureActivities(window, handleCollection);
     }
 
     function initSettings() {
@@ -48,6 +50,8 @@ $(function() {
             actions = [];
             data.nodes = [];
             data.links = [];
+            browsingActions = [];
+            browser.browsingActions(browsingActions);
             browser.actions(actions, function() {
                 redraw();
                 toggleToolbar();
@@ -113,23 +117,48 @@ $(function() {
         // });
     }
 
+    function captureActivities(w, handle) {
+        w.addEventListener("focus", handle);
+        w.addEventListener("blur", handle);
+        w.addEventListener("keydown", handle);
+        w.addEventListener("mousewheel", handle);
+        w.addEventListener("mousedown", handle);
+        w.addEventListener("mousemove", handle);
+    }
+
+    function handleCollection() {
+        chrome.runtime.sendMessage({ type: 'col-' + this.event.type, time: +new Date() });
+    }
+
+    function handleCuration() {
+        chrome.runtime.sendMessage({ type: 'cur-' + this.event.type, time: +new Date() });
+    }
+
     function toggleToolbar() {
         d3.select('.btn-toolbar').classed('hide', !d3.select('.btn-toolbar').classed('hide'));
     }
 
     function main() {
+        browser.browsingActions(browsingActions);
         browser.actions(actions, function() {
             buildVis();
             updateVis();
 
             // It's required the curation view should be opened at the beggining because curate-node action needs the view to determine location
-            chrome.windows.create({
-                url: chrome.extension.getURL('src/pages/curation-view.html'),
-                type: "popup",
-                state: "minimized"
-            }, function(w) {
-                curationWindowId = w.id;
-            });
+            var url = chrome.extension.getURL('src/pages/curation-view.html');
+            var view = chrome.extension.getViews().find(v => v.location.href === url);
+
+            if (view) {
+                view.location.reload();
+            } else {
+                chrome.windows.create({
+                    url: chrome.extension.getURL('src/pages/curation-view.html'),
+                    type: "popup",
+                    state: "minimized"
+                }, function(w) {
+                    curationWindowId = w.id;
+                });
+            }
         }).capture(listening)
         .on('dataChanged', _.throttle(onDataChanged, 200));
     };
@@ -162,14 +191,13 @@ $(function() {
             a.time = new Date(a.time);
         });
 
-        // Test test8
-        // actions = actions.slice(0, 56);
-
         mod.mergeActions(actions);
 
         if (!isJson) replaceRelativePathWithDataURI(zip);
 
         if (external) {
+            browsingActions = [];
+            browser.browsingActions(browsingActions);
             browser.actions(actions, function() {
                 if (collection) redraw();
             });
@@ -262,6 +290,9 @@ $(function() {
         // Main file
         zip.file('sensemap.json', JSON.stringify({ data: coreData }, null, 4));
 
+        // Browsing file
+        zip.file('browser.json', JSON.stringify({ data: browsingActions }, null, 4));
+
         // Zip and download
         var filename = d3.time.format('%Y%m%d%H%M%S')(new Date()) + '-sensemap.zip';
         sm.saveDataToFile(filename, zip.generate({ type: 'blob' }), false, true);
@@ -299,12 +330,18 @@ $(function() {
         if (!external) chrome.runtime.sendMessage({ type: 'redraw' });
     }
 
-    var firstTime = true;
+    var firstTime = true,
+        registered = false;
     function onCurated(d) {
         var url = chrome.extension.getURL('src/pages/curation-view.html');
         var view = chrome.extension.getViews().find(v => v.location.href === url);
 
         if (view) {
+            if (!registered) {
+                captureActivities(view, handleCuration);
+                registered = true;
+            }
+
             if (curationWindowId !== undefined) {
                 var o = { focused: true };
                 if (firstTime) {
