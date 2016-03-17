@@ -60,26 +60,11 @@ sm.layout.grid = function() {
         });
     }
 
-    function layoutNewNodesSimple() {
-        newVertices = vertices.filter(v => v.newlyCurated);
-
-        // Reassign computed location to expected attributes.
-        // Need to shift new nodes to avoid overlapping with existing ones.
-        graphWidth = d3.max(vertices, v => v.rp.x + v.rp.width) || 0;
-        graphHeight = d3.max(vertices, v => v.rp.y + v.rp.height) || 0;
-
-        newVertices.forEach(v => {
-            v.rp.x = 0;
-            v.rp.y = graphHeight + (graphHeight ? 20 : 0);
-        });
-    }
-
     /**
      * Computes the layout.
      */
     module.compute = function() {
-        // layoutNewNodes();
-        layoutNewNodesSimple();
+        layoutNewNodes();
 
         // Done layout for new nodes, next time, do not touch
         newVertices.forEach(v => { v.newlyCurated = false; });

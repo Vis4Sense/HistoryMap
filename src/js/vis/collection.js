@@ -14,13 +14,14 @@ sm.vis.collection = function() {
         paused = false; // Suspend collecting
 
     var ZoomLevel = [
-        { width: 26, numChildren: 0 },
+        { width: 26, imageWidth: 50, numChildren: 0 },
         { width: 100, numChildren: 0 },
         { width: 125, numChildren: 1 },
         { width: 150, numChildren: 2 }
     ];
     ZoomLevel.forEach(z => {
         z.maxHeight = z.width / 0.75;
+        if (z.imageWidth) z.maxImageHeight = z.imageWidth / 0.75;
     });
 
     // Rendering options
@@ -94,7 +95,9 @@ sm.vis.collection = function() {
 
         layout.width(width)
             .height(height)
-            .label(label);
+            .label(label)
+            .children(d => d.links ? d.links.filter(l => dataNodes.includes(l)) : d.links)
+            .parent(d => d.sup && dataNodes.includes(d.sup) ? d.sup : null);
 
         brush.x(d3.scale.identity().domain([0, width]))
             .y(d3.scale.identity().domain([0, height]));
@@ -245,7 +248,7 @@ sm.vis.collection = function() {
         titleDiv.append('xhtml:div').attr('class', 'node-label');
 
         // Snapshot
-        parent.append('xhtml:img').attr('class', 'node-snapshot');
+        parent.append('xhtml:img').attr('class', 'node-snapshot center-block');
 
         // Menu action
         menu.append('xhtml:button').attr('class', 'btn btn-default fa fa-star')
@@ -405,7 +408,7 @@ sm.vis.collection = function() {
     function scaleNode(self) {
         var d = d3.select(self).datum(),
             isMinZoomFavorite = zoomLevelIndex === minZoomIndex && d.favorite && image(d);
-        d3.select(self).select('.node').style('width', (isMinZoomFavorite ? zoomLevel.width * 2 : zoomLevel.width) + 'px');
+        d3.select(self).select('.node').style('width', (isMinZoomFavorite ? zoomLevel.imageWidth : zoomLevel.width) + 'px');
 
         scaleText(self);
         scaleImage(self);
@@ -441,7 +444,7 @@ sm.vis.collection = function() {
         var d = d3.select(self).datum(),
             isMinZoomFavorite = zoomLevelIndex === minZoomIndex && d.favorite && image(d),
             childrenHeight = self.querySelector('.children').getBoundingClientRect().height,
-            mainHeight = (isMinZoomFavorite ? zoomLevel.maxHeight * 2 : zoomLevel.maxHeight) - childrenHeight;
+            mainHeight = (isMinZoomFavorite ? zoomLevel.maxImageHeight : zoomLevel.maxHeight) - childrenHeight;
         d3.select(self).select('.parent').style('max-height', mainHeight + 'px');
     }
 

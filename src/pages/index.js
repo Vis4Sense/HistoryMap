@@ -8,7 +8,7 @@ $(function() {
         pendingTasks = {}, // For jumping to an action when its page isn't ready yet
         debugging = backgroundPage.debugging,
         closeConfirmation = !debugging,
-        datasetName = debugging ? 'data/representation.zip' : '';
+        datasetName = debugging ? 'data/saveload.zip' : '';
         // datasetName = '';
 
     // Vis and options
@@ -38,8 +38,6 @@ $(function() {
         }
 
         initSettings();
-
-        onCurationChanged(true);
     }
 
     function initSettings() {
@@ -122,6 +120,7 @@ $(function() {
         browser.actions(actions, function() {
             buildVis();
             updateVis();
+            onCurationChanged(true);
         }).capture(listening)
         .on('dataChanged', _.throttle(onDataChanged, 200));
     };
@@ -246,10 +245,11 @@ $(function() {
 
         var intervalId = setInterval(() => {
             mod.mergeActions(relevantActions.slice(0, count));
+            console.log(relevantActions[count - 1].type);
             redraw();
             count++;
 
-            if (count === relevantActions.length) clearInterval(intervalId);
+            if (count > relevantActions.length) clearInterval(intervalId);
         }, timeStep);
     }
 
@@ -259,7 +259,7 @@ $(function() {
     }
 
     function redraw(external) {
-        d3.select('.sm-collection-container').datum(data).call(collection);
+        if (collection) d3.select('.sm-collection-container').datum(data).call(collection);
 
         if (!external) chrome.runtime.sendMessage({ type: 'redraw' });
     }
@@ -273,18 +273,24 @@ $(function() {
                 chrome.windows.update(curationWindowId, { focused: true });
             }
             chrome.runtime.sendMessage({ type: 'redraw' });
-        } else if (!initial) {
-            chrome.windows.create({
-                url: chrome.extension.getURL('src/pages/curation-view.html'),
-                type: "popup",
-                left: 0,
-                top: 0,
-                width: screen.width / 2,
-                height: screen.height
-            }, function(w) {
-                curationWindowId = w.id;
-                chrome.runtime.sendMessage({ type: 'redraw' });
-            });
+        } else {
+            var numCuratedNodes = data.nodes.filter(n => n.curated && !n.curationRemoved).length;
+            console.log(numCuratedNodes);
+
+            // Note: should open curation view if there're some curated nodes
+            if (!initial || numCuratedNodes) {
+                chrome.windows.create({
+                    url: chrome.extension.getURL('src/pages/curation-view.html'),
+                    type: "popup",
+                    left: 0,
+                    top: 0,
+                    width: screen.width / 2,
+                    height: screen.height
+                }, function(w) {
+                    curationWindowId = w.id;
+                    chrome.runtime.sendMessage({ type: 'redraw' });
+                });
+            }
         }
     }
 

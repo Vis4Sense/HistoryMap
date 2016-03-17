@@ -137,7 +137,7 @@ sm.provenance.browser = function() {
             originalAction = urlToActionLookup[tab.url];
 
         if (type === 'revisit') {
-            action = createActionObject(tab.id, originalAction.url, originalAction.text, type, originalAction.favIconUrl, originalAction);
+            action = createActionObject(tab.id, originalAction.url, originalAction.text, type, originalAction.favIconUrl);
             dispatch.dataChanged(type, true);
         } else if (type === 'highlight' || type === 'filter') {
             action = createActionObject(tab.id, tab.url, text, type, undefined, path, classId);

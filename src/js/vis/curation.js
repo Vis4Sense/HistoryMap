@@ -13,10 +13,10 @@ sm.vis.curation = function() {
         image = d => d.image;
 
     var ZoomLevel = [
-        { width: 26, numChildren: 0, fontSize: 10 },
-        { width: 100, numChildren: 0, fontSize: 14 },
-        { width: 125, numChildren: 1, fontSize: 16 },
-        { width: 150, numChildren: 2, fontSize: 18 }
+        { width: 26, imageWidth: 50, numChildren: 0 },
+        { width: 100, numChildren: 0 },
+        { width: 125, numChildren: 1 },
+        { width: 150, numChildren: 2 }
     ];
     ZoomLevel.forEach(z => {
         z.maxHeight = z.width / 0.75;
@@ -123,6 +123,18 @@ sm.vis.curation = function() {
             links.call(updateLinks);
             nodes.call(updateNodePositions);
         });
+
+        // Press escape to exit connecting mode
+        document.addEventListener("keydown", function(e) {
+            if (e.keyCode === 27) {
+                connecting = false;
+                dragging = false;
+                nodeContainer.selectAll('.node').each(function() {
+                    d3.select(this).classed('connect', false);
+                });
+                cursorLink.classed('hide', true);
+            }
+        });
     }
 
     function computeLayout(callback) {
@@ -191,7 +203,7 @@ sm.vis.curation = function() {
         titleDiv.append('xhtml:div').attr('class', 'node-label');
 
         // Snapshot
-        parent.append('xhtml:img').attr('class', 'node-snapshot');
+        parent.append('xhtml:img').attr('class', 'node-snapshot center-block');
 
         // Menu action
         menu.append('xhtml:button').attr('class', 'btn btn-default fa fa-remove')
@@ -283,8 +295,8 @@ sm.vis.curation = function() {
      */
     function scaleNode(self) {
         var d = d3.select(self).datum(),
-            isMinZoomFavorite = zoomLevelIndex === minZoomIndex && d.favorite && image(d);
-        d3.select(self).select('.node').style('width', (isMinZoomFavorite ? zoomLevel.width * 2 : zoomLevel.width) + 'px');
+            isMinZoomFavorite = zoomLevelIndex === minZoomIndex && image(d);
+        d3.select(self).select('.node').style('width', (isMinZoomFavorite ? zoomLevel.imageWidth : zoomLevel.width) + 'px');
 
         scaleText(self);
         scaleImage(self);
@@ -318,9 +330,9 @@ sm.vis.curation = function() {
      */
     function scaleImage(self) {
         var d = d3.select(self).datum(),
-            isMinZoomFavorite = zoomLevelIndex === minZoomIndex && d.favorite && image(d),
+            isMinZoomFavorite = zoomLevelIndex === minZoomIndex && image(d),
             childrenHeight = self.querySelector('.children').getBoundingClientRect().height,
-            mainHeight = (isMinZoomFavorite ? zoomLevel.maxHeight * 2 : zoomLevel.maxHeight) - childrenHeight;
+            mainHeight = (isMinZoomFavorite ? zoomLevel.maxImageHeight : zoomLevel.maxHeight) - childrenHeight;
         d3.select(self).select('.parent').style('max-height', mainHeight + 'px');
     }
 
@@ -474,7 +486,7 @@ sm.vis.curation = function() {
             connectingTimerId = setTimeout(function() {
                 connecting = true;
                 d3.select(self.querySelector('.node')).classed('connect', true);
-                // hideMenu(self.querySelector('.node'));
+                hideMenu(self.querySelector('.node'));
             }, 300);
             dragging = true;
             d3.event.sourceEvent.stopPropagation();

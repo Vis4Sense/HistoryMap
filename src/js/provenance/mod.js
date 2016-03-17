@@ -85,7 +85,7 @@ sm.provenance.mod = function() {
     };
 
     function isNonActionType(type) {
-        return [ 'click-node', 'revisit', 'remove-node', 'favorite-node', 'unfavorite-node',
+        return [ 'click-node', 'revisit', 'remove-collection-node', 'remove-curation-node', 'favorite-node', 'unfavorite-node',
             'minimize-node', 'restore-node', 'move-node', 'add-link', 'remove-link', 'relink', 'renode', 'hide-link' ].includes(type);
     }
 
@@ -176,7 +176,7 @@ sm.provenance.mod = function() {
     module.getCoreData = function(d) {
         var c = {},
             fields = [ 'id', 'text', 'url', 'type', 'time', 'endTime', 'favIconUrl', 'image', 'classId', 'path', 'from',
-                'seen', 'favorite', 'minimized', 'collectionRemoved', 'curationRemoved', 'sourceId', 'targetId',
+                'seen', 'favorite', 'userImage', 'minimized', 'collectionRemoved', 'curationRemoved', 'sourceId', 'targetId',
                 'curated', 'newlyCurated', 'rp', 'rpoints' ];
 
         fields.forEach(f => {
