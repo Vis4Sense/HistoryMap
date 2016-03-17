@@ -81,13 +81,7 @@ sm.layout.grid = function() {
         // layoutNewNodes();
         layoutNewNodesSimple();
 
-        // Done layout for new nodes, next time, do not touch
-        newVertices.forEach(v => { v.newlyCurated = false; });
-
-        graphWidth = d3.max(vertices, v => v.rp.x + v.rp.width) || 0;
-        graphHeight = d3.max(vertices, v => v.rp.y + v.rp.height) || 0;
-
-        return { width: graphWidth, height: graphHeight };
+        return module.size();
     };
 
     /**
@@ -142,6 +136,16 @@ sm.layout.grid = function() {
         if (!arguments.length) return children;
         children = value;
         return this;
+    };
+
+    /**
+     * Gets the computed size of the graph
+     */
+    module.size = function() {
+        graphWidth = d3.max(vertices, v => v.rp.x + v.rp.width) || 0;
+        graphHeight = d3.max(vertices, v => v.rp.y + v.rp.height) || 0;
+
+        return { width: graphWidth, height: graphHeight };
     };
 
     return module;

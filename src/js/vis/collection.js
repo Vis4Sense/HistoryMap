@@ -10,6 +10,7 @@ sm.vis.collection = function() {
         type = d => d.type,
         time = d => d.time, // Expect a Date object
         image = d => d.image,
+        userImage = d => d.userImage,
         curated = false, // True to switch on selection for curation
         paused = false; // Suspend collecting
 
@@ -62,7 +63,7 @@ sm.vis.collection = function() {
 
     // Others
     var dispatch = d3.dispatch('nodeClicked', 'nodeCollectionRemoved', 'nodeCurationRemoved', 'nodeFavorite', 'nodeUnfavorite',
-        'nodeMinimized', 'nodeRestored', 'nodeMoved', 'nodeHovered', 'linkAdded', 'linkRemoved', 'curationChanged');
+        'nodeMinimized', 'nodeRestored', 'nodeMoved', 'nodeHovered', 'linkAdded', 'linkRemoved', 'curated');
 
     /**
      * Main entry of the module.
@@ -120,54 +121,53 @@ sm.vis.collection = function() {
         brushContainer.classed('hide', !curated);
     }
 
-    function addBrush() {
-        brush.x(d3.scale.identity().domain([0, width]))
-            .y(d3.scale.identity().domain([0, height]))
-        .on('brushstart', function () {
-            brushing = true;
-        }).on('brush', function () {
-            // Brush nodes and links
-            var brushNode = brushContainer.select('.extent').node();
-            nodeContainer.selectAll('.node').each(function(d) {
-                d.brushed = this.intersect(brushNode);
-                d3.select(this).classed('brushed', d.brushed);
-            });
+    // function addBrush() {
+    //     brush.x(d3.scale.identity().domain([0, width]))
+    //         .y(d3.scale.identity().domain([0, height]))
+    //     .on('brushstart', function () {
+    //         brushing = true;
+    //     }).on('brush', function () {
+    //         // Brush nodes and links
+    //         var brushNode = brushContainer.select('.extent').node();
+    //         nodeContainer.selectAll('.node').each(function(d) {
+    //             d.brushed = this.intersect(brushNode);
+    //             d3.select(this).classed('brushed', d.brushed);
+    //         });
 
-            linkContainer.selectAll('.link').each(function(l) {
-                l.brushed = l.source.brushed && l.target.brushed;
-                d3.select(this).select('path').classed('brushed', l.brushed);
-            });
-        }).on('brushend', function () {
-            brushing = false;
-            var changed = false;
+    //         linkContainer.selectAll('.link').each(function(l) {
+    //             l.brushed = l.source.brushed && l.target.brushed;
+    //             d3.select(this).select('path').classed('brushed', l.brushed);
+    //         });
+    //     }).on('brushend', function () {
+    //         brushing = false;
+    //         var changed = false;
 
-            // Remove brush effect
-            nodeContainer.selectAll('.node').each(function(d) {
-                if (d.brushed && !d.curated) {
-                    changed = d.curated = true;
-                    d.newlyCurated = true;
-                    d.curationRemoved = false; // Make sure if this node was removed, it reappears
-                }
-                d3.select(this).classed('brushed', false);
-            });
+    //         // Remove brush effect
+    //         nodeContainer.selectAll('.node').each(function(d) {
+    //             if (d.brushed && !d.curated) {
+    //                 changed = d.curated = true;
+    //                 d.curationRemoved = false; // Make sure if this node was removed, it reappears
+    //             }
+    //             d3.select(this).classed('brushed', false);
+    //         });
 
-            linkContainer.selectAll('.link').each(function(l) {
-                if (l.brushed) {
-                    l.removed = false; // Make sure if this link was removed, it reappears
-                    changed = true;
-                }
-                d3.select(this).select('path').classed('brushed', false);
-            });
+    //         linkContainer.selectAll('.link').each(function(l) {
+    //             if (l.brushed) {
+    //                 l.removed = false; // Make sure if this link was removed, it reappears
+    //                 changed = true;
+    //             }
+    //             d3.select(this).select('path').classed('brushed', false);
+    //         });
 
-            brushContainer.call(brush.clear());
+    //         brushContainer.call(brush.clear());
 
-            update();
+    //         update();
 
-            if (changed) dispatch.curationChanged();
-        });
+    //         if (changed) dispatch.curationChanged();
+    //     });
 
-        brushContainer.call(brush);
-    }
+    //     brushContainer.call(brush);
+    // }
 
     function computeLayout(callback) {
         sm.checkImagesLoaded(container.selectAll('.node-container'), function() {
@@ -282,18 +282,19 @@ sm.vis.collection = function() {
                 d3.event.stopPropagation();
                 d3.select(this.parentNode).classed('hide', true);
 
-                if (d.curated) return;
+                if (d.curated && !d.curationRemoved) return;
 
                 linkContainer.selectAll('.link').each(function(l) {
                     // Curate the link if the other end is also curated
                     // Make sure if this link was removed, it reappears
                     if (l.source === d && l.target.curated || l.target === d && l.source.curated) l.removed = false;
                 });
-                d.curated = d.newlyCurated = true;
+                d.curated = true;
                 d.curationRemoved = false; // Make sure if this node was removed, it reappears
+                d.newlyCurated = true; // Force it run the layout to find its location
 
                 update();
-                dispatch.curationChanged();
+                dispatch.curated(d);
             });
         menu.append('xhtml:button').attr('class', 'btn btn-default fa fa-remove')
             .attr('title', 'Remove')
@@ -340,7 +341,7 @@ sm.vis.collection = function() {
             d3.select(this).select('.node')
                 .classed('not-seen', !d.seen)
                 .classed('highlighted', isHighlighted(d))
-                .classed('brushed', d.brushed);
+                .classed('brushed', d.brushed && !d.curationRemoved);
 
             // Tooltip
             d3.select(this).select('.parent').attr('data-original-title', buildHTMLTitle(d));
@@ -356,10 +357,11 @@ sm.vis.collection = function() {
                     .style('background-color', colorScale(type(d)));
 
                 // Show image only in min zoom
-                if (zoomLevelIndex === minZoomIndex && image(d) && d.favorite) {
+                var showImage = isImageVisible(d);
+                if (zoomLevelIndex === minZoomIndex && showImage) {
                     container.selectAll('.node-icon').classed('hide', true);
                 }
-                container.select('.node-title').classed('hide', zoomLevelIndex === minZoomIndex && image(d) && d.favorite);
+                container.select('.node-title').classed('hide', zoomLevelIndex === minZoomIndex && showImage);
 
                 // Text
                 container.select('.node-label').text(label)
@@ -368,8 +370,8 @@ sm.vis.collection = function() {
 
                 // Snapshot
                 container.select('img.node-snapshot')
-                    .attr('src', image)
-                    .classed('hide', !image(d) || !d.userImage && !d.favorite);
+                    .attr('src', finalImage)
+                    .classed('hide', !showImage);
                 d3.select(this).select('.node').classed('favorite', d.favorite);
 
                 if (d.children) updateChildren(d3.select(this).select('.children'), d);
@@ -389,10 +391,19 @@ sm.vis.collection = function() {
         return d.highlighted || d.children && d.children.some(c => c.highlighted);
     }
 
+    function isImageVisible(d){
+        return userImage(d) || image(d) && d.favorite;
+    }
+
+    function finalImage(d) {
+        return userImage(d) || image(d);
+    }
+
     function buildHTMLTitle(d) {
         var s = '';
-        if (image(d) && !d.favorite && !d.userImage) {
-            s += "<img class='node-snapshot img-responsive center-block' src='" + image(d) + "'/>";
+        // Show image in tooltip if it's not shown in the box
+        if (!isImageVisible(d) && finalImage(d)) {
+            s += "<img class='node-snapshot img-responsive center-block' src='" + finalImage(d) + "'/>";
         }
 
         if (label(d)) {
@@ -407,7 +418,7 @@ sm.vis.collection = function() {
      */
     function scaleNode(self) {
         var d = d3.select(self).datum(),
-            isMinZoomFavorite = zoomLevelIndex === minZoomIndex && d.favorite && image(d);
+            isMinZoomFavorite = zoomLevelIndex === minZoomIndex && isImageVisible(d);
         d3.select(self).select('.node').style('width', (isMinZoomFavorite ? zoomLevel.imageWidth : zoomLevel.width) + 'px');
 
         scaleText(self);
@@ -421,15 +432,15 @@ sm.vis.collection = function() {
         d3.select(self).selectAll('.node-label')
             .each(function(d) {
                 // Available width depends on size of icon
-                var icon = this.parentNode.querySelector('.node-icon:not(.hide)'),
-                    iconWidth = icon ? icon.getBoundingClientRect().width : 0;
+                var iconNode = this.parentNode.querySelector('.node-icon:not(.hide)'),
+                    iconWidth = iconNode ? iconNode.getBoundingClientRect().width : 0;
 
                 // There are two cases that width is equal to 0: a div or an img without src.
                 // a div with non yet loaded css always has width of 20px.
-                if (!iconWidth && icon && icon.tagName.toLowerCase() === 'div') iconWidth = 20;
+                if (!iconWidth && iconNode && iconNode.tagName.toLowerCase() === 'div') iconWidth = 20;
 
                 // For any reason makes the icon's width 0, set it to the max 20
-                if (image(d) && !iconWidth) iconWidth = 20;
+                if (icon(d) && !iconWidth) iconWidth = 20;
 
                 var marginPadding = iconWidth ? 12 : 6,
                     w = zoomLevel.width - iconWidth - marginPadding;
@@ -442,7 +453,7 @@ sm.vis.collection = function() {
      */
     function scaleImage(self) {
         var d = d3.select(self).datum(),
-            isMinZoomFavorite = zoomLevelIndex === minZoomIndex && d.favorite && image(d),
+            isMinZoomFavorite = zoomLevelIndex === minZoomIndex && isImageVisible(d),
             childrenHeight = self.querySelector('.children').getBoundingClientRect().height,
             mainHeight = (isMinZoomFavorite ? zoomLevel.maxImageHeight : zoomLevel.maxHeight) - childrenHeight;
         d3.select(self).select('.parent').style('max-height', mainHeight + 'px');
@@ -491,7 +502,7 @@ sm.vis.collection = function() {
 
             // Curated indication
             var nc = d3.select(this).select('.node-curated')
-                .classed('hide', !d.curated)
+                .classed('hide', !d.curated || d.curationRemoved)
                 .style('top', d.minimized ? '-3px' : '-1px');
             var w = nc.node().getBoundingClientRect().width;
             nc.style('left', (d.minimized ? -2 : d.width - w - 1) + 'px');
@@ -596,7 +607,7 @@ sm.vis.collection = function() {
      */
     module.setBrushed = function(id, value) {
         nodeContainer.selectAll('.node').each(function(d) {
-            d.brushed = value && key(d) === id;
+            d.brushed = value && key(d) === id && !d.curationRemoved;
             d3.select(this).classed('brushed', d.brushed);
         });
     };

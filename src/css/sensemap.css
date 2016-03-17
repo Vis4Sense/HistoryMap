@@ -37,9 +37,9 @@
 	background-color: #E8A199 !important;
 }
 
-.sm-sensemap .node.not-seen:hover,
-.sm-sensemap .node.not-seen.hovered,
-.sm-sensemap .node.not-seen.brushed {
+.sm-sensemap .node.not-seen:not(.mini):hover,
+.sm-sensemap .node.not-seen:not(.mini).hovered,
+.sm-sensemap .node.not-seen:not(.mini).brushed {
 	border: 1px solid #e74c3c !important;
 	box-shadow: none !important;
 }
@@ -49,19 +49,19 @@
 	box-shadow: 0 0 0 2px #e74c3c;
 }
 
-.sm-sensemap .node.highlighted {
-    background-color: cyan !important;
-}
-
 .sm-sensemap .node.favorite {
     background-color: #e6e600;
+}
+
+.sm-sensemap .node.highlighted {
+    background-color: cyan;
 }
 
 .sm-sensemap .node.favorite .fa-star {
     color: #e6e600;
 }
 
-.sm-sensemap .node.not-seen {
+.sm-sensemap .node.not-seen:not(.mini) {
 	box-shadow: none;
 	border: 1px dashed #6e6e6e;
 }

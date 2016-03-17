@@ -140,7 +140,7 @@ sm.provenance.browser = function() {
             action = createActionObject(tab.id, originalAction.url, originalAction.text, type, originalAction.favIconUrl);
             dispatch.dataChanged(type, true);
         } else if (type === 'highlight' || type === 'filter') {
-            action = createActionObject(tab.id, tab.url, text, type, undefined, path, classId);
+            action = createActionObject(tab.id, tab.url, text, type, undefined, path, classId, originalAction.from || originalAction.id);
             if (type === 'filter') urlToActionLookup[tab.url] = action;
             dispatch.dataChanged(type, true);
         } else {
@@ -174,7 +174,7 @@ sm.provenance.browser = function() {
 
     var lastDate;
 
-    function createActionObject(tabId, url, text, type, favIconUrl, path, classId) {
+    function createActionObject(tabId, url, text, type, favIconUrl, path, classId, from) {
         var time = new Date(),
             action = {
                 id: +time,
@@ -198,19 +198,23 @@ sm.provenance.browser = function() {
         lastDate = time;
 
         // Referrer
-        // console.log('find: ' + url);
-        var rUrl = urlToReferrerLookup[url];
-        if (rUrl) {
-            var r = urlToActionLookup[rUrl];
-            if (r) action.from = r.id;
+        if (from) {
+            action.from = from;
         } else {
-            // Use document.referrer if available. This is less accurate because referrer only return the path excluding hash.
-            chrome.tabs.sendMessage(tabId, { type: 'askReferrer' }, function(response) {
-                if (response) {
-                    var r = _.findLast(actions, a => a.url && a.url === response && !isEmbeddedType(a.type));
-                    if (r) action.from = r.type === 'revisit' ? r.from : r.id;
-                }
-            });
+            // console.log('find: ' + url);
+            var rUrl = urlToReferrerLookup[url];
+            if (rUrl) {
+                var r = urlToActionLookup[rUrl];
+                if (r) action.from = r.id;
+            } else {
+                // Use document.referrer if available. This is less accurate because referrer only return the path excluding hash.
+                chrome.tabs.sendMessage(tabId, { type: 'askReferrer' }, function(response) {
+                    if (response) {
+                        var r = _.findLast(actions, a => a.url && a.url === response && !isEmbeddedType(a.type));
+                        if (r) action.from = r.type === 'revisit' ? r.from : r.id;
+                    }
+                });
+            }
         }
 
         actions.push(action);
@@ -337,7 +341,7 @@ sm.provenance.browser = function() {
                 tabs.forEach(tab => {
                     if (isTabIgnored(tab) || isTabInComplete(tab)) return;
 
-                    var action = _.findLast(actions, a => a.url === tab.url);
+                    var action = _.findLast(actions.filter(a => !isEmbeddedType(a.type)), a => a.url === tab.url);
                     if (action) {
                         action.endTime = new Date();
                     }
@@ -366,15 +370,14 @@ sm.provenance.browser = function() {
         chrome.contextMenus.onClicked.addListener((info, tab) => {
             if (info.menuItemId === 'sm-highlight') {
                 chrome.tabs.sendMessage(tab.id, { type: 'highlightSelection' }, d => {
-                    if (d) createNewAction(tab, 'highlight', d.text, urlToActionLookup[tab.url], d.path, d.classId);
+                    if (d) createNewAction(tab, 'highlight', d.text, d.path, d.classId);
                 });
             } else if (info.menuItemId === 'sm-save-image') {
                 // Overwrite existing image
                 var action = urlToActionLookup[tab.url];
                 if (action) {
-                    action.image = info.srcUrl;
-                    action.userImage = true;
-                    dispatch.dataChanged('image');
+                    action.userImage = info.srcUrl;
+                    dispatch.dataChanged('image', false, action);
                 }
             }
         });

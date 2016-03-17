@@ -18,9 +18,14 @@ $(function() {
     function respondToContentScript() {
         chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             if (request.type === 'redraw') {
+                console.log('received', new Date())
                 redraw(true);
             } else if (request.type === 'nodeHovered' && request.view !== 'curation') {
                 curation.setBrushed(request.value, request.status);
+            } else if (request.type === 'toZoomIn') {
+                curation.zoomIn();
+            } else if (request.type === 'toZoomOut') {
+                curation.zoomOut();
             }
         });
     }
@@ -29,11 +34,13 @@ $(function() {
         d3.select('#btnZoomIn').on('click', function() {
             curation.zoomIn();
             redraw(true);
+            chrome.runtime.sendMessage({ type: 'zoomedIn' });
         });
 
         d3.select('#btnZoomOut').on('click', function() {
             curation.zoomOut();
             redraw(true);
+            chrome.runtime.sendMessage({ type: 'zoomedOut' });
         });
 
         // Need confirmation when close/reload curation
@@ -51,7 +58,8 @@ $(function() {
     function buildVis() {
         curation = sm.vis.curation()
             .label(d => d.text)
-            .icon(d => d.favIconUrl);
+            .icon(d => d.favIconUrl)
+            .on('layoutDone', onLayoutDone);
 
         mod.view('curation')
             .on('redrawn', redraw)
@@ -80,5 +88,9 @@ $(function() {
 
     function onNodeClicked(d) {
         chrome.runtime.sendMessage({ type: 'nodeClicked', value: mod.getCoreData(d) });
+    }
+
+    function onLayoutDone(d) {
+        chrome.runtime.sendMessage({ type: 'layoutDone', value: d.rp, id: d.id });
     }
 });

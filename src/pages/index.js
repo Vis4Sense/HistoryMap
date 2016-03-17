@@ -8,8 +8,8 @@ $(function() {
         pendingTasks = {}, // For jumping to an action when its page isn't ready yet
         debugging = backgroundPage.debugging,
         closeConfirmation = !debugging,
-        datasetName = debugging ? 'data/saveload.zip' : '';
-        // datasetName = '';
+        // datasetName = debugging ? 'data/test2.zip' : '';
+        datasetName = '';
 
     // Vis and options
     var collection,
@@ -71,7 +71,7 @@ $(function() {
         });
 
         d3.select('#btnReplay').on('click', function() {
-            replay(1000);
+            replay(1500);
             toggleToolbar();
         });
 
@@ -83,21 +83,22 @@ $(function() {
             toggleToolbar();
         });
 
-        d3.select('#btnCurate').on('click', function() {
-            collection.curated(!collection.curated());
-            d3.select(this).text(collection.curated() ? 'Pan' : 'Select');
-
-            if (collection.curated()) onCurationChanged();
-        });
-
         d3.select('#btnZoomIn').on('click', function() {
             collection.zoomIn();
             redraw(true);
+            actions.push({
+                type: 'collection-zoom-in',
+                time: new Date()
+            });
         });
 
         d3.select('#btnZoomOut').on('click', function() {
             collection.zoomOut();
             redraw(true);
+            actions.push({
+                type: 'collection-zoom-out',
+                time: new Date()
+            });
         });
 
         // Need confirmation when close/reload collection
@@ -120,13 +121,28 @@ $(function() {
         browser.actions(actions, function() {
             buildVis();
             updateVis();
-            onCurationChanged(true);
+
+            // It's required the curation view should be opened at the beggining because curate-node action needs the view to determine location
+            chrome.windows.create({
+                url: chrome.extension.getURL('src/pages/curation-view.html'),
+                type: "popup",
+                state: "minimized"
+            }, function(w) {
+                curationWindowId = w.id;
+            });
         }).capture(listening)
         .on('dataChanged', _.throttle(onDataChanged, 200));
     };
 
-    function onDataChanged(p) {
-        // console.log(p, +new Date());
+    function onDataChanged(t, needRebuild, d) {
+        if (t === 'image') {
+            actions.push({
+                id: d.id,
+                type: 'save-image',
+                value: d.userImage
+            });
+        }
+        // console.log(t, +new Date());
         mod.mergeActions(actions);
         redraw();
     }
@@ -196,6 +212,18 @@ $(function() {
                 onNodeClicked(request.value);
             } else if (request.type === 'nodeHovered' && request.view !== 'collection') {
                 collection.setBrushed(request.value, request.status);
+            } else if (request.type === 'layoutDone') {
+                onLayoutDone(request.value, request.id);
+            } else if (request.type === 'zoomedIn') {
+                actions.push({
+                    type: 'curation-zoom-in',
+                    time: new Date()
+                });
+            } else if (request.type === 'zoomedOut') {
+                actions.push({
+                    type: 'curation-zoom-out',
+                    time: new Date()
+                });
             }
         });
     }
@@ -204,7 +232,7 @@ $(function() {
         collection = sm.vis.collection()
             .label(d => d.text)
             .icon(d => d.favIconUrl)
-            .on('curationChanged', onCurationChanged);
+            .on('curated', onCurated);
 
         mod.view('collection')
             .on('redrawn', redraw)
@@ -245,10 +273,17 @@ $(function() {
 
         var intervalId = setInterval(() => {
             mod.mergeActions(relevantActions.slice(0, count));
-            console.log(relevantActions[count - 1].type);
-            redraw();
-            count++;
 
+            var currentAction = relevantActions[count - 1];
+            if (currentAction.type === 'collection-zoom-in') collection.zoomIn();
+            if (currentAction.type === 'collection-zoom-out') collection.zoomOut();
+            if (currentAction.type === 'curation-zoom-in') chrome.runtime.sendMessage({ type: 'toZoomIn' });
+            if (currentAction.type === 'curation-zoom-out') chrome.runtime.sendMessage({ type: 'toZoomOut' });
+
+            redraw();
+
+            console.log(currentAction.type);
+            count++;
             if (count > relevantActions.length) clearInterval(intervalId);
         }, timeStep);
     }
@@ -264,21 +299,29 @@ $(function() {
         if (!external) chrome.runtime.sendMessage({ type: 'redraw' });
     }
 
-    function onCurationChanged(initial) {
+    var firstTime = true;
+    function onCurated(d) {
         var url = chrome.extension.getURL('src/pages/curation-view.html');
         var view = chrome.extension.getViews().find(v => v.location.href === url);
 
         if (view) {
             if (curationWindowId !== undefined) {
-                chrome.windows.update(curationWindowId, { focused: true });
+                var o = { focused: true };
+                if (firstTime) {
+                    o.left = o.top = 0;
+                    o.width = screen.width / 2;
+                    o.height = screen.height;
+                    firstTime = false;
+                }
+
+                chrome.windows.update(curationWindowId, o);
             }
             chrome.runtime.sendMessage({ type: 'redraw' });
         } else {
             var numCuratedNodes = data.nodes.filter(n => n.curated && !n.curationRemoved).length;
-            console.log(numCuratedNodes);
 
             // Note: should open curation view if there're some curated nodes
-            if (!initial || numCuratedNodes) {
+            if (d || numCuratedNodes) {
                 chrome.windows.create({
                     url: chrome.extension.getURL('src/pages/curation-view.html'),
                     type: "popup",
@@ -297,6 +340,15 @@ $(function() {
     function onActionAdded(d) {
         d.time = new Date(d.time);
         actions.push(d);
+    }
+
+    function onLayoutDone(rp, id) {
+        actions.push({
+            id: id,
+            type: 'curate-node',
+            time: new Date(),
+            trp: rp
+        });
     }
 
     function onNodeClicked(d) {

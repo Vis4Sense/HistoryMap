@@ -46,19 +46,37 @@ sm.provenance.mod = function() {
         });
 
         // - Ignore child and link actions
-        data.nodes = actions.filter(a => !a.parent && !isNonActionType(a.type));
+        data.nodes = actions.filter(a => !a.parent && isPageType(a.type));
+
+        // - Clear 'state' attributes so that history will be replayed
+        data.nodes.forEach(n => {
+            delete n.userImage;
+            delete n.collectionRemoved;
+            delete n.curationRemoved;
+            delete n.favorite;
+            delete n.minimized;
+            delete n.curated;
+            delete n.rp;
+        });
 
         // - Node attribute
-        actions.filter(a => isNonActionType(a.type)).forEach(a => {
+        actions.filter(a => !isPageType(a.type)).forEach(a => {
             var n = getNodeById(a.id);
             if (!n) return;
 
+            if (a.type === 'save-image') n.userImage = a.value;
             if (a.type === 'remove-collection-node') n.collectionRemoved = true;
             if (a.type === 'remove-curation-node') n.curationRemoved = true;
             if (a.type === 'favorite-node') n.favorite = true;
             if (a.type === 'unfavorite-node') n.favorite = false;
             if (a.type === 'minimize-node') n.minimized = true;
             if (a.type === 'restore-node') n.minimized = false;
+            if (a.type === 'curate-node') {
+                n.curated = true;
+                n.curationRemoved = false;
+                n.rp = a.trp;
+            }
+            if (a.type === 'move-node') n.rp = a.trp;
         });
 
         // - Then add to the link list
@@ -71,7 +89,7 @@ sm.provenance.mod = function() {
         });
 
         // -- User links
-        actions.filter(a => isNonActionType(a.type)).forEach(a => {
+        actions.filter(a => !isPageType(a.type)).forEach(a => {
             var l = getLinkByIds(a.sourceId, a.targetId);
             if (a.type === 'add-link') {
                 if (l) {
@@ -84,9 +102,8 @@ sm.provenance.mod = function() {
         });
     };
 
-    function isNonActionType(type) {
-        return [ 'click-node', 'revisit', 'remove-collection-node', 'remove-curation-node', 'favorite-node', 'unfavorite-node',
-            'minimize-node', 'restore-node', 'move-node', 'add-link', 'remove-link', 'relink', 'renode', 'hide-link' ].includes(type);
+    function isPageType(type) {
+        return [ 'search', 'location', 'dir', 'highlight', 'note', 'filter', 'link', 'type', 'bookmark' ].includes(type);
     }
 
     function isEmbeddedType(type) {
@@ -129,18 +146,23 @@ sm.provenance.mod = function() {
            .on('nodeMinimized', d => onNodeHandled('minimize-node', d))
            .on('nodeRestored', d => onNodeHandled('restore-node', d))
            .on('nodeHovered', (d, status) => onNodeHovered(d, status))
+           .on('nodeMoved', d => onNodeHandled('move-node', d))
            .on('linkAdded', d => onLinkHandled('add-link', d))
            .on('linkRemoved', d => onLinkHandled('remove-link', d));
     };
 
-    var redrawTypes = [ 'remove-curation-node' ];
+    var redrawTypes = [ 'remove-curation-node', 'remove-collection-node-node' ];
 
     function onNodeHandled(type, d) {
-        dispatch.actionAdded({
+        var a = {
             type: type,
             id: d.id,
             time: +new Date()
-        });
+        };
+
+        if (type === 'move-node') a.trp = d.rp;
+
+        dispatch.actionAdded(a);
 
         if (redrawTypes.includes(type)) dispatch.redrawn();
 
@@ -149,16 +171,6 @@ sm.provenance.mod = function() {
 
     function onNodeHovered(d, status) {
         chrome.runtime.sendMessage({ type: 'nodeHovered', value: d.id, view: view, status: status });
-    }
-
-    function onNodeMoved(d) {
-        dispatch.actionAdded({
-            type: 'move-node',
-            id: d.id,
-            time: +new Date(),
-            x: d.x,
-            y: d.y
-        });
     }
 
     function onLinkHandled(type, d) {
@@ -174,10 +186,13 @@ sm.provenance.mod = function() {
      * Just get real fields, not the generated one to prevent circular json.
      */
     module.getCoreData = function(d) {
+        // Don't need to save 'state' properties because they have their corresponding actions,
+        // which generate those properties such as favorite, minimized
+        // 'value' is to store the state property in the action.
+        // 'trp': we don't want to save 'rp', which is a state property
         var c = {},
             fields = [ 'id', 'text', 'url', 'type', 'time', 'endTime', 'favIconUrl', 'image', 'classId', 'path', 'from',
-                'seen', 'favorite', 'userImage', 'minimized', 'collectionRemoved', 'curationRemoved', 'sourceId', 'targetId',
-                'curated', 'newlyCurated', 'rp', 'rpoints' ];
+                'seen', 'value', 'sourceId', 'targetId', 'trp' ];
 
         fields.forEach(f => {
             if (d[f] !== undefined) c[f] = d[f];

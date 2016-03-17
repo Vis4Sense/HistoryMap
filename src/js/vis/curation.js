@@ -10,7 +10,8 @@ sm.vis.curation = function() {
         icon = d => d.icon,
         type = d => d.type,
         time = d => d.time, // Expect a Date object
-        image = d => d.image;
+        image = d => d.image,
+        userImage = d => d.userImage;
 
     var ZoomLevel = [
         { width: 26, imageWidth: 50, numChildren: 0 },
@@ -31,6 +32,7 @@ sm.vis.curation = function() {
         minZoomIndex = 0,
         maxZoomIndex = 3,
         zoomLevelIndex = maxZoomIndex,
+        oldZoomLevelIndex,
         zoomLevel = ZoomLevel[zoomLevelIndex],
         connectingTimerId;
 
@@ -68,7 +70,7 @@ sm.vis.curation = function() {
 
     // Others
     var dispatch = d3.dispatch('nodeClicked', 'nodeCollectionRemoved', 'nodeCurationRemoved', 'nodeFavorite', 'nodeUnfavorite',
-        'nodeMinimized', 'nodeRestored', 'nodeMoved', 'nodeHovered', 'linkAdded', 'linkRemoved');
+        'nodeMinimized', 'nodeRestored', 'nodeMoved', 'nodeHovered', 'linkAdded', 'linkRemoved', 'layoutDone');
 
     /**
      * Main entry of the module.
@@ -98,7 +100,7 @@ sm.vis.curation = function() {
 
         dataNodes = (data.nodes || []).filter(n => n.curated && !n.curationRemoved);
         dataLinks = (data.links || []).filter(l => dataNodes.includes(l.source) && dataNodes.includes(l.target) && !l.removed);
-
+console.log(data.nodes)
         // Curated nodes may have smaller set of children than the corresponding in collection
         dataNodes.filter(n => n.links).forEach(n => {
             n.rlinks = n.links.filter(target => dataNodes.includes(target));
@@ -122,6 +124,10 @@ sm.vis.curation = function() {
         computeLayout(function() {
             links.call(updateLinks);
             nodes.call(updateNodePositions);
+            dataNodes.filter(n => n.newlyCurated).forEach(n => {
+                n.newlyCurated = false;
+                dispatch.layoutDone(n);
+            });
         });
 
         // Press escape to exit connecting mode
@@ -147,12 +153,18 @@ sm.vis.curation = function() {
                 d.rp.height = r.height;
             });
 
-            var g = layout.vertices(dataNodes).edges(dataLinks).compute();
-            panExtent[1] = Math.max(0, g.width - width + margin.left + margin.right);
-            panExtent[3] = Math.max(0, g.height - height + margin.top + margin.bottom);
+            layout.vertices(dataNodes).edges(dataLinks).compute();
+
+            updatePanExtent();
 
             callback();
         });
+    }
+
+    function updatePanExtent() {
+        var g = layout.size();
+        panExtent[1] = Math.max(0, g.width - width + margin.left + margin.right);
+        panExtent[3] = Math.max(0, g.height - height + margin.top + margin.bottom);
     }
 
     /**
@@ -212,7 +224,6 @@ sm.vis.curation = function() {
                 d3.event.stopPropagation();
                 d3.select(this.parentNode).classed('hide', true);
                 d.curationRemoved = true;
-                d.curated = d.brushed = false;
                 connecting = false;
                 clearTimeout(connectingTimerId);
 
@@ -246,7 +257,8 @@ sm.vis.curation = function() {
             // Status
             d3.select(this).select('.node')
                 .classed('not-seen', !d.seen)
-                .classed('highlighted', isHighlighted(d));
+                .classed('highlighted', isHighlighted(d))
+                .classed('brushed', d.brushed && !d.collectionRemoved);
 
             // Tooltip
             d3.select(this).select('.parent').attr('data-original-title', label);
@@ -261,10 +273,10 @@ sm.vis.curation = function() {
                 .style('background-color', colorScale(type(d)));
 
             // Show image only in min zoom
-            if (zoomLevelIndex === minZoomIndex && image(d)) {
+            if (zoomLevelIndex === minZoomIndex && finalImage(d)) {
                 container.selectAll('.node-icon').classed('hide', true);
             }
-            container.select('.node-title').classed('hide', zoomLevelIndex === minZoomIndex && image(d));
+            container.select('.node-title').classed('hide', zoomLevelIndex === minZoomIndex && finalImage(d));
 
             // Text
             container.select('.node-label').text(label)
@@ -273,8 +285,8 @@ sm.vis.curation = function() {
 
             // Snapshot
             container.select('img.node-snapshot')
-                .attr('src', image)
-                .classed('hide', !image(d));
+                .attr('src', finalImage)
+                .classed('hide', !finalImage(d));
 
             if (d.children) updateChildren(d3.select(this).select('.children'), d);
             container.classed('has-children', d.children && zoomLevel.numChildren);
@@ -290,12 +302,16 @@ sm.vis.curation = function() {
         return d.highlighted || d.children && d.children.some(c => c.highlighted);
     }
 
+    function finalImage(d) {
+        return image(d) || userImage(d);
+    }
+
     /**
      * Scale image, text according to zoom level.
      */
     function scaleNode(self) {
         var d = d3.select(self).datum(),
-            isMinZoomFavorite = zoomLevelIndex === minZoomIndex && image(d);
+            isMinZoomFavorite = zoomLevelIndex === minZoomIndex && finalImage(d);
         d3.select(self).select('.node').style('width', (isMinZoomFavorite ? zoomLevel.imageWidth : zoomLevel.width) + 'px');
 
         scaleText(self);
@@ -309,15 +325,15 @@ sm.vis.curation = function() {
         d3.select(self).selectAll('.node-label')
             .each(function(d) {
                 // Available width depends on size of icon
-                var icon = this.parentNode.querySelector('.node-icon:not(.hide)'),
-                    iconWidth = icon ? icon.getBoundingClientRect().width : 0;
+                var iconNode = this.parentNode.querySelector('.node-icon:not(.hide)'),
+                    iconWidth = iconNode ? iconNode.getBoundingClientRect().width : 0;
 
                 // There are two cases that width is equal to 0: a div or an img without src.
                 // a div with non yet loaded css always has width of 20px.
-                if (!iconWidth && icon && icon.tagName.toLowerCase() === 'div') iconWidth = 20;
+                if (!iconWidth && iconNode && iconNode.tagName.toLowerCase() === 'div') iconWidth = 20;
 
                 // For any reason makes the icon's width 0, set it to the max 20
-                if (image(d) && !iconWidth) iconWidth = 20;
+                if (icon(d) && !iconWidth) iconWidth = 20;
 
                 var marginPadding = iconWidth ? 12 : 6,
                     w = zoomLevel.width - iconWidth - marginPadding;
@@ -330,7 +346,7 @@ sm.vis.curation = function() {
      */
     function scaleImage(self) {
         var d = d3.select(self).datum(),
-            isMinZoomFavorite = zoomLevelIndex === minZoomIndex && image(d),
+            isMinZoomFavorite = zoomLevelIndex === minZoomIndex && finalImage(d),
             childrenHeight = self.querySelector('.children').getBoundingClientRect().height,
             mainHeight = (isMinZoomFavorite ? zoomLevel.maxImageHeight : zoomLevel.maxHeight) - childrenHeight;
         d3.select(self).select('.parent').style('max-height', mainHeight + 'px');
@@ -559,10 +575,26 @@ sm.vis.curation = function() {
                 }
             });
         } else {
+            // Update new graph size to make pan correctly
+            updatePanExtent();
+
             dispatch.nodeMoved(d);
         }
 
         dragging = connecting = false;
+    }
+
+    /**
+     * Translate nodes to accommodate the change of zoom level.
+     */
+    function translateNodes() {
+        if (zoomLevelIndex === oldZoomLevelIndex) return;
+
+        var ratio = zoomLevel.width / ZoomLevel[oldZoomLevelIndex].width;
+        dataNodes.forEach(n => {
+            n.rp.x *= ratio;
+            n.rp.y *= ratio;
+        });
     }
 
     /**
@@ -615,7 +647,8 @@ sm.vis.curation = function() {
      */
     module.setBrushed = function(id, value) {
         nodeContainer.selectAll('.node').each(function(d) {
-            d3.select(this).classed('brushed', value && key(d) === id);
+            d.brushed = value && key(d) === id && !d.collectionRemoved;
+            d3.select(this).classed('brushed', d.brushed);
         });
     };
 
@@ -623,16 +656,20 @@ sm.vis.curation = function() {
      * Increase zoom level.
      */
     module.zoomIn = function() {
+        oldZoomLevelIndex = zoomLevelIndex;
         zoomLevelIndex = Math.min(maxZoomIndex, zoomLevelIndex + 1);
         zoomLevel = ZoomLevel[zoomLevelIndex];
+        translateNodes();
     };
 
     /**
      * Reduce zoom level.
      */
     module.zoomOut = function() {
+        oldZoomLevelIndex = zoomLevelIndex;
         zoomLevelIndex = Math.max(minZoomIndex, zoomLevelIndex - 1);
         zoomLevel = ZoomLevel[zoomLevelIndex];
+        translateNodes();
     };
 
     // Binds custom events
