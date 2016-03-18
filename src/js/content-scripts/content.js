@@ -29,6 +29,8 @@ function injectLinks() {
         // To make sure only 1 is bound
         $('body a').off('click', sendClick);
         $('body a').on('click', sendClick);
+        $('body a').off('mouseover', sendClick);
+        $('body a').on('mouseover', sendClick);
         count--;
 
         if (!count) clearInterval(timerId);
