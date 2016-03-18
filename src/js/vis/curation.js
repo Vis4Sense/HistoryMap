@@ -303,7 +303,7 @@ sm.vis.curation = function() {
     }
 
     function finalImage(d) {
-        return image(d) || userImage(d);
+        return userImage(d) || image(d);
     }
 
     /**
