@@ -87,6 +87,7 @@ sm.provenance.browser = function() {
             }
 
             if (tab.active) {
+                action.collectionRemoved = false;
                 action.seen = true;
                 actions.forEach(a => {
                     a.highlighted = action === a;

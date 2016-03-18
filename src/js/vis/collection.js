@@ -341,7 +341,7 @@ sm.vis.collection = function() {
             d3.select(this).select('.node')
                 .classed('not-seen', !d.seen)
                 .classed('highlighted', isHighlighted(d))
-                .classed('brushed', d.brushed && !d.curationRemoved);
+                .classed('brushed', d.collectionBrushed && !d.curationRemoved);
 
             // Tooltip
             d3.select(this).select('.parent').attr('data-original-title', buildHTMLTitle(d));
@@ -607,8 +607,8 @@ sm.vis.collection = function() {
      */
     module.setBrushed = function(id, value) {
         nodeContainer.selectAll('.node').each(function(d) {
-            d.brushed = value && key(d) === id && !d.curationRemoved;
-            d3.select(this).classed('brushed', d.brushed);
+            d.collectionBrushed = value && key(d) === id && !d.curationRemoved;
+            d3.select(this).classed('brushed', d.collectionBrushed);
         });
     };
 

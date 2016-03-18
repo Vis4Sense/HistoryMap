@@ -25,23 +25,23 @@ sm.provenance.action = function() {
         {
             hostname: "www.google.",
             pathnames: [ "/", "/webhp", "/search", "/url" ],
-            reg: /\Wq=([\w%+]*)/ig
+            reg: /\Wq=([\w%+-]*)/ig
         }, {
             hostname: "www.bing.",
             pathnames: [ "/search" ],
-            reg: /\Wq=([\w%+]*)/i
+            reg: /\Wq=([\w%+-]*)/i
         }, {
             hostname: "search.yahoo.",
             pathnames: [ "/search" ],
-            reg: /\Wp=([\w%+]*)/i
+            reg: /\Wp=([\w%+-]*)/i
         }, {
             hostname: "ask.",
             pathnames: [ "/web" ],
-            reg: /\Wq=([\w%+]*)/i
+            reg: /\Wq=([\w%+-]*)/i
         }, {
             hostname: "duckduckgo.",
             pathnames: [ "/" ],
-            reg: /\Wq=([\w%+]*)/i
+            reg: /\Wq=([\w%+-]*)/i
         }, { // https://www.facebook.com/search/str/visualization/keywords_top
             hostname: "www.facebook.",
             pathnames: [ "/search/str" ],
@@ -49,7 +49,7 @@ sm.provenance.action = function() {
         }, { // https://twitter.com/search?q=visualization&src=typd
             hostname: "twitter.",
             pathnames: [ "/search" ],
-            reg: /\Wq=([\w%+]*)/i
+            reg: /\Wq=([\w%+-]*)/i
         }
     ],
     locationSearchTemplates = [
@@ -86,7 +86,7 @@ sm.provenance.action = function() {
     function isEmptySearch(url) {
         var hostname = "www.google.",
             pathname = "/webhp",
-            reg = /\Wq=([\w%+]*)/ig;
+            reg = /\Wq=([\w%+-]*)/ig;
 
         if (url.hostname.startsWith(hostname) && url.pathname.includes(pathname)) {
             var result = url.toString().match(reg);
