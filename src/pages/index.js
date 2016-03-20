@@ -168,7 +168,8 @@ $(function() {
             actions.push({
                 id: d.id,
                 type: 'save-image',
-                value: d.userImage
+                value: d.userImage,
+                time: new Date()
             });
         }
         // console.log(t, +new Date());

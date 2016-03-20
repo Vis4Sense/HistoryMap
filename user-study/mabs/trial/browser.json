@@ -1,0 +1,7576 @@
+{
+    "data": [
+        {
+            "time": 1458301238159,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301238219,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458301238221,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301239269,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301240204,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458301240704,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301245269,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458301245439,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301254381,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301254385,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458301254396,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301255407,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301256164,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458301267475,
+            "type": "focus",
+            "url": "https://www.google.co.uk/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8"
+        },
+        {
+            "time": 1458301268674,
+            "type": "mousemove",
+            "url": "https://www.google.co.uk/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=Wearable+that+measure+stress"
+        },
+        {
+            "time": 1458301270998,
+            "type": "blur"
+        },
+        {
+            "time": 1458301271129,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458301273831,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301274850,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301275561,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458301275712,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301276530,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458301276670,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301277310,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458301277459,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301278461,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301279480,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301280092,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458301280235,
+            "type": "focus"
+        },
+        {
+            "time": 1458301280485,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301282530,
+            "type": "keydown"
+        },
+        {
+            "time": 1458301282530,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301283433,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458301283579,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301284612,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301284785,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301285383,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301286393,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301286651,
+            "type": "keydown"
+        },
+        {
+            "time": 1458301286655,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301287114,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458301287258,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301288243,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301289132,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301289449,
+            "type": "keydown"
+        },
+        {
+            "time": 1458301289456,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301290470,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301290924,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458301291074,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301291945,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301292105,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301292108,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301292812,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301293336,
+            "type": "keydown"
+        },
+        {
+            "time": 1458301297012,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301298570,
+            "type": "blur"
+        },
+        {
+            "time": 1458301298691,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458301302637,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458301302758,
+            "type": "focus"
+        },
+        {
+            "time": 1458301304130,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301309655,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301311687,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301315137,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301316140,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301316931,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301317743,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301318200,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301319009,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301319559,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301319940,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301321125,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458301321271,
+            "type": "mousemove",
+            "url": "https://www.google.co.uk/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=Wearable+that+measure+stress&start=10"
+        },
+        {
+            "time": 1458301322682,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301323462,
+            "type": "keydown"
+        },
+        {
+            "time": 1458301324133,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301325654,
+            "type": "mousemove",
+            "url": "https://www.google.co.uk/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=Wearable+that+measure+stress"
+        },
+        {
+            "time": 1458301326186,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301327073,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301327242,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301328245,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301328489,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301328767,
+            "type": "keydown"
+        },
+        {
+            "time": 1458301328767,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301330359,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458301330371,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301331439,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301333562,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301335376,
+            "type": "blur"
+        },
+        {
+            "time": 1458301335392,
+            "type": "focus",
+            "url": "https://www.spire.io/"
+        },
+        {
+            "time": 1458301336030,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301336992,
+            "type": "blur"
+        },
+        {
+            "time": 1458301337312,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458301337535,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301338728,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301339800,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458301339946,
+            "type": "focus"
+        },
+        {
+            "time": 1458301340165,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301341166,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301342258,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458301342377,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301343362,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301343835,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301345283,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301346069,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301347233,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458301347395,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301348396,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301353807,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301354979,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301355980,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301356466,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301358762,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301359280,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301360591,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301361064,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301361208,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301362249,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301362585,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301363314,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301364880,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301364921,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301365960,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301366148,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301366357,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301366929,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301367621,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301368113,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301368700,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301369164,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301370716,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301371250,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301372333,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301372812,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301373837,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301374325,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301374777,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301375547,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301376549,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301376638,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301376639,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301376648,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301376649,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301376658,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301376659,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301376668,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301376669,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301376680,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301376699,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301377730,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301377762,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301377781,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301378660,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301379661,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301380462,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301381464,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301382393,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301382410,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301383410,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301383594,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301384605,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301384899,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458301385025,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301388573,
+            "type": "blur",
+            "url": "https://www.spire.io/about"
+        },
+        {
+            "time": 1458301388684,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458301388690,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301389691,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301390149,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458301390280,
+            "type": "focus"
+        },
+        {
+            "time": 1458301390652,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301391820,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301392385,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301400795,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301401296,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301405610,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301406620,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301407315,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301407581,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301407648,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301408009,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301409309,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301411619,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301412169,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301417734,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301420252,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301420722,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301421949,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301422217,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301422373,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301422855,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301423013,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301423317,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301423334,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301424362,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301424521,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301424523,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301424527,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301424528,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301424544,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301424545,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301424549,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301424553,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301424565,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301424568,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301424679,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301424680,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301425034,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301425037,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301425043,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301425046,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301425054,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301425057,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301425064,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301425067,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301425073,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301425076,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301425083,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301425096,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301425525,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301426828,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301428046,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301428522,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301429531,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301430541,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301431594,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458301431756,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301433194,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301439416,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301440756,
+            "type": "focus",
+            "url": "http://www.fastcoexist.com/3046996/can-wearable-tech-measure-our-stress-and-calm-us-down-no-ones-cracked-the-code-yet"
+        },
+        {
+            "time": 1458301441129,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301442197,
+            "type": "blur"
+        },
+        {
+            "time": 1458301442239,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458301442585,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301443594,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301444597,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301445606,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301446607,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301446851,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458301447023,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301448194,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301449438,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301450672,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301451743,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301452744,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301453774,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301454159,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458301454298,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301456090,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301458123,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301459194,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458301459335,
+            "type": "focus"
+        },
+        {
+            "time": 1458301459803,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301460810,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301461356,
+            "type": "blur"
+        },
+        {
+            "time": 1458301461368,
+            "type": "focus",
+            "url": "https://www.google.co.uk/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=Wearable+that+measure+stress"
+        },
+        {
+            "time": 1458301462420,
+            "type": "blur"
+        },
+        {
+            "time": 1458301462426,
+            "type": "focus",
+            "url": "http://www.fastcoexist.com/3046996/can-wearable-tech-measure-our-stress-and-calm-us-down-no-ones-cracked-the-code-yet"
+        },
+        {
+            "time": 1458301462730,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301463844,
+            "type": "blur"
+        },
+        {
+            "time": 1458301463986,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458301464392,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301469990,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301471629,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301476186,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301477925,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301478602,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301479209,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458301479213,
+            "type": "focus"
+        },
+        {
+            "time": 1458301479228,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458301479232,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301481069,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301484475,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301484546,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301486992,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301487992,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301488923,
+            "type": "blur"
+        },
+        {
+            "time": 1458301488927,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458301488931,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458301488941,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301491077,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458301491081,
+            "type": "focus"
+        },
+        {
+            "time": 1458301491099,
+            "type": "blur"
+        },
+        {
+            "time": 1458301491111,
+            "type": "focus",
+            "url": "https://www.indiegogo.com/projects/olive-a-wearable-to-manage-stress#/"
+        },
+        {
+            "time": 1458301492537,
+            "type": "focus",
+            "url": "http://www.mensfitness.com/life/entertainment/wearable-tech-3-things-you-can-learn-stress-monitor"
+        },
+        {
+            "time": 1458301493343,
+            "type": "blur"
+        },
+        {
+            "time": 1458301493381,
+            "type": "focus",
+            "url": "https://www.google.co.uk/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=Wearable+that+measure+stress"
+        },
+        {
+            "time": 1458301493824,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301494379,
+            "type": "keydown"
+        },
+        {
+            "time": 1458301494663,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301494938,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458301495019,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301495068,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458301495212,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301496322,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301498929,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301499929,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301500988,
+            "type": "blur"
+        },
+        {
+            "time": 1458301503086,
+            "type": "blur",
+            "url": "https://www.indiegogo.com/projects/olive-a-wearable-to-manage-stress#/"
+        },
+        {
+            "time": 1458301503093,
+            "type": "focus",
+            "url": "https://www.google.co.uk/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=Wearable+that+measure+stress"
+        },
+        {
+            "time": 1458301503497,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301504086,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301505640,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301507344,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301507409,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301508841,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301509067,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301536914,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301536947,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301537367,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301537810,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301538292,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301539046,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301539207,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301540935,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301541938,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301545091,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301545163,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301545737,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301546257,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301546437,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301546728,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301547338,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458301547481,
+            "type": "mousemove",
+            "url": "https://www.google.co.uk/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=Wearable+that+measure+stress&start=10"
+        },
+        {
+            "time": 1458301549245,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301556678,
+            "type": "mousemove",
+            "url": "https://www.google.co.uk/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=Wearable+that+measure+stress"
+        },
+        {
+            "time": 1458301557193,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301557771,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301558032,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301559225,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301559326,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301560024,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301560787,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301561184,
+            "type": "keydown"
+        },
+        {
+            "time": 1458301561196,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301561714,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458301561721,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301563524,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301564814,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301566168,
+            "type": "blur"
+        },
+        {
+            "time": 1458301568081,
+            "type": "focus",
+            "url": "https://www.indiegogo.com/projects/olive-a-wearable-to-manage-stress#/"
+        },
+        {
+            "time": 1458301570213,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301571885,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458301571890,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458301571902,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301571907,
+            "type": "blur"
+        },
+        {
+            "time": 1458301572117,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301572141,
+            "type": "focus",
+            "url": "https://www.google.co.uk/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=Wearable+that+measure+stress"
+        },
+        {
+            "time": 1458301572175,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458301572179,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301575448,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301575842,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301576416,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301577077,
+            "type": "keydown"
+        },
+        {
+            "time": 1458301577077,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301577723,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458301577865,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301578873,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301580986,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301582270,
+            "type": "blur"
+        },
+        {
+            "time": 1458301588540,
+            "type": "mousemove",
+            "url": "https://www.indiegogo.com/projects/olive-a-wearable-to-manage-stress#/"
+        },
+        {
+            "time": 1458301590731,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301591214,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301592757,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458301592769,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458301592777,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301592797,
+            "type": "blur"
+        },
+        {
+            "time": 1458301592798,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301592842,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458301592851,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301594413,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301595445,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301596489,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301599302,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301599838,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301600099,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301601676,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301601742,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301603087,
+            "type": "focus"
+        },
+        {
+            "time": 1458301603095,
+            "type": "blur"
+        },
+        {
+            "time": 1458301604163,
+            "type": "blur"
+        },
+        {
+            "time": 1458301604215,
+            "type": "focus"
+        },
+        {
+            "time": 1458301646834,
+            "type": "blur"
+        },
+        {
+            "time": 1458301646843,
+            "type": "focus",
+            "url": "https://www.google.co.uk/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=Wearable+that+measure+stress"
+        },
+        {
+            "time": 1458301651164,
+            "type": "blur"
+        },
+        {
+            "time": 1458301651185,
+            "type": "focus",
+            "url": "https://www.indiegogo.com/projects/olive-a-wearable-to-manage-stress#/"
+        },
+        {
+            "time": 1458301654843,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301655336,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301656337,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301657612,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301658320,
+            "type": "blur"
+        },
+        {
+            "time": 1458301658323,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458301658327,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458301658343,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301658561,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458301658667,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301659673,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301663376,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301667412,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301668696,
+            "type": "blur"
+        },
+        {
+            "time": 1458301668703,
+            "type": "focus"
+        },
+        {
+            "time": 1458301670444,
+            "type": "blur"
+        },
+        {
+            "time": 1458301670469,
+            "type": "focus"
+        },
+        {
+            "time": 1458301671204,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301672361,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301676269,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301676985,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301677986,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301678997,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301680693,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458301680946,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301681936,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458301682124,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301683657,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301684495,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458301684667,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301685396,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458301685427,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301685536,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458301685673,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301686596,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458301686890,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301687950,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301688407,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301689596,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301690050,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301690571,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301691780,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301692064,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458301692141,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301692207,
+            "type": "keydown"
+        },
+        {
+            "time": 1458301692249,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301692433,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301692434,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301693222,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301694009,
+            "type": "blur"
+        },
+        {
+            "time": 1458301694305,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301694306,
+            "type": "focus"
+        },
+        {
+            "time": 1458301694312,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301695554,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458301695695,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301697594,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301699081,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301699729,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301700843,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301700910,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301701678,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458301701799,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301703695,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458301703702,
+            "type": "blur"
+        },
+        {
+            "time": 1458301703709,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458301703842,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301706911,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301707815,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301708187,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301710604,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301710692,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301711301,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301721015,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301721148,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301722259,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301722703,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301723855,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301724726,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458301724792,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301725230,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301726398,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301727402,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301728527,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301728919,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301729001,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301729917,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458301730011,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301731726,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458301731851,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301733691,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458301733705,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301737369,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301738089,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301738905,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458301738909,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301739319,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301740003,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301740517,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301740583,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458301740584,
+            "type": "focus"
+        },
+        {
+            "time": 1458301740587,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458301740601,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301741625,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301741790,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458301741819,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301742493,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458301742558,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301742639,
+            "type": "keydown"
+        },
+        {
+            "time": 1458301742747,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301742928,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301742945,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301743113,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301745131,
+            "type": "keydown"
+        },
+        {
+            "time": 1458301746353,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301746858,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301747382,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301748398,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301748795,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458301748875,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301749923,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301750601,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458301750742,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301752566,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301755985,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301756355,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301757422,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301758433,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301759421,
+            "type": "blur"
+        },
+        {
+            "time": 1458301759425,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458301759434,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458301759458,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301759997,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301761412,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458301761414,
+            "type": "focus"
+        },
+        {
+            "time": 1458301761420,
+            "type": "blur"
+        },
+        {
+            "time": 1458301764621,
+            "type": "focus"
+        },
+        {
+            "time": 1458301794737,
+            "type": "focus"
+        },
+        {
+            "time": 1458301796645,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301797407,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301797542,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301797546,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301797949,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301798679,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301799498,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301800416,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301800850,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301800915,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301801331,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301801348,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301801932,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301802439,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301802965,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301818246,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301818796,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301819941,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301822368,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301822828,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301823113,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301823661,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301823737,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301823899,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301824908,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301825261,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301825744,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301826758,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301832126,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301834144,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301834690,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301835217,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301835623,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301835732,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301836006,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301836307,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301836773,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301836825,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301837205,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301837239,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301838249,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301838422,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301840631,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301841837,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301842846,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301847169,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301850828,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301851319,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301852272,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301852785,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301853094,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301853502,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301853563,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301853619,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301853621,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301854035,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301854053,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301855057,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301855385,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301856941,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301857904,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301859276,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458301859428,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301859933,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301860750,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301866218,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301866715,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301867029,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301867482,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301868389,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301868899,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301869029,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301870120,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301871165,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301871677,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301872132,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301874249,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301895702,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301896810,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301897087,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301897563,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301898088,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301898543,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301900780,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301903698,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301904175,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301905177,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301906505,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301907446,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301907924,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301908212,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301908724,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301908942,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301909357,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301910518,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301911527,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301911856,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301912145,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301912607,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301912923,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301913374,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301915214,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301915706,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301915712,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301916239,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301920512,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301920639,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301921438,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301921815,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301922588,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301923330,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301923754,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301924683,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301925404,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301925424,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301926138,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301929554,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301930352,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301932959,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301933009,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301933801,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301934020,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301934685,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301942456,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301943117,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301950569,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301951365,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301951724,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301952465,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301953793,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301953873,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301954730,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301955165,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301955912,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301956380,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301956879,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301961038,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301962293,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301962845,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301965784,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301966743,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301967149,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301967909,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301968240,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301968710,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301968864,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301968892,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301968908,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301969342,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301970345,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301973200,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301973250,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301973725,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301974196,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301974641,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301974819,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301975675,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301976696,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301977701,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301980876,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301981590,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301981942,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301982524,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301982877,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301983456,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301983836,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301984456,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301984653,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301985106,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301985473,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301986022,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301986145,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301986639,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301987477,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301987622,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301987650,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301988665,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301988988,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301989984,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301990572,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301993174,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301993854,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301994137,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458301994604,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301995609,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458301997409,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302005366,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302006306,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302006751,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302006917,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302007551,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302007983,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302008418,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302009494,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302009950,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302010986,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302011534,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302011730,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302012233,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302013289,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302013766,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302013916,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302014799,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302014996,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302015699,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302016394,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302016882,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302017174,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302017649,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302020055,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302020938,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302021447,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302021675,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302022114,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302022397,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302022849,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302024380,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302025080,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302025655,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302026363,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302026838,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302027312,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302027943,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302028530,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302028744,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302029729,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302032302,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302033304,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302034111,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302034536,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302035378,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302036766,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302036858,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302037578,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302038110,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302038693,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302044606,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302045125,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302051284,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302051958,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302056721,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302057389,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302059782,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302060539,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302061850,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302062372,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302062787,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302063204,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302063259,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302063771,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302067453,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302067853,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302069164,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302069687,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302070689,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302071689,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302072693,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302073006,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302075221,
+            "type": "blur"
+        },
+        {
+            "time": 1458302075587,
+            "type": "focus"
+        },
+        {
+            "time": 1458302080022,
+            "type": "focus",
+            "url": "http://www.mensfitness.com/life/entertainment/wearable-tech-3-things-you-can-learn-stress-monitor"
+        },
+        {
+            "time": 1458302081148,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302082926,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302083342,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302083883,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302085524,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302086433,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302088818,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302089400,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302092748,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302093515,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302094222,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302094698,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302094970,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302095081,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302095110,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302095282,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302095505,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302095614,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302095618,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302095914,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302097081,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302097597,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302097909,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302098347,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302098869,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302099331,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302099566,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302100280,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302100364,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302100712,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302100726,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302101727,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302102646,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302103274,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302103768,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302104577,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302105179,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302105375,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302105912,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302106052,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302107131,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302108164,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302108328,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302108333,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302108828,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302109828,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302116009,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302117041,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302117043,
+            "type": "focus"
+        },
+        {
+            "time": 1458302117046,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302117993,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302118509,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302120978,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302121113,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302121614,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302121628,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302122275,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302123632,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302124304,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302124924,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302126426,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302127524,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302129073,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302130951,
+            "type": "mousemove",
+            "url": "http://www.mensfitness.com/life/entertainment/wearable-tech-3-things-you-can-learn-stress-monitor"
+        },
+        {
+            "time": 1458302133788,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302134766,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302135072,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302149391,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302150863,
+            "type": "mousemove",
+            "url": "http://www.mensfitness.com/life/entertainment/wearable-tech-3-things-you-can-learn-stress-monitor/slide/1"
+        },
+        {
+            "time": 1458302154442,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302155024,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302155801,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302166043,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302167067,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302168272,
+            "type": "mousemove",
+            "url": "http://www.mensfitness.com/life/entertainment/wearable-tech-3-things-you-can-learn-stress-monitor/slide/2"
+        },
+        {
+            "time": 1458302172207,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302173288,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302173549,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302174963,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302175501,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302176501,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302177533,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302178545,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302179571,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302180573,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302180875,
+            "type": "blur"
+        },
+        {
+            "time": 1458302180878,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458302180887,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458302180902,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302181957,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302182794,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458302182966,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302183966,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302185179,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458302185345,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302186550,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302186592,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302188139,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458302188142,
+            "type": "focus"
+        },
+        {
+            "time": 1458302188800,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302189100,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302189656,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302190917,
+            "type": "blur"
+        },
+        {
+            "time": 1458302190921,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458302190928,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458302190936,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302191126,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458302191130,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302191758,
+            "type": "mousemove",
+            "url": "https://www.google.co.uk/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=Wearable+that+measure+stress&start=10"
+        },
+        {
+            "time": 1458302192818,
+            "type": "focus",
+            "url": "http://www.fastcoexist.com/3046996/can-wearable-tech-measure-our-stress-and-calm-us-down-no-ones-cracked-the-code-yet"
+        },
+        {
+            "time": 1458302193011,
+            "type": "blur",
+            "url": "https://www.google.co.uk/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=Wearable+that+measure+stress&start=10"
+        },
+        {
+            "time": 1458302195454,
+            "type": "blur",
+            "url": "http://www.fastcoexist.com/3046996/can-wearable-tech-measure-our-stress-and-calm-us-down-no-ones-cracked-the-code-yet"
+        },
+        {
+            "time": 1458302195463,
+            "type": "focus",
+            "url": "https://www.google.co.uk/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=Wearable+that+measure+stress"
+        },
+        {
+            "time": 1458302195835,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302196242,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302196808,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302196919,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302197257,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302198170,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302198326,
+            "type": "mousemove",
+            "url": "https://www.google.co.uk/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=Wearable+that+measure+stress&start=10"
+        },
+        {
+            "time": 1458302200616,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302203870,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302205723,
+            "type": "keydown"
+        },
+        {
+            "time": 1458302206072,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302206123,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302206154,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302209384,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302210558,
+            "type": "focus",
+            "url": "http://www.fastcoexist.com/3046996/can-wearable-tech-measure-our-stress-and-calm-us-down-no-ones-cracked-the-code-yet"
+        },
+        {
+            "time": 1458302210558,
+            "type": "blur",
+            "url": "https://www.google.co.uk/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=Wearable+that+measure+stress&start=10"
+        },
+        {
+            "time": 1458302211413,
+            "type": "mousemove",
+            "url": "http://www.fastcoexist.com/3046996/can-wearable-tech-measure-our-stress-and-calm-us-down-no-ones-cracked-the-code-yet"
+        },
+        {
+            "time": 1458302212918,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302215697,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302215754,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302216570,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302221580,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302221654,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302222327,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302224175,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302224183,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302225142,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302225299,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302226254,
+            "type": "mousedown",
+            "url": "http://www.fastcoexist.com/3046996/can-wearable-tech-measure-our-stress-and-calm-us-down-no-ones-cracked-the-code-yet/3"
+        },
+        {
+            "time": 1458302226409,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302229106,
+            "type": "mousemove",
+            "url": "http://www.fastcoexist.com/3046996/can-wearable-tech-measure-our-stress-and-calm-us-down-no-ones-cracked-the-code-yet/4"
+        },
+        {
+            "time": 1458302229227,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302230258,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302230716,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302230720,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302231042,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302231114,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302232270,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302232869,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302233015,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302233520,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302233652,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302234220,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302235096,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302235246,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302237539,
+            "type": "mousedown",
+            "url": "http://www.fastcoexist.com/3046996/can-wearable-tech-measure-our-stress-and-calm-us-down-no-ones-cracked-the-code-yet/5"
+        },
+        {
+            "time": 1458302237691,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302240248,
+            "type": "mousewheel",
+            "url": "http://www.fastcoexist.com/3046996/can-wearable-tech-measure-our-stress-and-calm-us-down-no-ones-cracked-the-code-yet/6"
+        },
+        {
+            "time": 1458302241000,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302244512,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302245048,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302247755,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302247806,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302248320,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302250824,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302259982,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302260056,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302261205,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302262307,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302262508,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302263276,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302263426,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302264094,
+            "type": "mousedown",
+            "url": "http://www.fastcoexist.com/3046996/can-wearable-tech-measure-our-stress-and-calm-us-down-no-ones-cracked-the-code-yet/1"
+        },
+        {
+            "time": 1458302264245,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302267812,
+            "type": "mousemove",
+            "url": "http://www.fastcoexist.com/3046996/can-wearable-tech-measure-our-stress-and-calm-us-down-no-ones-cracked-the-code-yet/2"
+        },
+        {
+            "time": 1458302267845,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302269067,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302270319,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302270332,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458302270330,
+            "type": "blur"
+        },
+        {
+            "time": 1458302270336,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458302270353,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302271570,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302272438,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458302272674,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302273691,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302274074,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458302274265,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302275267,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302275913,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458302276098,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302277106,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302278178,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302279179,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302280187,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302282652,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458302282659,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302283268,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302284298,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302286896,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302287915,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302290339,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302291139,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302292152,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302294988,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302300384,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302301387,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302302391,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302303414,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302305039,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302305072,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302306423,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302306563,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302314602,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302318240,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302321514,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302323190,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302326224,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302335940,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302335984,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302336995,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302338189,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302339656,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302340713,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302341757,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302341904,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302343480,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302343502,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302344511,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302345511,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302346520,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302347540,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302348540,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302350078,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302351108,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302352117,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302353117,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302354321,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302355325,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302356521,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458302356526,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302357531,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302358541,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302358925,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458302359095,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302360280,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302360391,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302361724,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302364200,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302388041,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302389041,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302390305,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302404313,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302412157,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302413175,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302414180,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302422905,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302423913,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302424826,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302425833,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302426378,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458302426548,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302428017,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302428188,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302428352,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302428783,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302430026,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302431241,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302434312,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302435716,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302437526,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302438528,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302439841,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302440847,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302441705,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458302441711,
+            "type": "focus"
+        },
+        {
+            "time": 1458302441727,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302441761,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302442765,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302443765,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302444807,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302445741,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302445899,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302447257,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302449625,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302449718,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302449826,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302450374,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302451353,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302451395,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302452741,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302452847,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302454425,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302455151,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302455293,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302458092,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458302458092,
+            "type": "blur"
+        },
+        {
+            "time": 1458302458107,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458302458124,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302458244,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458302458251,
+            "type": "focus"
+        },
+        {
+            "time": 1458302458255,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302459269,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302460354,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302461412,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302462413,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302463454,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302464545,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302464678,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302465488,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302465495,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302465930,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302465939,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302466676,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302466824,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302467859,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302468940,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302469183,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302469385,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302470445,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302470799,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302470945,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302472092,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302472742,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302472901,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302473950,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302475118,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302475959,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302476092,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302477542,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302478282,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302478433,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302479435,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302480384,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302480533,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302481446,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302481604,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302483991,
+            "type": "keydown"
+        },
+        {
+            "time": 1458302485842,
+            "type": "keydown"
+        },
+        {
+            "time": 1458302487018,
+            "type": "keydown"
+        },
+        {
+            "time": 1458302488670,
+            "type": "keydown"
+        },
+        {
+            "time": 1458302489808,
+            "type": "keydown"
+        },
+        {
+            "time": 1458302490915,
+            "type": "keydown"
+        },
+        {
+            "time": 1458302492108,
+            "type": "keydown"
+        },
+        {
+            "time": 1458302493519,
+            "type": "keydown"
+        },
+        {
+            "time": 1458302494942,
+            "type": "keydown"
+        },
+        {
+            "time": 1458302496642,
+            "type": "keydown"
+        },
+        {
+            "time": 1458302498326,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302498858,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302498966,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302500118,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302500994,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302501288,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302501902,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302502126,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302502613,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302503452,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302504073,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302507029,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302507770,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302509758,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302511057,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302512017,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302512175,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302514725,
+            "type": "mousemove",
+            "url": "http://www.fastcoexist.com/3033292/this-new-wearable-device-says-it-helps-lower-stress-at-work-we-put-it-to-the-test"
+        },
+        {
+            "time": 1458302517192,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302517672,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302517897,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302518304,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302522374,
+            "type": "mousemove",
+            "url": "http://www.fastcoexist.com/3046996/can-wearable-tech-measure-our-stress-and-calm-us-down-no-ones-cracked-the-code-yet/2"
+        },
+        {
+            "time": 1458302528662,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302529117,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302530394,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302530917,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302536094,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302536632,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302545655,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302546547,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302551479,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302551545,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302551905,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302552133,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302555433,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302555935,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302556250,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302556711,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302556826,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302557260,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302558331,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302558943,
+            "type": "keydown"
+        },
+        {
+            "time": 1458302559229,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302559388,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302560722,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302560878,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302565455,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302566510,
+            "type": "blur"
+        },
+        {
+            "time": 1458302566510,
+            "type": "focus",
+            "url": "http://www.fastcoexist.com/3033292/this-new-wearable-device-says-it-helps-lower-stress-at-work-we-put-it-to-the-test"
+        },
+        {
+            "time": 1458302567251,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302569175,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302569758,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302582802,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302583372,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302583819,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302584322,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302585703,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302586221,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302594059,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302595068,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302595236,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302595631,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302596420,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302615762,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302626524,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302626568,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302627594,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302628608,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302629755,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302630768,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302631781,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302632788,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302632879,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302636922,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302637942,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302638423,
+            "type": "blur"
+        },
+        {
+            "time": 1458302638428,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458302638432,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458302638447,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302639680,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302639757,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302641496,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302642247,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302644351,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302645067,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302645890,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302646015,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302646719,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302661529,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302662523,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302663524,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302665228,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302666554,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302667725,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302669183,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302670374,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302674409,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302674494,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458302674499,
+            "type": "focus"
+        },
+        {
+            "time": 1458302674511,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302674522,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302675523,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302676875,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302677137,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302678150,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302679631,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302680609,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302680762,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302681783,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302682628,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302682779,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302682810,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302682874,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302682994,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302683144,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302683794,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302683935,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302686319,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302687294,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302688333,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302689569,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302690210,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302691255,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302691721,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302691860,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302692760,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302692775,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302693991,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302694004,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302695832,
+            "type": "keydown"
+        },
+        {
+            "time": 1458302696871,
+            "type": "keydown"
+        },
+        {
+            "time": 1458302698002,
+            "type": "keydown"
+        },
+        {
+            "time": 1458302699661,
+            "type": "keydown"
+        },
+        {
+            "time": 1458302700730,
+            "type": "keydown"
+        },
+        {
+            "time": 1458302701956,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302702968,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302703816,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302703966,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302704784,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302705794,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302706804,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302707848,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302710411,
+            "type": "blur"
+        },
+        {
+            "time": 1458302710414,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458302710419,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458302710437,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302710597,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458302710599,
+            "type": "focus",
+            "url": "http://www.fastcoexist.com/3042375/mapping-the-most-stressful-places-in-life-to-figure-out-how-stress-is-killing-us"
+        },
+        {
+            "time": 1458302710651,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302711501,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302714587,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302715159,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302718935,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302719321,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302720330,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302721330,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302722337,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302723927,
+            "type": "blur"
+        },
+        {
+            "time": 1458302723930,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458302723935,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458302723964,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302724101,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458302724103,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302725356,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302726376,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302727506,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458302727514,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458302727527,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302727638,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458302727641,
+            "type": "cur-focus"
+        },
+        {
+            "time": 1458302727700,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302729342,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302730058,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302730645,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302731738,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302732717,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302733576,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302735620,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302736473,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302737473,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302738105,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302738776,
+            "type": "cur-blur"
+        },
+        {
+            "time": 1458302738779,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458302738782,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458302738785,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302738844,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458302738850,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302738858,
+            "type": "focus",
+            "url": "http://www.fastcoexist.com/3046996/can-wearable-tech-measure-our-stress-and-calm-us-down-no-ones-cracked-the-code-yet/2"
+        },
+        {
+            "time": 1458302739073,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302740427,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458302740427,
+            "type": "blur"
+        },
+        {
+            "time": 1458302740434,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458302740454,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302740586,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458302740591,
+            "type": "cur-focus"
+        },
+        {
+            "time": 1458302740655,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302741452,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302742597,
+            "type": "cur-blur"
+        },
+        {
+            "time": 1458302742668,
+            "type": "focus"
+        },
+        {
+            "time": 1458302742910,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302743882,
+            "type": "blur"
+        },
+        {
+            "time": 1458302743886,
+            "type": "focus",
+            "url": "http://www.fastcoexist.com/3042375/mapping-the-most-stressful-places-in-life-to-figure-out-how-stress-is-killing-us"
+        },
+        {
+            "time": 1458302745393,
+            "type": "blur"
+        },
+        {
+            "time": 1458302745402,
+            "type": "focus",
+            "url": "http://www.fastcoexist.com/3033292/this-new-wearable-device-says-it-helps-lower-stress-at-work-we-put-it-to-the-test"
+        },
+        {
+            "time": 1458302746953,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302747191,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302747608,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302747656,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302748083,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302748759,
+            "type": "blur"
+        },
+        {
+            "time": 1458302748768,
+            "type": "focus",
+            "url": "http://www.fastcoexist.com/3046996/can-wearable-tech-measure-our-stress-and-calm-us-down-no-ones-cracked-the-code-yet/2"
+        },
+        {
+            "time": 1458302749162,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302749494,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302750507,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302750858,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302750859,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302750868,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302750871,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302750877,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302750879,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302750891,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302750900,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302751121,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302753384,
+            "type": "focus",
+            "url": "http://www.fastcoexist.com/3033292/this-new-wearable-device-says-it-helps-lower-stress-at-work-we-put-it-to-the-test"
+        },
+        {
+            "time": 1458302753846,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302754947,
+            "type": "blur"
+        },
+        {
+            "time": 1458302756464,
+            "type": "cur-focus"
+        },
+        {
+            "time": 1458302756480,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302757646,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302758683,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302760304,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302761320,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302762323,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302763707,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302764717,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302765556,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302765719,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302767012,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302767140,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302768149,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302768497,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302768605,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302769176,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302769322,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302770024,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302770170,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302770277,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302770352,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302770458,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302770545,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302770953,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302771069,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302771185,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302771272,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302771372,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302771464,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302772388,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302772534,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302772566,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302772726,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302774539,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302774666,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302774697,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302774856,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302775205,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302775393,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302775425,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302775584,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302776195,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302776352,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302776375,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302776534,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302777033,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302777171,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302777203,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302777271,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302777367,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302777443,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302777549,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302777616,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302777718,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302777807,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302777882,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302777958,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302778044,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302778130,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302778215,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302778302,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302778388,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302778494,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302778570,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302778666,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302778751,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302778857,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302778953,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302779029,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302779135,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302779191,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302779306,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302779413,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302779518,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302779595,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302779698,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302779777,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302779892,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302779958,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302780054,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302780161,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302780257,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302780342,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302780438,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302780555,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302780640,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302780767,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302780883,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302780979,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302781084,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302781191,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302781306,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302781394,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302781509,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302781605,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302781712,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302781797,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302781903,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302782009,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302782125,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302782212,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302782318,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302782423,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302782529,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302782636,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302782751,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302782838,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302782934,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302783029,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302783146,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302783302,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302787500,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302788509,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302788952,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302789135,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302790697,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302791812,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302792817,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302793590,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302793769,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302795478,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302796706,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302797846,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302799156,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302800169,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302801264,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302802001,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302803006,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302804311,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302807610,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302807732,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302808732,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302809412,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302810319,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302810727,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302812694,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302813891,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302814522,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302814524,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302814527,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302815077,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302817191,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302818413,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302822249,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302823401,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302825417,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302826425,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302829710,
+            "type": "cur-blur"
+        },
+        {
+            "time": 1458302829715,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458302829724,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458302829744,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302829944,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458302829946,
+            "type": "cur-focus"
+        },
+        {
+            "time": 1458302830021,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302830910,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302831914,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302832919,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302834489,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458302834500,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302836075,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302837186,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302841093,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302842130,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302843436,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302844437,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302845437,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302845453,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302846276,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302847280,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302848370,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302849371,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302850391,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302851372,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302853644,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302854811,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302907611,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302908621,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302912589,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302912712,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302913869,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302914408,
+            "type": "cur-blur"
+        },
+        {
+            "time": 1458302914411,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458302914419,
+            "type": "focus"
+        },
+        {
+            "time": 1458302914422,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302917285,
+            "type": "focus",
+            "url": "http://www.fastcoexist.com/3042375/mapping-the-most-stressful-places-in-life-to-figure-out-how-stress-is-killing-us"
+        },
+        {
+            "time": 1458302918829,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302919270,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302920014,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302924371,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302925030,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302925274,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302926701,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302926843,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302927306,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302927466,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302928211,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302928936,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302936085,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302937097,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302937760,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302938060,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302938126,
+            "type": "keydown"
+        },
+        {
+            "time": 1458302938147,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302938386,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302938405,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302938830,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302939996,
+            "type": "blur"
+        },
+        {
+            "time": 1458302940303,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302940305,
+            "type": "focus"
+        },
+        {
+            "time": 1458302940360,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302941459,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302941893,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302942013,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302943016,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302944236,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302945402,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302945630,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302947059,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302948938,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302949957,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302951319,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302951452,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302952835,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302954538,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302954675,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302956131,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458302956131,
+            "type": "blur"
+        },
+        {
+            "time": 1458302956151,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458302956287,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302957363,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302958171,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458302958350,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302959354,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302960526,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302962998,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302963045,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302964081,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302965095,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302966099,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302966404,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302967719,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458302967724,
+            "type": "focus"
+        },
+        {
+            "time": 1458302967730,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302967746,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302968821,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302968829,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302969725,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302969743,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302970822,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302970979,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302972100,
+            "type": "keydown"
+        },
+        {
+            "time": 1458302973186,
+            "type": "keydown"
+        },
+        {
+            "time": 1458302975066,
+            "type": "keydown"
+        },
+        {
+            "time": 1458302977618,
+            "type": "keydown"
+        },
+        {
+            "time": 1458302979069,
+            "type": "keydown"
+        },
+        {
+            "time": 1458302980529,
+            "type": "keydown"
+        },
+        {
+            "time": 1458302981539,
+            "type": "keydown"
+        },
+        {
+            "time": 1458302982197,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302982791,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302982901,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302983912,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302984921,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302985933,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302987122,
+            "type": "blur"
+        },
+        {
+            "time": 1458302987126,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458302987130,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458302987147,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302992945,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458302992945,
+            "type": "focus"
+        },
+        {
+            "time": 1458302992965,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458302992971,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302993193,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302993747,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302994010,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302994613,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302994670,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302995299,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302995751,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302996770,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302997079,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302997133,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302998176,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458302998380,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458302998927,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458302999932,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458303000945,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458303001983,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458303003305,
+            "type": "blur"
+        },
+        {
+            "time": 1458303003310,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458303003317,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458303003338,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458303003500,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458303003502,
+            "type": "cur-focus"
+        },
+        {
+            "time": 1458303003605,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458303003988,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303005006,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303006084,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303007084,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303007568,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458303007732,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303008973,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303010195,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303011236,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303012283,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303012399,
+            "type": "cur-blur"
+        },
+        {
+            "time": 1458303012403,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303014071,
+            "type": "focus"
+        },
+        {
+            "time": 1458303014468,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303015986,
+            "type": "blur"
+        },
+        {
+            "time": 1458303016837,
+            "type": "cur-focus"
+        },
+        {
+            "time": 1458303016841,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303017943,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303019338,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303020702,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303022146,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303023268,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303024480,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303025488,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303025792,
+            "type": "cur-mousedown"
+        },
+        {
+            "time": 1458303025933,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303026504,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458303029594,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458303029813,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303031784,
+            "type": "cur-blur"
+        },
+        {
+            "time": 1458303031925,
+            "type": "focus"
+        },
+        {
+            "time": 1458303032220,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303032845,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303033304,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303033328,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303033639,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303034048,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303034671,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303034886,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303035370,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303038887,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303039503,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303041292,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303041735,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303042150,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303042604,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303042988,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303043451,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303047734,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303047758,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458303048764,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458303049989,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458303051239,
+            "type": "blur"
+        },
+        {
+            "time": 1458303051242,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458303051248,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458303051273,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458303052274,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458303053495,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458303053734,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303054846,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458303054871,
+            "type": "focus",
+            "url": "http://www.livescience.com/49452-trackers-measure-stress-heart-rate-variability.html"
+        },
+        {
+            "time": 1458303054886,
+            "type": "blur"
+        },
+        {
+            "time": 1458303055435,
+            "type": "mousemove",
+            "url": "http://www.livescience.com/49452-trackers-measure-stress-heart-rate-variability.html"
+        },
+        {
+            "time": 1458303055937,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458303056299,
+            "type": "blur"
+        },
+        {
+            "time": 1458303056325,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458303056327,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458303056446,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458303056916,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303058452,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303059853,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303062080,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303068736,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303079040,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303079171,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303085225,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303087896,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303089174,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303090788,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303091799,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303093012,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303094005,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303094072,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458303095226,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458303096233,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458303097052,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458303097061,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458303097210,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458303097212,
+            "type": "cur-focus"
+        },
+        {
+            "time": 1458303097294,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458303097687,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303098698,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303099767,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303100767,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303101778,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303102829,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303103837,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303104887,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303105900,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303106910,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303107911,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303108911,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303110619,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303111736,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303113390,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303114793,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303115870,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303117153,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303118726,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303119763,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303120774,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303121778,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303122779,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303124143,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303124245,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458303125256,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458303126596,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458303126680,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303128972,
+            "type": "cur-blur"
+        },
+        {
+            "time": 1458303129114,
+            "type": "focus"
+        },
+        {
+            "time": 1458303129452,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303130658,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303131815,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458303131957,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303132596,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458303132736,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303132893,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458303133025,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303133077,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458303133225,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303133939,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303134497,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303135173,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303135697,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303137658,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303138363,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303139371,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303140376,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303140645,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303141178,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303141508,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303141979,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303142728,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303144080,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303145094,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303146100,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303150038,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303150576,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303151425,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303151909,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303151942,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303152443,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303152619,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303153045,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458303153050,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303153183,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303153193,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303153359,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303153375,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303153476,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303154961,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303155379,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303155809,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303156185,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303156642,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303159582,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303165691,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303166301,
+            "type": "mousewheel"
+        },
+        {
+            "time": 1458303167007,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303172755,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303173412,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458303173503,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303173552,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458303173622,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303173706,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458303173850,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303174850,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303176241,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458303176308,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303177094,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458303177225,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303177257,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458303177336,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303177456,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458303177600,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303177960,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458303178101,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303179588,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303180864,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458303181018,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303181982,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458303182143,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303183146,
+            "type": "keydown"
+        },
+        {
+            "time": 1458303184203,
+            "type": "keydown"
+        },
+        {
+            "time": 1458303185625,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303186864,
+            "type": "mousedown"
+        },
+        {
+            "time": 1458303186968,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303187803,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458303189153,
+            "type": "blur"
+        },
+        {
+            "time": 1458303189154,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458303189157,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458303189239,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458303189578,
+            "type": "mousemove"
+        },
+        {
+            "time": 1458303193106,
+            "type": "col-blur"
+        },
+        {
+            "time": 1458303193246,
+            "type": "cur-focus"
+        },
+        {
+            "time": 1458303193255,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303194273,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303195421,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303196434,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303197475,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303198535,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303203420,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303211162,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303212169,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303222515,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303222652,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458303223048,
+            "type": "cur-mousemove"
+        },
+        {
+            "time": 1458303223467,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458303224553,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458303224656,
+            "type": "cur-blur"
+        },
+        {
+            "time": 1458303224668,
+            "type": "col-focus"
+        },
+        {
+            "time": 1458303225350,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458303226628,
+            "type": "col-mousedown"
+        },
+        {
+            "time": 1458303226791,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458303227792,
+            "type": "col-mousemove"
+        },
+        {
+            "time": 1458303228551,
+            "type": "col-mousedown"
+        }
+    ]
+}
