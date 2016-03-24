@@ -31,7 +31,8 @@ sm.vis.collection = function() {
         brushing = false,
         minZoomIndex = 0,
         maxZoomIndex = 3,
-        zoomLevelIndex = maxZoomIndex,
+        defaultZoomIndex = maxZoomIndex,
+        zoomLevelIndex = defaultZoomIndex,
         zoomLevel = ZoomLevel[zoomLevelIndex];
 
     // Data
@@ -613,7 +614,7 @@ sm.vis.collection = function() {
     };
 
     /**
-     * Increase zoom level.
+     * Increases zoom level.
      */
     module.zoomIn = function() {
         zoomLevelIndex = Math.min(maxZoomIndex, zoomLevelIndex + 1);
@@ -621,10 +622,30 @@ sm.vis.collection = function() {
     };
 
     /**
-     * Reduce zoom level.
+     * Reduces zoom level.
      */
     module.zoomOut = function() {
         zoomLevelIndex = Math.max(minZoomIndex, zoomLevelIndex - 1);
+        zoomLevel = ZoomLevel[zoomLevelIndex];
+    };
+
+    /**
+     * Resets to the default zoom level.
+     */
+    module.resetZoom = function() {
+        zoomLevelIndex = defaultZoomIndex,
+        zoomLevel = ZoomLevel[zoomLevelIndex];
+    };
+
+    /**
+     * Computes the zoom level based on a series of zooms
+     */
+    module.computeZoomLevel = function(zooms) {
+        zoomLevelIndex = defaultZoomIndex;
+        zooms.forEach(z => {
+            if (z.type === 'collection-zoom-in') zoomLevelIndex = Math.min(maxZoomIndex, zoomLevelIndex + 1);
+            if (z.type === 'collection-zoom-out') zoomLevelIndex = Math.max(minZoomIndex, zoomLevelIndex - 1);
+        });
         zoomLevel = ZoomLevel[zoomLevelIndex];
     };
 

@@ -25,6 +25,10 @@ $(function() {
                 curation.zoomIn();
             } else if (request.type === 'toZoomOut') {
                 curation.zoomOut();
+            } else if (request.type === 'resetZoom') {
+                curation.resetZoom();
+            } else if (request.type === 'computeZoom') {
+                curation.computeZoomLevel(request.values);
             }
         });
     }

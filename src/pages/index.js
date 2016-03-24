@@ -9,8 +9,8 @@ $(function() {
         pendingTasks = {}, // For jumping to an action when its page isn't ready yet
         debugging = backgroundPage.debugging,
         closeConfirmation = !debugging,
-        // datasetName = debugging ? 'data/test2.zip' : '';
-        datasetName = '';
+        datasetName = debugging ? 'data/test2.zip' : '';
+        // datasetName = '';
 
     // Vis and options
     var collection,
@@ -47,6 +47,9 @@ $(function() {
         d3.select('#bars').on('click', toggleToolbar);
 
         d3.select('#btnNew').on('click', () => {
+            collection.resetZoom();
+            chrome.runtime.sendMessage({ type: 'resetZoom' });
+
             actions = [];
             data.nodes = [];
             data.links = [];
@@ -75,7 +78,7 @@ $(function() {
         });
 
         d3.select('#btnReplay').on('click', function() {
-            replay(1500);
+            replay(1000);
             toggleToolbar();
         });
 
@@ -115,6 +118,21 @@ $(function() {
         // d3.select('body').on('mouseover', function() {
         //     chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, { focused: true });
         // });
+
+        // Replay by shortcut
+        $(document).on("keydown", function(e) {
+            if (!e.metaKey && !e.ctrlKey) return;
+
+            var prevent = true;
+
+            if (e.keyCode === 80) { // Ctrl + P
+                replay(1000);
+            } else {
+                prevent = false;
+            }
+
+            if (prevent) e.preventDefault();
+        });
     }
 
     function captureActivities(w, handle) {
@@ -142,6 +160,7 @@ $(function() {
         browser.browsingActions(browsingActions);
         browser.actions(actions, function() {
             buildVis();
+            collection.computeZoomLevel(actions.filter(a => a.type === 'collection-zoom-in' || a.type === 'collection-zoom-out'));
             updateVis();
 
             // It's required the curation view should be opened at the beggining because curate-node action needs the view to determine location
@@ -150,6 +169,12 @@ $(function() {
 
             if (view) {
                 view.location.reload();
+
+                setTimeout(function() {
+                    var curationZoomActions = actions.filter(a => a.type === 'curation-zoom-in' || a.type === 'curation-zoom-out');
+                    chrome.runtime.sendMessage({ type: 'computeZoom', values: curationZoomActions });
+                    chrome.runtime.sendMessage({ type: 'redraw' });
+                }, 1000);
             } else {
                 chrome.windows.create({
                     url: chrome.extension.getURL('src/pages/curation-view.html'),
@@ -157,6 +182,12 @@ $(function() {
                     state: "minimized"
                 }, function(w) {
                     curationWindowId = w.id;
+
+                    setTimeout(function() {
+                        var curationZoomActions = actions.filter(a => a.type === 'curation-zoom-in' || a.type === 'curation-zoom-out');
+                        chrome.runtime.sendMessage({ type: 'computeZoom', values: curationZoomActions });
+                        chrome.runtime.sendMessage({ type: 'redraw' });
+                    }, 3000);
                 });
             }
         }).capture(listening)
@@ -194,6 +225,8 @@ $(function() {
 
         mod.mergeActions(actions);
 
+        computeZoomLevel();
+
         if (!isJson) replaceRelativePathWithDataURI(zip);
 
         if (external) {
@@ -203,6 +236,17 @@ $(function() {
                 if (collection) redraw();
             });
         }
+    }
+
+    function computeZoomLevel() {
+        if (!collection) return;
+
+        // Zoom for collection
+        collection.computeZoomLevel(actions.filter(a => a.type === 'collection-zoom-in' || a.type === 'collection-zoom-out'));
+
+        // Zoom for curation
+        curationZoomActions = actions.filter(a => a.type === 'curation-zoom-in' || a.type === 'curation-zoom-out');
+        chrome.runtime.sendMessage({ type: 'computeZoom', values: curationZoomActions });
     }
 
     function replaceRelativePathWithDataURI(zip) {
@@ -300,6 +344,9 @@ $(function() {
     }
 
     function replay(timeStep) {
+        collection.resetZoom();
+        chrome.runtime.sendMessage({ type: 'resetZoom' });
+
         var count = 1,
             relevantActions = actions.filter(a => a.type !== 'click-node' && a.type !== 'revisit');
 

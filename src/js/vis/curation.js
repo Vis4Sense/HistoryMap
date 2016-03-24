@@ -31,7 +31,8 @@ sm.vis.curation = function() {
         connecting = false,
         minZoomIndex = 0,
         maxZoomIndex = 3,
-        zoomLevelIndex = maxZoomIndex,
+        defaultZoomIndex = maxZoomIndex,
+        zoomLevelIndex = defaultZoomIndex,
         oldZoomLevelIndex,
         zoomLevel = ZoomLevel[zoomLevelIndex],
         connectingTimerId;
@@ -670,6 +671,26 @@ sm.vis.curation = function() {
         zoomLevelIndex = Math.max(minZoomIndex, zoomLevelIndex - 1);
         zoomLevel = ZoomLevel[zoomLevelIndex];
         translateNodes();
+    };
+
+    /**
+     * Resets to the default zoom level.
+     */
+    module.resetZoom = function() {
+        zoomLevelIndex = defaultZoomIndex,
+        zoomLevel = ZoomLevel[zoomLevelIndex];
+    };
+
+    /**
+     * Computes the zoom level based on a series of zooms
+     */
+    module.computeZoomLevel = function(zooms) {
+        zoomLevelIndex = defaultZoomIndex;
+        zooms.forEach(z => {
+            if (z.type === 'curation-zoom-in') zoomLevelIndex = Math.min(maxZoomIndex, zoomLevelIndex + 1);
+            if (z.type === 'curation-zoom-out') zoomLevelIndex = Math.max(minZoomIndex, zoomLevelIndex - 1);
+        });
+        zoomLevel = ZoomLevel[zoomLevelIndex];
     };
 
     // Binds custom events
