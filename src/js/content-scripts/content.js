@@ -22,23 +22,13 @@ $(function() {
 /**
  * Sometimes as in google search result page, the href is different from the openning page! Redirect?
  */
-var count = 10, // Don't know when links will be loaded, try 10 times
-    timerId;
 function injectLinks() {
-    timerId = setInterval(function() {
-        // To make sure only 1 is bound
-        $('body a').off('click', sendClick);
-        $('body a').on('click', sendClick);
-        $('body a').off('mouseover', sendClick);
-        $('body a').on('mouseover', sendClick);
-        count--;
-
-        if (!count) clearInterval(timerId);
-    }, 1000);
+  $(document).on('click', 'a', sendClick);
+   // .on('mouseover', 'a', sendClick);
 }
 
 function sendClick() {
-    chrome.runtime.sendMessage({ type: "linkClicked" });
+  chrome.runtime.sendMessage({ type: "linkClicked" });
 }
 
 /**
