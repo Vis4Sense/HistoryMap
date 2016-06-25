@@ -26,7 +26,7 @@ sm.provenance.browser = function() {
         chrome.tabs.onCreated.addListener(onTabCreated);
         chrome.tabs.onUpdated.addListener(onTabUpdated);
         chrome.tabs.onActivated.addListener(onTabActivated);
-        chrome.tabs.onRemoved.addListener(onTabRemoved);
+        chrome.tabs.onRemoved.addListener(onTabClose);
         chrome.runtime.onMessage.addListener(onMessageReceived);
         createContextMenus();
         addLinkHandler();
@@ -37,10 +37,14 @@ sm.provenance.browser = function() {
     init();
 
     function onTabCreated(tab) {
-        if (lastLinkClickedParentUrl) {
-            var a = urlToActionLookup[lastLinkClickedParentUrl];
-            if (a) tabIdToParentIdLookup[tab.id] = isEmbeddedType(a) ? a.from : a.id;
-            lastLinkClickedParentUrl = undefined;
+        //console.log('open new tabs, previous link', lastLinkClickedParentUrl);
+
+        if (lastLinkClickedParentUrl !== undefined) {
+            var action = urlToActionLookup[lastLinkClickedParentUrl];
+            if (action) {
+              tabIdToParentIdLookup[tab.id] = isEmbeddedType(action) ? action.from : action.id;
+              lastLinkClickedParentUrl = undefined;
+            }
         }
     }
 
@@ -48,6 +52,12 @@ sm.provenance.browser = function() {
     // I don't want to include auto reload page. So, don't capture revisit here at all.
     // If the user opens a revisited page, accept a known bug that it's not captured.
     function onTabUpdated(tabId, changeInfo, tab) {
+      if (!(changeInfo.status == 'complete' && tab.status == 'complete' && tab.url != undefined)) {
+        return;
+      }
+
+      //console.log('reload tab, previous link', lastLinkClickedParentUrl);
+
         if (lastLinkClickedParentUrl) {
             // We should do it once, but how to check.
             // Can't use tabId only because a tab can be updated many times if the user
@@ -174,6 +184,8 @@ sm.provenance.browser = function() {
             action = createActionObject(tab.id, originalAction.url, originalAction.text, type, originalAction.favIconUrl);
             dispatch.dataChanged(type, true);
         } else if (type === 'highlight' || type === 'filter') {
+          // console.log('original action', originalAction);
+
             action = createActionObject(tab.id, tab.url, text, type, undefined, path, classId, isEmbeddedType(originalAction.type) ? originalAction.from : originalAction.id);
             if (type === 'filter') urlToActionLookup[tab.url] = action;
             dispatch.dataChanged(type, true);
@@ -209,6 +221,8 @@ sm.provenance.browser = function() {
     var lastDate;
 
     function createActionObject(tabId, url, text, type, favIconUrl, path, classId, from) {
+      // console.log('Create action', arguments);
+
         var time = new Date(),
             action = {
                 id: +time,
@@ -347,7 +361,7 @@ sm.provenance.browser = function() {
         });
     }
 
-    function onTabRemoved(tabId, removeInfo) {
+    function onTabClose(tabId, removeInfo) {
         var n = tabIdToActionLookup[tabId];
         if (n) {
             n.closed = true;
@@ -451,7 +465,7 @@ sm.provenance.browser = function() {
     function addLinkHandler() {
         chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             if (request.type === 'linkClicked') {
-                console.log('click', +new Date());
+                console.log('click', sender.tab.url);
                 lastLinkClickedParentUrl = sender.tab.url;
             }
         });
