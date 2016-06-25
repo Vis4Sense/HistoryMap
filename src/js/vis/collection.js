@@ -18,11 +18,12 @@ sm.vis.collection = function() {
         { width: 26, imageWidth: 50, numChildren: 0 },
         { width: 100, numChildren: 0 },
         { width: 125, numChildren: 1 },
-        { width: 150, numChildren: 2 }
+        { width: 175, numChildren: 2 }
     ];
     ZoomLevel.forEach(z => {
-        z.maxHeight = z.width / 0.75;
-        if (z.imageWidth) z.maxImageHeight = z.imageWidth / 0.75;
+        var f = 1;
+        z.maxHeight = z.width * f;
+        if (z.imageWidth) z.maxImageHeight = z.imageWidth * f;
     });
 
     // Rendering options

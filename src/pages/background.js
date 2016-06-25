@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		if (getView(url)) return;
 
 		// Shared by all views
-		window.debugging = false;
+		window.debugging = true;
 
 	    // Resize current window
 		chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {

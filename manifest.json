@@ -3,7 +3,7 @@
 
     "name": "SenseMap",
     "description": "SenseMaking with Analytic Provenance",
-    "version": "0.5.5",
+    "version": "0.5.8",
 
     "browser_action": {
         "default_icon": {
