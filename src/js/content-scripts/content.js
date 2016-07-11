@@ -23,12 +23,12 @@ $(function() {
  * Sometimes as in google search result page, the href is different from the openning page! Redirect?
  */
 function injectLinks() {
-  $(document).on('click', 'a', sendClick);
-   // .on('mouseover', 'a', sendClick);
+  	$('body').on('click', 'a', sendClick)
+    	.on('mouseover', 'a', sendClick);
 }
 
 function sendClick() {
-  chrome.runtime.sendMessage({ type: "linkClicked" });
+  	chrome.runtime.sendMessage({ type: "linkClicked" });
 }
 
 /**

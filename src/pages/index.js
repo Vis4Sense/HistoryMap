@@ -9,8 +9,8 @@ $(function() {
         pendingTasks = {}, // For jumping to an action when its page isn't ready yet
         debugging = backgroundPage.debugging,
         closeConfirmation = !debugging,
-        datasetName = debugging ? 'data/test2.zip' : '';
-        // datasetName = '';
+        // datasetName = debugging ? 'data/test2.zip' : '';
+        datasetName = '';
 
     // Vis and options
     var collection,

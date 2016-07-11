@@ -23,10 +23,10 @@ sm.provenance.browser = function() {
     var dispatch = d3.dispatch('dataChanged');
 
     function init() {
-        chrome.tabs.onCreated.addListener(onTabCreated);
+        // chrome.tabs.onCreated.addListener(onTabCreated);
         chrome.tabs.onUpdated.addListener(onTabUpdated);
         chrome.tabs.onActivated.addListener(onTabActivated);
-        chrome.tabs.onRemoved.addListener(onTabClose);
+        chrome.tabs.onRemoved.addListener(onTabRemoved);
         chrome.runtime.onMessage.addListener(onMessageReceived);
         createContextMenus();
         addLinkHandler();
@@ -265,7 +265,10 @@ sm.provenance.browser = function() {
             // }
 
             // Method 2
-            if (tabIdToParentIdLookup[tabId]) action.from = tabIdToParentIdLookup[tabId];
+            if (tabIdToParentIdLookup[tabId]) {
+                action.from = tabIdToParentIdLookup[tabId];
+                tabIdToParentIdLookup[tabId] = undefined; // invalidate after use Phong 25/06/2016
+            }
         }
 
         actions.push(action);
@@ -361,7 +364,7 @@ sm.provenance.browser = function() {
         });
     }
 
-    function onTabClose(tabId, removeInfo) {
+    function onTabRemoved(tabId, removeInfo) {
         var n = tabIdToActionLookup[tabId];
         if (n) {
             n.closed = true;
