@@ -52832,20 +52832,7 @@ mxCurrentRootChange.prototype.execute = function()
  * performance. Default is mxConstants.DIALECT_MIXEDHTML (for IE).
  * stylesheet - Optional <mxStylesheet> to be used in the graph.
  */
-function mxGraph(container, model, renderHint, stylesheet)
-{
- 	var x = new Date();
- 	// Month starts at 0 = Jan
- 	x.setFullYear(2017,0,1);
- 	var today = new Date();
-
- 	if (x < today)
- 	{
- 		// We told you not to put an evaluation copy into production....
- 		alert("mxGraph Evaluation copy expired");
- 		return;
- 	}
-
+function mxGraph(container, model, renderHint, stylesheet) {
 	// Initializes the variable in case the prototype has been
 	// modified to hold some listeners (which is possible because
 	// the createHandlers call is executed regardless of the

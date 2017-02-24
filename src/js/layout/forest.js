@@ -12,7 +12,7 @@ sm.layout.forest = function() {
         roots,
         width, height,
         children = d => d.links,
-        parent = d => d.sup,
+        parent = d => d.source,
         time = d => d.time,
         label = d => d.label,
         nodeDict, linkDict,

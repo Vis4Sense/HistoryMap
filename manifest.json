@@ -3,7 +3,7 @@
 
     "name": "SenseMap",
     "description": "SenseMaking with Analytic Provenance",
-    "version": "0.5.8",
+    "version": "0.0.1",
 
     "browser_action": {
         "default_icon": {
@@ -21,12 +21,20 @@
         "persistent": false
     },
 
-    "content_scripts": [ {
-        "matches" : ["http://*/*", "https://*/*"],
-        "js": ["src/bower_components/jquery/dist/jquery.min.js", "src/bower_components/bootstrap/dist/js/bootstrap.min.js", "src/bower_components/jquery-ui.min.js", "src/js/content-scripts/highlight.js", "src/js/content-scripts/content.js"],
-        "css": ["src/css/content.css"],
-        "run_at": "document_end"
-    } ],
+    "content_scripts": [
+    {
+      "matches": [
+        "file:///*",
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+          "src/bower_components/jquery/dist/jquery.min.js",
+        "src/js/content-scripts/content.js"
+      ],
+      "run_at": "document_end"
+    }
+  ],
 
     "permissions": [
         "<all_urls>",

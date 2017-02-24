@@ -1,47 +1,43 @@
 document.addEventListener('DOMContentLoaded', function () {
-	// Called when the browser action is clicked.
 	chrome.browserAction.onClicked.addListener(function() {
-		// Get the main view or create if it doesn't exist
-		var url = chrome.extension.getURL("src/pages/index.html");
+		const url = chrome.extension.getURL('src/pages/history-map-page.html');
 
-		// Allow a single instance
+		// Only allow a single instance of the history map
 		if (getView(url)) return;
 
-		// Shared by all views
-		window.debugging = true;
-
-	    // Resize current window
+		// Adjust location and size of the current window, where the extension button is clicked
 		chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {
 			left: 0, top: 0, width: screen.width / 2, height: screen.height
 		});
 
-		// Collection view
+		// Create an instance of the history map
 		chrome.windows.create({
 	    	url: url,
-	    	type: "popup",
+	    	type: 'popup',
 	    	left: screen.width / 2,
 	    	top: 0,
 	    	width: screen.width / 2,
-	    	height: screen.height - (window.debugging ? 600 : 0)
+	    	height: screen.height
 	    }, function(w) {
 	    	chrome.windows.update(w.id, { focused: true });
 	    });
 
 		// Listen to content script
 		chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-			if (request.type === "backgroundOpened") { // To respond that background page already opened
+			if (request.type === 'backgroundOpened') { // To respond that the background page is currently active
 				sendResponse(true);
 			}
 		});
 	});
 
+	/**
+	 * Returns an extension page by url.
+	 */
 	function getView(url) {
-		var views = chrome.extension.getViews();
-		for (var i = 0; i < views.length; i++) {
-			var view = views[i];
-			if (view.location.href === url) {
-				return view;
-			}
+		const views = chrome.extension.getViews();
+
+		for (let i = 0; i < views.length; i++) {
+			if (views[i].location.href === url) return views[i];
 		}
 
 		return null;
