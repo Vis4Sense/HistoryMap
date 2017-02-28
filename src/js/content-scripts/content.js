@@ -10,7 +10,7 @@ $(function() {
 
 function injectLinks() {
      // Can't use 'click' because it doesn't detect a click when right click and open in new tab.
-  	$('body').on('mouseover', 'a', function() {
+  	$('body').on('mouseover', 'a', function() { // kai: is this jquery? what if mouseover and no click?
   	    chrome.runtime.sendMessage({ type: "linkClicked" });
     });
 }
