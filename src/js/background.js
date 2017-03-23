@@ -1,22 +1,22 @@
 document.addEventListener('DOMContentLoaded', function () {
 	chrome.browserAction.onClicked.addListener(function() {
-		const url = chrome.extension.getURL('src/pages/history-map-page.html');
+		const url = chrome.extension.getURL('src/html/history-map-page.html');
 
 		// Only allow a single instance of the history map
 		if (getView(url)) return;
 
 		// Adjust location and size of the current window, where the extension button is clicked
 		chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {
-			left: 0, top: 0, width: screen.width / 2, height: screen.height
+			left: screen.width * 0.4, top: 0, width: screen.width * 0.6, height: screen.height
 		});
 
 		// Create an instance of the history map
 		chrome.windows.create({
 	    	url: url,
 	    	type: 'popup',
-	    	left: screen.width / 2,
+	    	left: 0,
 	    	top: 0,
-	    	width: screen.width / 2,
+	    	width: screen.width * 0.4,
 	    	height: screen.height
 	    }, function(w) {
 	    	chrome.windows.update(w.id, { focused: true });

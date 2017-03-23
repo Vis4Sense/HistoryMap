@@ -17,7 +17,7 @@
    },
 
     "background": {
-        "page": "src/pages/background.html",
+        "page": "src/html/background.html",
         "persistent": false
     },
 
@@ -29,8 +29,8 @@
         "https://*/*"
       ],
       "js": [
-          "src/bower_components/jquery/dist/jquery.min.js",
-        "src/js/content-scripts/content.js"
+          "src/lib/jquery.min.js",
+        "src/js/browser/content-scripts.js"
       ],
       "run_at": "document_end"
     }
