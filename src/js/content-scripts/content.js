@@ -1,3 +1,15 @@
+
+// This is just for testing the test script
+
+function content(){
+
+}
+
+content.prototype.add=function(x, y){
+	return x+y;
+}
+
+
 $(function() {
     // Only run after the background page opens.
     chrome.runtime.sendMessage({ type: "backgroundOpened" }, function(response) {
