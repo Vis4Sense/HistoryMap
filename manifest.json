@@ -29,7 +29,7 @@
         "https://*/*"
       ],
       "js": [
-          "src/lib/jquery.min.js",
+          "lib/jquery.min.js",
         "src/js/browser/content-scripts.js"
       ],
       "run_at": "document_end"
@@ -45,5 +45,7 @@
         "contextMenus"
     ],
 
-    "web_accessible_resources": ["src/css/*.*"]
+    "web_accessible_resources": ["src/css/*.*"],
+
+    "options_page":"src/html/options.html"
 }

@@ -35,13 +35,9 @@
   var jasmineInterface = jasmineRequire.interface(jasmine, env);
 
   /**
-   * Add all of the Jasmine global/public interface to the proper global, so a project can use the public interface directly. For example, calling `describe` in specs instead of `jasmine.getEnv().describe`.
+   * Add all of the Jasmine global/public interface to the global scope, so a project can use the public interface directly. For example, calling `describe` in specs instead of `jasmine.getEnv().describe`.
    */
-  if (typeof window == "undefined" && typeof exports == "object") {
-    extend(exports, jasmineInterface);
-  } else {
-    extend(window, jasmineInterface);
-  }
+  extend(window, jasmineInterface);
 
   /**
    * ## Runner Parameters
@@ -53,8 +49,21 @@
     getWindowLocation: function() { return window.location; }
   });
 
+  var filterSpecs = !!queryString.getParam("spec");
+
   var catchingExceptions = queryString.getParam("catch");
   env.catchExceptions(typeof catchingExceptions === "undefined" ? true : catchingExceptions);
+
+  var throwingExpectationFailures = queryString.getParam("throwFailures");
+  env.throwOnExpectationFailure(throwingExpectationFailures);
+
+  var random = queryString.getParam("random");
+  env.randomizeTests(random);
+
+  var seed = queryString.getParam("seed");
+  if (seed) {
+    env.seed(seed);
+  }
 
   /**
    * ## Reporters
@@ -63,11 +72,14 @@
   var htmlReporter = new jasmine.HtmlReporter({
     env: env,
     onRaiseExceptionsClick: function() { queryString.navigateWithNewParam("catch", !env.catchingExceptions()); },
+    onThrowExpectationsClick: function() { queryString.navigateWithNewParam("throwFailures", !env.throwingExpectationFailures()); },
+    onRandomClick: function() { queryString.navigateWithNewParam("random", !env.randomTests()); },
     addToExistingQueryString: function(key, value) { return queryString.fullStringWithNewParam(key, value); },
     getContainer: function() { return document.body; },
     createElement: function() { return document.createElement.apply(document, arguments); },
     createTextNode: function() { return document.createTextNode.apply(document, arguments); },
-    timer: new jasmine.Timer()
+    timer: new jasmine.Timer(),
+    filterSpecs: filterSpecs
   });
 
   /**

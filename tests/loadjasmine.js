@@ -1,3 +1,5 @@
+// source: https://gist.github.com/stevenqzhang/333fd0b2bca201aabaa40c7b63a74296
+
 document.addEventListener('DOMContentLoaded', function () {
     document.getElementById("loadjasmine").addEventListener('click', loadJasmine);
 });
@@ -21,3 +23,4 @@ function loadJasmine() {
         execJasmine();
       }
   document.getElementById("runtests").addEventListener('click', runTests);
+}
