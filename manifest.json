@@ -3,7 +3,7 @@
 
     "name": "SenseMap",
     "description": "SenseMaking with Analytic Provenance",
-    "version": "0.0.1",
+    "version": "0.1.1",
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
 
     "browser_action": {
