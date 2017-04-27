@@ -4,6 +4,7 @@
     "name": "SenseMap",
     "description": "SenseMaking with Analytic Provenance",
     "version": "0.0.1",
+    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
 
     "browser_action": {
         "default_icon": {
@@ -45,7 +46,7 @@
         "contextMenus"
     ],
 
-    "web_accessible_resources": ["src/css/*.*"],
+    "web_accessible_resources": ["src/css/*.*", "tests/tests.html"],
 
     "options_page":"src/html/options.html"
 }
