@@ -1,10 +1,16 @@
 /**
  * captures user actions (provenance) in the Chrome browser.
- * part of the 'browser controller'.
- */
+ * part of the 'browser controller'.  */
 sm.provenance.browser = function() {
+	
+	var count = 0;
     const module = {};
-
+	var recordIDs = {};
+	var recordNodeID = {};
+	var recordNodeCounter = {};
+	var recordNodeTime = {};
+	var recordNodeLock = {};
+	
     const ignoredUrls = [
         'chrome://',
         'chrome-extension://',
@@ -14,78 +20,102 @@ sm.provenance.browser = function() {
         'google.com/url',
         'localhost://'
     ],
-        bookmarkTypes = [ 'auto_bookmark' ],
-        typedTypes = [ 'typed', 'generated', 'keyword', 'keyword_generated' ];
-
-    const urlToActionLookup = {}, // url -> action (data object) if the page was visited (first visit) and captured
-        urlToParentIdLookup = {}; // url -> its parent ID
+    bookmarkTypes = [ 'auto_bookmark' ],
+    typedTypes = [ 'typed', 'generated', 'keyword', 'keyword_generated' ];
 
     let lastClickedUrl; // The URL of the page where the last link was clicked
-
     const dispatch = d3.dispatch('dataChanged');
-
     saveLastClickedUrl();
-    detectPageLinking();
     captureTabInformation();
+	onCreatedCall();
 
     function saveLastClickedUrl() {
         chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-            if (request.type === 'linkClicked') {
-                lastClickedUrl = sender.tab.url;
-            }
+			 if (request.loadURL) {
+				//recordNodeLock[sender.tab.id] == 0;
+				
+/*				console.log("URL: "+sender.tab.url+" - Tab ID:"+sender.tab.id);
+                   action = {
+                        id: recordNodeID[sender.tab.id],
+                        time: recordNodeTime[sender.tab.id],
+                        url: sender.tab.url,
+                        text: sender.tab.title || sender.tab.url || '',
+                        type: "link",
+				        favIconUrl: sender.tab.favIconUrl,
+						counter: recordNodeCounter[sender.tab.id],
+						from: recordNodeID[recordIDs[sender.tab.id]]
+                    };
+                dispatch.dataChanged(action); */
+			 }
         });
+		
+		
     }
 
-    function detectPageLinking() {
-        // This detection method works based on the following assumption.
-        // When a link is clicked, instantly the corresponding page will be opened and the tabUpdated code below will be invoked.
-        // No other pages can be opened during this instant duration.
-        // Therefore, the parent URL of that page is the URL of the page where the last link was clicked (lastClickedUrl).
-        chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-            if (!lastClickedUrl || urlToActionLookup[tab.url]) return;
-
-            urlToParentIdLookup[tab.url] = urlToActionLookup[lastClickedUrl].id;
-
-            // IMPORTANT: this URL should be reset after use so that the method can also work with manual address.
-            delete lastClickedUrl;
-        });
-    }
+	function onCreatedCall() {
+		chrome.tabs.onCreated.addListener( function( tab) {
+		  
+		  if (tab.openerTabId && (tab.url.indexOf("chrome://newtab/") == -1)){
+			var pid = tab.openerTabId;	
+		  }  
+		  if(pid) {
+			console.log("An Edge is Created with the Tab ID:" + tab.id + " and Parent Id:"+ pid);
+			recordIDs[tab.id] = pid;
+		  } else {
+			console.log("A Node is Created with the Parent ID:" + tab.id);
+			recordIDs[tab.id] = tab.id;
+		  }
+		});
+	}
 
     function captureTabInformation() {
         chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-            // Wait until the tab completes loading
+			
             if (isTabIgnored(tab) || isTabInComplete(tab)) return;
-
-            const action = urlToActionLookup[tab.url];
-
-            // Do nothing if page is already captured
-            if (action) return;
-
-            getVisitType(tab.url, type => {
-                // Still need to check the last time before creating a new action
-                // because two updates can happen in a very short time,
-                // thus the second one happens even before a new action is added in the first update.
-                if (urlToActionLookup[tab.url]) return;
-
-                const time = new Date(),
-                    action = {
-                        id: +time,
-                        time: time,
+			if(changeInfo.status === undefined || changeInfo.status === null) return;
+			if(recordNodeLock[tabId] == 1) {  
+			
+                   action = {
+                        id: recordNodeID[tabId],
+                        time: recordNodeTime[tabId],
                         url: tab.url,
-                        text: tab.title || tab.url || '',
-                        type: type,
-                        favIconUrl: tab.favIconUrl
+						text: tab.title || tab.url || '',
+                        type: "link",
+						favIconUrl: tab.favIconUrl,
+						counter: recordNodeCounter[tabId],
+						from: recordNodeID[recordIDs[tabId]]
                     };
-
-                // Set page linking information
-                if (type === 'link' && urlToParentIdLookup[tab.url]) {
-                    action.from = urlToParentIdLookup[tab.url];
-                }
-
-                urlToActionLookup[tab.url] = action;
-
-                dispatch.dataChanged(action);
-            });
+					dispatch.dataChanged(action);			
+					
+					
+					recordNodeLock[tabId] = 0; 
+			return ; 
+			
+			} else {
+				const time = new Date(),
+					action = {
+						id: +time,
+						time: time,
+						url: tab.url,
+						text: tab.title || tab.url || '',
+						type: "link",
+						favIconUrl: tab.favIconUrl,
+						counter: count,
+						from: recordNodeID[recordIDs[tabId]]
+					};
+					
+				recordNodeID[tabId] = +time;
+				recordNodeTime[tabId] = time;
+				recordNodeCounter[tabId] = count;
+				recordNodeLock[tabId] = 1;
+				console.log("B"+recordNodeLock[tabId]);
+				dispatch.dataChanged(action);
+				count++;
+			}
+			
+			
+			
+			
         });
     }
 
@@ -97,20 +127,6 @@ sm.provenance.browser = function() {
         return ignoredUrls.some(url => tab.url.includes(url));
     }
 
-    function getVisitType(url, callback) {
-        chrome.history.getVisits({ url: url }, results => {
-            if (!results || !results.length) return;
-
-            // The latest one contains information about the just completely loaded page
-            const t = _.last(results).transition,
-                type = bookmarkTypes.includes(t) ? 'bookmark' : typedTypes.includes(t) ? 'type' : 'link';
-
-            callback(type);
-        });
-    }
-
-    // Binds custom events
     d3.rebind(module, dispatch, 'on');
-
     return module;
 };
