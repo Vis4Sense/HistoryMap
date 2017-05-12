@@ -49,4 +49,15 @@ describe("history map functionality: ", function(){
                 }
         });
     });
+
+    //Random Tests - RY
+
+    it("Check If it reads local files://"), function(){
+      
+      expect(sm.provenance.browser.lastClickedUrl).toBe('file://');
+        
+    };
+
+
+
 	});
