@@ -62,9 +62,10 @@ sm.provenance.browser = function() {
 		  if(pid) {
 			console.log("A Edge is Created with the Parent ID:" + pid);
 			recordIDs[tab.id] = pid;
+			
 		  } else {
-			recordIDs[tab.id] = tab.id;
-			console.log("A Node is Created with the Parent ID:" + tab.id);
+				recordIDs[tab.id] = tab.id;
+				console.log("A Node is Created with the Parent ID:" + tab.id);
 				const time = new Date(),
 					action = {
 						id: +time,
@@ -113,6 +114,7 @@ sm.provenance.browser = function() {
 							dispatch.dataChanged(action);
 							count++;
 					} else {
+							//update the node/edge
 						   action = {
 								id: recordNodeID[tabId],
 								time: recordNodeTime[tabId],
@@ -140,8 +142,6 @@ sm.provenance.browser = function() {
 						counter: count,
 						from: recordNodeID[recordIDs[tabId]]
 					};
-				
-						
 				recordNodeID[tabId] = +time;
 				recordNodeTime[tabId] = time;
 				recordNodeCounter[tabId] = count;
