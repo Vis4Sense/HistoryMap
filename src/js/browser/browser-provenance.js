@@ -69,8 +69,13 @@ sm.provenance.browser = function() {
 	}
 
     function captureTabInformation() {
+
+		console.log('captureTabInformation function - starts.');
+
         chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 			
+			console.log('captureTabInformation function - add listener.');
+
             if (isTabIgnored(tab) || isTabInComplete(tab)) return;
 			if(changeInfo.status === undefined || changeInfo.status === null) return;
 			if(recordNodeLock[tabId] == 1) {  
