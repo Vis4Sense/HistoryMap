@@ -1,6 +1,7 @@
 /**
  * captures user actions (provenance) in the Chrome browser.
- * part of the 'browser controller'.  */
+ * part of the 'browser controller'.
+ */
 sm.provenance.browser = function() {
 	
 	var count = 0;
@@ -10,6 +11,7 @@ sm.provenance.browser = function() {
 	var recordNodeCounter = {};
 	var recordNodeTime = {};
 	var recordNodeLock = {};
+	var recordNodeHasChild = {};
 	
     const ignoredUrls = [
         'chrome://',
@@ -54,16 +56,34 @@ sm.provenance.browser = function() {
 
 	function onCreatedCall() {
 		chrome.tabs.onCreated.addListener( function( tab) {
-		  
 		  if (tab.openerTabId && (tab.url.indexOf("chrome://newtab/") == -1)){
 			var pid = tab.openerTabId;	
 		  }  
 		  if(pid) {
-			console.log("An Edge is Created with the Tab ID:" + tab.id + " and Parent Id:"+ pid);
+			console.log("A Edge is Created with the Parent ID:" + pid);
 			recordIDs[tab.id] = pid;
+			
 		  } else {
-			console.log("A Node is Created with the Parent ID:" + tab.id);
-			recordIDs[tab.id] = tab.id;
+				recordIDs[tab.id] = tab.id;
+				console.log("A Node is Created with the Parent ID:" + tab.id);
+				const time = new Date(),
+					action = {
+						id: +time,
+						time: time,
+						url: tab.url,
+						text: tab.title || tab.url || '',
+						type: "link",
+						favIconUrl: tab.favIconUrl,
+						counter: count,
+						from: recordNodeID[recordIDs[tab.id]]
+					};
+					
+				recordNodeID[tab.id] = +time;
+				recordNodeTime[tab.id] = time;
+				recordNodeCounter[tab.id] = count;
+				recordNodeLock[tab.id] = 1;
+				dispatch.dataChanged(action);
+				count++;  
 		  }
 		});
 	}
@@ -79,22 +99,41 @@ sm.provenance.browser = function() {
             if (isTabIgnored(tab) || isTabInComplete(tab)) return;
 			if(changeInfo.status === undefined || changeInfo.status === null) return;
 			if(recordNodeLock[tabId] == 1) {  
-			
-                   action = {
-                        id: recordNodeID[tabId],
-                        time: recordNodeTime[tabId],
-                        url: tab.url,
-						text: tab.title || tab.url || '',
-                        type: "link",
-						favIconUrl: tab.favIconUrl,
-						counter: recordNodeCounter[tabId],
-						from: recordNodeID[recordIDs[tabId]]
-                    };
-					dispatch.dataChanged(action);			
-					
-					
-					recordNodeLock[tabId] = 0; 
-			return ; 
+					if(recordNodeHasChild[tabId] == 1) {  
+							const time = new Date(),
+							action = {
+								id: +time,
+								time: time,
+								url: tab.url,
+								text: tab.title || tab.url || '',
+								type: "link",
+								favIconUrl: tab.favIconUrl,
+								counter: count,
+								from: recordNodeID[recordIDs[tabId]]
+							};
+							recordNodeID[tabId] = +time;
+							recordNodeTime[tabId] = time;
+							recordNodeCounter[tabId] = count;
+							recordNodeLock[tabId] = 1;
+							recordNodeHasChild[recordIDs[tabId]] = 1;
+							dispatch.dataChanged(action);
+							count++;
+					} else {
+							//update the node/edge
+						   action = {
+								id: recordNodeID[tabId],
+								time: recordNodeTime[tabId],
+								url: tab.url,
+								text: tab.title || tab.url || '',
+								type: "link",
+								favIconUrl: tab.favIconUrl,
+								counter: recordNodeCounter[tabId],
+								from: recordNodeID[recordIDs[tabId]]
+							};
+							dispatch.dataChanged(action);			
+							recordNodeLock[tabId] = 0; 
+							return ; 
+					}
 			
 			} else {
 				const time = new Date(),
@@ -108,12 +147,12 @@ sm.provenance.browser = function() {
 						counter: count,
 						from: recordNodeID[recordIDs[tabId]]
 					};
-					
 				recordNodeID[tabId] = +time;
 				recordNodeTime[tabId] = time;
 				recordNodeCounter[tabId] = count;
 				recordNodeLock[tabId] = 1;
-				console.log("B"+recordNodeLock[tabId]);
+				recordNodeHasChild[recordIDs[tabId]] = 1;
+				//console.log("B"+recordNodeLock[tabId]);
 				dispatch.dataChanged(action);
 				count++;
 			}
