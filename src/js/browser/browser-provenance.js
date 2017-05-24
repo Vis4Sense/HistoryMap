@@ -94,7 +94,7 @@ sm.provenance.browser = function() {
 
         chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 			
-			console.log('captureTabInformation function - add listener.');
+			console.log('captureTabInformation function - add listener: '+ tabId);
 
             if (isTabIgnored(tab) || isTabInComplete(tab)) return;
 			if(changeInfo.status === undefined || changeInfo.status === null) return;
