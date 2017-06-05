@@ -27,7 +27,11 @@ function injectLinks() {
     });
 }
 
+<<<<<<< HEAD
 // Polling for the sake of my intern tests
+=======
+/* Polling for the sake of my intern tests
+>>>>>>> ff1124e5b6e44ec0fb173ff8f954f73b079ac22b
 var interval = setInterval(function() {
     if(document.readyState === 'complete') {
         clearInterval(interval);
@@ -38,4 +42,9 @@ var interval = setInterval(function() {
 
 window.onload = function () { 
 
+<<<<<<< HEAD
 }
+=======
+}
+*/
+>>>>>>> ff1124e5b6e44ec0fb173ff8f954f73b079ac22b

@@ -4,33 +4,40 @@
 <head>
   <title>SenseMap Tests</title>
 
-  <link rel="shortcut icon" type="image/png" href="jasmine-2.6.0/jasmine_favicon.png">
-  <link rel="stylesheet" type="text/css" href="jasmine-2.6.0/jasmine.css">
+  <link rel="shortcut icon" type="image/png" href="lib/jasmine-2.6.0/jasmine_favicon.png">
+  <link rel="stylesheet" type="text/css" href="lib/jasmine-2.6.0/jasmine.css">
 
-  <script type="text/javascript" src="jasmine-2.6.0/jasmine.js"></script>
-  <script type="text/javascript" src="jasmine-2.6.0/jasmine-html.js"></script>
-  <script type="text/javascript" src="jasmine-2.6.0/boot.js"></script>
+  <!--Jasmine library files-->
+  <script src="lib/jasmine-2.6.0/jasmine.js"></script>
+  <script src="lib/jasmine-2.6.0/jasmine-html.js"></script>
+  <script src="lib/jasmine-2.6.0/boot.js"></script>
 
-  <!-- include spec files here -->
-  <script type="text/javascript" src="spec/browser-provenance-spec.js"></script>
-  <script src="spec/contentspec.js"></script>
+  <!-- Jasmine spec files -->
+  <script src="browser-provenance-spec.js"></script>
+  <script src="contentspec.js"></script>
   
-  <!-- include source files here. These can be directly imported from wherever you're storing your background and content scripts.  -->
+  <!-- SenseMap dependency-->
   <script src="/lib/jquery.min.js"></script>
-  <script type="text/javascript" src="/src/js/background.js"></script>
-  <script type="text/javascript" src="/src/js/browser/content-scripts.js"></script>
-<script src="/src/js/core.js"></script>
-        <script src="/src/js/misc/sugar.js"></script>
-        <script src="/src/js/misc/widgets.js"></script>
-        <script src="/src/js/browser/browser-provenance.js"></script>
-        <script src="/src/js/data/list-to-tree.js"></script>
-        <script src="/src/js/history-map/forest.js"></script>
-        <script src="/src/js/history-map/history-map-vis.js"></script>
-        <script src="/src/js/history-map/history-map-page.js"></script>
+  <script src="/lib/d3.min.js"></script>
+  <script src="/lib/lodash.min.js"></script>
+
+  <!-- SenseMap source files -->
+  <script src="/src/js/background.js"></script>
+  <script src="/src/js/core.js"></script>
+  <script src="/src/js/browser/content-scripts.js"></script>
+  <script src="/src/js/browser/browser-provenance.js"></script>
+  <script src="/src/js/data/list-to-tree.js"></script>
+  <script src="/src/js/history-map/forest.js"></script>
+  <script src="/src/js/history-map/history-map-vis.js"></script>
+  <script src="/src/js/history-map/history-map-page.js"></script>
+  <script src="/src/js/misc/widgets.js"></script>
+  <script src="/src/js/misc/sugar.js"></script>
 
   <!--This comes from the source, but it seems to work even without it-->
   <!--<script type="text/javascript" src="loadjasmine.js"></script>-->
 
+  <!-- Sinon library file -->
+  <script src="lib/sinon-2.2.0.js"></script>
 </head>
 
   <body>

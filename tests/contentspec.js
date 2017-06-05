@@ -1,7 +1,7 @@
-describe("This is too test our chrome extension: ", function() {
+describe("This is to test that Jasmine is working", function() {
   var a;
 
-  it("and so is a spec", function() {
+  it("A spec not using SenseMap", function() {
     a = true;
 
     expect(a).toBe(true);
@@ -9,7 +9,7 @@ describe("This is too test our chrome extension: ", function() {
 });
 
 
-describe("history map functionality", function(){
+describe("history map functionality: ", function(){
 
 	// spyOn(sm.vis, "historyMap");
 	beforeEach(function(){
@@ -21,17 +21,17 @@ describe("history map functionality", function(){
           
           }
         }
-    //     browserAction: {
-   //        onClicked: {
-    //      addListener: function(){}
-   //     }
+      //   browserAction: {
+      //     onClicked: {
+      //    addListener: function(){}
+      //  }
       // }
       }
       spyOn(sm.provenance,'browser').and.callThrough();
 
     });
  	 
-    it('should work this time! ', function(){
+    it('SenseMap host URL', function(){
       expect(sm.host).toEqual("http://bigdata.mdx.ac.uk/");
       expect(true).toBe(true);
       // expect(sm.provenance.browser.saveLastClickedUrl).toHaveBeenCalled();
