@@ -1,3 +1,7 @@
+/**
+ * captures user actions (provenance) in the Chrome browser.
+ * part of the 'browser controller'.
+ */
 sm.provenance.browser = function() {
 	
 	/* Delcare Variables */
