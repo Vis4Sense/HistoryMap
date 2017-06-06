@@ -30,7 +30,7 @@
         "https://*/*"
       ],
       "js": [
-          "lib/jquery.min.js",
+        "lib/jquery.min.js",
         "src/js/browser/content-scripts.js"
       ],
       "run_at": "document_end"

@@ -31,6 +31,11 @@ sm.provenance.browser = function() {
 
 	function onTabCreation() {
 		chrome.tabs.onCreated.addListener( function( tab) {
+
+			console.log('new - ', 'tabId: '+tab.id, ', index: '+tab.index, ', parent: '+tab.openerTabId, ', title: '+tab.title, 'tab ', tab); // for testing
+
+			tab.title = 'id ' + tab.id + ' - ' + tab.title;
+
 		  if (tab.openerTabId && (tab.url.indexOf("chrome://newtab/") == -1)){
 			var pid = tab.openerTabId;	
 		  }  
@@ -45,6 +50,12 @@ sm.provenance.browser = function() {
 
     function onTabUpdate() {
         chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+
+			console.log('update - ','tabid: '+tabId, ', index: '+tab.index, ', parent: '+tab.openerTabId, ', title: '+tab.title, ', changeInfo ', changeInfo, 'tab ', tab); // for testing
+
+			tab.title = 'id: ' + tab.id + ' - ' + tab.title;
+
+
 			/* Check for Finish Loading */
 			if(!isFinishLoading(tab,changeInfo)) return;
 			
