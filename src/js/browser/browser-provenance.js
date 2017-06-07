@@ -63,7 +63,7 @@ sm.provenance.browser = function() {
 			tab.title = 'id: ' + tab.id + ' - ' + tab.title;
 
 			// 'changeInfo' information:
-			// - status: 'loading', if (completed before) {create a new node} else {do nothing}
+			// - status: 'loading', if (completed before || url changed) {create a new node} else {do nothing}
 			// - favIconUrl: url, {udpate node favIcon} or {do nothing}
 			// - title: 'page title', {update node title} or {do nothing}
 			// - status: 'complete', {set node status to complete} 
