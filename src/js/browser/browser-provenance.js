@@ -13,7 +13,12 @@ sm.provenance.browser = function() {
 	var recordNodeLock = {};
 	var recordNodeHasChild = {};
 	
-    const ignoredUrls = [
+	// how to get an action back from the array?
+
+	// can't use tab.id as node id because new url can be opened in the existing tab
+
+    // this is the not needed initially
+	const ignoredUrls = [
         'chrome://',
         'chrome-extension://',
         'chrome-devtools://',
@@ -30,21 +35,23 @@ sm.provenance.browser = function() {
 	onTabCreation();
 
 	function onTabCreation() {
-		chrome.tabs.onCreated.addListener( function( tab) {
+		chrome.tabs.onCreated.addListener( function(tab) {
 
 			console.log('new - ', 'tabId: '+tab.id, ', index: '+tab.index, ', parent: '+tab.openerTabId, ', title: '+tab.title, 'tab ', tab); // for testing
 
 			tab.title = 'id ' + tab.id + ' - ' + tab.title;
 
-		  if (tab.openerTabId && (tab.url.indexOf("chrome://newtab/") == -1)){
-			var pid = tab.openerTabId;	
-		  }  
-		  if(pid) {
-			recordIDs[tab.id] = pid; // an edge 
-		  } else {
-			recordIDs[tab.id] = tab.id;
-			addAction(tab,tab.id,0); // blank node gets created  - 0 is just written as null value 
-		  }
+			addNode(tab);
+
+			// if (tab.openerTabId && (tab.url.indexOf("chrome://newtab/") == -1)){
+			// var pid = tab.openerTabId;	
+			// }  
+			// if(pid) {
+			// recordIDs[tab.id] = pid; // an edge 
+			// } else {
+			// recordIDs[tab.id] = tab.id;
+			// addAction(tab,tab.id,0); // blank node gets created  - 0 is just written as null value 
+			// }
 		});
 	}
 
@@ -55,6 +62,11 @@ sm.provenance.browser = function() {
 
 			tab.title = 'id: ' + tab.id + ' - ' + tab.title;
 
+			// 'changeInfo' information:
+			// - status: 'loading', if (completed before) {create a new node} else {do nothing}
+			// - favIconUrl: url, {udpate node favIcon} or {do nothing}
+			// - title: 'page title', {update node title} or {do nothing}
+			// - status: 'complete', {set node status to complete} 
 
 			/* Check for Finish Loading */
 			if(!isFinishLoading(tab,changeInfo)) return;
@@ -115,6 +127,20 @@ sm.provenance.browser = function() {
 		
 	}
 
+	function addNode(tab) {
+		const time = new Date();
+		const node = {
+			tabId: tab.id,
+			time: time,
+			url: tab.url,
+			text: tab.title || tab.url || '',
+			type: "link", // what is this?
+			favIconUrl: tab.favIconUrl,
+			from: tab.openerTabId || ''
+		};
+		dispatch.dataChanged(node);
+	}
+
 
 	/* Additional Functions for Checking */
 	
@@ -132,6 +158,6 @@ sm.provenance.browser = function() {
         return ignoredUrls.some(url => tab.url.includes(url));
     }
 
-    d3.rebind(module, dispatch, 'on');
+    d3.rebind(module, dispatch, 'on'); // what's this?
     return module;
 };
