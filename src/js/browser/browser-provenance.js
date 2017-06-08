@@ -148,6 +148,9 @@ sm.provenance.browser = function() {
 			favIconUrl: tab.favIconUrl,
 			from: parentNodeId
 		};
+
+		tabId2nodeId[tab.id] = nodeIndex;
+
 		dispatch.dataChanged(node);
 	}
 
