@@ -1,3 +1,5 @@
+// require(['sinon-chrome'], function(chrome){
+import chrome from 'node_modules/sinon-chrome/bundle';
 describe("browser provenance", function () {
 
     // const browserProv;
@@ -11,4 +13,6 @@ describe("browser provenance", function () {
         chrome.tabs.update.sendmessage('dataChanged');
         expect(browserProv).toBe(0);
     });
+
 })
+// });
