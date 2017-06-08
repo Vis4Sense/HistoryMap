@@ -15,7 +15,8 @@ sm.provenance.browser = function() {
 
 	// can't use tab.id as node id because new url can be opened in the existing tab
 	var nodeIndex = 0;
-	var tabId2nodeId = {}; // returns the Id of the latest node for a given tab
+	var tabId2nodeId = {}; // stores the Id of the latest node for a given tab
+	var tabUrl = {}; // stores the url of a given tabId
 
     // this is the not needed initially
 	const ignoredUrls = [
@@ -41,7 +42,13 @@ sm.provenance.browser = function() {
 
 			tab.title = 'id ' + tab.id + ' - ' + tab.title;
 
-			addNode(tab);
+			// find the nodeId of the parent tab
+			var parent = '';
+			if (tab.openerTabId) {
+				parent = tabId2nodeId[tab.openerTabId];
+			}
+			
+			addNode(tab, parent);
 
 			// if (tab.openerTabId && (tab.url.indexOf("chrome://newtab/") == -1)){
 			// var pid = tab.openerTabId;	
@@ -64,7 +71,11 @@ sm.provenance.browser = function() {
 
 			// 'changeInfo' information:
 			// - status: 'loading', if (url changed) {create a new node} else {do nothing}
+			if (changeInfo.status == 'loading' && tab.url != tabUrl[tab.id]) {
+				addNode(tab, tabId2nodeId[tab.id]);
+			}
 			// - favIconUrl: url, {udpate node favIcon}
+			
 			// - title: 'page title', {update node title}
 			// - status: 'complete', {do nothing}
 
@@ -127,29 +138,24 @@ sm.provenance.browser = function() {
 		
 	}
 
-	function addNode(tab) {
+	function addNode(tab,parent) {
 		const time = new Date();
-		
-		// find the nodeId of the parent tab
-		var parentNodeId = '';
-		if (tab.openerTabId) {
-			parentNodeId = tabId2nodeId[tab.openerTabId];
-		}
 
 		nodeIndex++;
 
 		const node = {
-			nodeId: nodeIndex,
+			id: nodeIndex,
 			tabId: tab.id,
 			time: time,
 			url: tab.url,
 			text: tab.title || tab.url || '',
 			type: "link", // what is this?
 			favIconUrl: tab.favIconUrl,
-			from: parentNodeId
+			from: parent
 		};
 
 		tabId2nodeId[tab.id] = nodeIndex;
+		tabUrl[tab.id] = tab.url;
 
 		dispatch.dataChanged(node);
 	}
