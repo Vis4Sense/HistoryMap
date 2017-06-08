@@ -12,10 +12,10 @@ sm.provenance.browser = function() {
 	var recordNodeTime = {};
 	var recordNodeLock = {};
 	var recordNodeHasChild = {};
-	
-	// how to get an action back from the array?
 
 	// can't use tab.id as node id because new url can be opened in the existing tab
+	var nodeIndex = 0;
+	var tabId2nodeId = {}; // returns the Id of the latest node for a given tab
 
     // this is the not needed initially
 	const ignoredUrls = [
@@ -63,10 +63,10 @@ sm.provenance.browser = function() {
 			tab.title = 'id: ' + tab.id + ' - ' + tab.title;
 
 			// 'changeInfo' information:
-			// - status: 'loading', if (completed before || url changed) {create a new node} else {do nothing}
-			// - favIconUrl: url, {udpate node favIcon} or {do nothing}
-			// - title: 'page title', {update node title} or {do nothing}
-			// - status: 'complete', {set node status to complete} 
+			// - status: 'loading', if (url changed) {create a new node} else {do nothing}
+			// - favIconUrl: url, {udpate node favIcon}
+			// - title: 'page title', {update node title}
+			// - status: 'complete', {do nothing}
 
 			/* Check for Finish Loading */
 			if(!isFinishLoading(tab,changeInfo)) return;
@@ -129,16 +129,33 @@ sm.provenance.browser = function() {
 
 	function addNode(tab) {
 		const time = new Date();
+		
+		// find the nodeId of the parent tab
+		var parentNodeId = '';
+		if (tab.openerTabId) {
+			parentNodeId = tabId2nodeId[tab.openerTabId];
+		}
+
+		nodeIndex++;
+
 		const node = {
+			nodeId: nodeIndex,
 			tabId: tab.id,
 			time: time,
 			url: tab.url,
 			text: tab.title || tab.url || '',
 			type: "link", // what is this?
 			favIconUrl: tab.favIconUrl,
-			from: tab.openerTabId || ''
+			from: parentNodeId
 		};
 		dispatch.dataChanged(node);
+	}
+
+	function udpateNode(nodeId,url,title,favIconUrl) {
+		// how to get a node/action back from the action array?
+		// actions[nodeId].url = url;
+		// actions[nodeId].title = title;
+		// actions[nodeId].favIconUrl = favIconUrl;
 	}
 
 
