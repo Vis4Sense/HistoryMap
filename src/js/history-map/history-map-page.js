@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	
     // Data
     let data = { nodes: [], links: [] }, // Data for the vis, in tree format
-        actions = []; // All actions added in temporal order
+        nodes = []; // All actions added in temporal order
 
     // Options
 
@@ -13,7 +13,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Provenance capture
     const browser = sm.provenance.browser()
-        .on('dataChanged', _.throttle(onDataChanged, 100));
+        .on('nodeCreated', onNodeCreated)
+        .on('nodeUpdated', onNodeUpdated);
 
     // Converter from an array of actions to a tree
     const listToTree = sm.data.listToTree();
@@ -26,12 +27,23 @@ document.addEventListener("DOMContentLoaded", function() {
 	//{"id":1492234796532,"time":"2017-04-15T05:39:56.532Z","url":"https://getonepush.com/push/","text":"Push | OnePush","type":"link","favIconUrl":"https://getonepush.com/wp-content/themes/onepush/images/favicon.ico","from":1492234782998}
     // here ids are useds as reference.
 	
-	function onDataChanged(action) {
-		
-			actions[action.counter] = action ;
-			data = listToTree(actions);
-			updateVis();
-		
+	function onNodeCreated(node) {
+        nodes.push(node) ;
+        data = listToTree(nodes);
+        updateVis();
+    }
+
+    function onNodeUpdated(nodeUpdate) {
+        
+        console.log('nodeUpdate', nodeUpdate, 'nodes', nodes);
+        
+        // nodes[nodeUpdate.id].time = nodeUpdate.time;
+        nodes[nodeUpdate.id].url = nodeUpdate.url;
+        nodes[nodeUpdate.id].text = nodeUpdate.text;
+        nodes[nodeUpdate.id].favIconUrl = nodeUpdate.favIconUrl;
+
+        data = listToTree(nodes);
+        updateVis();
     }
 	
     function updateVis() {

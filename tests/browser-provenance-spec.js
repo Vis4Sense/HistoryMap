@@ -8,7 +8,7 @@ describe("browser provenance", function () {
     
     it('the count should be 0', function() {
         var browserProv = sm.provenance.browser();
-        chrome.tabs.update.sendmessage('dataChanged');
+        chrome.tabs.update.sendmessage('nodeCreated');
         expect(browserProv).toBe(0);
     });
 })
