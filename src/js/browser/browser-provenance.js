@@ -3,9 +3,9 @@
  * part of the 'browser controller'.
  */
 sm.provenance.browser = function() {
-	
+
 	/* Delcare Variables */
-	
+
 	var count = 0;
     const module = {};
 	var recordIDs = {};
@@ -14,7 +14,7 @@ sm.provenance.browser = function() {
 	var recordNodeTime = {};
 	var recordNodeLock = {};
 	var recordNodeHasChild = {};
-	
+
     const ignoredUrls = [
         'chrome://',
         'chrome-extension://',
@@ -24,13 +24,13 @@ sm.provenance.browser = function() {
         'google.com/url',
         'localhost://'
     ],
-    
+
 	bookmarkTypes = [ 'auto_bookmark' ],
     typedTypes = [ 'typed', 'generated', 'keyword', 'keyword_generated' ];
     const dispatch = d3.dispatch('dataChanged');
-	
+
 	/* Initialize Functions */
-	
+
     onTabUpdate();
 	onTabCreation();
 
@@ -38,8 +38,8 @@ sm.provenance.browser = function() {
 	function onTabCreation() {
 		chrome.tabs.onCreated.addListener( function( tab) {
 		  if (tab.openerTabId && (tab.url.indexOf("chrome://newtab/") == -1)){
-			var pid = tab.openerTabId;	
-		  }  
+			var pid = tab.openerTabId;
+		  }
 		  if(pid) {
 			recordIDs[tab.id] = pid;
 		  } else {
@@ -51,13 +51,16 @@ sm.provenance.browser = function() {
 
     function onTabUpdate() {
         chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-			
+// You can add some logs here and there to check if your test code is correct.
+// For example console.log(tabId, tab.url) to see if sinon-chrome can dispatch your event or not.
+// This is particularly helpful because we're still learning how to write tests.
+// However, you should remove all of them when you commit because the real code should not contain code for testing purpose.
 			if (isTabIgnored(tab) || isTabInComplete(tab)) return;
 
 			if(changeInfo.status === undefined || changeInfo.status === null) return;
-			
-			if(recordNodeLock[tabId] == 1) {  
-				if(recordNodeHasChild[tabId] == 1) {  
+
+			if(recordNodeLock[tabId] == 1) {
+				if(recordNodeHasChild[tabId] == 1) {
 					addAction(tab,tabId,1);
 				} else {
 					updateAction(tab,tabId);
@@ -67,11 +70,11 @@ sm.provenance.browser = function() {
 			}
         });
     }
-	
+
 	/* Support Functions */
-	
+
 	function updateAction(tab,tabId) {
-			
+
 		action = {
 			id: recordNodeID[tabId],
 			time: recordNodeTime[tabId],
@@ -82,14 +85,14 @@ sm.provenance.browser = function() {
 			counter: recordNodeCounter[tabId],
 			from: recordNodeID[recordIDs[tabId]]
 		};
-		dispatch.dataChanged(action);			
-		recordNodeLock[tabId] = 0; 	
+		dispatch.dataChanged(action);
+		recordNodeLock[tabId] = 0;
 	}
-	
+
 	function addAction(tab,tabId,hasChild) {
-		
+
 			const time = new Date(),
-			
+
 			action = {
 				id: +time,
 				time: time,
@@ -100,24 +103,24 @@ sm.provenance.browser = function() {
 				counter: count,
 				from: recordNodeID[recordIDs[tabId]]
 			};
-			
+
 			recordNodeID[tabId] = +time;
 			recordNodeTime[tabId] = time;
 			recordNodeCounter[tabId] = count;
 			recordNodeLock[tabId] = 1;
-			
+
 			if(hasChild==1) {
 				recordNodeHasChild[recordIDs[tabId]] = 1;
 			}
-		
+
 			dispatch.dataChanged(action);
 			count++;
-		
+
 	}
-	
-	
+
+
 	/* Additional Functions for Checking */
-	
+
     function isTabInComplete(tab) {
         return tab.status !== 'complete';
     }
