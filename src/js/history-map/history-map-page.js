@@ -28,6 +28,9 @@ document.addEventListener("DOMContentLoaded", function() {
     // here ids are useds as reference.
 	
 	function onNodeCreated(node) {
+
+        console.log('createNode - tabId:'+node.tabId,', parent:'+node.from, ', url:'+node.url);
+
         nodes.push(node) ;
         data = listToTree(nodes);
         updateVis();
@@ -35,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function onNodeUpdated(nodeUpdate) {
         
-        console.log('nodeUpdate', nodeUpdate, 'nodes', nodes);
+        // console.log('updateNode -', nodeUpdate.text);
         
         // nodes[nodeUpdate.id].time = nodeUpdate.time;
         nodes[nodeUpdate.id].url = nodeUpdate.url;

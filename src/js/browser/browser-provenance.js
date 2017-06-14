@@ -40,7 +40,7 @@ sm.provenance.browser = function() {
 		chrome.tabs.onCreated.addListener( function(tab) {
 
 			if(!isTabIgnored(tab)) {
-				console.log('new - ', 'tabId:'+tab.id, ', parent:'+tab.openerTabId, ', title:'+tab.title, ', tab', tab); // for testing
+				console.log('newTabEvent -', 'tabId:'+tab.id, ', parent:'+tab.openerTabId, ', title:'+tab.title); // for testing
 
 				tab.title = 'id ' + tab.id + ' - ' + tab.title;
 
@@ -69,19 +69,32 @@ sm.provenance.browser = function() {
         chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 
 			if(!isTabIgnored(tab)) {
-				console.log('update - ','tabid:'+tabId, ', parent:'+tab.openerTabId, ', title:'+tab.title, ', changeInfo', changeInfo, ', tab', tab); // for testing
+				// console.log('updateTabEvent - ','tabid:'+tabId, ', parent:'+tab.openerTabId, ', title:'+tab.title,); // for testing
 
-				tab.title = 'id: ' + tab.id + ' - ' + tab.title;
+				tab.title = 'tid:' + tab.id + ' - ' + tab.title;
 
 				// 'changeInfo' information:
 				// - status: 'loading', if (url changed) {create a new node} else {do nothing}
 				if (changeInfo.status == 'loading' && tab.url != tabUrl[tab.id]) {
-					addNode(tab, tab2node[tab.id]);
+
+					console.log('updateTabEvent -','tabId:'+tabId, ', parent:'+tab.openerTabId,', url:'+tab.url,); // for testing
+
+					if (tab2node[tab.id]) {
+						addNode(tab, tab2node[tab.id]); //if there is already a node for this tab
+					}
+					else {
+						addNode(tab, tab2node[tab.openerTabId]); // when opening a link in a new tab, there is no tabCreation event, only tabUpdate event. 
+					}
 				}
 
 				// - favIconUrl: url, {udpate node favIcon}
 				// - title: 'page title', {update node title}
 				if (changeInfo.favIconUrl || changeInfo.title) {
+
+					// if (changeInfo.title) {
+					// 	console.log('updateTabEvent - ','tabid:'+tabId, ', newTitle:'+tab.title,); // for testing
+					// }
+
 					updateNode(tab);
 				}
 
