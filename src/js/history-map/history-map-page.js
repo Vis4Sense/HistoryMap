@@ -14,7 +14,8 @@ document.addEventListener("DOMContentLoaded", function() {
     // Provenance capture
     const browser = sm.provenance.browser()
         .on('nodeCreated', onNodeCreated)
-        .on('nodeUpdated', onNodeUpdated);
+        .on('titleUpdated', onTitleUpdated)
+        .on('favUpdated', onFavUpdated);
 
     // Converter from an array of actions to a tree
     const listToTree = sm.data.listToTree();
@@ -36,14 +37,22 @@ document.addEventListener("DOMContentLoaded", function() {
         updateVis();
     }
 
-    function onNodeUpdated(nodeUpdate) {
+    function onTitleUpdated(titleUpdate) {
         
         // console.log('updateNode -', nodeUpdate.text);
         
-        // nodes[nodeUpdate.id].time = nodeUpdate.time;
-        nodes[nodeUpdate.id].url = nodeUpdate.url;
-        nodes[nodeUpdate.id].text = nodeUpdate.text;
-        nodes[nodeUpdate.id].favIconUrl = nodeUpdate.favIconUrl;
+        nodes[titleUpdate.id].url = titleUpdate.url;
+        nodes[titleUpdate.id].text = titleUpdate.text;
+
+        data = listToTree(nodes);
+        updateVis();
+    }
+
+    function onFavUpdated(favUpdate) {
+        
+        // console.log('updateNode -', nodeUpdate.text);
+        
+        nodes[favUpdate.id].favIconUrl = favUpdate.favUrl;
 
         data = listToTree(nodes);
         updateVis();
