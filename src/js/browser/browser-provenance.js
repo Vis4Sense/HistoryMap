@@ -3,6 +3,7 @@
  * part of the 'browser controller'.
  */
 sm.provenance.browser = function() {
+	const module = {};
 
 	// can't use tab.id as node id because new url can be opened in the existing tab
 	var nodeIndex = 0;
@@ -36,7 +37,7 @@ sm.provenance.browser = function() {
 				console.log('newTabEvent -', 'tabId:'+tab.id, ', parent:'+tab.openerTabId, ', url:'+tab.url); // for testing
 
 				// tab.title = 'id ' + tab.id + ' - ' + tab.title || tab.url;
-				
+
 				addNode(tab, tab.openerTabId);
 			}
 		});
@@ -60,7 +61,7 @@ sm.provenance.browser = function() {
 						addNode(tab, tab.id); //if there is already a node for this tab
 					// }
 					// else {
-					// 	addNode(tab, tab2node[tab.openerTabId]); // when opening a link in a new tab, there is no tabCreation event, only tabUpdate event. 
+					// 	addNode(tab, tab2node[tab.openerTabId]); // when opening a link in a new tab, there is no tabCreation event, only tabUpdate event.
 					// }
 				}
 
