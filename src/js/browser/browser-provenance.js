@@ -49,38 +49,27 @@ sm.provenance.browser = function() {
 			if(!isTabIgnored(tab)) {
 				// console.log('updateTabEvent - ','tabid:'+tabId, ', parent:'+tab.openerTabId, ', title:'+tab.title,); // for testing
 
-				tab.title = 'tid:' + tab.id + ' - ' + tab.title;
-
 				// 'changeInfo' information:
 				// - status: 'loading', if (url changed) {create a new node} else {do nothing}
 				if (changeInfo.status == 'loading' && tab.url != tabUrl[tab.id]) {
 
-					console.log('updateTabEvent -','tabId:'+tabId, ', parent:'+tab.openerTabId,', url:'+tab.url,); // for testing
+					console.log('urlChange -','tabId:'+tabId, ', parent:'+tab.openerTabId,', url:'+tab.url,); // for testing
 
-					// if (tab2node[tab.id]) {
-						addNode(tab, tab.id); //if there is already a node for this tab
-					// }
-					// else {
-					// 	addNode(tab, tab2node[tab.openerTabId]); // when opening a link in a new tab, there is no tabCreation event, only tabUpdate event.
-					// }
+					addNode(tab, tab.id); //if there is already a node for this tab
 				}
 
-				// - favIconUrl: url, {udpate node favIcon}
 				// - title: 'page title', {update node title}
 				if (changeInfo.title) {
-
-					// if (changeInfo.title) {
-					// 	console.log('updateTabEvent - ','tabid:'+tabId, ', newTitle:'+tab.title,); // for testing
-					// }
-
+					
 					const titleUpdate = {
 						id: tab2node[tab.id],
-						text: tab.id + tab.title,
+						text: tab.id + ':' + tab.title
 					};
 
 					dispatch.titleUpdated(titleUpdate);
 				}
 
+				// - favIconUrl: url, {udpate node favIcon}
 				if (changeInfo.favIconUrl) {
 					const favUpdate = {
 						id: tab2node[tab.id],
@@ -97,13 +86,21 @@ sm.provenance.browser = function() {
 
 	function addNode(tab,parent) {
 
+		var title;
+		if (tab.title) {
+			title = tab.title;
+		}
+		else {
+			title = tab.url;
+		}
+
 		const time = new Date();
 		const node = {
 			id: nodeIndex,
 			tabId: tab.id,
 			time: time,
 			url: tab.url,
-			text: tabId + ' ' + tab.title || tab.url,
+			text: tab.id + ':' + title,
 			type: "link", // there are different edge types (manual url, open a link, etc.). Only 'link' in the simplified version
 			favIconUrl: tab.favIconUrl,
 			parentTabId:parent,

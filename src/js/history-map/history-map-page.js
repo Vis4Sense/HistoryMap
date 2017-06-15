@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	
 	function onNodeCreated(node) {
 
-        console.log('createNode - tabId:'+node.tabId,', parent:'+node.from, ', url:'+node.url);
+        // console.log('createNode - tabId:'+node.tabId,', parent:'+node.from, ', url:'+node.url);
 
         nodes.push(node) ;
         data = listToTree(nodes);
