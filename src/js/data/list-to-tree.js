@@ -21,12 +21,13 @@ sm.data.listToTree = function() {
         // Build parent-child relationship
         actions.slice(1).forEach(d => {
             // Add page linking as a type of link
-            if (d.type === 'link') {
+            // 16.06.2017, Phong: chrome may not detect as a link
+            // if (d.type === 'link') {
                 const source = actions.find(d2 => d2.id === d.from);
                 if (source && source !== d) {
                     addLink(source, d);
                 }
-            }
+            // }
 
             // If the action type of an item is embedded, add it as a child of the containing page
             if (d.embedded) {
