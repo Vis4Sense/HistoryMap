@@ -40,7 +40,7 @@ sm.provenance.browser = function() {
     bookmarkTypes = [ 'auto_bookmark' ],
     typedTypes = [ 'typed', 'generated', 'keyword', 'keyword_generated' ];
 
-    const dispatch = d3.dispatch('nodeCreated','titleUpdated','favUpdated');
+    const dispatch = d3.dispatch('nodeCreated','titleUpdated','favUpdated', 'typeUpdated');
 
     onTabUpdate();
 	onTabCreation();
@@ -102,38 +102,39 @@ sm.provenance.browser = function() {
     }
 
 	function addNode(tab,parent) {
-		getVisitType(tab.url, function(type) {
-			const title = tab.title || tab.url;
-			const time = new Date();
-			const node = {
-				id: nodeIndex,
-				tabId: tab.id,
-				time: time,
-				url: tab.url,
-				text: '[' + tab.id + ', ' + type + '] ' + title,
-				type: type,
-				favIconUrl: tab.favIconUrl,
-				parentTabId:parent,
-				from: tab2node[parent]
-			};
+		const title = tab.title || tab.url;
+		const time = new Date();
+		const node = {
+			id: nodeIndex,
+			tabId: tab.id,
+			time: time,
+			url: tab.url,
+			text: tab.id + ':' + tab.title,
+			favIconUrl: tab.favIconUrl,
+			parentTabId:parent,
+			from: tab2node[parent]
+		};
 
-			tab2node[tab.id] = nodeIndex;
-			tabUrl[tab.id] = tab.url;
+		tab2node[tab.id] = nodeIndex;
+		tabUrl[tab.id] = tab.url;
 
-			dispatch.nodeCreated(node);
+		dispatch.nodeCreated(node);
 
-			nodeIndex++;
-		});
-	}
+		nodeIndex++;
 
-	function getVisitType(url, callback) {
-        chrome.history.getVisits({ url: url }, results => {
+		// Update with visit type
+		chrome.history.getVisits({ url: tab.url }, results => {
 			// The latest one contains information about the just completely loaded page
 			const type = results && results.length ? _.last(results).transition : undefined;
 
-            callback(type);
+            const typeUpdate = {
+				id: tab2node[tab.id],
+				type: type
+			};
+
+			dispatch.typeUpdated(typeUpdate);
         });
-    }
+	}
 
 	/* Additional Functions for Checking */
 
