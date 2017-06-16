@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	
     // Data
     let data = { nodes: [], links: [] }, // Data for the vis, in tree format
-        nodes = []; // All actions added in temporal order
+        actions = []; // All actions added in temporal order
 
     // Options
 
@@ -13,9 +13,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Provenance capture
     const browser = sm.provenance.browser()
-        .on('nodeCreated', onNodeCreated)
-        .on('titleUpdated', onTitleUpdated)
-        .on('favUpdated', onFavUpdated);
+        .on('dataChanged', _.throttle(onDataChanged, 100));
 
     // Converter from an array of actions to a tree
     const listToTree = sm.data.listToTree();
@@ -28,34 +26,12 @@ document.addEventListener("DOMContentLoaded", function() {
 	//{"id":1492234796532,"time":"2017-04-15T05:39:56.532Z","url":"https://getonepush.com/push/","text":"Push | OnePush","type":"link","favIconUrl":"https://getonepush.com/wp-content/themes/onepush/images/favicon.ico","from":1492234782998}
     // here ids are useds as reference.
 	
-	function onNodeCreated(node) {
-
-        // console.log('createNode - tabId:'+node.tabId,', parent:'+node.from, ', url:'+node.url);
-
-        nodes.push(node) ;
-        data = listToTree(nodes);
-        updateVis();
-    }
-
-    function onTitleUpdated(titleUpdate) {
-        
-        // console.log('updateNode -', nodeUpdate.text);
-        
-        nodes[titleUpdate.id].url = titleUpdate.url;
-        nodes[titleUpdate.id].text = titleUpdate.text;
-
-        data = listToTree(nodes);
-        updateVis();
-    }
-
-    function onFavUpdated(favUpdate) {
-        
-        // console.log('updateNode -', nodeUpdate.text);
-        
-        nodes[favUpdate.id].favIconUrl = favUpdate.favUrl;
-
-        data = listToTree(nodes);
-        updateVis();
+	function onDataChanged(action) {
+		
+			actions[action.counter] = action ;
+			data = listToTree(actions);
+			updateVis();
+		
     }
 	
     function updateVis() {
