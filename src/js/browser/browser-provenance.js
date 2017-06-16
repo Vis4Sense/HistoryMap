@@ -2,6 +2,23 @@
  * captures user actions (provenance) in the Chrome browser.
  * part of the 'browser controller'.
  */
+
+// Pseudo code
+// function onTabCreation(newTab) {
+//     addNode(newTab);
+// }
+
+// function onTabUpdate(tab) {
+//     if (url changed) addNode(tab);
+//     if (title updated) send the new title to history-map-page.js through an event;
+//     if (favIconUrl updated) send the new favIconUrl to history-map-page.js through an event;
+// }
+
+// function addNode(tab) {
+//     create a new node with  the information from 'tab';
+//     send the new 'node' to history-map-page.js through an event;
+// }
+
 sm.provenance.browser = function() {
 	const module = {};
 
