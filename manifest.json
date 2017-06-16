@@ -1,9 +1,9 @@
 {
     "manifest_version": 2,
 
-    "name": "SenseMap",
+    "name": "SenseMap-rebuild-shaz",
     "description": "SenseMaking with Analytic Provenance",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
 
     "browser_action": {
@@ -30,7 +30,7 @@
         "https://*/*"
       ],
       "js": [
-          "lib/jquery.min.js",
+        "lib/jquery.min.js",
         "src/js/browser/content-scripts.js"
       ],
       "run_at": "document_end"
