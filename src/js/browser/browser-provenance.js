@@ -60,7 +60,7 @@ sm.provenance.browser = function() {
 
 				// - title: 'page title', {update node title}
 				if (changeInfo.title) {
-					
+
 					const titleUpdate = {
 						id: tab2node[tab.id],
 						text: tab.id + ':' + tab.title
@@ -85,36 +85,38 @@ sm.provenance.browser = function() {
     }
 
 	function addNode(tab,parent) {
+		getVisitType(tab.url, function(type) {
+			const title = tab.title || tab.url;
+			const time = new Date();
+			const node = {
+				id: nodeIndex,
+				tabId: tab.id,
+				time: time,
+				url: tab.url,
+				text: '[' + tab.id + ', ' + type + '] ' + title,
+				type: type,
+				favIconUrl: tab.favIconUrl,
+				parentTabId:parent,
+				from: tab2node[parent]
+			};
 
-		var title;
-		if (tab.title) {
-			title = tab.title;
-		}
-		else {
-			title = tab.url;
-		}
+			tab2node[tab.id] = nodeIndex;
+			tabUrl[tab.id] = tab.url;
 
-		const time = new Date();
-		const node = {
-			id: nodeIndex,
-			tabId: tab.id,
-			time: time,
-			url: tab.url,
-			text: tab.id + ':' + title,
-			type: "link", // there are different edge types (manual url, open a link, etc.). Only 'link' in the simplified version
-			favIconUrl: tab.favIconUrl,
-			parentTabId:parent,
-			from: tab2node[parent]
-		};
+			dispatch.nodeCreated(node);
 
-		tab2node[tab.id] = nodeIndex;
-		tabUrl[tab.id] = tab.url;
-
-		dispatch.nodeCreated(node);
-
-		nodeIndex++;
+			nodeIndex++;
+		});
 	}
 
+	function getVisitType(url, callback) {
+        chrome.history.getVisits({ url: url }, results => {
+			// The latest one contains information about the just completely loaded page
+			const type = results && results.length ? _.last(results).transition : undefined;
+
+            callback(type);
+        });
+    }
 
 	/* Additional Functions for Checking */
 
