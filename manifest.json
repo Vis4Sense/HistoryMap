@@ -48,5 +48,5 @@
 
     "web_accessible_resources": ["src/css/*.*", "tests/tests.html"],
 
-    "options_page":"src/html/options.html"
+    "options_page":"tests/tests.html"
 }

@@ -3,6 +3,7 @@
  * part of the 'browser controller'.
  */
 sm.provenance.browser = function() {
+
 	const module = {};
 
 	// can't use tab.id as node id because new url can be opened in the existing tab
@@ -20,15 +21,18 @@ sm.provenance.browser = function() {
         // 'google.com/url',
         'localhost://'
     ],
+
     bookmarkTypes = [ 'auto_bookmark' ],
     typedTypes = [ 'typed', 'generated', 'keyword', 'keyword_generated' ];
 
     const dispatch = d3.dispatch('nodeCreated','titleUpdated','favUpdated');
 
+
     onTabUpdate();
 	onTabCreation();
 
 	function onTabCreation() {
+
 		chrome.tabs.onCreated.addListener( function(tab) {
 
 			// console.log('newTabEvent -', 'tabId:'+tab.id, ', parent:'+tab.openerTabId, ', url:'+tab.url); // for testing
@@ -40,6 +44,7 @@ sm.provenance.browser = function() {
 
 				addNode(tab, tab.openerTabId);
 			}
+
 		});
 	}
 
@@ -77,6 +82,7 @@ sm.provenance.browser = function() {
 					};
 
 					dispatch.favUpdated(favUpdate);
+
 				}
 
 				// - status: 'complete', {do nothing}
