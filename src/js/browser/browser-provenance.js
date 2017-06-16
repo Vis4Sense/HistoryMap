@@ -4,130 +4,131 @@
  */
 sm.provenance.browser = function() {
 
-	const module = {};
+	/* Delcare Variables */
 
-	// can't use tab.id as node id because new url can be opened in the existing tab
-	var nodeIndex = 0;
-	var tab2node = {}; // stores the Id of the latest node for a given tab
-	var tabUrl = {}; // stores the latest url of a given tabId
+	var count = 0;
+    const module = {};
+	var recordIDs = {};
+	var recordNodeID = {};
+	var recordNodeCounter = {};
+	var recordNodeTime = {};
+	var recordNodeLock = {};
+	var recordNodeHasChild = {};
 
-    // not recording any chrome-specific url
-	const ignoredUrls = [
+    const ignoredUrls = [
         'chrome://',
         'chrome-extension://',
         'chrome-devtools://',
         'view-source:',
-        // 'google.co.uk/url',
-        // 'google.com/url',
+        'google.co.uk/url',
+        'google.com/url',
         'localhost://'
     ],
 
-    bookmarkTypes = [ 'auto_bookmark' ],
+	bookmarkTypes = [ 'auto_bookmark' ],
     typedTypes = [ 'typed', 'generated', 'keyword', 'keyword_generated' ];
+    const dispatch = d3.dispatch('dataChanged');
 
-    const dispatch = d3.dispatch('nodeCreated','titleUpdated','favUpdated');
-
+	/* Initialize Functions */
 
     onTabUpdate();
 	onTabCreation();
 
+
 	function onTabCreation() {
-
-		chrome.tabs.onCreated.addListener( function(tab) {
-
-			// console.log('newTabEvent -', 'tabId:'+tab.id, ', parent:'+tab.openerTabId, ', url:'+tab.url); // for testing
-
-			if(!isTabIgnored(tab)) {
-				console.log('newTabEvent -', 'tabId:'+tab.id, ', parent:'+tab.openerTabId, ', url:'+tab.url); // for testing
-
-				// tab.title = 'id ' + tab.id + ' - ' + tab.title || tab.url;
-
-				addNode(tab, tab.openerTabId);
-			}
-
+		chrome.tabs.onCreated.addListener( function( tab) {
+		  if (tab.openerTabId && (tab.url.indexOf("chrome://newtab/") == -1)){
+			var pid = tab.openerTabId;
+		  }
+		  if(pid) {
+			recordIDs[tab.id] = pid;
+		  } else {
+			recordIDs[tab.id] = tab.id;
+			addAction(tab,tab.id,0);
+		  }
 		});
 	}
 
     function onTabUpdate() {
         chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+// You can add some logs here and there to check if your test code is correct.
+// For example console.log(tabId, tab.url) to see if sinon-chrome can dispatch your event or not.
+// This is particularly helpful because we're still learning how to write tests.
+// However, you should remove all of them when you commit because the real code should not contain code for testing purpose.
+			if (isTabIgnored(tab) || isTabInComplete(tab)) return;
 
-			if(!isTabIgnored(tab)) {
-				// console.log('updateTabEvent - ','tabid:'+tabId, ', parent:'+tab.openerTabId, ', title:'+tab.title,); // for testing
+			if(changeInfo.status === undefined || changeInfo.status === null) return;
 
-				// 'changeInfo' information:
-				// - status: 'loading', if (url changed) {create a new node} else {do nothing}
-				if (changeInfo.status == 'loading' && tab.url != tabUrl[tab.id]) {
-
-					console.log('urlChange -','tabId:'+tabId, ', parent:'+tab.openerTabId,', url:'+tab.url,); // for testing
-
-					addNode(tab, tab.id); //if there is already a node for this tab
+			if(recordNodeLock[tabId] == 1) {
+				if(recordNodeHasChild[tabId] == 1) {
+					addAction(tab,tabId,1);
+				} else {
+					updateAction(tab,tabId);
 				}
-
-				// - title: 'page title', {update node title}
-				if (changeInfo.title) {
-					
-					const titleUpdate = {
-						id: tab2node[tab.id],
-						text: tab.id + ':' + tab.title
-					};
-
-					dispatch.titleUpdated(titleUpdate);
-				}
-
-				// - favIconUrl: url, {udpate node favIcon}
-				if (changeInfo.favIconUrl) {
-					const favUpdate = {
-						id: tab2node[tab.id],
-						favUrl: tab.favIconUrl,
-					};
-
-					dispatch.favUpdated(favUpdate);
-
-				}
-
-				// - status: 'complete', {do nothing}
+			} else {
+				addAction(tab,tabId,1);
 			}
         });
     }
 
-	function addNode(tab,parent) {
+	/* Support Functions */
 
-		var title;
-		if (tab.title) {
-			title = tab.title;
-		}
-		else {
-			title = tab.url;
-		}
+	function updateAction(tab,tabId) {
 
-		const time = new Date();
-		const node = {
-			id: nodeIndex,
-			tabId: tab.id,
-			time: time,
+		action = {
+			id: recordNodeID[tabId],
+			time: recordNodeTime[tabId],
 			url: tab.url,
-			text: tab.id + ':' + title,
-			type: "link", // there are different edge types (manual url, open a link, etc.). Only 'link' in the simplified version
+			text: tab.title || tab.url || '',
+			type: "link",
 			favIconUrl: tab.favIconUrl,
-			parentTabId:parent,
-			from: tab2node[parent]
+			counter: recordNodeCounter[tabId],
+			from: recordNodeID[recordIDs[tabId]]
 		};
+		dispatch.dataChanged(action);
+		recordNodeLock[tabId] = 0;
+	}
 
-		tab2node[tab.id] = nodeIndex;
-		tabUrl[tab.id] = tab.url;
+	function addAction(tab,tabId,hasChild) {
 
-		dispatch.nodeCreated(node);
+			const time = new Date(),
 
-		nodeIndex++;
+			action = {
+				id: +time,
+				time: time,
+				url: tab.url,
+				text: tab.title || tab.url || '',
+				type: "link",
+				favIconUrl: tab.favIconUrl,
+				counter: count,
+				from: recordNodeID[recordIDs[tabId]]
+			};
+
+			recordNodeID[tabId] = +time;
+			recordNodeTime[tabId] = time;
+			recordNodeCounter[tabId] = count;
+			recordNodeLock[tabId] = 1;
+
+			if(hasChild==1) {
+				recordNodeHasChild[recordIDs[tabId]] = 1;
+			}
+
+			dispatch.dataChanged(action);
+			count++;
+
 	}
 
 
 	/* Additional Functions for Checking */
 
+    function isTabInComplete(tab) {
+        return tab.status !== 'complete';
+    }
+
     function isTabIgnored(tab) {
         return ignoredUrls.some(url => tab.url.includes(url));
     }
 
-    d3.rebind(module, dispatch, 'on'); // what's this?
+    d3.rebind(module, dispatch, 'on');
     return module;
 };
