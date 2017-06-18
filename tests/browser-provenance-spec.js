@@ -1,5 +1,6 @@
 // require(['sinon-chrome'], function(chrome){
-import chrome from 'node_modules/sinon-chrome/bundle';
+// 'use strict';
+// import chrome from 'node_modules/sinon-chrome/bundle';
 describe("browser provenance", function () {
 
     // const browserProv;
