@@ -109,7 +109,7 @@ sm.provenance.browser = function() {
 			tabId: tab.id,
 			time: time,
 			url: tab.url,
-			text: tab.id + ':' + tab.title,
+			text: tab.id + ':' + title,
 			favIconUrl: tab.favIconUrl,
 			parentTabId:parent,
 			from: tab2node[parent]
