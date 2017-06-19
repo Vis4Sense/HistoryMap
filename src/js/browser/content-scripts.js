@@ -26,3 +26,17 @@ function injectLinks() {
   	    chrome.runtime.sendMessage({ type: "linkClicked" });
     });
 }
+
+// Polling for the sake of my intern tests
+// var interval = setInterval(function() {
+//     if(document.readyState === 'complete') {
+//         clearInterval(interval);
+// 		chrome.runtime.sendMessage({loadURL: true});
+//         done();
+//     }    
+// }, 100);
+
+
+// window.onload = function () { 
+
+// }
