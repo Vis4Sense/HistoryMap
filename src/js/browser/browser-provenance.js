@@ -123,17 +123,21 @@ sm.provenance.browser = function() {
 		nodeIndex++;
 
 		// Update with visit type
-		chrome.history.getVisits({ url: tab.url }, results => {
-			// The latest one contains information about the just completely loaded page
-			const type = results && results.length ? _.last(results).transition : undefined;
+		if (tab.url) {
+			chrome.history.getVisits({ url: tab.url }, results => {
+				// The latest one contains information about the just completely loaded page
+				const type = results && results.length ? _.last(results).transition : undefined;
 
-            const typeUpdate = {
-				id: tab2node[tab.id],
-				type: type
-			};
+				const typeUpdate = {
+					id: tab2node[tab.id],
+					type: type
+				};
 
-			dispatch.typeUpdated(typeUpdate);
-        });
+				dispatch.typeUpdated(typeUpdate);
+			});
+		} else {
+			console.warn('tab.url', tab.url);
+		}
 	}
 
 	/* Additional Functions for Checking */
