@@ -9,7 +9,7 @@ describe("New node", function () {
         let linkClicked = false;
 
         browser = sm.provenance.browser()
-            .on('dataChanged', function(action) {
+            .on('nodeCreated', function(action) {
                 if (action.url === manualUrl) caseManualUrl = true;
                 if (action.url === linkUrl) caseLink = true;
 

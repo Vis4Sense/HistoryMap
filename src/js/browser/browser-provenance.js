@@ -1,131 +1,126 @@
-/**
- * captures user actions (provenance) in the Chrome browser.
- * part of the 'browser controller'.
- */
 sm.provenance.browser = function() {
-	
-	/* Delcare Variables */
-	
-	var count = 0;
-    const module = {};
-	var recordIDs = {};
-	var recordNodeID = {};
-	var recordNodeCounter = {};
-	var recordNodeTime = {};
-	var recordNodeLock = {};
-	var recordNodeHasChild = {};
-	
-    const ignoredUrls = [
+	const module = {};
+
+	// can't use tab.id as node id because new url can be opened in the existing tab
+	var nodeIndex = 0;
+	var tab2node = {}; // stores the Id of the latest node for a given tab
+	var tabUrl = {}; // stores the latest url of a given tabId
+
+    // not recording any chrome-specific url
+	const ignoredUrls = [
         'chrome://',
         'chrome-extension://',
         'chrome-devtools://',
         'view-source:',
-        'google.co.uk/url',
-        'google.com/url',
+        // 'google.co.uk/url',
+        // 'google.com/url',
         'localhost://'
     ],
-    
-	bookmarkTypes = [ 'auto_bookmark' ],
+    bookmarkTypes = [ 'auto_bookmark' ],
     typedTypes = [ 'typed', 'generated', 'keyword', 'keyword_generated' ];
-    const dispatch = d3.dispatch('dataChanged');
-	
-	/* Initialize Functions */
-	
+
+    const dispatch = d3.dispatch('nodeCreated','titleUpdated','favUpdated', 'typeUpdated');
+
     onTabUpdate();
 	onTabCreation();
 
-
 	function onTabCreation() {
-		chrome.tabs.onCreated.addListener( function( tab) {
-		  if (tab.openerTabId && (tab.url.indexOf("chrome://newtab/") == -1)){
-			var pid = tab.openerTabId;	
-		  }  
-		  if(pid) {
-			recordIDs[tab.id] = pid;
-		  } else {
-			recordIDs[tab.id] = tab.id;
-			addAction(tab,tab.id,0);
-		  }
+
+		chrome.tabs.onCreated.addListener( function(tab) {
+
+			// console.log('newTabEvent -', 'tabId:'+tab.id, ', parent:'+tab.openerTabId, ', url:'+tab.url); // for testing
+
+			if(!isTabIgnored(tab)) {
+				console.log('newTabEvent -', 'tabId:'+tab.id, ', parent:'+tab.openerTabId, ', url:'+tab.url); // for testing
+
+				// tab.title = 'id ' + tab.id + ' - ' + tab.title || tab.url;
+
+				addNode(tab, tab.openerTabId);
+			}
 		});
 	}
 
     function onTabUpdate() {
         chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-			
-			if (isTabIgnored(tab) || isTabInComplete(tab)) return;
 
-			if(changeInfo.status === undefined || changeInfo.status === null) return;
-			
-			if(recordNodeLock[tabId] == 1) {  
-				if(recordNodeHasChild[tabId] == 1) {  
-					addAction(tab,tabId,1);
-				} else {
-					updateAction(tab,tabId);
+			if(!isTabIgnored(tab)) {
+				// console.log('updateTabEvent - ','tabid:'+tabId, ', parent:'+tab.openerTabId, ', title:'+tab.title,); // for testing
+
+				// 'changeInfo' information:
+				// - status: 'loading', if (url changed) {create a new node} else {do nothing}
+				if (changeInfo.status == 'loading' && tab.url != tabUrl[tab.id]) {
+
+
+					addNode(tab, tab.id); //if there is already a node for this tab
 				}
-			} else {
-				addAction(tab,tabId,1);
+
+				// - title: 'page title', {update node title}
+				if (changeInfo.title) {
+
+					const titleUpdate = {
+						id: tab2node[tab.id],
+						text: tab.id + ':' + tab.title
+					};
+
+					dispatch.titleUpdated(titleUpdate);
+				}
+
+				// - favIconUrl: url, {udpate node favIcon}
+				if (changeInfo.favIconUrl) {
+					const favUpdate = {
+						id: tab2node[tab.id],
+						favUrl: tab.favIconUrl,
+					};
+
+					dispatch.favUpdated(favUpdate);
+				}
+
+				// - status: 'complete', {do nothing}
 			}
         });
     }
-	
-	/* Support Functions */
-	
-	function updateAction(tab,tabId) {
-			
-		action = {
-			id: recordNodeID[tabId],
-			time: recordNodeTime[tabId],
+
+	function addNode(tab,parent) {
+		const title = tab.title || tab.url;
+		const time = new Date();
+		const node = {
+			id: nodeIndex,
+			tabId: tab.id,
+			time: time,
 			url: tab.url,
-			text: tab.title || tab.url || '',
-			type: "link",
+			text: tab.id + ':' + tab.title,
 			favIconUrl: tab.favIconUrl,
-			counter: recordNodeCounter[tabId],
-			from: recordNodeID[recordIDs[tabId]]
+			parentTabId:parent,
+			from: tab2node[parent]
 		};
-		dispatch.dataChanged(action);			
-		recordNodeLock[tabId] = 0; 	
-	}
-	
-	function addAction(tab,tabId,hasChild) {
-		
-			const time = new Date(),
-			
-			action = {
-				id: +time,
-				time: time,
-				url: tab.url,
-				text: tab.title || tab.url || '',
-				type: "link",
-				favIconUrl: tab.favIconUrl,
-				counter: count,
-				from: recordNodeID[recordIDs[tabId]]
+
+		tab2node[tab.id] = nodeIndex;
+		tabUrl[tab.id] = tab.url;
+
+		dispatch.nodeCreated(node);
+
+		nodeIndex++;
+
+		// Update with visit type
+		chrome.history.getVisits({ url: tab.url }, results => {
+			// The latest one contains information about the just completely loaded page
+			const type = results && results.length ? _.last(results).transition : undefined;
+
+            const typeUpdate = {
+				id: tab2node[tab.id],
+				type: type
 			};
-			
-			recordNodeID[tabId] = +time;
-			recordNodeTime[tabId] = time;
-			recordNodeCounter[tabId] = count;
-			recordNodeLock[tabId] = 1;
-			
-			if(hasChild==1) {
-				recordNodeHasChild[recordIDs[tabId]] = 1;
-			}
-		
-			dispatch.dataChanged(action);
-			count++;
-		
+
+			dispatch.typeUpdated(typeUpdate);
+        });
 	}
-	
-	
+
 	/* Additional Functions for Checking */
-	
-    function isTabInComplete(tab) {
-        return tab.status !== 'complete';
-    }
 
     function isTabIgnored(tab) {
         return ignoredUrls.some(url => tab.url.includes(url));
     }
 
-    d3.rebind(module, dispatch, 'on');
+    d3.rebind(module, dispatch, 'on'); // what's this?
     return module;
 };
