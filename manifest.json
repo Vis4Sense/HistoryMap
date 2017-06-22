@@ -46,7 +46,7 @@
         "contextMenus"
     ],
 
-    "web_accessible_resources": ["src/css/*.*", "tests/tests.html"],
+    "web_accessible_resources": ["src/css/*.*", "tests/phong/tests.html"],
 
     "options_page":"src/html/options.html"
 }

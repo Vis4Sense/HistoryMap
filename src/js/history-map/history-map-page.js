@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
-
+    console.log("in history map");
     // Data
     let data = { nodes: [], links: [] }, // Data for the vis, in tree format
         nodes = []; // All actions added in temporal order
