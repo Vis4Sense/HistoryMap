@@ -28,7 +28,7 @@ sm.provenance.browser = function() {
 	var nodeId = 0; // can't use tab.id as node id because new url can be opened in the existing tab
 	var tab2node = {}; // the Id of the latest node for a given tab
 	var tabUrl = {}; // the latest url of a given tabId
-	var tabCompleted = {}; // whether a tab completes loading (for redirection detection).
+	var isTabCompleted = {}; // whether a tab completes loading (for redirection detection).
 
     // not recording any chrome-specific url
 	const ignoredUrls = [
@@ -60,7 +60,7 @@ sm.provenance.browser = function() {
 
 				addNode(tab, tab.openerTabId);
 
-				tabCompleted[tab.id] = false;
+				isTabCompleted[tab.id] = false;
 			}
 		});
 	}
@@ -76,9 +76,9 @@ sm.provenance.browser = function() {
 				if (changeInfo.status == 'loading') {
 					// console.log('urlChange -','tabId:'+tabId, ', parent:'+tab.openerTabId,', url:'+tab.url,); // for testing
 					
-					if (!tab2node[tabId] || tabCompleted[tabId]) { // not redirection
+					if (!tab2node[tabId] || isTabCompleted[tabId]) { // not redirection
 						addNode(tab, tab.id); 
-						tabCompleted[tabId] = false;
+						isTabCompleted[tabId] = false;
 					}
 					
 					else { // redirection
@@ -116,7 +116,7 @@ sm.provenance.browser = function() {
 
 				// - status: 'complete', {do nothing}
 				if (changeInfo.status == 'complete') {
-					tabCompleted[tabId] = true;
+					isTabCompleted[tabId] = true;
 				}
 			}
         });
