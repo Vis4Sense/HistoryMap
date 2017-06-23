@@ -9,7 +9,10 @@
 // }
 
 // function onTabUpdate(tab) {
-//     if (url changed) addNode(tab);
+//     if ('loading') {
+			// if (non-redireciton) addNode(tab);
+			// else {update existing node}; // redirection
+		// }
 //     if (title updated) send the new title to history-map-page.js through an event;
 //     if (favIconUrl updated) send the new favIconUrl to history-map-page.js through an event;
 // }
@@ -22,10 +25,10 @@
 sm.provenance.browser = function() {
 	const module = {};
 
-	// can't use tab.id as node id because new url can be opened in the existing tab
-	var nodeIndex = 0;
-	var tab2node = {}; // stores the Id of the latest node for a given tab
-	var tabUrl = {}; // stores the latest url of a given tabId
+	var nodeId = 0; // can't use tab.id as node id because new url can be opened in the existing tab
+	var tab2node = {}; // the Id of the latest node for a given tab
+	var tabUrl = {}; // the latest url of a given tabId
+	var tabCompleted = {}; // whether a tab completes loading (for redirection detection).
 
     // not recording any chrome-specific url
 	const ignoredUrls = [
@@ -50,12 +53,14 @@ sm.provenance.browser = function() {
 
 			// console.log('newTabEvent -', 'tabId:'+tab.id, ', parent:'+tab.openerTabId, ', url:'+tab.url); // for testing
 
-			if(!isTabIgnored(tab)) {
-				console.log('newTabEvent -', 'tabId:'+tab.id, ', parent:'+tab.openerTabId, ', url:'+tab.url); // for testing
+			if(!isIgnoredTab(tab)) {
+				console.log('newTab -', 'tabId:'+tab.id, ', parent:'+tab.openerTabId, ', url:'+tab.url, tab); // for testing
 
 				// tab.title = 'id ' + tab.id + ' - ' + tab.title || tab.url;
 
 				addNode(tab, tab.openerTabId);
+
+				tabCompleted[tab.id] = false;
 			}
 		});
 	}
@@ -63,16 +68,29 @@ sm.provenance.browser = function() {
     function onTabUpdate() {
         chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 
-			if(!isTabIgnored(tab)) {
-				// console.log('updateTabEvent - ','tabid:'+tabId, ', parent:'+tab.openerTabId, ', title:'+tab.title,); // for testing
+			if(!isIgnoredTab(tab)) {
+				console.log('tabUpdate - ','tabid:'+tabId, ', parent:'+tab.openerTabId, ', title:'+tab.title, ' changeInfo:', changeInfo); // for testing
 
 				// 'changeInfo' information:
-				// - status: 'loading', if (url changed) {create a new node} else {do nothing}
-				if (changeInfo.status == 'loading' && tab.url != tabUrl[tab.id]) {
+				// - status: 'loading': if (tabCompleted) {create a new node} else {update exisiting node}
+				if (changeInfo.status == 'loading') {
+					// console.log('urlChange -','tabId:'+tabId, ', parent:'+tab.openerTabId,', url:'+tab.url,); // for testing
+					
+					if (!tab2node[tabId] || tabCompleted[tabId]) { // not redirection
+						addNode(tab, tab.id); 
+						tabCompleted[tabId] = false;
+					}
+					
+					else { // redirection
+						const titleUpdate = {
+							id: tab2node[tab.id],
+							text: tab.id + ':' + tab.title || tab.url
+						};
 
-					console.log('urlChange -','tabId:'+tabId, ', parent:'+tab.openerTabId,', url:'+tab.url,); // for testing
+						dispatch.titleUpdated(titleUpdate);
 
-					addNode(tab, tab.id); //if there is already a node for this tab
+						tabUrl[tabId] = tab.url;
+					}
 				}
 
 				// - title: 'page title', {update node title}
@@ -97,6 +115,9 @@ sm.provenance.browser = function() {
 				}
 
 				// - status: 'complete', {do nothing}
+				if (changeInfo.status == 'complete') {
+					tabCompleted[tabId] = true;
+				}
 			}
         });
     }
@@ -105,7 +126,7 @@ sm.provenance.browser = function() {
 		const title = tab.title || tab.url;
 		const time = new Date();
 		const node = {
-			id: nodeIndex,
+			id: nodeId,
 			tabId: tab.id,
 			time: time,
 			url: tab.url,
@@ -115,12 +136,12 @@ sm.provenance.browser = function() {
 			from: tab2node[parent]
 		};
 
-		tab2node[tab.id] = nodeIndex;
+		tab2node[tab.id] = nodeId;
 		tabUrl[tab.id] = tab.url;
 
 		dispatch.nodeCreated(node);
 
-		nodeIndex++;
+		nodeId++;
 
 		// Update with visit type
 		if (tab.url) {
@@ -135,14 +156,15 @@ sm.provenance.browser = function() {
 
 				dispatch.typeUpdated(typeUpdate);
 			});
-		} else {
-			console.warn('tab.url', tab.url);
-		}
+		} 
+		// else { // when the url is empty
+		// 	console.warn('tab.url', tab.url);
+		// }
 	}
 
 	/* Additional Functions for Checking */
 
-    function isTabIgnored(tab) {
+    function isIgnoredTab(tab) {
         return ignoredUrls.some(url => tab.url.includes(url));
     }
 

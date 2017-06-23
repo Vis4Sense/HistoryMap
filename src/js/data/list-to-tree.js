@@ -25,18 +25,19 @@ sm.data.listToTree = function() {
             // if (d.type === 'link') {
                 const source = actions.find(d2 => d2.id === d.from);
                 if (source && source !== d) {
-                    if (d.url) {
-                        if (source.url) {
-                            addLink(source, d);
-                        } else {
-                            addLink(source.source, d);
-                        }
-                    } else {
-                        // If a node doesn't have url, it is a temporary one, may be the result of redirection.
-                        // This node will be excluded from the display
-                        // but the 'source' will be updated to always refer to the normal node
-                        d.source = source.source || source; // either recursive (in case multiple empty nodes) or the latest
-                    }
+                    addLink(source, d);
+                    // if (d.url) {
+                    //     if (source.url) {
+                    //         addLink(source, d);
+                    //     } else {
+                    //         addLink(source.source, d);
+                    //     }
+                    // } else {
+                    //     // If a node doesn't have url, it is a temporary one, may be the result of redirection.
+                    //     // This node will be excluded from the display
+                    //     // but the 'source' will be updated to always refer to the normal node
+                    //     d.source = source.source || source; // either recursive (in case multiple empty nodes) or the latest
+                    // }
                 }
             // }
 
@@ -50,7 +51,10 @@ sm.data.listToTree = function() {
         });
 
         // Add nodes, excluding child actions and empty url nodes
-        root.nodes = actions.filter(a => !a.parent && a.url);
+        // root.nodes = actions.filter(a => !a.parent && a.url);
+
+        // Add nodes, excluding child actions
+        root.nodes = actions.filter(a => !a.parent);
 
         // Then add to the link list
         root.links = [];
