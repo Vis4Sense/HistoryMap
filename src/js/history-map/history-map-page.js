@@ -32,6 +32,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	function onNodeCreated(node) {
 
         // console.log('createNode - tabId:'+node.tabId,', parent:'+node.from, ', url:'+node.url);
+        console.log('createNode',node);
 
         nodes.push(node) ;
         redraw();

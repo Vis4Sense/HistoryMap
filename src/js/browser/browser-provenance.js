@@ -69,7 +69,9 @@ sm.provenance.browser = function() {
         chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 
 			if(!isIgnoredTab(tab)) {
-				console.log('tabUpdate - ','tabid:'+tabId, ', parent:'+tab.openerTabId, ', title:'+tab.title, ' changeInfo:', changeInfo); // for testing
+				// console.log('tabUpdate - ','tabid:'+tabId, ', parent:'+tab.openerTabId, ', title:'+tab.title, ' changeInfo:', changeInfo); // for testing
+
+				console.log('loading',tabId,changeInfo,tab);
 
 				// 'changeInfo' information:
 				// - status: 'loading': if (tabCompleted) {create a new node} else {update exisiting node}
