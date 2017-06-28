@@ -1,0 +1,43 @@
+<!-- srouce:https://gist.github.com/stevenqzhang/333fd0b2bca201aabaa40c7b63a74296 -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SenseMap Tests</title>
+
+  <link rel="shortcut icon" type="image/png" href="/tests/lib/jasmine-2.6.0/jasmine_favicon.png">
+  <link rel="stylesheet" type="text/css" href="/tests/lib/jasmine-2.6.0/jasmine.css">
+
+  <!--Jasmine library files-->
+  <script src="/tests/lib/jasmine-2.6.0/jasmine.js"></script>
+  <script src="/tests/lib/jasmine-2.6.0/jasmine-html.js"></script>
+  <script src="/tests/lib/jasmine-2.6.0/boot.js"></script>
+
+  <!-- Jasmine spec files -->
+  <!--Put them in specs folder. We may use this naming convection: what-to-test.test.js -->
+  <!--<script src="specs/node.test.js"></script>-->
+  
+  <script src="specs/edge.case1.js"></script>
+  <script src="specs/edge.case2.js"></script> 
+  <script src="specs/edge.case3-UnrelatedUrl.js"></script> 
+  <script src="specs/edge.case3-relatedUrl.js"></script>
+ 
+  <!-- Test fail/error
+  edge.case1: error with async call back, after moving spec file to latest commit 
+  edge.case2: works as intended however an erroneus identical edge/node are created due to the tab update event listener
+  edge.case3-UnrelatedUrl: when tested in isolation works as expected, test fail is due to implementation of sensemap edges,
+  however when tested with the other Three specs, the error does not occur (this may be caused by edge.case1.js async callback error)
+  -->
+
+  <!-- SenseMap dependency-->
+  <script src="/lib/jquery.min.js"></script>
+  <script src="/lib/d3.min.js"></script>
+  <script src="/lib/lodash.min.js"></script>
+
+  <!-- SenseMap source files -->
+  <script src="/src/js/core.js"></script>
+  <script src="/src/js/misc/widgets.js"></script>
+  <script src="/src/js/misc/sugar.js"></script>
+  <script src="/src/js/browser/content-scripts.js"></script>
+  <script src="/src/js/browser/browser-provenance.js"></script>
+</head>
+</html>
