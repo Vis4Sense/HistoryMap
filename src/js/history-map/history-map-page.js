@@ -1,8 +1,7 @@
 document.addEventListener("DOMContentLoaded", function() {
 
     // Data
-    let data = { nodes: [], links: [] }, // Data for the vis, in tree format
-        nodes = []; // All actions added in temporal order
+    let nodes = []; // All actions added in temporal order
 
     // Options
 
@@ -30,26 +29,19 @@ document.addEventListener("DOMContentLoaded", function() {
     // here ids are useds as reference.
 
 	function onNodeCreated(node) {
-
         // console.log('createNode - tabId:'+node.tabId,', parent:'+node.from, ', url:'+node.url);
-        console.log('createNode',node);
-
         nodes.push(node) ;
         redraw();
     }
 
     function onTitleUpdated(titleUpdate) {
-
         // console.log('updateNode -', nodeUpdate.text);
-
         nodes[titleUpdate.id].text = titleUpdate.text;
         redraw();
     }
 
     function onFavUpdated(favUpdate) {
-
         // console.log('updateNode -', nodeUpdate.text);
-
         nodes[favUpdate.id].favIconUrl = favUpdate.favUrl;
         redraw();
     }
@@ -60,12 +52,12 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function redraw() {
-        data = listToTree(nodes);
+        sm.data.tree = listToTree(nodes);
         updateVis();
     }
 
     function updateVis() {
         historyMap.width(window.innerWidth).height(window.innerHeight);
-        d3.select('.sm-history-map-container').datum(data).call(historyMap);
+        d3.select('.sm-history-map-container').datum(sm.data.tree).call(historyMap);
     }
 });

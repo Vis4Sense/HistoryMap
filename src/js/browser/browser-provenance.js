@@ -77,16 +77,16 @@ sm.provenance.browser = function() {
 				// - status: 'loading': if (tabCompleted) {create a new node} else {update exisiting node}
 				if (changeInfo.status == 'loading') {
 					// console.log('urlChange -','tabId:'+tabId, ', parent:'+tab.openerTabId,', url:'+tab.url,); // for testing
-					
+
 					if (!tab2node[tabId] || isTabCompleted[tabId]) { // not redirection
-						addNode(tab, tab.id); 
+						addNode(tab, tab.id);
 						isTabCompleted[tabId] = false;
 					}
-					
+
 					else { // redirection
 						const titleUpdate = {
 							id: tab2node[tab.id],
-							text: tab.id + ':' + tab.title || tab.url
+							text: tab.title || tab.url
 						};
 
 						dispatch.titleUpdated(titleUpdate);
@@ -100,7 +100,7 @@ sm.provenance.browser = function() {
 
 					const titleUpdate = {
 						id: tab2node[tab.id],
-						text: tab.id + ':' + tab.title
+						text: tab.title
 					};
 
 					dispatch.titleUpdated(titleUpdate);
@@ -132,7 +132,7 @@ sm.provenance.browser = function() {
 			tabId: tab.id,
 			time: time,
 			url: tab.url,
-			text: tab.id + ':' + title,
+			text: title,
 			favIconUrl: tab.favIconUrl,
 			parentTabId:parent,
 			from: tab2node[parent]
@@ -158,7 +158,7 @@ sm.provenance.browser = function() {
 
 				dispatch.typeUpdated(typeUpdate);
 			});
-		} 
+		}
 		// else { // when the url is empty
 		// 	console.warn('tab.url', tab.url);
 		// }
