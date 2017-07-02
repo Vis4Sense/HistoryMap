@@ -1,8 +1,7 @@
 document.addEventListener("DOMContentLoaded", function() {
-	
+
     // Data
-    let data = { nodes: [], links: [] }, // Data for the vis, in tree format
-        nodes = []; // All actions added in temporal order
+    let nodes = []; // All actions added in temporal order
 
     // Options
 
@@ -15,7 +14,8 @@ document.addEventListener("DOMContentLoaded", function() {
     const browser = sm.provenance.browser()
         .on('nodeCreated', onNodeCreated)
         .on('titleUpdated', onTitleUpdated)
-        .on('favUpdated', onFavUpdated);
+        .on('favUpdated', onFavUpdated)
+        .on('typeUpdated', onTypeUpdated);
 
     // Converter from an array of actions to a tree
     const listToTree = sm.data.listToTree();
@@ -27,39 +27,37 @@ document.addEventListener("DOMContentLoaded", function() {
 	//{"id":1492234782998,"time":"2017-04-15T05:39:42.998Z","url":"https://getonepush.com/demo/","text":"Demo | OnePush","type":"link","favIconUrl":"https://getonepush.com/wp-content/themes/onepush/images/favicon.ico"}
 	//{"id":1492234796532,"time":"2017-04-15T05:39:56.532Z","url":"https://getonepush.com/push/","text":"Push | OnePush","type":"link","favIconUrl":"https://getonepush.com/wp-content/themes/onepush/images/favicon.ico","from":1492234782998}
     // here ids are useds as reference.
-	
+
 	function onNodeCreated(node) {
-
         // console.log('createNode - tabId:'+node.tabId,', parent:'+node.from, ', url:'+node.url);
-
         nodes.push(node) ;
-        data = listToTree(nodes);
-        updateVis();
+        redraw();
     }
 
     function onTitleUpdated(titleUpdate) {
-        
         // console.log('updateNode -', nodeUpdate.text);
-        
-        nodes[titleUpdate.id].url = titleUpdate.url;
         nodes[titleUpdate.id].text = titleUpdate.text;
-
-        data = listToTree(nodes);
-        updateVis();
+        redraw();
     }
 
     function onFavUpdated(favUpdate) {
-        
         // console.log('updateNode -', nodeUpdate.text);
-        
         nodes[favUpdate.id].favIconUrl = favUpdate.favUrl;
+        redraw();
+    }
 
-        data = listToTree(nodes);
+    function onTypeUpdated(typeUpdate) {
+        nodes[typeUpdate.id].type = typeUpdate.type;
+        redraw();
+    }
+
+    function redraw() {
+        sm.data.tree = listToTree(nodes);
         updateVis();
     }
-	
+
     function updateVis() {
         historyMap.width(window.innerWidth).height(window.innerHeight);
-        d3.select('.sm-history-map-container').datum(data).call(historyMap);
+        d3.select('.sm-history-map-container').datum(sm.data.tree).call(historyMap);
     }
 });

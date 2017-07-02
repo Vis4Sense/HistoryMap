@@ -1,15 +1,3 @@
-
-// This is just for testing the test script
-
-function content(){
-
-}
-
-content.prototype.add=function(x, y){
-	return x+y;
-}
-
-
 $(function() {
     // Only run after the background page opens.
     chrome.runtime.sendMessage({ type: "backgroundOpened" }, function(response) {
@@ -26,17 +14,3 @@ function injectLinks() {
   	    chrome.runtime.sendMessage({ type: "linkClicked" });
     });
 }
-
-/* Polling for the sake of my intern tests
-var interval = setInterval(function() {
-    if(document.readyState === 'complete') {
-        clearInterval(interval);
-		chrome.runtime.sendMessage({loadURL: true});
-        done();
-    }    
-}, 100);
-
-window.onload = function () { 
-
-}
-*/

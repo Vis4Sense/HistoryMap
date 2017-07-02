@@ -21,12 +21,25 @@ sm.data.listToTree = function() {
         // Build parent-child relationship
         actions.slice(1).forEach(d => {
             // Add page linking as a type of link
-            if (d.type === 'link') {
+            // 16.06.2017, Phong: chrome may not detect as a link
+            // if (d.type === 'link') {
                 const source = actions.find(d2 => d2.id === d.from);
                 if (source && source !== d) {
                     addLink(source, d);
+                    // if (d.url) {
+                    //     if (source.url) {
+                    //         addLink(source, d);
+                    //     } else {
+                    //         addLink(source.source, d);
+                    //     }
+                    // } else {
+                    //     // If a node doesn't have url, it is a temporary one, may be the result of redirection.
+                    //     // This node will be excluded from the display
+                    //     // but the 'source' will be updated to always refer to the normal node
+                    //     d.source = source.source || source; // either recursive (in case multiple empty nodes) or the latest
+                    // }
                 }
-            }
+            // }
 
             // If the action type of an item is embedded, add it as a child of the containing page
             if (d.embedded) {
@@ -36,6 +49,9 @@ sm.data.listToTree = function() {
                 }
             }
         });
+
+        // Add nodes, excluding child actions and empty url nodes
+        // root.nodes = actions.filter(a => !a.parent && a.url);
 
         // Add nodes, excluding child actions
         root.nodes = actions.filter(a => !a.parent);
