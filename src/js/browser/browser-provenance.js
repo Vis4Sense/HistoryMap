@@ -71,7 +71,7 @@ sm.provenance.browser = function() {
 			if(!isIgnoredTab(tab)) {
 				// console.log('tabUpdate - ','tabid:'+tabId, ', parent:'+tab.openerTabId, ', title:'+tab.title, ' changeInfo:', changeInfo); // for testing
 
-				console.log('loading',tabId,changeInfo,tab);
+				console.log('tab update',tabId,changeInfo,tab);
 
 				// 'changeInfo' information:
 				// - status: 'loading': if (tabCompleted) {create a new node} else {update exisiting node}
