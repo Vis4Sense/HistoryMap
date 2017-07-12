@@ -75,7 +75,7 @@ sm.provenance.browser = function() {
 
 				// 'changeInfo' information:
 				// - status: 'loading': if (tabCompleted) {create a new node} else {update exisiting node}
-				if (changeInfo.status == 'loading') {
+				if (changeInfo.status == 'loading' && tab.url != tabUrl[tabId]) {
 					// console.log('urlChange -','tabId:'+tabId, ', parent:'+tab.openerTabId,', url:'+tab.url,); // for testing
 
 					if (!tab2node[tabId] || isTabCompleted[tabId]) { // not redirection
