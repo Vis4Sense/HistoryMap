@@ -13,13 +13,13 @@
 			// if (non-redireciton) addNode(tab);
 			// else {update existing node}; // redirection
 		// }
-//     if (title updated) send the new title to history-map-page.js through an event;
-//     if (favIconUrl updated) send the new favIconUrl to history-map-page.js through an event;
+//     if (title updated) send the new title to historyMapPage.js through an event;
+//     if (favIconUrl updated) send the new favIconUrl to historyMapPage.js through an event;
 // }
 
 // function addNode(tab) {
 //     create a new node with  the information from 'tab';
-//     send the new 'node' to history-map-page.js through an event;
+//     send the new 'node' to historyMapPage.js through an event;
 // }
 
 sm.provenance.browser = function() {
