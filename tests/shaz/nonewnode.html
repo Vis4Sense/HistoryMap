@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>SenseMap Tests for No New Node</title>
+  <title>SenseMap Tests for Redirection</title>
 
   <link rel="shortcut icon" type="image/png" href="/tests/lib/jasmine-2.6.0/jasmine_favicon.png">
   <link rel="stylesheet" type="text/css" href="/tests/lib/jasmine-2.6.0/jasmine.css">
@@ -12,20 +12,27 @@
   <script src="/tests/lib/jasmine-2.6.0/jasmine-html.js"></script>
   <script src="/tests/lib/jasmine-2.6.0/boot.js"></script>
 
+  <!-- Sinon library file -->
+  <script src="/tests/lib/sinon-2.2.0.js"></script>
+  <script src="/tests/lib/sinon-chrome.min.js"></script>
+
   <!-- Jasmine spec files -->
   <!--Put them in specs folder. We may use this naming convection: what-to-test.test.js -->
-  <script src="specs/nonode.test.js"></script>
+  <script src="specs/nonode-sinon-chrome.test.js"></script>
 
   <!-- SenseMap dependency-->
   <script src="/lib/jquery.min.js"></script>
   <script src="/lib/d3.min.js"></script>
   <script src="/lib/lodash.min.js"></script>
 
-  <!-- SenseMap source files -->
+ <!-- SenseMap source files -->
   <script src="/src/js/core.js"></script>
   <script src="/src/js/misc/widgets.js"></script>
   <script src="/src/js/misc/sugar.js"></script>
-  <script src="/src/js/browser/content-scripts.js"></script>
   <script src="/src/js/browser/browser-provenance.js"></script>
+  <script src="/src/js/history-map/history-map-page.js"></script>
+  <script src="/src/js/history-map/history-map-vis.js"></script>
+  <script src="/src/js/history-map/forest.js"></script>
+  <script src="/src/js/data/list-to-tree.js"></script>
 </head>
 </html>

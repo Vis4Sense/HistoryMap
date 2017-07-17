@@ -1,13 +1,12 @@
-nonownodetest("chrome-extension://");
-nonownodetest("chrome://");
-nonownodetest("chrome-devtools://");
-nonownodetest("localhost://");
-nonownodetest("view-source:");
+// here first url is the url start and the last is the url where it actually ends. 
 
-function nonownodetest(url) {
-	describe("Case: No New node", function () {
-		it('Testing: No new node should appear on the history map when a new url is: '+url, function() {
-			// I got this from console log in browser-provenance.js
+redirectiontest("http://movies.disney.com/finding-nemo","http://www.disneyinternational.com/");
+
+function redirectiontest(urlstart,urlend) {
+	describe("Case: Redirection", function () {
+		
+		it('Testing: Redirection of URL from one to other', function() {
+
 			const tabInfo = {
 				"tabId": 131,
 				"changeInfo": {
@@ -29,16 +28,19 @@ function nonownodetest(url) {
 					"pinned": false,
 					"selected": true,
 					"status": "complete",
-					"title": "",
-					"url": url,
+					"title": "Disney - Disney Online International",
+					"url": urlend,
 					"width": 964,
 					"windowId": 1
 				}
 			};
 			
 			chrome.tabs.onUpdated.dispatch(tabInfo.tabId, tabInfo.changeInfo, tabInfo.tab);
+			
 			const lastNode = _.last(sm.data.tree.nodes);
-				expect(lastNode).not.toBeDefined(); 
+			expect(lastNode.url).not.toBe(urlstart); 
+			
+
 		});
 	});	
 }
