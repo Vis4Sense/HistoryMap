@@ -1,8 +1,17 @@
 nonownodetest("chrome-extension://");
+nonownodetest("chrome-extension://sdsdsd");
+nonownodetest("chrome-extension://?id=gekbinhnlmhidijgdccmnakheaeplado");
 nonownodetest("chrome://");
+nonownodetest("chrome://sdsdsd");
+nonownodetest("chrome://?id=gekbinhnlmhidijgdccmnakheaeplado");
 nonownodetest("chrome-devtools://");
+nonownodetest("chrome-devtools://sdsdssd");
+nonownodetest("chrome-devtools://?id=gekbinhnlmhidijgdccmnakheaeplado");
 nonownodetest("localhost://");
+nonownodetest("localhost://sdsdsddsd");
 nonownodetest("view-source:");
+nonownodetest("view-source:sdsdsdsd");
+nonownodetest("view-source:?id=gekbinhnlmhidijgdccmnakheaeplado");
 
 function nonownodetest(url) {
 	describe("Case: No New node", function () {
