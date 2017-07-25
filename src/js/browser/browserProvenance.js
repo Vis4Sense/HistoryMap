@@ -59,8 +59,6 @@ sm.provenance.browser = function() {
 				// tab.title = 'id ' + tab.id + ' - ' + tab.title || tab.url;
 
 				addNode(tab, tab.openerTabId);
-
-				isTabCompleted[tab.id] = false;
 			}
 		});
 	}
@@ -72,18 +70,14 @@ sm.provenance.browser = function() {
 				// console.log('tabUpdate - ','tabid:'+tabId, ', parent:'+tab.openerTabId, ', title:'+tab.title, ' changeInfo:', changeInfo); // for testing
 
 				console.log('tab update',tabId,changeInfo,tab);
+				// console.log('isComplete',isTabCompleted[tabId],', tab2node',tab2node[tabId]);
 
 				// 'changeInfo' information:
 				// - status: 'loading': if (tabCompleted) {create a new node} else {update exisiting node}
 				if (changeInfo.status == 'loading' && tab.url != tabUrl[tabId]) {
 					// console.log('urlChange -','tabId:'+tabId, ', parent:'+tab.openerTabId,', url:'+tab.url,); // for testing
 
-					if (!tab2node[tabId] || isTabCompleted[tabId]) { // not redirection
-						addNode(tab, tab.id);
-						isTabCompleted[tabId] = false;
-					}
-
-					else { // redirection
+					if (tab2node[tabId] !== undefined && !isTabCompleted[tabId]) { // redirection
 						const titleUpdate = {
 							id: tab2node[tab.id],
 							text: tab.title || tab.url
@@ -92,6 +86,9 @@ sm.provenance.browser = function() {
 						dispatch.titleUpdated(titleUpdate);
 
 						tabUrl[tabId] = tab.url;
+					}
+					else { // not redirection
+						addNode(tab, tab.id);
 					}
 				}
 
@@ -125,6 +122,9 @@ sm.provenance.browser = function() {
     }
 
 	function addNode(tab,parent) {
+
+		// console.log('addding new node',tab,parent);
+
 		const title = tab.title || tab.url;
 		const time = new Date();
 		const node = {
@@ -140,6 +140,7 @@ sm.provenance.browser = function() {
 
 		tab2node[tab.id] = nodeId;
 		tabUrl[tab.id] = tab.url;
+		isTabCompleted[tab.id] = false;
 
 		dispatch.nodeCreated(node);
 
