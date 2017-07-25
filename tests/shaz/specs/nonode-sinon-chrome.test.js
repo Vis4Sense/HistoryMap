@@ -1,31 +1,28 @@
-noNewNodeTest("chrome-extension://");
-noNewNodeTest("chrome-extension://sdsdsd");
-noNewNodeTest("chrome-extension://?id=gekbinhnlmhidijgdccmnakheaeplado");
-noNewNodeTest("chrome://");
-noNewNodeTest("chrome://sdsdsd");
-noNewNodeTest("chrome://?id=gekbinhnlmhidijgdccmnakheaeplado");
-noNewNodeTest("chrome-devtools://");
-noNewNodeTest("chrome-devtools://sdsdssd");
-noNewNodeTest("chrome-devtools://?id=gekbinhnlmhidijgdccmnakheaeplado");
-noNewNodeTest("localhost://");
-noNewNodeTest("localhost://sdsdsddsd");
-noNewNodeTest("view-source:");
-noNewNodeTest("view-source:sdsdsdsd");
-noNewNodeTest("view-source:?id=gekbinhnlmhidijgdccmnakheaeplado");
-noNewNodeTestWithDataPresent("chrome-extension://");
-noNewNodeTestWithDataPresent("chrome-extension://sdsdsd");
-noNewNodeTestWithDataPresent("chrome-extension://?id=gekbinhnlmhidijgdccmnakheaeplado");
-noNewNodeTestWithDataPresent("chrome://");
-noNewNodeTestWithDataPresent("chrome://sdsdsd");
-noNewNodeTestWithDataPresent("chrome://?id=gekbinhnlmhidijgdccmnakheaeplado");
-noNewNodeTestWithDataPresent("chrome-devtools://");
-noNewNodeTestWithDataPresent("chrome-devtools://sdsdssd");
-noNewNodeTestWithDataPresent("chrome-devtools://?id=gekbinhnlmhidijgdccmnakheaeplado");
-noNewNodeTestWithDataPresent("localhost://");
-noNewNodeTestWithDataPresent("localhost://sdsdsddsd");
-noNewNodeTestWithDataPresent("view-source:");
-noNewNodeTestWithDataPresent("view-source:sdsdsdsd");
-noNewNodeTestWithDataPresent("view-source:?id=gekbinhnlmhidijgdccmnakheaeplado");
+var urlArray = [
+	"chrome-extension://",
+	"chrome-extension://sdsdsd",
+	"chrome-extension://?id=gekbinhnlmhidijgdccmnakheaeplado",
+	"chrome://",
+	"chrome://sdsdsd",
+	"chrome://?id=gekbinhnlmhidijgdccmnakheaeplado",
+	"chrome-devtools://",
+	"chrome-devtools://sdsdssd",
+	"chrome-devtools://?id=gekbinhnlmhidijgdccmnakheaeplado",
+	"localhost://",
+	"localhost://sdsdsddsd",
+	"view-source:",
+	"view-source:sdsdsdsd",
+	"view-source:?id=gekbinhnlmhidijgdccmnakheaeplado"
+]
+
+for (var i=0; i<urlArray.length;i++) {
+	noNewNodeTest(urlArray[i]);
+}
+
+for (var i = 0; i < urlArray.length; i++) {
+	noNewNodeTestWithDataPresent(urlArray[1]);
+	
+}
 
 function noNewNodeTest(url) {
 	describe("Case: No New node", function () {
