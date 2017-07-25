@@ -101,7 +101,8 @@ function noNewNodeTestWithDataPresent(url) {
 
 		const lastNode = _.last(sm.data.tree.nodes);
 		var count1 = sm.data.tree.nodes.length;
-			
+		var beforeTitle = sm.data.tree.nodes[0].text;
+		
 		const tabInfoBlank = {
 				"tabId": 131,
 				"changeInfo": {
@@ -133,7 +134,9 @@ function noNewNodeTestWithDataPresent(url) {
 			chrome.tabs.onUpdated.dispatch(tabInfoBlank.tabId, tabInfoBlank.changeInfo, tabInfoBlank.tab);
 			const lastNodetabBlank = _.last(sm.data.tree.nodes);
 			var count2 = sm.data.tree.nodes.length;
+			var afterTitle = sm.data.tree.nodes[0].text;
 			expect(count2).toEqual(count1); 	
+			expect(afterTitle).toEqual(beforeTitle); 	
 			
 			
 		});
