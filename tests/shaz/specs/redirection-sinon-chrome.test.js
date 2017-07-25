@@ -1,10 +1,10 @@
 // here first url is the url start and the last is the url where it actually ends. 
 
-redirectiontest("http://movies.disney.com/finding-nemo","http://www.disneyinternational.com/");
+redirectionTest("http://movies.disney.com/finding-nemo","http://www.disneyinternational.com/");
 
 
 
-function redirectiontest(urlstart,urlend) {
+function redirectionTest(urlstart,urlend) {
 	describe("Case: Redirection", function () {
 		
 		it('Testing: Redirection of URL from one to other', function() {

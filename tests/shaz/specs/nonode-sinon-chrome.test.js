@@ -1,19 +1,19 @@
-nonownodetest("chrome-extension://");
-nonownodetest("chrome-extension://sdsdsd");
-nonownodetest("chrome-extension://?id=gekbinhnlmhidijgdccmnakheaeplado");
-nonownodetest("chrome://");
-nonownodetest("chrome://sdsdsd");
-nonownodetest("chrome://?id=gekbinhnlmhidijgdccmnakheaeplado");
-nonownodetest("chrome-devtools://");
-nonownodetest("chrome-devtools://sdsdssd");
-nonownodetest("chrome-devtools://?id=gekbinhnlmhidijgdccmnakheaeplado");
-nonownodetest("localhost://");
-nonownodetest("localhost://sdsdsddsd");
-nonownodetest("view-source:");
-nonownodetest("view-source:sdsdsdsd");
-nonownodetest("view-source:?id=gekbinhnlmhidijgdccmnakheaeplado");
+noNewNodeTest("chrome-extension://");
+noNewNodeTest("chrome-extension://sdsdsd");
+noNewNodeTest("chrome-extension://?id=gekbinhnlmhidijgdccmnakheaeplado");
+noNewNodeTest("chrome://");
+noNewNodeTest("chrome://sdsdsd");
+noNewNodeTest("chrome://?id=gekbinhnlmhidijgdccmnakheaeplado");
+noNewNodeTest("chrome-devtools://");
+noNewNodeTest("chrome-devtools://sdsdssd");
+noNewNodeTest("chrome-devtools://?id=gekbinhnlmhidijgdccmnakheaeplado");
+noNewNodeTest("localhost://");
+noNewNodeTest("localhost://sdsdsddsd");
+noNewNodeTest("view-source:");
+noNewNodeTest("view-source:sdsdsdsd");
+noNewNodeTest("view-source:?id=gekbinhnlmhidijgdccmnakheaeplado");
 
-function nonownodetest(url) {
+function noNewNodeTest(url) {
 	describe("Case: No New node", function () {
 		it('Testing: No new node should appear on the history map when a new url is: '+url, function() {
 			// I got this from console log in browser-provenance.js
