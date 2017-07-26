@@ -1,6 +1,6 @@
 {
   "manifest_version": 2,
-  "name": "SenseMap",
+  "name": "SenseMap - old backend",
   "description": "SenseMaking with Analytic Provenance",
   "version": "0.5.9",
   "minimum_chrome_version": "52",
