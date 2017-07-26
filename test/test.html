@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test page</title>
+    <!-- Add the Mocha's styles to view results -->
+    <link rel="stylesheet" href="/src/bower_components/mocha/mocha.css">
+</head>
+<body>
+    <!-- To test results -->
+    <div id="mocha"></div>
+    <!-- Add the Mocha library -->
+    <script src="/src/bower_components/mocha/mocha.js"></script>
+    <script src="mochaSetup.js"></script>
+    <!-- Add the chai library -->
+    <script src="/src/bower_components/chai/chai.js"></script>
+    <!-- Load the third party libraries -->
+    <script src="/src/bower_components/d3/d3.min.js"></script>
+    <!-- Load all the classes -->
+    <script src="/src/js/classes/senseConsole.js"></script>
+    <script src="/src/js/classes/senseUrl.js"></script>
+    <script src="/src/js/classes/senseImage.js"></script>
+    <script src="/src/js/classes/senseHighlight.js"></script>
+    <script src="/src/js/classes/senseNode.js"></script>
+    <script src="/src/js/classes/senseLink.js"></script>
+    <script src="/src/js/classes/senseTab.js"></script>
+    <script src="/src/js/classes/senseQueue.js"></script>
+    <script src="/src/js/classes/senseTransaction.js"></script>
+    <script src="/src/js/classes/senseTask.js"></script>
+    <script src="/src/js/classes/senseHistory.js"></script>
+    <script src="/src/js/classes/senseGrid.js"></script>
+    <script src="/src/js/classes/senseKnowledge.js"></script>
+    <!-- Load full specification -->
+    <script src="testSenseURL.js"></script>
+    <script src="testSenseHighlight.js"></script>
+    <script src="testSenseImage.js"></script>
+    <script src="testSenseNode.js"></script>
+    <script src="testSenseLink.js"></script>
+    <script src="testSenseQueue.js"></script>
+    <script src="testSenseTransaction.js"></script>
+    <script src="testSenseHistory.js"></script>
+    <script src="testSenseKnowledge.js"></script>
+    <!-- Run all the test -->
+    <script src="mochaRun.js"></script>
+    <div style="display: flex; justify-content: center;">
+        <p>
+            <strong>P.S.</strong> Don't forget to launch <strong>bower install</strong>
+            if you see incorrect behavior of this page
+        </p>
+    </div>
+</body>
+</html>

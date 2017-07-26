@@ -3,127 +3,104 @@
  */
 sm.provenance.mod = function() {
     var module = {},
-        data = chrome.extension.getBackgroundPage().data,
+        backgroundPage = chrome.extension.getBackgroundPage(),
+        data = backgroundPage.data,
         view = 'name';
 
     var dispatch = d3.dispatch('redrawn', 'actionAdded', 'nodeClicked');
 
     /**
      * Each action is a change of data. Merge all changes to produce the latest data.
+     *
+     * @param {Array} actions
+     * @param {Array} nodes
      */
-    module.mergeActions = function(actions) {
-        // Init
-        actions.forEach(n => {
-            delete n.children;
-            delete n.parent;
-            delete n.links;
-            delete n.sup;
-        });
-
-        // - Build parent-child relationship first
-        actions.forEach((d, i) => {
-            if (!i) return;
-
-            // Add page linking as a type of link
-            if (d.type === 'link' || isSearchType(d.type)) {
-                var source = actions.find(d2 => d2.id === d.from);
-                if (source && source !== d) {
-                    addLink(source, d);
-                } else {
-                    // console.log('could not find the source of ' + d.text);
-                }
-            }
-
-            // If the action type of an item is embedded, add it as a child of the containing page
-            if (isEmbeddedType(d.type)) {
-                var source = actions.find(d2 => d2.id === d.from);
-                if (source) {
-                    addChild(source, d);
-                } else {
-                    // console.log('could not find the source of ' + d.text);
-                }
-            }
-        });
-
+    module.mergeActions = function(actions, nodes) {
         // - Ignore child and link actions
-        data.nodes = actions.filter(a => !a.parent && isPageType(a.type));
+        if (nodes) {
+            data.nodes = nodes.slice();
+        } else {
+            data.nodes = actions.filter(a => !a.parent && typeof a.isRegistered == 'function' && a.isRegistered());
+        }
 
         // - Clear 'state' attributes so that history will be replayed
         data.nodes.forEach(n => {
-            delete n.userImage;
-            delete n.collectionRemoved;
-            delete n.curationRemoved;
-            delete n.favorite;
-            delete n.minimized;
-            delete n.curated;
+            /**
+             * The line below was commented out because it didn't allow to create a node on Knowledge Map
+             * when using the button 'Curate' at the first time
+             */
+            // delete n.curated;
             delete n.rp;
         });
-
         // - Node attribute
-        actions.filter(a => !isPageType(a.type)).forEach(a => {
+        actions.filter(a => typeof a.isRegistered === 'undefined').forEach(a => {
             var n = getNodeById(a.id);
-            if (!n) return;
-
-            if (a.type === 'save-image') n.userImage = a.value;
-            if (a.type === 'remove-collection-node') n.collectionRemoved = true;
-            if (a.type === 'remove-curation-node') n.curationRemoved = true;
-            if (a.type === 'favorite-node') n.favorite = true;
-            if (a.type === 'unfavorite-node') n.favorite = false;
-            if (a.type === 'minimize-node') n.minimized = true;
-            if (a.type === 'restore-node') n.minimized = false;
-            if (a.type === 'curate-node') {
-                n.curated = true;
-                n.curationRemoved = false;
-                n.rp = a.trp;
+            if (!n) {
+                return;
             }
-            if (a.type === 'move-node') n.rp = a.trp;
-        });
 
+            switch (a.type) {
+                case 'save-image':
+                    n.userImage = a.value;
+                    break;
+                case 'remove-collection-node':
+                    n.collectionRemoved = true;
+                    break;
+                case 'remove-curation-node':
+                    n.curationRemoved = true;
+                    break;
+                case 'unfavorite-node':
+                case 'favorite-node':
+                    n.favorite = a.type === 'favorite-node';
+                    break;
+                case 'restore-node':
+                case 'minimize-node':
+                    n.minimized = a.type === 'minimize-node';
+                    break;
+                case 'curate-node':
+                    n.curationRemoved = false;
+                case 'move-node':
+                    n.rp = a.trp;
+                    break;
+                default:
+                    break;
+            }
+        });
         // - Then add to the link list
         data.links = [];
         // -- Automatic links
-        data.nodes.filter(d => d.links).forEach(d => {
-            d.links.forEach(c => {
-                if (data.nodes.includes(c)) data.links.push({ source: d, target: c });
+        data.nodes.filter(d => d.slaves).forEach(d => {
+            d.slaves.forEach(c => {
+                if (data.nodes.includes(c)) {
+                    data.links.push({source: d, target: c});
+                }
             });
         });
-
         // -- User links
-        actions.filter(a => !isPageType(a.type)).forEach(a => {
-            var l = getLinkByIds(a.sourceId, a.targetId);
-            if (a.type === 'add-link') {
-                if (l) {
-                    l.removed = false;
-                } else {
-                    data.links.push({ source: getNodeById(a.sourceId), target: getNodeById(a.targetId), userAdded: true });
-                }
+        let events = actions.filter(a => !(a instanceof SenseNode));
+        events.forEach(events => {
+            var link = getLinkByIds(events.sourceId, events.targetId);
+            switch (events.type) {
+                case 'add-link':
+                    if (link) {
+                        link.removed = false;
+                    } else {
+                        data.links.push({
+                            source: getNodeById(events.sourceId),
+                            target: getNodeById(events.targetId),
+                            userAdded: true
+                        });
+                    }
+                    break;
+                case 'remove-link':
+                    if (link) {
+                        link.removed = true;
+                    }
+                    break;
+                default:
+                    break;
             }
-            if (a.type === 'remove-link' && l) l.removed = true;
         });
-    };
-
-    function isPageType(type) {
-        return [ 'search', 'location', 'dir', 'highlight', 'note', 'filter', 'link', 'type', 'bookmark' ].includes(type);
-    }
-
-    function isEmbeddedType(type) {
-        return [ 'highlight', 'note', 'filter' ].includes(type);
-    }
-
-    function isSearchType(type) {
-        return [ 'search', 'location', 'dir' ].includes(type);
-    }
-
-    function addLink(p, c) {
-        if (!p.links) p.links = [];
-        p.links.push(c);
-        c.sup = p;
-    };
-
-    function addChild(p, c) {
-        if (!p.children) p.children = [];
-        p.children.push(c);
-        c.parent = p;
     };
 
     function getNodeById(id) {
@@ -139,75 +116,74 @@ sm.provenance.mod = function() {
      */
     module.handleEvents = function(vis) {
         vis.on('nodeClicked', d => onNodeHandled('click-node', d))
-           .on('nodeCollectionRemoved', d => onNodeHandled('remove-collection-node', d))
-           .on('nodeCurationRemoved', d => onNodeHandled('remove-curation-node', d))
-           .on('nodeFavorite', d => onNodeHandled('favorite-node', d))
-           .on('nodeUnfavorite', d => onNodeHandled('unfavorite-node', d))
-           .on('nodeMinimized', d => onNodeHandled('minimize-node', d))
-           .on('nodeRestored', d => onNodeHandled('restore-node', d))
-           .on('nodeHovered', (d, status) => onNodeHovered(d, status))
-           .on('nodeMoved', d => onNodeHandled('move-node', d))
-           .on('linkAdded', d => onLinkHandled('add-link', d))
-           .on('linkRemoved', d => onLinkHandled('remove-link', d));
+            .on('nodeCollectionRemoved', d => onNodeHandled('remove-collection-node', d))
+            .on('nodeCurationRemoved', d => onNodeHandled('remove-curation-node', d))
+            .on('nodeFavorite', d => onNodeHandled('favorite-node', d))
+            .on('nodeUnfavorite', d => onNodeHandled('unfavorite-node', d))
+            .on('nodeMinimized', d => onNodeHandled('minimize-node', d))
+            .on('nodeRestored', d => onNodeHandled('restore-node', d))
+            .on('nodeHovered', (d, status) => onNodeHovered(d, status))
+            .on('nodeCollectionMoved', d => onNodeHandled('move-collection-node', d))
+            .on('nodeCurationMoved', d => onNodeHandled('move-curation-node', d))
+            .on('linkAdded', d => onLinkHandled('add-link', d))
+            .on('linkRemoved', d => onLinkHandled('remove-link', d));
     };
-
-    var redrawTypes = [ 'remove-curation-node', 'remove-collection-node-node' ];
 
     function onNodeHandled(type, d) {
         var a = {
             type: type,
             id: d.id,
-            time: +new Date()
+            time: Date.now()
         };
 
-        if (type === 'move-node') a.trp = d.rp;
-
+        switch (type) {
+            case 'move-collection-node':
+                a.trp = d.rp;
+                break;
+            case 'move-curation-node':
+                chrome.runtime.sendMessage({type: 'nodeCurationMoved', value: d.export});
+                break;
+            case 'click-node':
+                dispatch.nodeClicked(d);
+                break;
+            case 'remove-curation-node':
+            case 'remove-collection-node':
+                dispatch.redrawn();
+                break;
+            default:
+                console.warn('Unknown type: ' + type);
+                break;
+        }
         dispatch.actionAdded(a);
 
-        if (redrawTypes.includes(type)) dispatch.redrawn();
-
-        if (type === 'click-node') dispatch.nodeClicked(d);
     }
 
     function onNodeHovered(d, status) {
-        chrome.runtime.sendMessage({ type: 'nodeHovered', value: d.id, view: view, status: status });
+        chrome.runtime.sendMessage({type: 'nodeHovered', value: d.id, view: view, status: status});
     }
 
     function onLinkHandled(type, d) {
+        if (backgroundPage.options.debugOthers) {
+            console.log('onLinkHandled: node ', [d.source, d.target], ', type ' + type);
+        }
         dispatch.actionAdded({
             type: type,
             sourceId: d.source.id,
             targetId: d.target.id,
-            time: +new Date()
+            time: Date.now()
         });
     }
-
-    /**
-     * Just get real fields, not the generated one to prevent circular json.
-     */
-    module.getCoreData = function(d) {
-        // Don't need to save 'state' properties because they have their corresponding actions,
-        // which generate those properties such as favorite, minimized
-        // 'value' is to store the state property in the action.
-        // 'trp': we don't want to save 'rp', which is a state property
-        var c = {},
-            fields = [ 'id', 'text', 'url', 'type', 'time', 'endTime', 'favIconUrl', 'image', 'classId', 'path', 'from',
-                'seen', 'value', 'sourceId', 'targetId', 'trp' ];
-
-        fields.forEach(f => {
-            if (d[f] !== undefined) c[f] = d[f];
-        });
-
-        return c;
-    };
 
     /**
      * Sets/gets the view name.
      */
     module.view = function(value) {
-        if (!arguments.length) return view;
-        view = value;
-        return this;
+        if (arguments.length) {
+            view = value;
+            return this;
+        } else {
+            return view;
+        }
     };
 
     // Binds custom events

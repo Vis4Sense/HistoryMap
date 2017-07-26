@@ -1,0 +1,32 @@
+{
+  "name": "sense-map-extension",
+  "version": "0.5.8",
+  "description": "SenseMaking with Analytic Provenance",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "bower": "^1.7.9"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "chromium-browser test/test.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/SEVEN_Collab/sense_map_extension.git"
+  },
+  "keywords": [
+    "chrome",
+    "extension",
+    "d3.js",
+    "es6"
+  ],
+  "authors": [
+    "phongvis",
+    "stevebidenko"
+  ],
+  "license": "MIT",
+  "homepage": "https://bitbucket.org/SEVEN_Collab/sense_map_extension#readme"
+}

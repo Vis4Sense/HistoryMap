@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SenseMap options</title>
+    <link rel="stylesheet" href="options.css">
+</head>
+<body>
+<div id="options">
+    <label>
+        <input type="checkbox" id="debugHistory"/>
+        Debug mode in the History Map (need to restart the app)
+    </label>
+    <label>
+        <input type="checkbox" id="debugKnowledge"/>
+        Debug mode in the Knowledge Map (need to restart the app)
+    </label>
+    <label>
+        <input type="checkbox" id="debugOthers"/>
+        Debug mode in other modules (need to restart the app)
+    </label>
+    <label>
+        <input type="checkbox" id="testTab"/>
+        Open a tab with all the application tests when launch
+    </label>
+    <label>
+        <input type="checkbox" id="noSnapshots"/>
+        Don't take any snapshot
+    </label>
+    <label>
+        <input type="checkbox" id="inventory"/>
+        Auto add all the opened pages into the History Map
+    </label>
+    <label>
+        <input type="checkbox" id="autoSave"/>
+        Auto save all the changes in Sense Map
+    </label>
+    <label>
+        <input type="checkbox" id="labelGenerator"/>
+        Auto generate label text for the edges on the Knowledge Map
+    </label>
+    <label>
+        <input type="checkbox" id="firefoxSnapshot"/>
+        Use firefox to get starred pages' snapshots in the History Map
+    </label>
+    <label>
+        <input type="checkbox" id="inSeparatedTab"/>
+        Start the application in tabs of the current browser
+    </label>
+    <label>
+        <input type="checkbox" id="markLastNodes"/>
+        Use color marks for current and last 3 nodes
+    </label>
+    <label>
+        <input type="radio" name="storage" value="indexedDB" />
+        Store data locally into the indexedDB system
+    </label>
+    <label class="for-url">
+        <input type="radio" name="storage" value="restAPI" checked />
+        <span>&nbsp;API server:</span>
+        <input type="url" id="api"/>
+    </label>
+</div>
+
+<div class="buttons">
+    <div id="status"></div>
+    <button id="save-options">Save</button>
+</div>
+
+<script src="options.js"></script>
+</body>
+</html>

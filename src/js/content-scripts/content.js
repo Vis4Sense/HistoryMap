@@ -1,10 +1,10 @@
-$(function() {
+$(() => {
     // Only run when the background page opened
-    chrome.runtime.sendMessage({ type: "backgroundOpened" }, function(response) {
+    chrome.runtime.sendMessage({type: 'backgroundOpened'}, response => {
         if (response) {
             // If page uses ajax, we don't know when it's actually complete such as google search result page.
             // Naively wait one more second.
-            setTimeout(function() {
+            setTimeout(() => {
                 loadHighlights();
             }, 2000);
 
@@ -14,35 +14,34 @@ $(function() {
             respondExtension();
             // focusWhenHovering();
 
-            console.log("SensePath: content script loaded");
+            console.log('SenseMap: content script loaded');
         }
     });
 });
 
 /**
- * Sometimes as in google search result page, the href is different from the openning page! Redirect?
+ * Sometimes as in google search result page, the href is different from the opening page! Redirect?
  */
 function injectLinks() {
-  	$('body').on('click', 'a', sendClick)
-    	.on('mouseover', 'a', sendClick);
-}
-
-function sendClick() {
-  	chrome.runtime.sendMessage({ type: "linkClicked" });
+    $(document).on('click', 'a', () => {
+        chrome.runtime.sendMessage({type: 'linkClicked'});
+    });
 }
 
 /**
- * Loads existing highlights to the page.
+ * Loads existing highlights to the page in the browser.
  */
 function loadHighlights() {
     // Get data from the extension
-    chrome.runtime.sendMessage({ type: "requestData" }, function(response) {
-        if (!response) return;
+    chrome.runtime.sendMessage({type: 'requestData'}, response => {
+        if (!response) {
+            return;
+        }
 
-        response.forEach(function(d) {
-            if (d.type === "highlight") {
+        response.forEach(d => {
+            if (d.type === 'highlight') {
                 $.highlightPath(d.path, d.classId);
-            } else if (d.type === "note") {
+            } else if (d.type === 'note') {
                 $.highlightPath(d.path, d.classId, d);
             }
         });
@@ -53,25 +52,20 @@ function loadHighlights() {
  * Captures page activities to be able to infer if the page is idle or not.
  */
 function captureActivities() {
-    window.addEventListener("focus", handle);
-    window.addEventListener("blur", handle);
-    window.addEventListener("keydown", handle);
-    window.addEventListener("mousewheel", handle);
-    window.addEventListener("mousedown", handle);
-    window.addEventListener("mousemove", handle);
-}
-
-function handle() {
-    chrome.runtime.sendMessage({ type: this.event.type, time: +new Date() });
+    ['focus', 'blur', 'keydown', 'mousewheel', 'mousedown', 'mousemove'].forEach(event => {
+        window.addEventListener(event, () => {
+            chrome.runtime.sendMessage({type: this.event.type, time: Date.now()});
+        });
+    });
 }
 
 function respondExtension() {
-    chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-        if (request.type === "scrollToElement") {
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+        if (request.type === 'scrollToElement') {
             scrollTo(request);
-        } else if (request.type === "removeHighlight") {
+        } else if (request.type === 'removeHighlight') {
             // Remove highlight by replacing 'mark' node with 'text' node
-            $("." + request.classId).each(function() {
+            $('.' + request.classId).each(function() {
                 // 'Remove' appended to the end of the node because button is added into markNode. Get only text node.
                 var texts = $(this).contents().filter(function() { return this.nodeType === 3; });
                 if (texts.length) {
@@ -80,7 +74,7 @@ function respondExtension() {
                 }
 
                 // One of them can be the note icon
-                if ($(this).hasClass("sm-note-icon")) {
+                if ($(this).hasClass('sm-note-icon')) {
                     $(this).remove();
                 }
             });
@@ -94,7 +88,9 @@ function respondExtension() {
 
 function highlightSelection(sendResponse) {
     var selection = getSelection();
-    if (!selection || selection.type !== "Range") return;
+    if (!selection || selection.type !== 'Range') {
+        return;
+    }
     sendResponse($.highlight(selection));
     selection.empty();
 }
@@ -103,10 +99,13 @@ function scrollTo(request) {
     var node;
     try {
         if (request.path) {
-            node = document.evaluate(request.path.split(/\|/g)[0], document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.parentNode;// node is a text node
+            node = document.evaluate(
+                request.path.split(/\|/g)[0], document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null
+            ).singleNodeValue.parentNode;// node is a text node
         } else {
-            var nodes = document.querySelectorAll("img");
-            for (var i = 0; i < nodes.length; i++) { // Can't use querySelector because of relative image src
+            var nodes = document.querySelectorAll('img');
+            // Can't use querySelector because of relative image src
+            for (var i = 0; i < nodes.length; i++) {
                 if (nodes[i].src === request.image) {
                     node = nodes[i];
                     break;
@@ -118,9 +117,9 @@ function scrollTo(request) {
             $('html, body').animate({
                 scrollTop: Math.max(0, $(node).offset().top - 100)
             }, 500);
-            setTimeout(function() {
-                $(node).fadeTo("fast", 0.2);
-                $(node).fadeTo("fast", 1);
+            setTimeout(() => {
+                $(node).fadeTo('fast', 0.2);
+                $(node).fadeTo('fast', 1);
             }, 500);
         }
     }
@@ -130,7 +129,7 @@ function scrollTo(request) {
  * Runs some tasks requested before content script finishes loading.
  */
 function completePendingTask() {
-    chrome.runtime.sendMessage({ type: "requestTask" }, function(response) {
+    chrome.runtime.sendMessage({type: 'requestTask'}, response => {
         if (response) {
             scrollTo(response);
         }
@@ -138,7 +137,7 @@ function completePendingTask() {
 }
 
 function focusWhenHovering() {
-    $('body').mouseover(function() {
-        chrome.runtime.sendMessage({ type: "focusWindow" });
+    $('body').mouseover(() => {
+        chrome.runtime.sendMessage({type: 'focusWindow'});
     });
 }

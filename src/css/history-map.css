@@ -1,0 +1,146 @@
+body {
+    overflow: hidden;
+    position: relative;
+}
+
+.sm-collection-container {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.btn-toolbar .btn {
+    padding: 4px 8px;
+}
+
+#btnCurate {
+    position: fixed;
+    float: right;
+    right: 5px;
+    bottom: 5px;
+    cursor: pointer;
+    padding: 2px 6px;
+}
+
+#groupZoom {
+    position: fixed;
+    float: right;
+    right: 5px;
+    bottom: 5px;
+}
+
+#groupZoom .btn {
+    padding: 0 6px;
+    font-size: 20px;
+}
+
+.sm-sensemap div.node.tab-closed {
+    box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0);
+}
+
+.sm-sensemap div.node.tab-closed .parent.has-children {
+    border-bottom: 1px dotted rgba(0, 0, 0, 0.3);
+}
+
+.sm-sensemap div.node div.node-title div.small-icon {
+    display: inline;
+}
+
+.sm-sensemap div.node-title div.small-icon img.node-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.sm-sensemap div.node.many-tabs {
+    box-shadow: 0 0 0 2px #6e6e6e, 0 0 0 3px rgba(0, 0, 0, 0);
+}
+
+.sm-sensemap div.btn-group {
+    z-index: 1;
+    background: white;
+}
+
+.sm-sensemap div.btn-group.hideMenu {
+  display: none;
+  z-index: auto;
+}
+
+.form-session-select {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 5px;
+    background: #f2f2f2;
+    box-shadow: 2px 2px 2px #666;
+}
+
+.firefox-snapshots {
+    position: absolute;
+    overflow: hidden;
+    background: white;
+}
+
+.form-session-select > input {
+    width: 100%;
+}
+
+.saved-sessions {
+    overflow-y: auto;
+    max-height: 300px;
+}
+
+.saved-sessions ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: block;
+    outline: 0;
+    min-width: 200px;
+    max-width: 400px;
+}
+
+.saved-sessions ul > li {
+    border: 1px solid #f2f2f2;
+    display: flex;
+}
+
+.saved-sessions ul > li > div:nth-child(1) {
+    flex-grow: 1;
+}
+
+.saved-sessions ul > li > div:not(:nth-child(1)) {
+    align-self: center;
+    margin-left: 5px;
+}
+
+.saved-sessions ul > li > div > i:hover {
+    font-size: 110%;
+}
+
+.saved-sessions ul > li > div:not(:nth-child(1)):hover {
+    cursor: default;
+}
+
+.saved-sessions ul > li:hover {
+    cursor: pointer;
+    border: 1px solid #003eff;
+    background: #007fff;
+    font-weight: normal;
+    color: #ffffff;
+}
+
+.status {
+    display: inline-block;
+    color: green;
+    background-color: white;
+}
+
+.status.error {
+    color: red;
+}
+
+.status > span {
+    font-weight: bold;
+}

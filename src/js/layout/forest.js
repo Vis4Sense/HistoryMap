@@ -6,13 +6,13 @@ sm.layout.forest = function() {
 
     // Key function to bind data
     var key = d => d.id,
-        linkKey = d => key(d.source) + "-" + key(d.target);
+        linkKey = d => key(d.source) + '-' + key(d.target);
 
     var vertices, edges,
         roots,
         width, height,
-        children = d => d.links,
-        parent = d => d.sup,
+        children = d => d.slaves,
+        parent = d => d.leader,
         time = d => d.time,
         label = d => d.label,
         nodeDict, linkDict,
@@ -27,9 +27,11 @@ sm.layout.forest = function() {
      */
     function dfs(d, f) {
         f(d);
-        if (children(d)) children(d).forEach(c => {
-            dfs(c, f);
-        });
+        if (children(d)) {
+            children(d).forEach(c => {
+                dfs(c, f);
+            });
+        }
     }
 
     /**
@@ -48,15 +50,17 @@ sm.layout.forest = function() {
         var timeSort = (a, b) => d3.ascending(time(a), time(b));
         roots = vertices.filter(n => !parent(n)).sort(timeSort);
         dfsRoots(d => {
-            if (children(d)) children(d).sort();
+            if (children(d)) {
+                children(d).sort();
+            }
         });
     }
 
     function init() {
-        if (dummyContainer) return;
-
-        dummyContainer = document.createElement('div');
-        document.body.appendChild(dummyContainer);
+        if (!dummyContainer) {
+            dummyContainer = document.createElement('div');
+            document.body.appendChild(dummyContainer);
+        }
     }
 
     function buildGraph() {
@@ -108,12 +112,15 @@ sm.layout.forest = function() {
         });
 
         vertices.forEach(n => {
-            if (!n._edges.length) return;
+            if (!n._edges.length) {
+                return;
+            }
 
-            // For each node, we want to distribute the contacting points of outgoing edges along the boundary rather than always in the center
+            // For each node, we want to distribute the contacting points of outgoing edges along the boundary rather
+            // than always in the center
             var scale = d3.scale.ordinal()
                 .domain(_.range(children(n).length))
-                .rangePoints([ 0, n.height ], 1);
+                .rangePoints([0, n.height], 1);
 
             // Make the tips in the middle longer to give bigger angles [0, 1, 2, 2, 1, 0]
             var l = children(n).length,
@@ -124,11 +131,11 @@ sm.layout.forest = function() {
             }
 
             n._edges.forEach((l, i) => {
-                var p1 = { x: l.source.x + l.source.width, y: l.source.y + scale(i) },
-                    p2 = { x: p1.x + headLength / 2 + deltas[i] * 2, y: p1.y },
-                    p4 = { x: l.target.x, y: l.target.y + l.target.height / 2 },
-                    p3 = { x: p4.x - headLength, y: p4.y };
-                l.points = [ p1, p2, p3, p4 ];
+                var p1 = {x: l.source.x + l.source.width, y: l.source.y + scale(i)},
+                    p2 = {x: p1.x + headLength / 2 + deltas[i] * 2, y: p1.y},
+                    p4 = {x: l.target.x, y: l.target.y + l.target.height / 2},
+                    p3 = {x: p4.x - headLength, y: p4.y};
+                l.points = [p1, p2, p3, p4];
             });
         });
 
@@ -142,7 +149,20 @@ sm.layout.forest = function() {
         //     e.points = [ sm.getRectEdgePoint(e.source, centerTarget), sm.getRectEdgePoint(e.target, centerSource) ];
         // });
     }
-
+    /**
+     * Get the dimension of the Graph
+     *
+     * @returns {{width: Number, height: Number}}
+     */
+    function getDimension() {
+        var width = d3.max(vertices, n => n.x + n.width),
+            height = d3.max(vertices, n => n.y + n.height);
+        return {
+            width: width ? Math.round(width) : 0,
+            height: height ? Math.round(height) : 0
+        };
+    }
+    module.getDimension = getDimension;
     /**
      * Computes the layout.
      */
@@ -153,84 +173,102 @@ sm.layout.forest = function() {
         runMXLayout();
         setNodeCoordinate();
         setLinkCoordinate();
-
         // The vis width and height
-        return {
-            width: d3.max(vertices, n => n.x + n.width) || 0,
-            height: d3.max(vertices, n => n.y + n.height) || 0
-        };
+        return getDimension();
     };
 
     /**
      * Sets/gets data input: a list vertices.
      */
     module.vertices = function(value) {
-        if (!arguments.length) return vertices;
-        vertices = value;
-        return this;
+        if (arguments.length) {
+            vertices = value;
+            return this;
+        } else {
+            return vertices;
+        }
     };
 
     /**
      * Sets/gets data input: a list edges.
      */
     module.edges = function(value) {
-        if (!arguments.length) return edges;
-        edges = value;
-        return this;
+        if (arguments.length) {
+            edges = value;
+            return this;
+        } else {
+            return edges;
+        }
     };
 
     /**
      * Sets/gets the constrained width of the layout.
      */
     module.width = function(value) {
-        if (!arguments.length) return width;
-        width = value;
-        return this;
+        if (arguments.length) {
+            width = value;
+            return this;
+        } else {
+            return width;
+        }
     };
-
     /**
      * Sets/gets the constrained height of the layout.
      */
     module.height = function(value) {
-        if (!arguments.length) return height;
-        height = value;
-        return this;
+        if (arguments.length) {
+            height = value;
+            return this;
+        } else {
+            return height;
+        }
     };
-
     /**
      * Sets/gets the childrent accessor.
      */
     module.children = function(value) {
-        if (!arguments.length) return children;
-        children = value;
-        return this;
+        if (arguments.length) {
+            children = value;
+            return this;
+        } else {
+            return children;
+        }
     };
 
     /**
      * Sets/gets the parent accessor.
      */
     module.parent = function(value) {
-        if (!arguments.length) return parent;
-        parent = value;
-        return this;
+        if (arguments.length) {
+            parent = value;
+            return this;
+        } else {
+            return parent;
+        }
     };
 
     /**
      * Sets/gets the time accessor.
      */
     module.time = function(value) {
-        if (!arguments.length) return time;
-        time = value;
-        return this;
+        if (arguments.length) {
+            time = value;
+            return this;
+        } else {
+            return time;
+        }
     };
 
     /**
      * Sets/gets the label accessor.
      */
     module.label = function(value) {
-        if (!arguments.length) return label;
-        label = value;
-        return this;
+        if (arguments.length) {
+            label = value;
+            return this;
+        } else {
+            return label;
+        }
     };
 
     return module;

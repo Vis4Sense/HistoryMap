@@ -1,217 +1,247 @@
 .sm-sensemap .node {
-	display: inline-block;
-    background-color: white;
-    color: black;
-	box-shadow: 0 0 0 1px #6e6e6e, 0 0 0 2px rgba(0,0,0,0);
-    border-radius: 3px;
-    transition: box-shadow 0.25s ease-in-out, border 0.25s ease-in-out, background-color 0.125s ease-in-out;
-    overflow: hidden;
+  display: inline-block;
+  background-color: white;
+  color: black;
+  box-shadow: 0 0 0 1px #6e6e6e, 0 0 0 2px rgba(0, 0, 0, 0);
+  border-radius: 3px;
+  transition: box-shadow 0.25s ease-in-out, border 0.25s ease-in-out, background-color 0.125s ease-in-out;
+  overflow: hidden;
 }
 
 .sm-sensemap .node.mini {
-	background-color: #6e6e6e;
-    width: 8px;
-    height: 8px;
-    border-radius: 4px;
-    margin-bottom: 7px;
-    cursor: pointer;
-    box-shadow: 0 0 0 2px #6e6e6e;
+  background-color: #6e6e6e;
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  margin-bottom: 7px;
+  cursor: pointer;
+  box-shadow: 0 0 0 2px #6e6e6e;
 }
 
 .sm-sensemap .node.removed {
-	cursor: pointer;
+  cursor: pointer;
 }
 
 .sm-sensemap .node.connect {
-	cursor: e-resize;
+  cursor: e-resize;
 }
 
 .sm-sensemap .node:hover,
 .sm-sensemap .node.hovered,
 .sm-sensemap .node.brushed {
-	box-shadow: 0 0 0 2px #e74c3c !important;
-	border: none !important;
+  box-shadow: 0 0 0 2px #e74c3c !important;
+  border: none !important;
 }
 
 .sm-sensemap .node.brushed {
-	background-color: #E8A199 !important;
+  background-color: #E8A199 !important;
 }
 
 .sm-sensemap .node.not-seen:not(.mini):hover,
 .sm-sensemap .node.not-seen:not(.mini).hovered,
 .sm-sensemap .node.not-seen:not(.mini).brushed {
-	border: 1px solid #e74c3c !important;
-	box-shadow: none !important;
+  border: 1px solid #e74c3c !important;
+  box-shadow: none !important;
 }
 
 .sm-sensemap .node.mini:hover,
 .sm-sensemap .node.mini.hovered {
-	box-shadow: 0 0 0 2px #e74c3c;
+  box-shadow: 0 0 0 2px #e74c3c;
 }
 
 .sm-sensemap .node.favorite {
-    background-color: #e6e600;
+  background-color: #e6e600;
 }
 
 .sm-sensemap .node.highlighted {
-    background-color: cyan;
+  background-color: hsla(180, 100%, 50%, 1);
+}
+
+.sm-sensemap div.node[in-queue="1"] {
+  /*background-color: hsla(180, 100%, 35%, 0.7);*/
+  background-color: #6baed6;
+}
+
+.sm-sensemap div.node[in-queue="2"] {
+  /*background-color: hsla(180, 100%, 20%, 0.4);*/
+  background-color: #bdd7e7;
+}
+
+.sm-sensemap div.node[in-queue="3"] {
+  /*background-color: hsla(180, 100%, 5%, 0.1);*/
+  background-color: #eff3ff;
 }
 
 .sm-sensemap .node.favorite .fa-star {
-    color: #e6e600;
+  color: #e6e600;
 }
 
 .sm-sensemap .node.not-seen:not(.mini) {
-	box-shadow: none;
-	border: 1px dashed #6e6e6e;
+  box-shadow: none;
+  border: 1px dashed #6e6e6e;
 }
 
 .sm-sensemap .node-title {
-	/*margin: -3px -3px 3px -3px;*/
-    padding: 3px;
+  /*margin: -3px -3px 3px -3px;*/
+  padding: 3px;
 }
 
 .sm-sensemap .node-snapshot {
-	/* the next 3 lines together with set width, height for .parent to scale and crop image */
-	max-width: 100%;
-  	width: auto;
-  	height: auto;
-	border-bottom-left-radius: 3px;
-	border-bottom-right-radius: 3px;
+  /* the next 3 lines together with set width, height for .parent to scale and crop image */
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
 }
 
 .sm-sensemap .has-children .node-snapshot {
-	border-bottom-left-radius: 0px;
-	border-bottom-right-radius: 0px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
 }
 
 .sm-sensemap .link path {
-	fill: none;
-	stroke: #6e6e6e;
+  fill: none;
+  stroke: #6e6e6e;
 }
 
 .sm-sensemap .link path.main-link {
-	marker-end: url(#arrow-marker);
-	stroke-width: 1.5px;
+  marker-end: url(#arrow-marker);
+  stroke-width: 1.5px;
 }
 
 .sm-sensemap .link path.main-link.straight-arrow {
-	marker-end: none;
+  marker-end: none;
 }
 
 .sm-sensemap .link path.main-link.brushed,
 .sm-sensemap .link path.main-link.hovered {
-	stroke: #e74c3c;
-	stroke-width: 2px;
-	marker-end: url(#arrow-marker-hover);
+  stroke: #e74c3c;
+  stroke-width: 2px;
+  marker-end: url(#arrow-marker-hover);
 }
 
 .sm-sensemap .link path.hover-link {
-	opacity: 0;
-	stroke-width: 15px;
+  opacity: 0;
+  stroke-width: 15px;
 }
 
 .sm-sensemap .link path.user-added {
-	stroke: blue;
-	marker-end: url(#arrow-marker-cursor);
+  stroke: blue;
+  marker-end: url(#arrow-marker-cursor);
 }
 
 /* To make icon and label in one line */
 .sm-sensemap .node-icon {
-	max-width: 20px;
-	max-height: 20px;
-	display: inline-block;
-	margin-right: 3px;
+  max-width: 20px;
+  max-height: 20px;
+  display: inline-block;
+  margin-right: 3px;
 }
 
 /* Action type icon. */
 .sm-sensemap .node-icon.fa {
-	color: white;
-	padding: 3px;
-	border-radius: 4px;
-	width: 20px;
-	margin: 0 3px 0 0; /* every 'simple' node has a height of 26px */
+  color: white;
+  padding: 3px;
+  border-radius: 4px;
+  width: 20px;
+  margin: 0 3px 0 0; /* every 'simple' node has a height of 26px */
 }
 
 .sm-sensemap .children .node-icon.fa {
-	margin: 1px 3px 1px 0;
+  margin: 1px 3px 1px 0;
 }
 
 .sm-sensemap img.node-icon {
-	margin-top: -2px; /* every 'simple' node has a height of 26px */
+  margin-top: -2px; /* every 'simple' node has a height of 26px */
+  pointer-events: none; /* to prevent mouseover on the link, which causes mouseout from the node */
 }
 
 .sm-sensemap .node-label {
-	display: inline-block;
-	white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    vertical-align: bottom; /* inline-block and overflow hidden make text move upwards */
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom; /* inline-block and overflow hidden make text move upwards */
 }
 
 .sm-sensemap .node-label.min-zoom {
-	text-overflow: clip;
+  text-overflow: clip;
 }
 
 .sm-sensemap .cursor-link {
-	stroke-width: 1.5px;
-    stroke: blue;
-    shape-rendering: auto;
-    marker-end: url(#arrow-marker-cursor);
-    pointer-events: none; /* to prevent mouseover on the link, which causes mouseout from the node */
+  stroke-width: 1.5px;
+  stroke: blue;
+  shape-rendering: auto;
+  marker-end: url(#arrow-marker-cursor);
+  pointer-events: none; /* to prevent mouseover on the link, which causes mouseout from the node */
 }
 
 .sm-sensemap .parent {
-	overflow: hidden; /* to crop image */
+  overflow: hidden; /* to crop image */
 }
 
 .sm-sensemap .parent.has-children {
-	font-weight: bold;
-	border-bottom: 1px solid #6e6e6e;
+  font-weight: bold;
+  border-bottom: 1px solid #6e6e6e;
 }
 
-.sm-sensemap .children {
-	padding: 3px;
+.sm-sensemap .children > div.sub-node {
+  margin: 3px 0 3px 3px;
 }
 
 /* Node menu */
 .sm-sensemap .node .btn-group,
 .sm-sensemap .node-curated {
-	position: fixed;
-	color: #2ecc71;
+  position: fixed;
+  color: #2ecc71;
 }
 
 .sm-sensemap .node .btn.show-all-highlights {
-	position: fixed;
-	padding: 2px 4px;
-	font-size: 14px;
-	margin-top: -4px;
+  position: fixed;
+  padding: 2px 4px;
+  font-size: 14px;
+  margin-top: -4px;
 }
 
 .sm-sensemap .node-curated {
-	pointer-events: none;
+  pointer-events: none;
 }
 
 /* Link menu */
 .sm-sensemap .menu-container .btn-group,
 .sm-sensemap .menu-container .btn {
-	position: inherit;
+  position: inherit;
 }
 
 .sm-sensemap .node .btn,
 .sm-sensemap .link .btn {
-	padding: 4px 6px;
-	font-size: 18px;
+  padding: 4px 6px;
+  font-size: 18px;
 }
 
 /* Overwrite bootstrap tooltip */
 .tooltip.in {
-	opacity: 1 !important;
-	filter: alpha(opacity=100) !important;
+  opacity: 1 !important;
+  filter: alpha(opacity=100) !important;
 }
 
 .sm-sensemap .brush .extent {
-	stroke: #fff;
-	fill-opacity: .125;
-  	shape-rendering: crispEdges;
+  stroke: #fff;
+  fill-opacity: .125;
+  shape-rendering: crispEdges;
+}
+
+#settings {
+  position: fixed;
+  float: right;
+  right: 5px;
+  top: 5px;
+}
+
+#bars {
+  font-size: 18px;
+  float: right;
+  margin-left: 5px;
+  cursor: pointer;
 }

@@ -1,36 +1,36 @@
 /**
  * curation allows curate data collection.
+ *
+ * @param {SenseKnowledge} senseKnowledge
  */
-sm.vis.curation = function() {
+sm.vis.curation = function(senseKnowledge) {
     // Private members
     var width = 400, height = 250,
-        margin = { top: 5, right: 5, bottom: 5, left: 5 },
+        margin = {top: 5, right: 5, bottom: 5, left: 5},
         label = d => d.label,
         children = d => d.rlinks,
         icon = d => d.icon,
         type = d => d.type,
+        id = d => d.id,
         time = d => d.time, // Expect a Date object
         image = d => d.image,
         userImage = d => d.userImage;
 
     var ZoomLevel = [
-        { width: 26, imageWidth: 50, numChildren: 0 },
-        { width: 100, numChildren: 0 },
-        { width: 125, numChildren: 1 },
-        { width: 175, numChildren: 2 }
+        {width: 26, imageWidth: 50, numChildren: 0},
+        {width: 100, numChildren: 0},
+        {width: 125, numChildren: 1},
+        {width: 150, numChildren: 2}
     ];
     ZoomLevel.forEach(z => {
-        var f = 1;
-        z.maxHeight = z.width * f;
-        if (z.imageWidth) z.maxImageHeight = z.imageWidth * f;
+        z.maxHeight = z.width / 0.75;
     });
 
     // Rendering options
-    var layout = sm.layout.grid(),
-        panExtent = [ 0, 1, 0, 1 ],
-        defaultMaxWidth = 150,
+    var panExtent = [0, 1, 0, 1],
         dragging = false,
         connecting = false,
+        senseInput = new SenseInput(senseKnowledge.options),
         minZoomIndex = 0,
         maxZoomIndex = 3,
         defaultZoomIndex = maxZoomIndex,
@@ -55,10 +55,10 @@ sm.vis.curation = function() {
             .x(d => d.x)
             .y(d => d.y),
         colorScale = d3.scale.category10()
-            .domain([ 'search', 'location', 'dir', 'highlight', 'note', 'filter' ])
-            .range([ '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#e377c2' ]),
-        searchTypes = [ 'search', 'location', 'dir' ],
-        iconClassLookup = { search: 'fa-search', location: 'fa-globe', dir: 'fa-street-view', highlight: 'fa-paint-brush',
+            .domain(['search', 'location', 'dir', 'highlight', 'note', 'filter'])
+            .range(['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#e377c2']),
+        searchTypes = ['search', 'location', 'dir'],
+        iconClassLookup = {search: 'fa-search', location: 'fa-globe', dir: 'fa-street-view', highlight: 'fa-paint-brush',
             note: 'fa-file-text-o', filter: 'fa-filter'
         };
     var drag = d3.behavior.drag()
@@ -67,13 +67,16 @@ sm.vis.curation = function() {
         .on('dragend', onNodeDragEnd);
 
     // Key function to bind data
-    var key = d => d.id,
-        linkKey = d => key(d.source) + '-' + key(d.target),
-        linkHoverKey = d => key(d.source) + '-' + key(d.target) + 'h';
+    var key = d => d.id;
 
     // Others
-    var dispatch = d3.dispatch('nodeClicked', 'nodeCollectionRemoved', 'nodeCurationRemoved', 'nodeFavorite', 'nodeUnfavorite',
-        'nodeMinimized', 'nodeRestored', 'nodeMoved', 'nodeHovered', 'linkAdded', 'linkRemoved', 'layoutDone');
+    var dispatch = d3.dispatch('nodeClicked',
+        'nodeCollectionRemoved', 'nodeCurationRemoved',
+        'nodeFavorite', 'nodeUnfavorite',
+        'nodeMinimized', 'nodeRestored',
+        'nodeCollectionMoved', 'nodeCurationMoved', 'nodeHovered',
+        'linkAdded', 'linkRemoved', 'layoutDone'
+    );
 
     /**
      * Main entry of the module.
@@ -90,31 +93,35 @@ sm.vis.curation = function() {
         if (!container) {
             container = d3.select(self).append('g')
                 .attr('class', 'sm-sensemap')
-                .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+                .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+                .on('click', () => { senseInput.emptySpaceClick(); });
             nodeContainer = container.append('g').attr('class', 'nodes');
             linkContainer = container.append('g').attr('class', 'links');
             cursorLink = container.append('line').attr('class', 'cursor-link hide');
 
-            sm.addPan([ nodeContainer, linkContainer, cursorLink ], container, panExtent);
+            sm.addPan([nodeContainer, linkContainer, cursorLink], container, panExtent);
             sm.createArrowHeadMarker(self, 'arrow-marker', '#6e6e6e');
             sm.createArrowHeadMarker(self, 'arrow-marker-hover', '#e74c3c');
             sm.createArrowHeadMarker(self, 'arrow-marker-cursor', 'blue');
         }
 
-        dataNodes = (data.nodes || []).filter(n => n.curated && !n.curationRemoved);
-        dataLinks = (data.links || []).filter(l => dataNodes.includes(l.source) && dataNodes.includes(l.target) && !l.removed);
+        dataNodes = (data.nodes || []).filter(n => (n.curated || n.newlyCurated) && !n.curationRemoved);
+        dataLinks = (data.links || []).filter(
+            l => l.userAdded && !l.removed && dataNodes.includes(l.source) && dataNodes.includes(l.target)
+        );
+        senseInput.updateNodesLinks(dataNodes, dataLinks);
 
         // Curated nodes may have smaller set of children than the corresponding in collection
-        dataNodes.filter(n => n.links).forEach(n => {
-            n.rlinks = n.links.filter(target => dataNodes.includes(target));
+        dataNodes.filter(n => n.slaves).forEach(n => {
+            n.rlinks = n.slaves.filter(target => dataNodes.includes(target));
         });
 
-        layout.width(width)
+        senseKnowledge.width(width)
             .height(height)
             .label(label)
             .children(children);
 
-        var links = linkContainer.selectAll('.link').data(dataLinks, linkKey);
+        var links = linkContainer.selectAll('.link').data(dataLinks, SenseLink.linkId);
         links.enter().call(enterLinks);
         links.exit().remove();
 
@@ -125,8 +132,8 @@ sm.vis.curation = function() {
 
         // Layout DAG
         computeLayout(function() {
-            links.call(updateLinks);
             nodes.call(updateNodePositions);
+            links.call(updateLinks);
             dataNodes.filter(n => n.newlyCurated).forEach(n => {
                 n.newlyCurated = false;
                 dispatch.layoutDone(n);
@@ -134,18 +141,22 @@ sm.vis.curation = function() {
         });
 
         // Press escape to exit connecting mode
-        document.addEventListener("keydown", function(e) {
-            if (e.keyCode === 27) {
-                connecting = false;
-                dragging = false;
-                nodeContainer.selectAll('.node').each(function() {
-                    d3.select(this).classed('connect', false);
-                });
-                cursorLink.classed('hide', true);
+        document.onkeydown = function(e) {
+            senseInput.keyHandle(e.keyCode, e.target);
+            switch (e.keyCode) {
+                case 27: // Esc
+                    connecting = false;
+                    dragging = false;
+                    nodeContainer.selectAll('.node').each(function() {
+                        d3.select(this).classed('connect', false);
+                    });
+                    cursorLink.classed('hide', true);
+                    break;
+                default:
+                    // console.warn('Unknown key code: ' + e.keyCode);
+                    break;
             }
-        });
-
-        printGraphSize();
+        };
     }
 
     function computeLayout(callback) {
@@ -153,25 +164,34 @@ sm.vis.curation = function() {
             // Compute how much space each node needs
             container.selectAll('.node').each(function(d) {
                 var r = this.getBoundingClientRect();
-                d.rp = d.rp || {};
-                d.rp.width = r.width + 1;
-                d.rp.height = r.height;
+
+                d.curated = d.curated || {x: 0, y: 0};
+                d.curated.width = r.width + 1;
+                d.curated.height = r.height;
             });
-
-            layout.vertices(dataNodes).edges(dataLinks).compute();
-
+            senseKnowledge.vertices(dataNodes).edges(dataLinks).compute();
             updatePanExtent();
-
             callback();
         });
     }
 
     function updatePanExtent() {
-        var g = layout.size();
+        var g = senseKnowledge.size();
         panExtent[1] = Math.max(0, g.width - width + margin.left + margin.right);
         panExtent[3] = Math.max(0, g.height - height + margin.top + margin.bottom);
     }
-
+    /**
+     * Activate the node in a browser window
+     *
+     * @param {Object} node
+     */
+    function clickNode(node) {
+        if (d3.event.defaultPrevented || d3.event.shiftKey) {
+            return;
+        }
+        clearTimeout(connectingTimerId);
+        dispatch.nodeClicked(node);
+    }
     /**
      * Does stuff when new nodes added (usually called when 'enter').
      */
@@ -185,16 +205,12 @@ sm.vis.curation = function() {
         fo.call(drag);
 
         var container = fo.append('xhtml:div').attr('class', 'node')
-            .on('click', function(d) {
-                if (d3.event.defaultPrevented || d3.event.shiftKey) return;
-                clearTimeout(connectingTimerId);
-                dispatch.nodeClicked(d);
-            }).on('mouseover', function(d) {
+            .on('mouseover', function(d) {
                 // Align menu to the right side
                 var menu = d3.select(this).select('.btn-group').classed('hide', dragging),
                     menuRect = menu.node().getBoundingClientRect(),
                     nodeRect = this.getBoundingClientRect();
-                menu.style('left', (nodeRect.right > width - menuRect.width ? 1 - menuRect.width : d.rp.width - 1) + 'px');
+                menu.style('left', (nodeRect.right > width - menuRect.width ? 1 - menuRect.width : d.curated.width - 1) + 'px');
 
                 if (dragging) {
                     hideTooltip(this);
@@ -204,7 +220,7 @@ sm.vis.curation = function() {
             }).on('mouseout', function(d) {
                 container.classed('connect', false);
                 hideMenu(this);
-                dispatch.nodeHovered(d, false)
+                dispatch.nodeHovered(d, false);
             });
 
         var menu = container.append('xhtml:div').attr('class', 'btn-group hide').style('top', '-2px');
@@ -217,10 +233,15 @@ sm.vis.curation = function() {
         titleDiv.append('xhtml:div').attr('class', 'node-icon fa fa-fw');
 
         // Text
-        titleDiv.append('xhtml:div').attr('class', 'node-label');
+        titleDiv.append('xhtml:div').attr('class', 'node-label').on('click', node => {
+            senseInput.clickNodeLabel(d3.event.target, node);
+        });
 
         // Snapshot
-        parent.append('xhtml:img').attr('class', 'node-snapshot center-block');
+        parent.append('xhtml:img').attr('class', 'node-snapshot center-block').on('click', clickNode);
+
+        // Children
+        container.append('xhtml:div').attr('class', 'children').on('click', clickNode);
 
         // Menu action
         menu.append('xhtml:button').attr('class', 'btn btn-default fa fa-remove')
@@ -231,16 +252,13 @@ sm.vis.curation = function() {
                 d.curationRemoved = true;
                 connecting = false;
                 clearTimeout(connectingTimerId);
-
                 // Remove connected links
-                dataLinks.filter(l => l.source === d || l.target === d).forEach(l => { l.removed = true; });
-
-                update();
+                dataLinks.filter(l => l.source === d || l.target === d).forEach(l => {
+                    l.removed = true;
+                });
+                update(d);
                 dispatch.nodeCurationRemoved(d);
             });
-
-        // Children
-        container.append('xhtml:div').attr('class', 'children');
     }
 
     function hideMenu(self) {
@@ -293,7 +311,9 @@ sm.vis.curation = function() {
                 .attr('src', finalImage)
                 .classed('hide', !finalImage(d));
 
-            if (d.children) updateChildren(d3.select(this).select('.children'), d);
+            if (d.children) {
+                updateChildren(d3.select(this).select('.children'), d);
+            }
             container.classed('has-children', d.children && zoomLevel.numChildren);
             d3.select(this).select('.children').classed('hide', !d.children || !zoomLevel.numChildren);
 
@@ -335,10 +355,14 @@ sm.vis.curation = function() {
 
                 // There are two cases that width is equal to 0: a div or an img without src.
                 // a div with non yet loaded css always has width of 20px.
-                if (!iconWidth && iconNode && iconNode.tagName.toLowerCase() === 'div') iconWidth = 20;
+                if (!iconWidth && iconNode && iconNode.tagName.toLowerCase() === 'div') {
+                    iconWidth = 20;
+                }
 
                 // For any reason makes the icon's width 0, set it to the max 20
-                if (icon(d) && !iconWidth) iconWidth = 20;
+                if (icon(d) && !iconWidth) {
+                    iconWidth = 20;
+                }
 
                 var marginPadding = iconWidth ? 12 : 6,
                     w = zoomLevel.width - iconWidth - marginPadding;
@@ -359,11 +383,14 @@ sm.vis.curation = function() {
 
     function updateChildren(container, d) {
         // Enter
-        var subItems = container.selectAll('.sub-node').data(d.collectionShowAll ? d.children : _.take(d.children, zoomLevel.numChildren), key);
+        var subItems = container.selectAll('.sub-node')
+            .data(d.collectionShowAll ? d.children : _.take(d.children, zoomLevel.numChildren), key);
         var enterItems = subItems.enter().append('div').attr('class', 'sub-node')
             .call(sm.addBootstrapTooltip)
             .on('click', function(d) {
-                if (d3.event.defaultPrevented || d3.event.shiftKey) return;
+                if (d3.event.defaultPrevented || d3.event.shiftKey) {
+                    return;
+                }
                 dispatch.nodeClicked(d);
                 clearTimeout(connectingTimerId);
                 d3.event.stopPropagation(); // Prevent click fired in parent
@@ -410,19 +437,19 @@ sm.vis.curation = function() {
 
         // Main link
         container.append('path')
-            .attr('id', linkKey)
+            .attr('id', SenseLink.linkId)
             .attr('class', 'main-link')
             .classed('user-added', d => d.userAdded);
 
         // Dummy link for easy selection
         container.append('path')
-            .attr('id', linkHoverKey)
+            .attr('id', SenseLink.linkHoverId)
             .attr('class', 'hover-link');
 
         container.on('mouseover', function(d) {
-            showLinkMenu(true, this);
+            SenseLink.menu(true, this, d, dragging);
         }).on('mouseout', function(d) {
-            showLinkMenu(false, this);
+            SenseLink.menu(false, this, d, dragging);
         });
 
         // Menu action
@@ -431,35 +458,21 @@ sm.vis.curation = function() {
             .attr('width', '100%').attr('height', '100%')
             .append('xhtml:div').attr('class', 'btn-group hide');
 
+        menu.append('xhtml:button').attr('class', 'btn btn-default fa fa-info')
+            .style('width', '30px')
+            .attr('title', 'Add title')
+            .on('click', link => { senseInput.addInputToEdge(link); });
+
         menu.append('xhtml:button').attr('class', 'btn btn-default fa fa-remove')
             .attr('title', 'Remove')
             .on('click', function(d) {
                 d3.event.stopPropagation();
                 d3.select(this.parentNode).classed('hide', true);
                 d.removed = true;
-                update();
+                update(d);
                 dispatch.linkRemoved(d);
             });
-
-        container.append('title');
     }
-
-    function showLinkMenu(visible, self) {
-        // Link feedback
-        d3.select(self).select('.main-link').classed('hovered', visible);
-
-        var d = d3.select(self).datum();
-        d3.select(self).select('.btn-group').classed('hide', !visible || dragging);
-
-        // Menu: show it at the middle of the link : sometimes, menu disappear along the way
-        var m = d.rpoints.length / 2,
-            w = d3.select(self).select('.btn-group').node().getBoundingClientRect().width / 2,
-            t = [ d.rpoints.length % 2 ? d.rpoints[m - 0.5].x : (d.rpoints[m].x + d.rpoints[m - 1].x) / 2 - w,
-                d.rpoints.length % 2 ? d.rpoints[m - 0.5]. cy : (d.rpoints[m].y + d.rpoints[m - 1].y) / 2 - w ];
-
-        d3.select(self).select('.menu-container').attr('transform', 'translate(' + t + ')');
-    }
-
     /**
      * Does stuff when link updated (usually called when 'update').
      */
@@ -468,7 +481,6 @@ sm.vis.curation = function() {
             var container = d3.select(this);
 
             container.transition().duration(500).attr('opacity', 1);
-
             // Set data
             container.selectAll('path').transition().duration(500).attr('d', line(roundPoints(d)));
         });
@@ -479,16 +491,18 @@ sm.vis.curation = function() {
      */
     function roundPoints(l) {
         // stroke-width: 1.5px
-        var centerSource = { x: l.source.rp.x + l.source.rp.width / 2, y: l.source.rp.y + l.source.rp.height / 2 },
-            centerTarget = { x: l.target.rp.x + l.target.rp.width / 2, y: l.target.rp.y + l.target.rp.height / 2 };
+        var src = l.source,
+            dst = l.target,
+            centerSource = {x: src.curated.x + src.curated.width / 2, y: src.curated.y + src.curated.height / 2},
+            centerTarget = {x: dst.curated.x + dst.curated.width / 2, y: dst.curated.y + dst.curated.height / 2};
 
-        l.rpoints = [ sm.getRectEdgePoint(l.source.rp, centerTarget), sm.getRectEdgePoint(l.target.rp, centerSource) ];
+        l.rpoints = [sm.getRectEdgePoint(src.curated, centerTarget), sm.getRectEdgePoint(dst.curated, centerSource)];
 
-        return l.rpoints.map(p => ({ x: Math.round(p.x) - 0.5, y: Math.round(p.y) - 0.5 }));
+        return l.rpoints.map(p => ({x: Math.round(p.x) - 0.5, y: Math.round(p.y) - 0.5}));
     }
 
     function roundPoint(d) {
-        return [ Math.round(d.rp.x), Math.round(d.rp.y) ];
+        return [Math.round(d.curated.x), Math.round(d.curated.y)];
     }
 
     function updateDragPosition(d) {
@@ -497,28 +511,34 @@ sm.vis.curation = function() {
     }
 
     function updateLinkDragPosition(d) {
-        d3.select(document.getElementById(linkKey(d))).attr('d', line(roundPoints(d)));
-        d3.select(document.getElementById(linkHoverKey(d))).attr('d', line(roundPoints(d)));
+        var titleDiv = d3.select('#' + SenseLink.linkTitleId(d));
+        d3.select('#' + SenseLink.linkId(d)).attr('d', line(roundPoints(d)));
+        d3.select('#' + SenseLink.linkHoverId(d)).attr('d', line(roundPoints(d)));
+        if (titleDiv.node()) {
+            titleDiv.attr('transform', senseInput.getTitleTransform(titleDiv.select('div'), d));
+        }
     }
 
-    function onNodeDragStart(d) {
+    function onNodeDragStart() {
+        var self = this;
+
+        d3.event.sourceEvent.stopPropagation();
         if (d3.event.sourceEvent.which === 1 && !d3.event.sourceEvent.shiftKey) {
-            var self = this;
             connectingTimerId = setTimeout(function() {
                 connecting = true;
                 d3.select(self.querySelector('.node')).classed('connect', true);
                 hideMenu(self.querySelector('.node'));
             }, 300);
             dragging = true;
-            d3.event.sourceEvent.stopPropagation();
         }
-
         // Bootstrap tooltip appears even when moving the node => disable it
         hideTooltip(this);
     }
 
     function onNodeDrag(d) {
-        if (!dragging) return;
+        if (!dragging) {
+            return;
+        }
 
         // Already drag, no need to check
         clearTimeout(connectingTimerId);
@@ -530,9 +550,9 @@ sm.vis.curation = function() {
             // Draw a link from the node center to the current mouse position
             cursorLink.classed('hide', false);
             cursorLink
-                .attr('x1', d.rp.x + d.rp.width / 2).attr('y1', d.rp.y + d.rp.height / 2)
+                .attr('x1', d.curated.x + Math.round(d.curated.width / 2))
+                .attr('y1', d.curated.y + Math.round(d.curated.height / 2))
                 .attr('x2', d3.event.x).attr('y2', d3.event.y);
-
             // Don't know why mouse over other nodes doesn't work. Have to do it manually
             var self = this;
             nodeContainer.selectAll('.node').each(function() {
@@ -542,7 +562,7 @@ sm.vis.curation = function() {
             this.moveToFront();
 
             // Update position of the dragging node
-            updateDragPosition(d.rp);
+            updateDragPosition(d.curated);
             d3.select(this).attr('transform', 'translate(' + roundPoint(d) + ')');
 
             // And also links
@@ -551,58 +571,71 @@ sm.vis.curation = function() {
     }
 
     function onNodeDragEnd(d) {
-        cursorLink.classed('hide', true);
+        var self = this,
+            found = false;
 
+        cursorLink.classed('hide', true);
         if (connecting) {
-            var self = this,
-                found = false;
             nodeContainer.selectAll('.node').each(function(d2) {
+                var l, centerSource, centerTarget;
+
                 d3.select(this).classed('hovered', false);
 
                 if (!found && this.parentNode !== self && this.containsPoint(d3.event.sourceEvent)) {
                     // Add a link from the dragging node to the hovering node if not existed
-                    var l = data.links.find(l => l.source === d && l.target === d2);
-                    if (!l) {
-                        var l = { source: d, target: d2, userAdded: true };
-                        data.links.push(l);
+                    l = data.links.find(l => l.source === d && l.target === d2);
+                    if (l) {
+                        delete l.removed;
                     } else {
-                        l.removed = false;
+                        l = {
+                            id: d3.time.format('%Y%m%d%H%M%S')(new Date()),
+                            source: d, target: d2,
+                            userAdded: true
+                        };
+                        data.links.push(l);
+                        // Find position of two end-points
+                        centerSource = {
+                            x: l.source.curated.x + l.source.curated.width / 2,
+                            y: l.source.curated.y + l.source.curated.height / 2
+                        };
+                        centerTarget = {
+                            x: l.target.curated.x + l.target.curated.width / 2,
+                            y: l.target.curated.y + l.target.curated.height / 2
+                        };
+                        l.rpoints = [
+                            sm.getRectEdgePoint(l.source.curated, centerTarget),
+                            sm.getRectEdgePoint(l.target.curated, centerSource)
+                        ];
                     }
-
-                    // Find position of two end-points
-                    var centerSource = { x: l.source.rp.x + l.source.rp.width / 2, y: l.source.rp.y + l.source.rp.height / 2 },
-                        centerTarget = { x: l.target.rp.x + l.target.rp.width / 2, y: l.target.rp.y + l.target.rp.height / 2 };
-                    l.rpoints = [ sm.getRectEdgePoint(l.source.rp, centerTarget), sm.getRectEdgePoint(l.target.rp, centerSource) ];
-
                     found = true;
-                    update();
+                    update(d);
                     dispatch.linkAdded(l);
                 }
             });
         } else {
+            senseKnowledge.calcGridPoint(d.curated);
+            d3.select(this).attr('transform', 'translate(' + roundPoint(d) + ')');
+            dataLinks.filter(l => l.source === d || l.target === d).forEach(updateLinkDragPosition);
             // Update new graph size to make pan correctly
             updatePanExtent();
-
-            dispatch.nodeMoved(d);
+            dispatch.nodeCurationMoved(d);
         }
 
         dragging = connecting = false;
-    }
-
-    function printGraphSize() {
-        console.log('nodes: ' + dataNodes.length, 'links: ' + dataLinks.length);
     }
 
     /**
      * Translate nodes to accommodate the change of zoom level.
      */
     function translateNodes() {
-        if (zoomLevelIndex === oldZoomLevelIndex) return;
+        if (zoomLevelIndex === oldZoomLevelIndex) {
+            return;
+        }
 
         var ratio = zoomLevel.width / ZoomLevel[oldZoomLevelIndex].width;
         dataNodes.forEach(n => {
-            n.rp.x *= ratio;
-            n.rp.y *= ratio;
+            n.curated.x *= ratio;
+            n.curated.y *= ratio;
         });
     }
 
@@ -610,45 +643,60 @@ sm.vis.curation = function() {
      * Sets/gets the width of the control.
      */
     module.width = function(value) {
-        if (!arguments.length) return width;
-        width = value;
-        return this;
+        if (arguments.length) {
+            width = value;
+            return this;
+        } else {
+            return width;
+        }
     };
 
     /**
      * Sets/gets the height of the control.
      */
     module.height = function(value) {
-        if (!arguments.length) return height;
-        height = value;
-        return this;
+        if (arguments.length) {
+            height = value;
+            return this;
+        } else {
+            return height;
+        }
     };
 
     /**
      * Sets/gets the key function to bind data.
      */
     module.key = function(value) {
-        if (!arguments.length) return key;
-        key = value;
-        return this;
+        if (arguments.length) {
+            key = value;
+            return this;
+        } else {
+            return key;
+        }
     };
 
     /**
      * Sets/gets the label accessor.
      */
     module.label = function(value) {
-        if (!arguments.length) return label;
-        label = value;
-        return this;
+        if (arguments.length) {
+            label = value;
+            return this;
+        } else {
+            return label;
+        }
     };
 
     /**
      * Sets/gets the icon accessor.
      */
     module.icon = function(value) {
-        if (!arguments.length) return icon;
-        icon = value;
-        return this;
+        if (arguments.length) {
+            icon = value;
+            return this;
+        } else {
+            return icon;
+        }
     };
 
     /**
@@ -685,7 +733,7 @@ sm.vis.curation = function() {
      * Resets to the default zoom level.
      */
     module.resetZoom = function() {
-        zoomLevelIndex = defaultZoomIndex,
+        zoomLevelIndex = defaultZoomIndex;
         zoomLevel = ZoomLevel[zoomLevelIndex];
     };
 
@@ -695,8 +743,12 @@ sm.vis.curation = function() {
     module.computeZoomLevel = function(zooms) {
         zoomLevelIndex = defaultZoomIndex;
         zooms.forEach(z => {
-            if (z.type === 'curation-zoom-in') zoomLevelIndex = Math.min(maxZoomIndex, zoomLevelIndex + 1);
-            if (z.type === 'curation-zoom-out') zoomLevelIndex = Math.max(minZoomIndex, zoomLevelIndex - 1);
+            if (z.type === 'curation-zoom-in') {
+                zoomLevelIndex = Math.min(maxZoomIndex, zoomLevelIndex + 1);
+            }
+            if (z.type === 'curation-zoom-out') {
+                zoomLevelIndex = Math.max(minZoomIndex, zoomLevelIndex - 1);
+            }
         });
         zoomLevel = ZoomLevel[zoomLevelIndex];
     };

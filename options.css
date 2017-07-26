@@ -1,0 +1,28 @@
+#options {
+  display: flex;
+  flex-direction: column;
+}
+
+div.buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+#status {
+  color: darkgreen;
+}
+
+label.for-url {
+  display: flex;
+  align-items: center;
+}
+
+label.for-url > span {
+  white-space: nowrap;
+  padding-right: 4px;
+}
+
+input#api {
+  flex-grow: 1;
+}

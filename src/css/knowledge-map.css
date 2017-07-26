@@ -1,0 +1,34 @@
+body {
+    overflow: hidden;
+}
+
+.sm-curation-container {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+#groupZoom {
+    position: fixed;
+    float: right;
+    right: 5px;
+    bottom: 5px;
+}
+
+#groupZoom .btn {
+    padding: 0px 6px;
+    font-size: 20px;
+}
+
+.sm-sensemap .node-label input {
+  border: 0;
+  padding: 0;
+}
+
+.sm-sensemap div.input-container {
+  border: 1px solid blue;
+  background: white;
+  display: inline-block;
+  padding: 7px;
+}

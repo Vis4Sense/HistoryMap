@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="SenseMap supports online sensemaking.">
+        <meta name="author" content="Steve Bidenko">
+        <title>History Map</title>
+
+        <link rel="icon" href="../../logo/sm-logo-19.png">
+        <link rel="stylesheet" href="../bower_components/fontawesome/css/font-awesome.min.css">
+        <link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap-sm.min.css">
+        <link rel="stylesheet" href="../css/core.css">
+        <link rel="stylesheet" href="../css/sensemap.css">
+        <link rel="stylesheet" href="../css/history-map.css">
+    </head>
+
+    <body>
+        <!-- the below svg must have id to use a global listener in the History Map -->
+        <svg id="history-map" class="sm-collection-container"></svg>
+        <div id="settings">
+            <div class="status"></div>
+            <div class="btn-toolbar hide" style="display: inline-block;">
+                <div class="btn-group">
+                    <button id='btnNew' class="btn btn-default"><i class="fa fa-file-o"></i> New</button>
+                    <button id="btnSave" class="btn btn-default"><i class="fa fa-save"></i> Save</button>
+                    <label class="btn btn-default" for="btnLoad">
+                        <input id="btnLoad" type="file" class="hide"><i class="fa fa-folder-open-o"></i> Load
+                    </label>
+                </div>
+                <button id='btnPause' class="btn btn-default"><i class="fa fa-pause"></i> Pause</button>
+                <!-- <button id='btnReplay' class="btn btn-default"><i class="fa fa-play"></i> Replay</button> -->
+                <!-- TODO The button on the line below will be removed after finishing changes of architecture -->
+                <button id='btnInspect' class="btn btn-default"><i class="fa fa-binoculars"></i> Inspect</button>
+                <button id="btnAddStarred" class="btn btn-default">
+                    <i class="fa fa-files-o" aria-hidden="true"></i> Starred
+                </button>
+            </div>
+            <i id="bars" class="fa fa-bars"></i>
+        </div>
+
+        <!-- <button id="btnCurate" class="btn btn-default">Pan</button> -->
+
+        <div id="groupZoom" class="btn-group-vertical">
+            <button id="btnZoomIn" class="btn btn-default" title="Zoom In"><i class="fa fa-plus"></i></button>
+            <button id='btnZoomOut' class="btn btn-default" title="Zoom Out"><i class="fa fa-minus"></i></button>
+        </div>
+
+        <div class="form-session-select" title="Start a new session or select a previous session">
+            <input type="text" class="new-session" placeholder="Start a new session" />
+            <div class="saved-sessions"></div>
+        </div>
+
+        <div class="firefox-snapshots"></div>
+
+        <script src="../bower_components/jquery/dist/jquery.min.js"></script>
+        <script src="../bower_components/jquery-ui.min.js"></script>
+        <script src="../bower_components/d3/d3.js"></script>
+        <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+        <script src="../bower_components/lodash/lodash.min.js"></script>
+        <script src="../bower_components/jszip/dist/jszip.min.js"></script>
+        <script src="../bower_components/jszip-utils.js"></script>
+        <script src="../bower_components/mxClient.js"></script>
+        <script src="../bower_components/Readability.js"></script>
+        <script src="../bower_components/html2canvas.js"></script>
+
+        <script src="../js/core.js"></script>
+        <script src="../js/classes/senseConsole.js"></script>
+        <script src="../js/classes/senseDB.js"></script>
+        <script src="../js/classes/senseUrl.js"></script>
+        <script src="../js/classes/senseImage.js"></script>
+        <script src="../js/classes/senseHighlight.js"></script>
+        <script src="../js/classes/senseNode.js"></script>
+        <script src="../js/classes/senseTab.js"></script>
+        <script src="../js/classes/senseFavorite.js"></script>
+        <script src="../js/classes/senseQueue.js"></script>
+        <script src="../js/classes/senseTransaction.js"></script>
+        <script src="../js/classes/senseTask.js"></script>
+        <script src="../js/classes/senseHistory.js"></script>
+        <script src="../js/classes/senseZip.js"></script>
+        <script src="../js/classes/senseGrid.js"></script>
+        <script src="../js/classes/senseKnowledge.js"></script>
+        <script src="../js/misc/sugar.js"></script>
+        <script src="../js/misc/widgets.js"></script>
+        <script src="../js/layout/forest.js"></script>
+        <script src="../js/vis/collection.js"></script>
+        <script src="../js/provenance/mod.js"></script>
+        <script src="../js/history-map.js"></script>
+    </body>
+</html>

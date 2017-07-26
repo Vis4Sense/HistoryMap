@@ -1,0 +1,30 @@
+{
+  "name": "sense-map",
+  "version": "0.1.0",
+  "description": "Supporting Sensemaking through Analytic Provenance.",
+  "authors": [
+    "phongvis",
+    "stevebidenko"
+  ],
+  "license": "MIT",
+  "private": false,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.1",
+    "bootstrap": "~3.3.1",
+    "fontawesome": "^4.4.0",
+    "d3": "~3.4.13",
+    "lodash": "~3.10.1",
+    "jszip": "Stuk/jszip#^2.5.0"
+  },
+  "devDependencies": {
+    "mocha": "^3.0.2",
+    "chai": "^3.5.0"
+  }
+}
