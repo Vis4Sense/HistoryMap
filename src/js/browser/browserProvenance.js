@@ -43,7 +43,7 @@ sm.provenance.browser = function() {
     bookmarkTypes = [ 'auto_bookmark' ],
     typedTypes = [ 'typed', 'generated', 'keyword', 'keyword_generated' ];
 
-    const dispatch = d3.dispatch('nodeCreated','titleUpdated','favUpdated', 'typeUpdated');
+    const dispatch = d3.dispatch('nodeCreated','titleUpdated','favUpdated', 'typeUpdated','urlUpdated');
 
     onTabUpdate();
 	onTabCreation();
@@ -82,8 +82,13 @@ sm.provenance.browser = function() {
 							id: tab2node[tab.id],
 							text: tab.title || tab.url
 						};
-
 						dispatch.titleUpdated(titleUpdate);
+
+						const urlUpdate = {
+							id: tab2node[tab.id],
+							url: tab.url
+						};
+						dispatch.urlUpdated(urlUpdate);
 
 						tabUrl[tabId] = tab.url;
 					}
