@@ -20,8 +20,7 @@ for (var i=0; i<urlArray.length;i++) {
 }
 
 for (var i = 0; i < urlArray.length; i++) {
-	noNewNodeTestWithDataPresent(urlArray[1]);
-	
+	noNewNodeTestWithDataPresent(urlArray[i]);	
 }
 
 function noNewNodeTest(url) {
