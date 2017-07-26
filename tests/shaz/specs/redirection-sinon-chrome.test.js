@@ -207,9 +207,6 @@ function redirectionTest() {
 			expect(countStart).toEqual(countEnd); 	
 			expect(urlStart).not.toEqual(urlEnd); 	
 			
-			
-			
-			
 
 		});
 	});	
