@@ -41,6 +41,7 @@ function redirectionTest() {
 			const lastNode1 = _.last(sm.data.tree.nodes);
 			var countStart = sm.data.tree.nodes.length;
 			var urlStart = lastNode1.url;
+			var faviconStart = lastNode1.favIconUrl;
 			
 			const tabInfo2 = {
 				"tabId": 1637,
@@ -71,6 +72,7 @@ function redirectionTest() {
 			};
 			chrome.tabs.onUpdated.dispatch(tabInfo2.tabId, tabInfo2.changeInfo, tabInfo2.tab);
 			const lastNode2 = _.last(sm.data.tree.nodes);
+			var titleStart = lastNode2.title;
 
 
 			const tabInfo3 = {
@@ -198,14 +200,15 @@ function redirectionTest() {
 			chrome.tabs.onUpdated.dispatch(tabInfo6.tabId, tabInfo6.changeInfo, tabInfo6.tab);		
 			
 			lastNode6 = _.last(sm.data.tree.nodes);
-			console.log(lastNode6);
-			console.log(lastNode6.url);
 
 			var countEnd = sm.data.tree.nodes.length
 			var urlEnd = lastNode6.url;
+			var titleEnd = lastNode6.title;
 			
 			expect(countStart).toEqual(countEnd); 	
 			expect(urlStart).not.toEqual(urlEnd); 	
+			expect(faviconStart).not.toBeDefined(); 	
+			expect(titleStart).toEqual(titleEnd); 	
 			
 
 		});

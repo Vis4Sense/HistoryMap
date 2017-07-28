@@ -101,6 +101,8 @@ function noNewNodeTestWithDataPresent(url) {
 		const lastNode = _.last(sm.data.tree.nodes);
 		var count1 = sm.data.tree.nodes.length;
 		var beforeTitle = sm.data.tree.nodes[0].text;
+		var beforeUrl = sm.data.tree.nodes[0].url;
+		var beforeFavicon = sm.data.tree.nodes[0].favIconUrl;
 		
 		const tabInfoBlank = {
 				"tabId": 131,
@@ -134,8 +136,14 @@ function noNewNodeTestWithDataPresent(url) {
 			const lastNodetabBlank = _.last(sm.data.tree.nodes);
 			var count2 = sm.data.tree.nodes.length;
 			var afterTitle = sm.data.tree.nodes[0].text;
+			var afterUrl = sm.data.tree.nodes[0].url;
+			var afterFavicon = sm.data.tree.nodes[0].favIconUrl;
+			
+			
 			expect(count2).toEqual(count1); 	
 			expect(afterTitle).toEqual(beforeTitle); 	
+			expect(afterUrl).toEqual(beforeUrl); 	
+			expect(afterFavicon).toEqual(beforeFavicon); 	
 			
 			
 		});
