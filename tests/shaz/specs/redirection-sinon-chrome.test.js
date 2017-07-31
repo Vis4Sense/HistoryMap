@@ -42,6 +42,7 @@ function redirectionTest() {
 			var countStart = sm.data.tree.nodes.length;
 			var urlStart = lastNode1.url;
 			var faviconStart = lastNode1.favIconUrl;
+			var beforeObj = sm.data.tree.nodes[0];
 			
 			const tabInfo2 = {
 				"tabId": 1637,
@@ -204,11 +205,21 @@ function redirectionTest() {
 			var countEnd = sm.data.tree.nodes.length
 			var urlEnd = lastNode6.url;
 			var titleEnd = lastNode6.title;
-			
+			var afterObj = sm.data.tree.nodes[0];
+				
 			expect(countStart).toEqual(countEnd); 	
 			expect(urlStart).not.toEqual(urlEnd); 	
 			expect(faviconStart).not.toBeDefined(); 	
 			expect(titleStart).toEqual(titleEnd); 	
+			
+			
+			for (var property in beforeObj) {
+				if (beforeObj.hasOwnProperty(property)) {
+					if (afterObj.hasOwnProperty(property)) {
+						expect(beforeObj.property).toEqual(afterObj.property); 	
+					}
+				}
+			}
 			
 
 		});
