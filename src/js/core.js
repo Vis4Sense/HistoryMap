@@ -8,7 +8,9 @@ const sm = function() {
         vis: {},
         layout: {},
         provenance: {},
-        data: {},
+        data: {
+            tree: {} // real data
+        },
         model: {},
         view: {},
         misc: {}
