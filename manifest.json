@@ -3,7 +3,8 @@
 
     "name": "SenseMap",
     "description": "SenseMaking with Analytic Provenance",
-    "version": "0.5.8",
+    "version": "0.1.1",
+    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
 
     "browser_action": {
         "default_icon": {
@@ -17,16 +18,24 @@
    },
 
     "background": {
-        "page": "src/pages/background.html",
+        "page": "src/html/background.html",
         "persistent": false
     },
 
-    "content_scripts": [ {
-        "matches" : ["http://*/*", "https://*/*"],
-        "js": ["src/bower_components/jquery/dist/jquery.min.js", "src/bower_components/bootstrap/dist/js/bootstrap.min.js", "src/bower_components/jquery-ui.min.js", "src/js/content-scripts/highlight.js", "src/js/content-scripts/content.js"],
-        "css": ["src/css/content.css"],
-        "run_at": "document_end"
-    } ],
+    "content_scripts": [
+    {
+      "matches": [
+        "file:///*",
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+          "lib/jquery.min.js",
+        "src/js/browser/contentScripts.js"
+      ],
+      "run_at": "document_end"
+    }
+  ],
 
     "permissions": [
         "<all_urls>",
@@ -34,8 +43,11 @@
         "storage",
         "history",
         "tabs",
-        "contextMenus"
+        "contextMenus",
+        "identity"
     ],
 
-    "web_accessible_resources": ["src/css/*.*"]
+    "web_accessible_resources": ["src/css/*.*", "tests/tests.html"],
+
+    "options_page":"tests/Reday/tests.html"
 }
