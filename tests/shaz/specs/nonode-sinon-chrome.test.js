@@ -149,9 +149,7 @@ function noNewNodeTestWithDataPresent(url) {
 			
 			for (var property in beforeObj) {
 				if (beforeObj.hasOwnProperty(property)) {
-					if (afterObj.hasOwnProperty(property)) {
 						expect(beforeObj.property).toEqual(afterObj.property); 	
-					}
 				}
 			}
 
