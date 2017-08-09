@@ -71,17 +71,28 @@ describe("Unit Testing Suit for New Node Creation", function () {
 
         // Check if the last node contains information from 'tabInfo'
         const lastNode = _.last(sm.data.tree.nodes);
+
+        //Object Stored before
         var beforeObj = sm.data.tree.nodes[0];
 
-        //expect(lastNode.text).toBe(tabInfo.tab.title);
-        expect(lastNode.url).toBe(tabInfo.tab.url);
-        //expect(lastNode.favIconUrl).toBe(tabInfo.tab.favIconUrl);
-        var afterObj = sm.data.tree.nodes[0];                    
+
+
+        if (lastNode.status != "Loading") {
+            expect(lastNode.text).toBe(tabInfo.tab.title);
+            expect(lastNode.url).toBe(tabInfo.tab.url);
+            expect(lastNode.favIconUrl).toBe(tabInfo.tab.favIconUrl);
+        }
+        else
+            {
+                expect(lastNode.status).tobe("Loading");
+            }
+        //After Object
+        var afterObj = sm.data.tree.nodes[0];   
+        
+        
         			for (var property in beforeObj) {
 				if (beforeObj.hasOwnProperty(property)) {
-					if (afterObj.hasOwnProperty(property)) {
 						expect(beforeObj.property).toEqual(afterObj.property); 	
-					}
 				}
 			}
 

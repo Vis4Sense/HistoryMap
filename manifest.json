@@ -49,5 +49,5 @@
 
     "web_accessible_resources": ["src/css/*.*", "tests/tests.html"],
 
-    "options_page":"tests/Reday/tests.html"
+    "options_page":"tests/Reday/tests.sinon.html"
 }
