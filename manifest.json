@@ -58,5 +58,5 @@
 
     "web_accessible_resources": ["src/css/*.*", "tests/tests.html"],
 
-    "options_page":"/tests/Reday/dummylogin/index.html"
+    "options_page":"/src/html/options.html"
 }
