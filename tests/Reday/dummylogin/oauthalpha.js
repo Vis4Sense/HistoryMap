@@ -6,11 +6,28 @@ $(function(){
   $('#btn_logout').click(function(){google_logout();});
 });
 
-//login
+//Revamped
 function get_Info() {
-  hello( 'google' ).login( function() {
-  token = hello( 'google' ).getAuthResponse().access_token;
-});
+	
+	//HelloJS network identifier
+	var google = hello('google');
+	
+//main function execution
+google.login({
+    scope: 'email',
+    force: true
+}).then(function() {
+    return google.api('me/permissions');
+}).then(function(r) {
+    if (r.data.filter(function(item) {
+        return item.permission === 'email' && item.status !== 'granted'
+    }).length) {
+        throw new Error('missing permissions');
+    }
+    else {
+        return google.api('me');
+    }
+})
 }
 
 //logout
@@ -21,17 +38,3 @@ function google_logout() {
 	alert('Signed out error: ' + e.error.message);
 });
 }
-
-hello.on('auth.login', function(auth) {
-	// Call user information, for the given network
-	hello(auth.network).api('me').then(function(r) {
-		// Inject it into the container
-		var label = document.getElementById('profile_' + auth.network);
-		if (!label) {
-			label = document.createElement('div');
-			label.id = 'profile_' + auth.network;
-			document.getElementById('profile').appendChild(label);
-		}
-		label.innerHTML = '<img src="' + r.thumbnail + '" /> Hey ' + r.name;
-	});
-});

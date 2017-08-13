@@ -26,14 +26,29 @@ This is a minor Prototype and heavily wip
 <!-- Hello.js and Oauth Dependencies -->
   <script src="hello.all.min.js"></script>
   <script src="initHelloOauth.js"></script>
-  <script src="oauthalpha.js"></script> 
+  <script src="oauthalpha.js"></script>
+  <script src="profile.js"></script>  
 
 </head>
 <body>
 
 <button type="button" id="btn_run">Google Log In</button>
 <button type="button" id="btn_logout">Google Log out</button>
-<div id="user_info"></div>
+
+<div id="user_info">
+
+    <h1> User Information </h1></<br>
+
+    <h1 id="google"></h1>
+    <p> Open Console to see User Object for MongoDB </p>
+
+    <h2 id ="html_pfn"></h2></<br>
+    <h2 id ="Lastname"></h2></<br>
+    <h2 id ="E-Mail"></h2></<br>
+    <h2 id ="Gender"></h2></<br>
+    <h2><img id="profieimage"</img></h2></<br>
+    <h2 id ="Language"></h2></<br>
+</div>
 </button>
 
 </body>
