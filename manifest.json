@@ -45,10 +45,18 @@
         "tabs",
         "contextMenus",
         "identity",
-        "popup"
+        "https://accounts.google.com/*",
+        "https://www.googleapis.com/*"
     ],
+
+"oauth2": {
+    "client_id": "216563153005-3nh8toqoe8gjr151fbsvhru3hls5eh59.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/plus.login"
+    ]
+  },
 
     "web_accessible_resources": ["src/css/*.*", "tests/tests.html"],
 
-    "options_page":"tests/Reday/tests.sinon.html"
+    "options_page":"/tests/Reday/dummylogin/index.html"
 }
