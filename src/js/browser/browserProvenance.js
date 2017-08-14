@@ -13,13 +13,13 @@
 			// if (non-redireciton) addNode(tab);
 			// else {update existing node}; // redirection
 		// }
-//     if (title updated) send the new title to history-map-page.js through an event;
-//     if (favIconUrl updated) send the new favIconUrl to history-map-page.js through an event;
+//     if (title updated) send the new title to historyMapPage.js through an event;
+//     if (favIconUrl updated) send the new favIconUrl to historyMapPage.js through an event;
 // }
 
 // function addNode(tab) {
 //     create a new node with  the information from 'tab';
-//     send the new 'node' to history-map-page.js through an event;
+//     send the new 'node' to historyMapPage.js through an event;
 // }
 
 sm.provenance.browser = function() {
@@ -69,22 +69,24 @@ sm.provenance.browser = function() {
         chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 
 			if(!isIgnoredTab(tab)) {
-				console.log('tabUpdate - ','tabid:'+tabId, ', parent:'+tab.openerTabId, ', title:'+tab.title, ' changeInfo:', changeInfo); // for testing
+				// console.log('tabUpdate - ','tabid:'+tabId, ', parent:'+tab.openerTabId, ', title:'+tab.title, ' changeInfo:', changeInfo); // for testing
+
+				console.log('tab update',tabId,changeInfo,tab);
 
 				// 'changeInfo' information:
 				// - status: 'loading': if (tabCompleted) {create a new node} else {update exisiting node}
-				if (changeInfo.status == 'loading') {
+				if (changeInfo.status == 'loading' && tab.url != tabUrl[tabId]) {
 					// console.log('urlChange -','tabId:'+tabId, ', parent:'+tab.openerTabId,', url:'+tab.url,); // for testing
-					
+
 					if (!tab2node[tabId] || isTabCompleted[tabId]) { // not redirection
-						addNode(tab, tab.id); 
+						addNode(tab, tab.id);
 						isTabCompleted[tabId] = false;
 					}
-					
+
 					else { // redirection
 						const titleUpdate = {
 							id: tab2node[tab.id],
-							text: tab.id + ':' + tab.title || tab.url
+							text: tab.title || tab.url
 						};
 
 						dispatch.titleUpdated(titleUpdate);
@@ -98,7 +100,7 @@ sm.provenance.browser = function() {
 
 					const titleUpdate = {
 						id: tab2node[tab.id],
-						text: tab.id + ':' + tab.title
+						text: tab.title
 					};
 
 					dispatch.titleUpdated(titleUpdate);
@@ -130,7 +132,7 @@ sm.provenance.browser = function() {
 			tabId: tab.id,
 			time: time,
 			url: tab.url,
-			text: tab.id + ':' + title,
+			text: title,
 			favIconUrl: tab.favIconUrl,
 			parentTabId:parent,
 			from: tab2node[parent]
@@ -156,7 +158,7 @@ sm.provenance.browser = function() {
 
 				dispatch.typeUpdated(typeUpdate);
 			});
-		} 
+		}
 		// else { // when the url is empty
 		// 	console.warn('tab.url', tab.url);
 		// }
