@@ -8,7 +8,7 @@ hello.on('auth.login', function(r) {
 	hello( r.network ).api( '/me' ).then( function(p) {
         var label = document.getElementById(r.network);
         label.innerHTML = "<img src='"+ p.thumbnail + "' width=50/>Connected to "+ r.network+" as " + p.name;
-
+        console.log(p);
         //creating Profile Object for MongoDB useage
         hello('google').api('me').then(function(json) {
 
@@ -22,18 +22,8 @@ hello.on('auth.login', function(r) {
             }
 
         //minor debug
-        console.log(SenseMapUser);
+        //console.log(SenseMapUser);
 });
-
-            /*fetching HTML 
-            var Profile_FirstName = document.getElementById(FirstName);
-            var Profile_LastName = document.getElementById(LastName);
-            var Profile_email = document.getElementById(E-Mail);
-            var Profile_gender = document.getElementById(Gender);
-            var Profile_image = document.getElementById(profileimage);
-            var Profile_language = document.getElementById(language);
-            */
-
 
 		// On chrome apps we're not able to get remote images
 		// This is a workaround
