@@ -7,7 +7,7 @@ hello.on('auth.login', function(r) {
 	// Get Profile
 	hello( r.network ).api( '/me' ).then( function(p) {
         var label = document.getElementById(r.network);
-        label.innerHTML = "<img src='"+ p.thumbnail + "' width=50/>Connected to "+ r.network+" as " + p.name;
+        //label.innerHTML = "<img src='"+ p.thumbnail + "' width=50/>Connected to "+ r.network+" as " + p.name;
         console.log(p);
         //creating Profile Object for MongoDB useage
         hello('google').api('me').then(function(json) {
@@ -24,7 +24,6 @@ hello.on('auth.login', function(r) {
         //minor debug
         //console.log(SenseMapUser);
 });
-
 		// On chrome apps we're not able to get remote images
 		// This is a workaround
 		if (typeof(chrome) === 'object') {
@@ -33,6 +32,7 @@ hello.on('auth.login', function(r) {
 	});
 });
 
+/*
 // Bind events to the buttons on the page
 var b = Array.prototype.slice.call(document.querySelectorAll('button.profile'));
 b.forEach(function(btn){
@@ -51,4 +51,4 @@ function img_xhr(img, url) {
 	};
 	xhr.send();
 }
-
+*/
