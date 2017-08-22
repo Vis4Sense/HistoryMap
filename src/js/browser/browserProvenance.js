@@ -59,6 +59,7 @@ sm.provenance.browser = function() {
 				// tab.title = 'id ' + tab.id + ' - ' + tab.title || tab.url;
 
 				addNode(tab, tab.openerTabId);
+				isTabCompleted[tab.id] = false;
 			}
 		});
 	}
