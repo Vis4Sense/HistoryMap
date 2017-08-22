@@ -14,4 +14,3 @@ function injectLinks() {
   	    chrome.runtime.sendMessage({ type: "linkClicked" });
     });
 }
-

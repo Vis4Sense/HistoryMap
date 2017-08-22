@@ -1,9 +1,9 @@
 {
     "manifest_version": 2,
 
-    "name": "SenseMap",
+    "name": "SenseMap - Shaz",
     "description": "SenseMaking with Analytic Provenance",
-    "version": "0.1.2",
+    "version": "0.1.1",
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
 
     "browser_action": {
@@ -31,7 +31,7 @@
       ],
       "js": [
           "lib/jquery.min.js",
-        "src/js/browser/content-scripts.js"
+        "src/js/browser/contentScripts.js"
       ],
       "run_at": "document_end"
     }
