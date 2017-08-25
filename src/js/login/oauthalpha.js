@@ -1,11 +1,3 @@
-//external JS to give buttons functionality
-
-//Jquery for Button action
-$(function(){
-  $('#btn_run').click(function(){get_Info();});
-  $('#btn_logout').click(function(){google_logout();});
-});
-
 //Open Login onload
 window.onload = function get_Info() {
 	
@@ -20,13 +12,13 @@ window.onload = function get_Info() {
             })
 }
 
-//logout
-function google_logout() {
+//Logout on unload
+window.onbeforeunload = function google_logout(){
 	hello('google').logout().then(function() {
 	alert('Signed out');
 }, function(e) {
-	alert('Signed out error: ' + e.error.message);
-});
+  alert('Signed out error: ' + e.error.message);
+  });
 }
 
 
