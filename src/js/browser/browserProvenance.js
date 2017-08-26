@@ -43,7 +43,9 @@ sm.provenance.browser = function() {
     bookmarkTypes = [ 'auto_bookmark' ],
     typedTypes = [ 'typed', 'generated', 'keyword', 'keyword_generated' ];
 
-    const dispatch = d3.dispatch('nodeCreated','titleUpdated','favUpdated', 'typeUpdated','urlUpdated');
+	const dispatch = d3.dispatch('nodeCreated','titleUpdated','favUpdated', 'typeUpdated','urlUpdated', 'nodeRemoved');
+	
+	chrome.runtime.onMessage.addListener(onMessageReceived);
 
     onTabUpdate();
 	onTabCreation();
@@ -273,6 +275,12 @@ sm.provenance.browser = function() {
         });
     }
 
+	function onMessageReceived(request, sender, sendResponse) {
+		if (request.type === 'highlightRemoved') {
+            dispatch.nodeRemoved(request.classId, sender.tab.url);
+        }
+	}
+	
     d3.rebind(module, dispatch, 'on'); // what's this?
     return module;
 };
