@@ -47,6 +47,7 @@ sm.provenance.browser = function() {
 
     onTabUpdate();
 	onTabCreation();
+	createContextMenus();
 
 	function onTabCreation() {
 		chrome.tabs.onCreated.addListener( function(tab) {
@@ -175,6 +176,42 @@ sm.provenance.browser = function() {
 
     function isIgnoredTab(tab) {
         return ignoredUrls.some(url => tab.url.includes(url));
+	}	
+	
+	function createContextMenus() {
+        chrome.contextMenus.removeAll();
+
+        // To highlight selected text
+        chrome.contextMenus.create({
+            id: 'sm-highlight',
+            title: 'Highlight',
+            contexts: ['selection']
+        });
+
+        // To save image
+        chrome.contextMenus.create({
+            id: 'sm-save-image',
+            title: 'Set as Page Image',
+            contexts: ['image']
+        });
+
+        //function on contextMenuClicked
+        chrome.contextMenus.onClicked.addListener((info, tab) => {
+            if (info.menuItemId === 'sm-highlight') {
+                chrome.tabs.sendMessage(tab.id, { type: 'highlightSelection' }, d => {
+                    if (d) {
+						//createNewAction(tab, 'highlight', d.text, d.path, d.classId);
+					}
+                });
+            } else if (info.menuItemId === 'sm-save-image') {
+                // Overwrite existing image
+                var action = urlToActionLookup[tab.url];
+                if (action) {
+                    action.userImage = info.srcUrl;
+                    dispatch.dataChanged('image', false, action);
+                }
+            }
+        });
     }
 
     d3.rebind(module, dispatch, 'on'); // what's this?
