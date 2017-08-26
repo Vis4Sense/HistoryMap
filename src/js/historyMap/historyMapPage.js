@@ -15,7 +15,8 @@ document.addEventListener("DOMContentLoaded", function() {
         .on('nodeCreated', onNodeCreated)
         .on('titleUpdated', onTitleUpdated)
         .on('favUpdated', onFavUpdated)
-        .on('typeUpdated', onTypeUpdated);
+        .on('typeUpdated', onTypeUpdated)
+        .on('urlUpdated', onUrlUpdated);
 
     // Converter from an array of actions to a tree
     const listToTree = sm.data.listToTree();
@@ -49,6 +50,10 @@ document.addEventListener("DOMContentLoaded", function() {
     function onTypeUpdated(typeUpdate) {
         nodes[typeUpdate.id].type = typeUpdate.type;
         redraw();
+    }
+
+    function onUrlUpdated(urlUpdate) {
+        nodes[urlUpdate.id].url = urlUpdate.url;
     }
 
     function redraw() {
