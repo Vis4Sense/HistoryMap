@@ -172,6 +172,65 @@ sm.provenance.browser = function() {
 		// }
 	}
 
+	function isEmbeddedType(type) {
+        return [ 'highlight', 'note', 'filter' ].includes(type);
+    }
+	
+	function createNewAction(tab, type, text, path, classId) {
+        // Still need to check the last time before creating a new action
+        // because two updates can happen in a very short time, thus the second one
+        // happens even before a new action is added in the first update
+		var action;
+		if (type === 'highlight') {
+            action = createActionObject(tab.id, tab.url, text, type, undefined, path, classId, tab2node[tab.id]);
+		}
+		return action;
+	}
+
+	var lastDate;
+
+	//using old style of creating nodes(actions)
+	function createActionObject(tabId, url, text, type, favIconUrl, path, classId, from) {
+	    var time = new Date(),
+            action = {
+                id: nodeId,
+                time: time,
+                url: url,
+                text: text,
+                type: type,
+                showImage: true
+            };
+
+        if (favIconUrl) action.favIconUrl = favIconUrl;
+        if (path) action.path = path;
+        if (classId) action.classId = classId;
+
+        if (!isEmbeddedType(type)) {
+            // End time
+            action.endTime = action.id + 1;
+        } else {
+            action.embedded = true;
+        }
+
+        if (lastDate && action.id === +lastDate) action.id += 1;
+        lastDate = time;
+
+        // Referrer
+        //cant use if(action.from) because action.from = node.id,
+		//which has range of 0 to n  
+        if (typeof from !== "undefined") {
+            action.from = from;
+        } else {
+			if(tabId) {
+                action.from = tab2node[tabId];
+            }
+        }
+        
+        dispatch.nodeCreated(action);
+        nodeId++;
+        return action;
+    }
+
 	/* Additional Functions for Checking */
 
     function isIgnoredTab(tab) {
@@ -200,7 +259,7 @@ sm.provenance.browser = function() {
             if (info.menuItemId === 'sm-highlight') {
                 chrome.tabs.sendMessage(tab.id, { type: 'highlightSelection' }, d => {
                     if (d) {
-						//createNewAction(tab, 'highlight', d.text, d.path, d.classId);
+						createNewAction(tab, 'highlight', d.text, d.path, d.classId);
 					}
                 });
             } else if (info.menuItemId === 'sm-save-image') {
