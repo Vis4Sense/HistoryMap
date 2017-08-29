@@ -10,7 +10,7 @@ window.onload = function get_Info() {
             force: true}).then(function(){
             return google.api('me');
             })
-}
+};
 
 //Logout on unload
 window.onbeforeunload = function google_logout(){

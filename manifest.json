@@ -7,10 +7,11 @@
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
 
     "browser_action": {
+      "default_popup": "src/html/popup.html",
         "default_icon": {
             "19": "logo/sm-logo-19.png"
         },
-        "default_title": "Open SenseMap"
+        "default_title": "SenseMap Control Panel"
     },
 
     "icons": {

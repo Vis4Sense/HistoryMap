@@ -7,7 +7,7 @@ hello.on('auth.login', function(r) {
 	// Get Profile
 	hello( r.network ).api( '/me' ).then( function(p) {
         var label = document.getElementById(r.network);
-        //label.innerHTML = "<img src='"+ p.thumbnail + "' width=50/>Connected to "+ r.network+" as " + p.name;
+        label.innerHTML = "<img src='"+ p.thumbnail + "' id='profileIMG'/> <p id='profileName'>"+ p.name;
         console.log(p);
         //creating Profile Object for MongoDB useage
         hello('google').api('me').then(function(json) {
@@ -19,7 +19,12 @@ hello.on('auth.login', function(r) {
                 picture : json.picture,
                 gender : json.gender,
                 language : json.language,
-            }
+			}
+
+		document.getElementById("btn_login").disabled = true;
+		document.getElementById("btn_logout").disabled = false;
+		document.getElementById("btn_logout").style.color = "darkmagenta";
+		document.getElementById("btn_login").style.color = "red";
 
         //minor debug
         //console.log(SenseMapUser);

@@ -49,7 +49,7 @@ describe("Unit Testing Suit for Login", function () {
     //server fake request
     server.respondWith("GET", "/something",
                 [200, { "Content-Type": "application/json" },
-                    '{"kind":"plus#person","etag":"\"Sh4n9u6EtD24TM0RmWv7jTXojqc/TxFVR2WoyGFdFoAfTOpGIRtcEJ0\"","emails":[{"value":"jamesmowkito@gmail.com","type":"account"}],"objectType":"person","id":"106780643953396250439","displayName":"James Mowkito","name":"James Mowkito","image":{"url":"https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/photo.jpg?sz=50","isDefault":true},"isPlusUser":false,"language":"en","verified":false,"last_name":"Mowkito","first_name":"James","email":"jamesmowkito@gmail.com","picture":"https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/photo.jpg?sz=50","thumbnail":"https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/photo.jpg?sz=50"}']);
+                    '{"kind":"plus#person","etag":"\"Sh4n9u6EtD24TM0RmWv7jTXojqc/TxFVR2WoyGFdFoAfTOpGIRtcEJ0\"","emails":[{"value":"jamesmowkito@gmail.com","type":"account"}],"objectType":"person","id":"106780643953396250439","displayName":"James Mowkito","name":"James Mowkito","image":{"url":"https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/photo.jpg?sz=50","isDefault":true},"isPlusUser":false,"language":"en","verified":false,"last_name":"Mowkito"']);
     
        //Spying on Callbacks
     var callbacks = [sinon.spy(), sinon.spy()];
