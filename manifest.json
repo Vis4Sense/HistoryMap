@@ -44,6 +44,7 @@
         "storage",
         "history",
         "tabs",
+        "cookies",
         "contextMenus",
         "identity",
         "https://accounts.google.com/*",
