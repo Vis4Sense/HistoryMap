@@ -1,5 +1,5 @@
 //Made by Reday Yahya | @RedayY
-//Sensemap Jasmine Testing Specification Document
+//Sensemap Sinon and Jasmine Testing Specification Document
 //Unit Testing for New Nodes
 
 /*
@@ -20,9 +20,9 @@ Using Shaz way of testing each object
 
 urlLinkArray = [
     "http://www.mdx.ac.uk/",
-    "https://google.com/",
-    "http://sdjfrwerlwkejrljkwerlkjwe/",
-    "http://bing/"
+    "https://google.com/"
+    //"http://sdjfrwerlwkejrljkwerlkjwe/",
+    //"http://bing/"
 ];
 
 
