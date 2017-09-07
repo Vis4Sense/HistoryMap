@@ -1,60 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="Captures and visualizes browsing sessions.">
-        <meta name="author" content="phongvis - Phong Nguyen">
-        <title>History Map</title>
 
-        <link rel="icon" href="../../logo/sm-logo-19.png">
-		<link rel="stylesheet" href="/lib/bootstrap-sm.min.css">
-        <link rel="stylesheet" href="/lib/fontawesome/css/font-awesome.min.css">
-        <link rel="stylesheet" href="../css/core.css">
-        <link rel="stylesheet" href="../css/sensemap.css">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Captures and visualizes browsing sessions.">
+    <meta name="author" content="phongvis - Phong Nguyen">
+    <title>History Map</title>
 
-        <style>
-            body {
-                overflow: hidden;
-            }
+    <link rel="icon" href="../../logo/sm-logo-19.png">
+    <link rel="stylesheet" href="/lib/bootstrap-sm.min.css">
 
-            .sm-history-map-container {
-                overflow: hidden;
-                position: relative;
-                width: 100%;
-                height: 100%;
-            }
-        </style>
-    </head>
+    <link rel="stylesheet" href="/lib/fontawesome/css/font-awesome.min.css">
 
-    <body>
-        <svg class="sm-history-map-container"></svg>
+    <link rel="stylesheet" href="/lib/fontawesome/css/font-awesome.min.css">
 
-        <script src="/lib/jquery.min.js"></script>
-        <script src="/lib/jquery-ui.min.js"></script>
-        <script src="/lib/d3.min.js"></script>
-        <script src="/lib/lodash.min.js"></script>
-        <script src="/lib/mxClient.js"></script>
-        <script src="/lib/hello.all.min.js"></script>
+    <link rel="stylesheet" href="../css/core.css">
+    <link rel="stylesheet" href="../css/sensemap.css">
 
-        <script src="../js/core.js"></script>
+    <link rel="stylesheet" href="/lib/new-fontawesome/css/animation.css">
+    <link rel="stylesheet" href="/lib/new-fontawesome/css/core.css">
 
-        <script src="../js/misc/sugar.js"></script>
-        <script src="../js/misc/widgets.js"></script>
 
-        <script src="../js/browser/browserProvenance.js"></script>
+    <style>
+        body {
+            overflow: hidden;
+        }
 
-        <script src="../js/data/listToTree.js"></script>
+        .sm-history-map-container {
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
 
-        <script src="../js/historyMap/forest.js"></script>
-        <script src="../js/historyMap/historyMapVis.js"></script>
-        <script src="../js/historyMap/historyMapPage.js"></script>
+        #bars {
+            font-size: 18px;
+            float: right;
+            margin-left: 5px;
+            cursor: pointer;
+        }
 
-        <!--
-        <script src="../js/login/initHelloOauth.js"></script>
-        <script src="../js/login/profile.js"></script>
-        <script src="../js/login/oauthalpha.js"></script>
+        #settings {
+            position: fixed;
+            float: right;
+            right: 5px;
+            top: 5px;
+        }
+
+        .btn-toolbar .btn {
+            padding: 4px 8px;
+        }
+
+        #btnCurate {
+            position: fixed;
+            float: right;
+            right: 5px;
+            bottom: 5px;
+            cursor: pointer;
+            padding: 2px 6px;
+        }
+
+        #groupZoom {
+            position: fixed;
+            float: right;
+            right: 5px;
+            bottom: 5px;
+        }
+
+        #groupZoom .btn {
+            padding: 0px 6px;
+            font-size: 20px;
+        }
+    </style>
+    </style>
+</head>
+
+<body>
+    <svg class="sm-history-map-container"></svg>
+
+    <script src="/lib/jquery.min.js"></script>
+    <script src="/lib/jquery-ui.min.js"></script>
+    <script src="/lib/d3.min.js"></script>
+    <script src="/lib/lodash.min.js"></script>
+    <script src="/lib/mxClient.js"></script>
+    <script src="/lib/hello.all.min.js"></script>
+
+    <script src="../js/core.js"></script>
+
+    <script src="../js/misc/sugar.js"></script>
+    <script src="../js/misc/widgets.js"></script>
+
+    <script src="../js/browser/browserProvenance.js"></script>
+
+    <script src="../js/data/listToTree.js"></script>
+
+    <script src="../js/historyMap/forest.js"></script>
+    <script src="../js/historyMap/historyMapVis.js"></script>
+    <script src="../js/historyMap/historyMapPage.js"></script>
+
+    <script src="/lib/new-fontawesome/script/cSwitcher.js"></script>
+
+    <script src="../js/login/initHelloOauth.js"></script>
+    <script src="../js/login/profile.js"></script>
+    <script src="../js/login/LoginDocument.js"></script>
+
+    <svg class="sm-collection-container"></svg>
+    <div id='settings'>
+        <div class="btn-toolbar" style="display: inline-block;">
+            <div class="btn-group">
+                <button id='btn_login' class="btn btn-default"><i class="demo-icon icon-login">&#xe800;</i> Login</button>
+                <button id="btn_logout" class="btn btn-default"><i class="demo-icon icon-logout">&#xe801;</i> Logout</button>
+                </label>
+            </div>
+        </div>
         <h1 id="google"></h1>
-        -->
-    </body>
+        <p id="google"></p>
+        <p id="savSess"></p>
+    </div>
+</body>
+
 </html>
