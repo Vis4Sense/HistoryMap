@@ -24,7 +24,7 @@ sm.data.listToTree = function() {
             // 16.06.2017, Phong: chrome may not detect as a link
             // if (d.type === 'link') {
                 const source = actions.find(d2 => d2.id === d.from);
-                if (source && source !== d) {
+                if (source && source !== d && !d.hidden) {
                     addLink(source, d);
                     // if (d.url) {
                     //     if (source.url) {
@@ -42,10 +42,10 @@ sm.data.listToTree = function() {
             // }
 
             // If the action type of an item is embedded, add it as a child of the containing page
-            if (d.embedded) {
+            if (d.embedded && !d.hidden) {
                 const source = actions.find(d2 => d2.id === d.from);
                 if (source && source !== d) {
-                    addChild(source, d);
+					addChild(source, d);
                 }
             }
         });
@@ -54,8 +54,8 @@ sm.data.listToTree = function() {
         // root.nodes = actions.filter(a => !a.parent && a.url);
 
         // Add nodes, excluding child actions
-        root.nodes = actions.filter(a => !a.parent);
-
+        root.nodes = actions.filter(a => !a.parent && !a.hidden);
+		
         // Then add to the link list
         root.links = [];
         root.nodes.filter(d => d.links).forEach(d => {

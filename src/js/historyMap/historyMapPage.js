@@ -36,8 +36,19 @@ document.addEventListener("DOMContentLoaded", function() {
         redraw();
     }
 
+    function applyHidden(classIdToRemove, urlToRemove) {
+        for(var i = 0; i < nodes.length; i++) {
+            if (nodes[i].url === urlToRemove && nodes[i].classId === classIdToRemove) {
+                nodes[i].hidden = true;
+            } else {
+				nodes[i].hidden = false;
+			}
+        }
+    }
+
     function onNodeRemoved(classIdToRemove, urlToRemove) {
-		_.remove(nodes, n => n.url === urlToRemove && n.classId === classIdToRemove);
+        //_.remove(nodes, n => n.url === urlToRemove && n.classId === classIdToRemove);
+        applyHidden(classIdToRemove, urlToRemove);
         redraw();
     }
 
