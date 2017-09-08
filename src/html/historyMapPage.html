@@ -72,6 +72,23 @@
             padding: 0px 6px;
             font-size: 20px;
         }
+
+        #profileIMG {
+            padding-left: 5px;
+            border-radius: 50%;
+            margin-right: 16px;
+            float: left;
+        }
+
+        #profileName {
+            padding-left: 5px;
+            border-radius: 50%;
+            margin-right: 8px;
+
+            padding: 10px 35px;
+            border-top: 0.2px solid #e1ddd8;
+            background-color: gainsboro;
+        }
     </style>
     </style>
 </head>
@@ -106,17 +123,17 @@
     <script src="../js/login/LoginDocument.js"></script>
 
     <svg class="sm-collection-container"></svg>
+
     <div id='settings'>
         <div class="btn-toolbar" style="display: inline-block;">
             <div class="btn-group">
                 <button id='btn_login' class="btn btn-default"><i class="demo-icon icon-login">&#xe800;</i> Login</button>
                 <button id="btn_logout" class="btn btn-default"><i class="demo-icon icon-logout">&#xe801;</i> Logout</button>
-                </label>
+                <div class="profile_container">
+                    <p id="google"></p>
+                </div>
             </div>
         </div>
-        <h1 id="google"></h1>
-        <p id="google"></p>
-        <p id="savSess"></p>
     </div>
 </body>
 

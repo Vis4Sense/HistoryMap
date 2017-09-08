@@ -29,13 +29,19 @@ function google_Login() {
 };
 
 function google_Logout() {
-  hello('google').logout().then(function () {
-    alert('Signed out');
-    btn_reset();
-  }, function (e) {
-    alert('Signed out error: ' + e.error.message);
-  });
-};
+
+  var answer = confirm("Logging Out will reload SenseMap, do you wish to Continue?")
+  if (answer) {
+    hello('google').logout().then(function () {
+      alert('Signed out');
+      btn_reset();
+      location.reload();
+    }, function (e) {
+      alert('Signed out error: ' + e.error.message);
+    });
+  };
+}
+
 
 // function openSensemap() {
 //   chrome.windows.create({
