@@ -43,7 +43,7 @@ sm.provenance.browser = function() {
     bookmarkTypes = [ 'auto_bookmark' ],
     typedTypes = [ 'typed', 'generated', 'keyword', 'keyword_generated' ];
 
-	const dispatch = d3.dispatch('nodeCreated','titleUpdated','favUpdated', 'typeUpdated','urlUpdated', 'nodeRemoved');
+	const dispatch = d3.dispatch('nodeCreated','titleUpdated','favUpdated', 'typeUpdated','urlUpdated', 'nodeRemoved', 'imageSaved');
 	
 	chrome.runtime.onMessage.addListener(onMessageReceived);
 
@@ -178,13 +178,15 @@ sm.provenance.browser = function() {
         return [ 'highlight', 'note', 'filter' ].includes(type);
     }
 	
-	function createNewAction(tab, type, text, path, classId) {
-        // Still need to check the last time before creating a new action
+	function createNewAction(tab, type, text, path, classId, pic) {
+		// Still need to check the last time before creating a new action
         // because two updates can happen in a very short time, thus the second one
         // happens even before a new action is added in the first update
 		var action;
 		if (type === 'highlight') {
-            action = createActionObject(tab.id, tab.url, text, type, undefined, path, classId, tab2node[tab.id]);
+            action = createActionObject(tab.id, tab.url, text, type, undefined, path, classId, tab2node[tab.id], undefined, false);
+		} else if (type === 'save-image') {
+			action = createActionObject(tab.id, tab.url, undefined, type, undefined, undefined, undefined, tab2node[tab.id], pic, true);
 		}
 		return action;
 	}
@@ -192,7 +194,7 @@ sm.provenance.browser = function() {
 	var lastDate;
 
 	//using old style of creating nodes(actions)
-	function createActionObject(tabId, url, text, type, favIconUrl, path, classId, from) {
+	function createActionObject(tabId, url, text, type, favIconUrl, path, classId, from, pic, hidden) {
 	    var time = new Date(),
             action = {
                 id: nodeId,
@@ -200,13 +202,18 @@ sm.provenance.browser = function() {
                 url: url,
                 text: text,
                 type: type,
-                showImage: true
+                showImage: true,
+				hidden: hidden
             };
 
         if (favIconUrl) action.favIconUrl = favIconUrl;
         if (path) action.path = path;
         if (classId) action.classId = classId;
-
+		
+		if (pic) {
+			action.value = pic;
+			action.id = tab2node[tabId];
+		}
         if (!isEmbeddedType(type)) {
             // End time
             action.endTime = action.id + 1;
@@ -227,8 +234,8 @@ sm.provenance.browser = function() {
                 action.from = tab2node[tabId];
             }
         }
-        
-        dispatch.nodeCreated(action);
+
+		dispatch.nodeCreated(action);
         nodeId++;
         return action;
     }
@@ -266,12 +273,9 @@ sm.provenance.browser = function() {
                 });
             } else if (info.menuItemId === 'sm-save-image') {
                 // Overwrite existing image
-                var action = urlToActionLookup[tab.url];
-                if (action) {
-                    action.userImage = info.srcUrl;
-                    dispatch.dataChanged('image', false, action);
-                }
-            }
+				dispatch.imageSaved(tab2node[tab.id], info.srcUrl);
+				createNewAction(tab, 'save-image', tab.title, undefined, undefined, info.srcUrl)
+			}
         });
     }
 

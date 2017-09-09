@@ -17,7 +17,8 @@ document.addEventListener("DOMContentLoaded", function() {
         .on('favUpdated', onFavUpdated)
         .on('typeUpdated', onTypeUpdated)
         .on('urlUpdated', onUrlUpdated)
-        .on('nodeRemoved', onNodeRemoved);
+        .on('nodeRemoved', onNodeRemoved)
+        .on('imageSaved', onImageSaved);
 
     // Converter from an array of actions to a tree
     const listToTree = sm.data.listToTree();
@@ -40,9 +41,7 @@ document.addEventListener("DOMContentLoaded", function() {
         for(var i = 0; i < nodes.length; i++) {
             if (nodes[i].url === urlToRemove && nodes[i].classId === classIdToRemove) {
                 nodes[i].hidden = true;
-            } else {
-				nodes[i].hidden = false;
-			}
+             }
         }
     }
 
@@ -81,5 +80,10 @@ document.addEventListener("DOMContentLoaded", function() {
     function updateVis() {
         historyMap.width(window.innerWidth).height(window.innerHeight);
         d3.select('.sm-history-map-container').datum(sm.data.tree).call(historyMap);
+    }
+	
+	function onImageSaved(id, imageUrl) {
+        var foundNode = nodes.find(a => a.id === id);
+        foundNode.userImage = imageUrl
     }
 });
