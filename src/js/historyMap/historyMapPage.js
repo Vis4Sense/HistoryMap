@@ -16,7 +16,8 @@ document.addEventListener("DOMContentLoaded", function() {
         .on('titleUpdated', onTitleUpdated)
         .on('favUpdated', onFavUpdated)
         .on('typeUpdated', onTypeUpdated)
-        .on('urlUpdated', onUrlUpdated);
+        .on('urlUpdated', onUrlUpdated)
+        .on('nodeRemoved', onNodeRemoved);
 
     // Converter from an array of actions to a tree
     const listToTree = sm.data.listToTree();
@@ -32,6 +33,22 @@ document.addEventListener("DOMContentLoaded", function() {
 	function onNodeCreated(node) {
         // console.log('createNode - tabId:'+node.tabId,', parent:'+node.from, ', url:'+node.url);
         nodes.push(node) ;
+        redraw();
+    }
+
+    function applyHidden(classIdToRemove, urlToRemove) {
+        for(var i = 0; i < nodes.length; i++) {
+            if (nodes[i].url === urlToRemove && nodes[i].classId === classIdToRemove) {
+                nodes[i].hidden = true;
+            } else {
+				nodes[i].hidden = false;
+			}
+        }
+    }
+
+    function onNodeRemoved(classIdToRemove, urlToRemove) {
+        //_.remove(nodes, n => n.url === urlToRemove && n.classId === classIdToRemove);
+        applyHidden(classIdToRemove, urlToRemove);
         redraw();
     }
 

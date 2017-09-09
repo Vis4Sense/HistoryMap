@@ -43,10 +43,13 @@ sm.provenance.browser = function() {
     bookmarkTypes = [ 'auto_bookmark' ],
     typedTypes = [ 'typed', 'generated', 'keyword', 'keyword_generated' ];
 
-    const dispatch = d3.dispatch('nodeCreated','titleUpdated','favUpdated', 'typeUpdated','urlUpdated');
+	const dispatch = d3.dispatch('nodeCreated','titleUpdated','favUpdated', 'typeUpdated','urlUpdated', 'nodeRemoved');
+	
+	chrome.runtime.onMessage.addListener(onMessageReceived);
 
     onTabUpdate();
 	onTabCreation();
+	createContextMenus();
 
 	function onTabCreation() {
 		chrome.tabs.onCreated.addListener( function(tab) {
@@ -171,12 +174,113 @@ sm.provenance.browser = function() {
 		// }
 	}
 
+	function isEmbeddedType(type) {
+        return [ 'highlight', 'note', 'filter' ].includes(type);
+    }
+	
+	function createNewAction(tab, type, text, path, classId) {
+        // Still need to check the last time before creating a new action
+        // because two updates can happen in a very short time, thus the second one
+        // happens even before a new action is added in the first update
+		var action;
+		if (type === 'highlight') {
+            action = createActionObject(tab.id, tab.url, text, type, undefined, path, classId, tab2node[tab.id]);
+		}
+		return action;
+	}
+
+	var lastDate;
+
+	//using old style of creating nodes(actions)
+	function createActionObject(tabId, url, text, type, favIconUrl, path, classId, from) {
+	    var time = new Date(),
+            action = {
+                id: nodeId,
+                time: time,
+                url: url,
+                text: text,
+                type: type,
+                showImage: true
+            };
+
+        if (favIconUrl) action.favIconUrl = favIconUrl;
+        if (path) action.path = path;
+        if (classId) action.classId = classId;
+
+        if (!isEmbeddedType(type)) {
+            // End time
+            action.endTime = action.id + 1;
+        } else {
+            action.embedded = true;
+        }
+
+        if (lastDate && action.id === +lastDate) action.id += 1;
+        lastDate = time;
+
+        // Referrer
+        //cant use if(action.from) because action.from = node.id,
+		//which has range of 0 to n  
+        if (typeof from !== "undefined") {
+            action.from = from;
+        } else {
+			if(tabId) {
+                action.from = tab2node[tabId];
+            }
+        }
+        
+        dispatch.nodeCreated(action);
+        nodeId++;
+        return action;
+    }
+
 	/* Additional Functions for Checking */
 
     function isIgnoredTab(tab) {
         return ignoredUrls.some(url => tab.url.includes(url));
+	}	
+	
+	function createContextMenus() {
+        chrome.contextMenus.removeAll();
+
+        // To highlight selected text
+        chrome.contextMenus.create({
+            id: 'sm-highlight',
+            title: 'Highlight',
+            contexts: ['selection']
+        });
+
+        // To save image
+        chrome.contextMenus.create({
+            id: 'sm-save-image',
+            title: 'Set as Page Image',
+            contexts: ['image']
+        });
+
+        //function on contextMenuClicked
+        chrome.contextMenus.onClicked.addListener((info, tab) => {
+            if (info.menuItemId === 'sm-highlight') {
+                chrome.tabs.sendMessage(tab.id, { type: 'highlightSelection' }, d => {
+                    if (d) {
+						createNewAction(tab, 'highlight', d.text, d.path, d.classId);
+					}
+                });
+            } else if (info.menuItemId === 'sm-save-image') {
+                // Overwrite existing image
+                var action = urlToActionLookup[tab.url];
+                if (action) {
+                    action.userImage = info.srcUrl;
+                    dispatch.dataChanged('image', false, action);
+                }
+            }
+        });
     }
 
+	function onMessageReceived(request, sender, sendResponse) {
+		if (request.type === 'highlightRemoved') {
+            dispatch.nodeRemoved(request.classId, sender.tab.url);
+        }
+	}
+	
     d3.rebind(module, dispatch, 'on'); // what's this?
     return module;
 };
