@@ -18,7 +18,8 @@ document.addEventListener("DOMContentLoaded", function() {
         .on('typeUpdated', onTypeUpdated)
         .on('urlUpdated', onUrlUpdated)
         .on('nodeRemoved', onNodeRemoved)
-        .on('imageSaved', onImageSaved);
+        .on('imageSaved', onImageSaved)
+        .on('imageRemoved', onImageRemoved);
 
     // Converter from an array of actions to a tree
     const listToTree = sm.data.listToTree();
@@ -84,6 +85,16 @@ document.addEventListener("DOMContentLoaded", function() {
 	
 	function onImageSaved(id, imageUrl) {
         var foundNode = nodes.find(a => a.id === id);
+        if (foundNode) {
         foundNode.userImage = imageUrl
+        }
+    }
+
+    function onImageRemoved(id, imageUrl) {
+        var foundNode = nodes.find(a => a.id === id && a.userImage === imageUrl);
+        if (foundNode) {
+            delete foundNode.userImage;
+            redraw();
+        }
     }
 });

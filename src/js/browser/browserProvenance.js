@@ -43,7 +43,7 @@ sm.provenance.browser = function() {
     bookmarkTypes = [ 'auto_bookmark' ],
     typedTypes = [ 'typed', 'generated', 'keyword', 'keyword_generated' ];
 
-	const dispatch = d3.dispatch('nodeCreated','titleUpdated','favUpdated', 'typeUpdated','urlUpdated', 'nodeRemoved', 'imageSaved');
+	const dispatch = d3.dispatch('nodeCreated','titleUpdated','favUpdated', 'typeUpdated','urlUpdated', 'nodeRemoved', 'imageSaved', 'imageRemoved');
 	
 	chrome.runtime.onMessage.addListener(onMessageReceived);
 
@@ -261,8 +261,8 @@ sm.provenance.browser = function() {
             id: 'sm-save-image',
             title: 'Set as Page Image',
             contexts: ['image']
-        });
-
+		});
+		
         //function on contextMenuClicked
         chrome.contextMenus.onClicked.addListener((info, tab) => {
             if (info.menuItemId === 'sm-highlight') {
@@ -274,7 +274,15 @@ sm.provenance.browser = function() {
             } else if (info.menuItemId === 'sm-save-image') {
                 // Overwrite existing image
 				dispatch.imageSaved(tab2node[tab.id], info.srcUrl);
-				createNewAction(tab, 'save-image', tab.title, undefined, undefined, info.srcUrl)
+				createNewAction(tab, 'save-image', tab.title, undefined, undefined, info.srcUrl);
+				//To remove image (created once an image is saved)
+				chrome.contextMenus.create({
+					id: 'sm-remove-image',
+					title: 'Remove Page Image',
+					contexts: ['image']
+        		});
+			} else if (info.menuItemId === 'sm-remove-image') {
+				dispatch.imageRemoved(tab2node[tab.id], info.srcUrl);
 			}
         });
     }
