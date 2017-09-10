@@ -68,6 +68,10 @@ function respondExtension() {
             sendResponse(document.referrer);
         } else if (request.type === 'highlightSelection') {
             highlightSelection(sendResponse);
+        } else if (request.type === 'highlightImage') {
+            changeHighlightImage(request.srcUrl, request.pageUrl, true, sendResponse);
+        } else if (request.type === 'removeHighlightImage') {
+            changeHighlightImage(request.srcUrl, request.pageUrl, false, sendResponse);    
         }
     });
 }
@@ -77,6 +81,46 @@ function highlightSelection(sendResponse) {
     if (!selection || selection.type !== "Range") return;
     sendResponse($.highlight(selection));
     selection.empty();
+}
+
+function calculateImgSrcAttribute(srcUrl, pageUrl) {
+    //srcUrl and pageUrl are the same up to a certain point, 
+    //the img(to highlight) elements' src attribute is a substring of srcUrl
+    //this is found where srcUrl and pageUrl differ from each other
+    //srcUrl = "https://myunihub-1.mdx.ac.uk/cas-web/images/mdx/mdx-icon-enrol.png"  
+    //pageUrl = "https://myunihub-1.mdx.ac.uk/cas-web/login?service=https%3A%2F%2Fmyunihub.mdx.ac.uk%2Fc%2Fportal%2Flogin"
+    //imgSrcAttribute = "images/mdx/mdx-icon-enrol.png"
+    var imgSrcAttribute;
+    for(var i = 0; i < srcUrl.length; i++) {
+        var different = (srcUrl.charAt(i) != pageUrl.charAt(i));
+        if (different) {
+            imgSrcAttribute = srcUrl.substring(i);
+            i = srcUrl.length + 1;
+        }
+    }
+    return imgSrcAttribute;
+}
+
+function locateImageElement(srcAttributeValue) {
+    var foundElements = $('img[src*="'+srcAttributeValue+'"');
+    if (foundElements.length) {
+        return foundElements;
+    }
+    return null;
+}
+
+function changeHighlightImage(srcUrl, pageUrl, applyHighlight, sendResponse) {
+    var imageSrcAttribute = calculateImgSrcAttribute(srcUrl, pageUrl);
+    var imageElement = locateImageElement(imageSrcAttribute);
+    if(imageElement) {
+        if (applyHighlight){
+            imageElement.addClass("sensemap-highlight-image");
+            sendResponse({ imageHighlighted: true});
+        } else {
+            imageElement.removeClass("sensemap-highlight-image");
+            sendResponse({ imageHighlighted: false});
+        }
+    }
 }
 
 function scrollTo(request) {

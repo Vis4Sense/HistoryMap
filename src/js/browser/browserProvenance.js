@@ -273,8 +273,13 @@ sm.provenance.browser = function() {
                 });
             } else if (info.menuItemId === 'sm-save-image') {
                 // Overwrite existing image
-				dispatch.imageSaved(tab2node[tab.id], info.srcUrl);
-				createNewAction(tab, 'save-image', tab.title, undefined, undefined, info.srcUrl);
+				chrome.tabs.sendMessage(tab.id, {type: 'highlightImage', srcUrl: info.srcUrl, pageUrl: info.pageUrl}, d => {
+					if (d) {
+						createNewAction(tab, 'save-image', tab.title, undefined, undefined, info.srcUrl);
+						dispatch.imageSaved(tab2node[tab.id], info.srcUrl);
+					}
+                });
+
 				//To remove image (created once an image is saved)
 				chrome.contextMenus.create({
 					id: 'sm-remove-image',
@@ -282,7 +287,11 @@ sm.provenance.browser = function() {
 					contexts: ['image']
         		});
 			} else if (info.menuItemId === 'sm-remove-image') {
-				dispatch.imageRemoved(tab2node[tab.id], info.srcUrl);
+				chrome.tabs.sendMessage(tab.id, {type: 'removeHighlightImage', srcUrl: info.srcUrl, pageUrl: info.pageUrl}, d=> {
+					if (d) {
+						dispatch.imageRemoved(tab2node[tab.id], info.srcUrl);
+					}
+				});
 			}
         });
     }
@@ -290,7 +299,7 @@ sm.provenance.browser = function() {
 	function onMessageReceived(request, sender, sendResponse) {
 		if (request.type === 'highlightRemoved') {
             dispatch.nodeRemoved(request.classId, sender.tab.url);
-        }
+	   }
 	}
 	
     d3.rebind(module, dispatch, 'on'); // what's this?

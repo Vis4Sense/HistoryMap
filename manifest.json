@@ -34,6 +34,9 @@
           "src/js/browser/contentScripts.js",
 		  "src/js/browser/highlight.js"
       ],
+	  "css": [
+		  "src/css/content.css"
+	  ],
       "run_at": "document_end"
     }
   ],
