@@ -114,12 +114,20 @@ function changeHighlightImage(srcUrl, pageUrl, applyHighlight, sendResponse) {
     var imageElement = locateImageElement(imageSrcAttribute);
     if(imageElement) {
         if (applyHighlight){
+            removeHighlightFromImages();
             imageElement.addClass("sensemap-highlight-image");
             sendResponse({ imageHighlighted: true});
         } else {
             imageElement.removeClass("sensemap-highlight-image");
             sendResponse({ imageHighlighted: false});
         }
+    }
+}
+
+function removeHighlightFromImages(){
+    var highlighedImageElements = $('.sensemap-highlight-image');
+    if (highlighedImageElements) {
+        highlighedImageElements.removeClass("sensemap-highlight-image");
     }
 }
 
