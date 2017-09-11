@@ -86,7 +86,8 @@ document.addEventListener("DOMContentLoaded", function() {
 	function onImageSaved(id, imageUrl) {
         var foundNode = nodes.find(a => a.id === id);
         if (foundNode) {
-        foundNode.userImage = imageUrl
+            foundNode.userImage = imageUrl
+            redraw();
         }
     }
 
