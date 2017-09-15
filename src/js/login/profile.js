@@ -1,6 +1,6 @@
-// Profile UI
+// DB Login/Registration Document
 // Made by Reday Yahya | @RedayY
-// Displays the users profile details
+// Login/Registration Logic including User Profile display
 
 
 // Listen to signin requests
@@ -8,8 +8,10 @@ hello.on('auth.login', function (r) {
 	// Get Profile
 	hello(r.network).api('/me').then(function (p) {
 
+		//debug function
+		//die_for_me();
+
 		btn_format();
-		console.log(p);
 		pushToDB();
 		draw_profile();
 
@@ -42,24 +44,76 @@ function pushToDB() {
 	hello('google').api('me').then(function (up) {
 
 		var UserProfileObject = {
-			"displayName": up.displayName,
-			"name": up.name, //p.firs_tname + " " + p.last_name;
-			"tagline": up.tagline,
-			"aboutMe": up.aboutMe,
+			"name": up.name,
 			"emailAddress": up.email,
-			"gender": up.gender,
-			"birthday": up.birthday, //added birthday
-			"occupation": up.occupation,
-			"pictureUrl": up.picture,
-			"createdOn": up.birthday,
-			"activeSession": [sessionSchema]
+			"addtionalinfo": Object.values(up),
+			//"activeSession": [sessionSchema]
 		};
-		console.log(UserProfileObject);
+
+		//Crucial Bit that Adds the User to the DB, if the user has something on the DB, do not add at all cost.
+		//Code is based on Shaz example
+
+		//check if email is in db
+		var url = "https://sensemap-api.herokuapp.com/userbyemail/" + up.email + "/3yARG4zzLndmE39Mw00xigqDV3lOrjEJ/";
+		var xhr = new XMLHttpRequest()
+		xhr.open('GET', url, true)
+		xhr.onload = function () {
+			var users = JSON.parse(xhr.responseText);
+			if (xhr.readyState == 4 && xhr.status == "200") {
+				console.table(users);
+				console.log(users);
+				if (users.length == 0) {
+					add_user_to_db();
+				}
+			} else {
+				console.log("Could not perform action")
+			}
+		}
+		xhr.send(null);
 	})
+}
 
-	// Bit to add to send this object off to server goes into here
-	// Logic : Look for User (EMAIL), if user does not exsist add it to the DB
-	// Once it stores, SenseMap on update will add Nodes to Nodelist in DB
-	// something something post something something submit form
+// Minor Debug function
+function die_for_me() {
 
+	var url = "https://sensemap-api.herokuapp.com/user/5995669767008e00111c033f/3yARG4zzLndmE39Mw00xigqDV3lOrjEJ/";
+	var xhr = new XMLHttpRequest();
+	xhr.open("DELETE", url, true);
+	xhr.onload = function () {
+		var users = JSON.parse(xhr.responseText);
+		if (xhr.readyState == 4 && xhr.status == "200") {
+			console.table(users);
+			console.log("murder");
+		} else {
+			console.error(users);
+			console.log("dead end couldn't do it");
+		}
+	}
+	xhr.send(null);
+}
+
+//due to bugs its better to do this in a seperate function
+
+function add_user_to_db() {
+	//Creating the Object for the DB
+	hello('google').api('me').then(function (up) {
+
+		var new_stuff = {
+			"name": up.name,
+			"emailAddress": up.email,
+			"addtionalinfo": Object.values(up),
+			//"activeSession": [sessionSchema]
+		};
+
+		// Adding the User to the DB
+		var url = "https://sensemap-api.herokuapp.com/users/3yARG4zzLndmE39Mw00xigqDV3lOrjEJ/";
+		var json = JSON.stringify(new_stuff);
+		var xhr = new XMLHttpRequest();
+		xhr.open("POST", url, true);
+		xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+		xhr.onload = function () {
+			var users = JSON.parse(xhr.responseText);
+		}
+		xhr.send(json);
+	})
 }
