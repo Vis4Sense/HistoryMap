@@ -58,5 +58,13 @@
 
     "web_accessible_resources": ["src/css/*.*", "tests/tests.html"],
 
-    "options_page":"/src/html/options.html"
+    "options_page":"/src/html/options.html",
+
+    "commands": {
+        "_execute_browser_action": {
+            "suggested_key": {
+                "default": "Alt+S"
+            }
+        }
+    }
 }
