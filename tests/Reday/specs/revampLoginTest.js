@@ -47,7 +47,7 @@ describe("Unit Testing Suit for Login", function () {
         });
 
         expect(loggedin).toBe(true);
-        expect(loggedin).toBe("James Mowkito");
+        expect(fullname).toBe("James Mowkito");
         //end of it    
     });
 

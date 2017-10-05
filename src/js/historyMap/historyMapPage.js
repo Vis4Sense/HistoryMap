@@ -30,7 +30,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	function onNodeCreated(node) {
         // console.log('createNode - tabId:'+node.tabId,', parent:'+node.from, ', url:'+node.url);
-        nodes.push(node) ;
+        
+        //login functionality
+        if (AccLoggedIn == true && UserRecord == true){
+            nodes.push(node);
+        }
+
         redraw();
     }
 

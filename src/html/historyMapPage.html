@@ -12,14 +12,10 @@
     <link rel="stylesheet" href="/lib/bootstrap-sm.min.css">
 
     <link rel="stylesheet" href="/lib/fontawesome/css/font-awesome.min.css">
-
-    <link rel="stylesheet" href="/lib/fontawesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/lib/new-fontawesome/fontello.css">
 
     <link rel="stylesheet" href="../css/core.css">
     <link rel="stylesheet" href="../css/sensemap.css">
-
-    <link rel="stylesheet" href="/lib/new-fontawesome/css/animation.css">
-    <link rel="stylesheet" href="/lib/new-fontawesome/css/core.css">
 
 
     <style>
@@ -72,24 +68,21 @@
             padding: 0px 6px;
             font-size: 20px;
         }
-        /* Budget Material Design */
+
         #profileIMG {
             padding-left: 5px;
             border-radius: 50%;
-            margin-right: 16px;
-            float: left;
+            float: right;
         }
-        /* Budget Material Design */
-        #profileName {
-            padding-left: 5px;
-            border-radius: 50%;
-            margin-right: 8px;
 
-            padding: 10px 35px;
-            border-top: 0.2px solid #e1ddd8;
-            background-color: gainsboro;
+        .ProfileDiv {
+            position: fixed;
+            float: right;
+            left: 5px;
+            top: 5px;
+            border: 0.1px solid darkmagenta;
+            padding: 5px;
         }
-    </style>
     </style>
 </head>
 
@@ -124,17 +117,26 @@
 
     <svg class="sm-collection-container"></svg>
 
+    <div class="ProfileDiv" id="ProfileDiv">
+        <p id="Image"></p>
+        <p id="networkName"></p>
+        <p id="SessName"></p>
+    </div>
+
     <div id='settings'>
-        <div class="btn-toolbar" style="display: inline-block;">
+        <div class="btn-toolbar">
             <div class="btn-group">
                 <button id='btn_login' class="btn btn-default"><i class="demo-icon icon-login">&#xe800;</i> Login</button>
                 <button id="btn_logout" class="btn btn-default"><i class="demo-icon icon-logout">&#xe801;</i> Logout</button>
-                <div class="profile_container">
-                    <p id="google"></p>
-                </div>
+                <button id='btn_load' class="btn btn-default"><i class="demo-icon icon-upload">&#xe804;</i> Load</button>
+                <button id='btn_new' class="btn btn-default"><i class="demo-icon icon-doc">&#xe805;</i> New</button>
+                <button id='btn_start' class="btn btn-default"><i class="demo-icon icon-play">&#xe802;</i> Start</button>
+                <button id='btn_pause' class="btn btn-default"><i class="demo-icon icon-pause">&#xe803;</i> Pause</button>
             </div>
         </div>
     </div>
+    </br>
+
 </body>
 
 </html>

@@ -2,6 +2,10 @@
 // JavaScript Document for Login Functionality (Previously this was the control panel)
 
 // Jquery for Button action
+
+var SessionName;
+
+
 $(function () {
   $('#btn_login').click(function () {
     google_Login();
@@ -9,8 +13,19 @@ $(function () {
   $('#btn_logout').click(function () {
     google_Logout();
   });
-  $('#btn_openSense').click(function () {
-    openSensemap();
+  $('#btn_start').click(function () {
+    start_recording();
+    btn_pause_start_conf();
+  });
+  $('#btn_pause').click(function () {
+    pause_recording();
+    btn_pause_start_conf();
+  });
+  $('#btn_new').click(function () {
+    reset_sense();
+  });
+  $('#btn_load').click(function () {
+    load_session();
   });
 });
 
@@ -35,6 +50,7 @@ function google_Logout() {
     hello('google').logout().then(function () {
       alert('Signed out');
       btn_reset();
+      LoggedIn = false;
       location.reload();
     }, function (e) {
       alert('Signed out error: ' + e.error.message);
@@ -53,13 +69,64 @@ function google_Logout() {
 window.onload = function button_config() {
   document.getElementById("btn_logout").disabled = true;
   document.getElementById("btn_logout").style.color = "red";
-  document.getElementById("btn_logout").style.visibility = 'hidden';
   document.getElementById("btn_login").style.color = "darkmagenta";
+  btn_pause_start_conf();
 };
 
 function btn_reset() {
   document.getElementById("btn_logout").disabled = true;
   document.getElementById("btn_login").style.color = "darkmagenta";
-  document.getElementById("btn_login").style.visibility = 'visible';
-  document.getElementById("btn_logout").style.visibility = 'hidden';
+}
+
+function btn_pause_start_conf() {
+
+  if (UserRecord == true) {
+    document.getElementById("btn_start").disabled = true;
+    document.getElementById("btn_pause").disabled = false;
+    document.getElementById("btn_pause").style.color = "darkmagenta";
+    document.getElementById("btn_start").style.color = "red";
+  } else {
+    document.getElementById("btn_pause").disabled = true;
+    document.getElementById("btn_start").disabled = false;
+    document.getElementById("btn_pause").style.color = "red";
+    document.getElementById("btn_start").style.color = "darkmagenta";
+  }
+
+}
+
+function askForSession() {
+  var UserInput = prompt("Please enter a Session Name");
+  if (UserInput == null || UserInput == "" || UserInput == " ") {
+    window.alert("Please enter a suitable Session Name");
+    askForSession();
+  } else {
+    SessionName = UserInput;
+    window.alert("Using Session Name: " + UserInput);
+  }
+}
+
+function reset_sense() {
+  var answer = confirm("Would you like to start over again, this do not log you out, does you still wish to Continue?")
+  if (answer) {
+    location.reload();
+  } else {
+    window.alert("SenseMap did not restart, carry on!")
+  }
+}
+
+function load_session() {
+  var sesReq = prompt("Please enter a Session Name");
+  if (sesReq == null || sesReq == "" || sesReq == " ") {
+    window.alert("Please enter a suitable Session Name");
+    load_Session();
+  } else {
+    searchSessionName = sesReq;
+
+    //code to load session goes here
+    
+
+
+
+    window.alert("Loaded Session Name: " + searchSessionName);
+  }
 }

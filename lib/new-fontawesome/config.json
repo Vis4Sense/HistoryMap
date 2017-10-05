@@ -23,6 +23,30 @@
       "css": "logout",
       "code": 59393,
       "src": "fontawesome"
+    },
+    {
+      "uid": "ce06b5805120d0c2f8d60cd3f1a4fdb5",
+      "css": "play",
+      "code": 59394,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "0b28050bac9d3facf2f0226db643ece0",
+      "css": "pause",
+      "code": 59395,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "eeec3208c90b7b48e804919d0d2d4a41",
+      "css": "upload",
+      "code": 59396,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "85ef733b1e280809e8443f5f0167b5c2",
+      "css": "doc",
+      "code": 59397,
+      "src": "typicons"
     }
   ]
 }
