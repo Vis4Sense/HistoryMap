@@ -27,6 +27,9 @@ $(function () {
   $('#btn_load').click(function () {
     load_session();
   });
+  $('#btn_mySessions').click(function () {
+    load_MySession();
+  });
 });
 
 function google_Login() {
@@ -123,10 +126,32 @@ function load_session() {
     searchSessionName = sesReq;
 
     //code to load session goes here
-    
+
 
 
 
     window.alert("Loaded Session Name: " + searchSessionName);
   }
+}
+
+function load_MySession() {
+
+  var url = "http://sensemap-api.herokuapp.com/session/"+UserEmail+"/3yARG4zzLndmE39Mw00xigqDV3lOrjEJ/";
+  var xhr = new XMLHttpRequest()
+  xhr.open('GET', url, true)
+  xhr.onload = function () {
+    var users = JSON.parse(xhr.responseText);
+    if (xhr.readyState == 4 && xhr.status == "200") {
+      
+      //display user session allow him to select one session information stored under users
+      console.log("Hey it is working dont worry");
+
+
+
+
+    } else {
+      window.alert("You do not have any saved sessions under this Account");
+    }
+  }
+  xhr.send(null);
 }

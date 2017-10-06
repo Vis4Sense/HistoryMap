@@ -5,6 +5,8 @@
 let AccLoggedIn;
 let DBnodes = [];
 let UserRecord = true;
+let UserEmail;
+let DBSessionPointer;
 
 
 
@@ -18,6 +20,9 @@ hello.on('auth.login', function (r) {
 		draw_profile();
 		askForSession();
 		AccLoggedIn = true;
+		UserEmail = p.email;
+		pushSessToDB();
+
 
 		// On chrome apps we're not able to get remote images
 		// This is a workaround
@@ -32,13 +37,14 @@ function btn_format() {
 	document.getElementById("btn_logout").disabled = false;
 	document.getElementById("btn_logout").style.color = "darkmagenta";
 	document.getElementById("btn_login").style.color = "red";
+	document.getElementById("btn_mySessions").style.visibility = "visible";
 };
 
 function draw_profile() {
 	hello('google').api('me').then(function (upp) {
 		document.getElementById("networkName").innerHTML = "<p>" + upp.name;
 		document.getElementById("Image").innerHTML = "<img src='" + upp.thumbnail + "'id='profileIMG'/>";
-		document.getElementById("SessName").innerHTML = "<p> Session Name: " + SessionName + " </p>"
+		document.getElementById("SessName").innerHTML = "<p> Session Name: " + SessionName + " </p>";
 	})
 }
 
@@ -130,3 +136,22 @@ function start_recording() {
 
 var little_helper = 'https://' + chrome.runtime.id + '.chromiumapp.org/tests/Reday/tests.jasmine.html';
 
+function pushSessToDB() {
+	var url  = "http://sensemap-api.herokuapp.com/session/"+UserEmail+"/3yARG4zzLndmE39Mw00xigqDV3lOrjEJ/";
+    var data = {};
+    data.sessionname  = SessionName;
+    var json = JSON.stringify(data);
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", url, true);
+    xhr.setRequestHeader('Content-type','application/json; charset=utf-8');
+    xhr.onload = function () {
+      var users = JSON.parse(xhr.responseText);
+      if (xhr.readyState == 4 && xhr.status == "201") {
+      } else {
+		console.error(users);
+		var indexNo = users["sessions"].length - 1;
+		DBSessionPointer = users["sessions"][indexNo]._id;
+      }
+    }
+    xhr.send(json);
+}

@@ -34,6 +34,24 @@ document.addEventListener("DOMContentLoaded", function() {
         //login functionality
         if (AccLoggedIn == true && UserRecord == true){
             nodes.push(node);
+            
+            var url  = "https://sensemap-api.herokuapp.com/node/"+DBSessionPointer+"/3yARG4zzLndmE39Mw00xigqDV3lOrjEJ/";
+            var json = JSON.stringify(node);
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader('Content-type','application/json; charset=utf-8');
+            xhr.onload = function () {
+                var users = JSON.parse(xhr.responseText);
+                if (xhr.readyState == 4 && xhr.status == "201") {
+                    console.table(users);
+                } else {
+                    console.error(users);
+                    console.log("Success")
+                }
+            }
+            xhr.send(json);
+
+
         }
 
         redraw();
