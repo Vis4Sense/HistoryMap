@@ -2,16 +2,19 @@
 // Made by Reday Yahya | @RedayY
 // Login/Registration Logic including User Profile display
 
+//user vars
 let AccLoggedIn;
 let DBnodes = [];
 let UserRecord = true;
 let UserEmail;
 let DBSessionPointer;
+let UserProfile;
 
 
 
 // Listen to signin requests
 hello.on('auth.login', function (r) {
+
 	// Get Profile
 	hello(r.network).api('/me').then(function (p) {
 
@@ -82,23 +85,6 @@ function pushToDB() {
 	})
 }
 
-// Minor Debug function
-function die_for_me() {
-
-	var url = "https://sensemap-api.herokuapp.com/user/59bbb16e4d82e500124d53d5/3yARG4zzLndmE39Mw00xigqDV3lOrjEJ/";
-	var xhr = new XMLHttpRequest();
-	xhr.open("DELETE", url, true);
-	xhr.onload = function () {
-		var users = JSON.parse(xhr.responseText);
-		if (xhr.readyState == 4 && xhr.status == "200") {
-			console.log("murder");
-		} else {
-			console.log("dead end couldn't do it");
-		}
-	}
-	xhr.send(null);
-}
-
 //due to bugs its better to do this in a seperate function
 
 function add_user_to_db() {
@@ -109,8 +95,6 @@ function add_user_to_db() {
 			"name": up.name,
 			"emailAddress": up.email,
 			"addtionalinfo": JSON.stringify(Object.values(up)),
-			//"activeSession": [sessionSchema]
-			//"SessionName" : UserSession;
 		};
 
 		// Adding the User to the DB
@@ -134,24 +118,26 @@ function start_recording() {
 	UserRecord = true;
 }
 
-var little_helper = 'https://' + chrome.runtime.id + '.chromiumapp.org/tests/Reday/tests.jasmine.html';
+//var little_helper = 'https://' + chrome.runtime.id + '.chromiumapp.org/tests/Reday/tests.jasmine.html';
 
 function pushSessToDB() {
-	var url  = "http://sensemap-api.herokuapp.com/session/"+UserEmail+"/3yARG4zzLndmE39Mw00xigqDV3lOrjEJ/";
-    var data = {};
-    data.sessionname  = SessionName;
-    var json = JSON.stringify(data);
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", url, true);
-    xhr.setRequestHeader('Content-type','application/json; charset=utf-8');
-    xhr.onload = function () {
-      var users = JSON.parse(xhr.responseText);
-      if (xhr.readyState == 4 && xhr.status == "201") {
-      } else {
-		console.error(users);
-		var indexNo = users["sessions"].length - 1;
-		DBSessionPointer = users["sessions"][indexNo]._id;
-      }
-    }
-    xhr.send(json);
+	var url = "http://sensemap-api.herokuapp.com/session/" + UserEmail + "/3yARG4zzLndmE39Mw00xigqDV3lOrjEJ/";
+	var data = {};
+	data.sessionname = SessionName;
+	var json = JSON.stringify(data);
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+	xhr.onload = function () {
+		var users = JSON.parse(xhr.responseText);
+		if (xhr.readyState == 4 && xhr.status == "201") {} else {
+			//debug
+			console.error(users);
+			var indexNo = users["sessions"].length - 1;
+			DBSessionPointer = users["sessions"][indexNo]._id;
+			UserProfile = users["sessions"];
+			SessionCount = users["sessions"].length - 1;
+		}
+	}
+	xhr.send(json);
 }

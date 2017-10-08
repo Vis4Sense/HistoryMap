@@ -125,8 +125,11 @@ sm.provenance.browser = function() {
     }
 
 	function addNode(tab,parent) {
+
 		const title = tab.title || tab.url;
+
 		const time = new Date();
+
 		const node = {
 			id: nodeId,
 			tabId: tab.id,
@@ -135,14 +138,56 @@ sm.provenance.browser = function() {
 			text: title,
 			favIconUrl: tab.favIconUrl,
 			parentTabId:parent,
-			from: tab2node[parent]
+			from: tab2node[parent],
+			hidden: false
+		};
+
+		const nodeoff = {
+			id: nodeId,
+			tabId: tab.id,
+			time: time,
+			url: tab.url,
+			text: title,
+			favIconUrl: tab.favIconUrl,
+			parentTabId:parent,
+			from: tab2node[parent],
+			hidden: true
 		};
 
 		tab2node[tab.id] = nodeId;
 		tabUrl[tab.id] = tab.url;
 
-		dispatch.nodeCreated(node);
+		if (AccLoggedIn == true && UserRecord == true){
 
+            dispatch.nodeCreated(node);
+            
+            var url  = "https://sensemap-api.herokuapp.com/node/"+DBSessionPointer+"/3yARG4zzLndmE39Mw00xigqDV3lOrjEJ/";
+            var json = JSON.stringify(node);
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader('Content-type','application/json; charset=utf-8');
+            xhr.onload = function () {
+                var users = JSON.parse(xhr.responseText);
+            }
+            xhr.send(json);
+		}
+		else {
+
+			if (AccLoggedIn == true && UserRecord == false){
+				
+				var url  = "https://sensemap-api.herokuapp.com/node/"+DBSessionPointer+"/3yARG4zzLndmE39Mw00xigqDV3lOrjEJ/";
+				var json = JSON.stringify(nodeoff);
+				var xhr = new XMLHttpRequest();
+				xhr.open("POST", url, true);
+				xhr.setRequestHeader('Content-type','application/json; charset=utf-8');
+				xhr.onload = function () {
+					var users = JSON.parse(xhr.responseText);
+				}
+				xhr.send(json);
+			}
+			//debug
+			console.log("did not add node");
+		}
 		nodeId++;
 
 		// Update with visit type

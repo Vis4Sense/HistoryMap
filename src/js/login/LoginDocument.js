@@ -4,6 +4,7 @@
 // Jquery for Button action
 
 var SessionName;
+var SessionCount;
 
 
 $(function () {
@@ -120,38 +121,43 @@ function reset_sense() {
 function load_session() {
   var sesReq = prompt("Please enter a Session Name");
   if (sesReq == null || sesReq == "" || sesReq == " ") {
-    window.alert("Please enter a suitable Session Name");
+    window.alert("Please enter a suitable Session ID");
     load_Session();
   } else {
     searchSessionName = sesReq;
 
     //code to load session goes here
-
-
-
-
+    
     window.alert("Loaded Session Name: " + searchSessionName);
   }
 }
 
 function load_MySession() {
+  var $container = $("#pictureBlock ul");
 
-  var url = "http://sensemap-api.herokuapp.com/session/"+UserEmail+"/3yARG4zzLndmE39Mw00xigqDV3lOrjEJ/";
+  var url = "http://sensemap-api.herokuapp.com/session/" + UserEmail + "/3yARG4zzLndmE39Mw00xigqDV3lOrjEJ/";
   var xhr = new XMLHttpRequest()
   xhr.open('GET', url, true)
   xhr.onload = function () {
     var users = JSON.parse(xhr.responseText);
     if (xhr.readyState == 4 && xhr.status == "200") {
-      
-      //display user session allow him to select one session information stored under users
-      console.log("Hey it is working dont worry");
+      //display session information (need to make this clickable)
+      for (var i = 1; i => SessionCount; i++) {
+        $container.append('<li><p>'+ UserProfile[i].sessionname + '</p> <p>'+ UserProfile[i]._id + '</p></li>');
+      }
 
-
-
+      //now just get the user to select the session and load using load_selectedSession(i)
 
     } else {
+
       window.alert("You do not have any saved sessions under this Account");
+
     }
   }
   xhr.send(null);
+}
+
+function load_SelectedSession(i){
+  nodes.length = 0;
+  nodes = UserProfile[i].nodes;
 }
