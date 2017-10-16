@@ -4,17 +4,9 @@
 
 //Profile specific Variables
 let AccLoggedIn;
-let DBnodes = [];
 let UserRecord = true;
 let UserEmail;
 let UserProfile;
-
-
-//API (Save and Load) specific Variables
-var baseURL = "https://sensemap-api.herokuapp.com/";
-let APIKey;
-let apiinput;
-let DBSessionPointer;
 
 
 // Listens to Login requests and executes functions upon verification
@@ -23,14 +15,11 @@ hello.on('auth.login', function (r) {
 	// Get Profile
 	hello(r.network).api('/me').then(function (p) {
 
-		askForAPIKey();
 		btn_format();
-		pushToDB();
 		draw_profile();
 		askForSession();
 		AccLoggedIn = true;
 		UserEmail = p.email;
-		pushSessToDB();
 
 
 		// On chrome apps we're not able to get remote images
@@ -46,8 +35,6 @@ function btn_format() {
 	document.getElementById("btn_logout").disabled = false;
 	document.getElementById("btn_logout").style.color = "darkmagenta";
 	document.getElementById("btn_login").style.color = "red";
-	document.getElementById("btn_mySessions").style.visibility = "visible";
-	document.getElementById("btn_loadSession").style.visibility = "visible";
 };
 
 function draw_profile() {
@@ -59,13 +46,3 @@ function draw_profile() {
 }
 
 //var little_helper = 'https://' + chrome.runtime.id + '.chromiumapp.org/tests/Reday/tests.jasmine.html';
-
-function askForAPIKey() {
-	var apik = prompt("Please enter the API Key ");
-	if (apik == null || apik == "" || apik == " ") {
-		window.alert("Please enter a suitable api key");
-		askForAPIKey();
-	} else {
-		APIKey = "/" + apik + "/";
-	}
-}

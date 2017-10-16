@@ -4,9 +4,6 @@
 // Jquery for Button action
 
 var SessionName;
-var SessionCount;
-var select_Val;
-var selectedNodes;
 
 
 $(function () {
@@ -29,13 +26,6 @@ $(function () {
   });
   $('#btn_load').click(function () {
     load_session();
-  });
-  $('#btn_mySessions').click(function () {
-    load_MySession();
-    document.getElementById("ProfileDiv").removeChild(document.getElementById("btn_mySessions"));
-  });
-  $('#btn_loadSession').click(function() {
-    load_Select_Session()
   });
 });
 
@@ -78,7 +68,6 @@ function google_Logout() {
 
 window.onload = function button_config() {
   document.getElementById("btn_logout").disabled = true;
-  document.getElementById("btn_loadSession").style.visibility = "hidden";
   document.getElementById("btn_logout").style.color = "red";
   document.getElementById("btn_login").style.color = "darkmagenta";
   btn_pause_start_conf();

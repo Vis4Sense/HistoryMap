@@ -30,15 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function onNodeCreated(node) {
         // console.log('createNode - tabId:'+node.tabId,', parent:'+node.from, ', url:'+node.url);
-
-        if (AccLoggedIn == true && UserRecord == true) {
-            nodes.push(node);
-            Node2DB(node);
-        } else if (UserRecord == true) {
-            nodes.push(node);
-        } else {
-            console.log("did not add node")
-        }
+        nodes.push(node);
 
         redraw();
     }
