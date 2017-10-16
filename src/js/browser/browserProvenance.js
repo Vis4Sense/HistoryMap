@@ -10,9 +10,9 @@
 
 // function onTabUpdate(tab) {
 //     if ('loading') {
-			// if (non-redireciton) addNode(tab);
-			// else {update existing node}; // redirection
-		// }
+// if (non-redireciton) addNode(tab);
+// else {update existing node}; // redirection
+// }
 //     if (title updated) send the new title to historyMapPage.js through an event;
 //     if (favIconUrl updated) send the new favIconUrl to historyMapPage.js through an event;
 // }
@@ -22,7 +22,7 @@
 //     send the new 'node' to historyMapPage.js through an event;
 // }
 
-sm.provenance.browser = function() {
+sm.provenance.browser = function () {
 	const module = {};
 
 	var nodeId = 0; // can't use tab.id as node id because new url can be opened in the existing tab
@@ -30,31 +30,31 @@ sm.provenance.browser = function() {
 	var tabUrl = {}; // the latest url of a given tabId
 	var isTabCompleted = {}; // whether a tab completes loading (for redirection detection).
 
-    // not recording any chrome-specific url
+	// not recording any chrome-specific url
 	const ignoredUrls = [
-        'chrome://',
-        'chrome-extension://',
-        'chrome-devtools://',
-        'view-source:',
-        // 'google.co.uk/url',
-        // 'google.com/url',
-        'localhost://'
-    ],
-    bookmarkTypes = [ 'auto_bookmark' ],
-    typedTypes = [ 'typed', 'generated', 'keyword', 'keyword_generated' ];
+			'chrome://',
+			'chrome-extension://',
+			'chrome-devtools://',
+			'view-source:',
+			// 'google.co.uk/url',
+			// 'google.com/url',
+			'localhost://'
+		],
+		bookmarkTypes = ['auto_bookmark'],
+		typedTypes = ['typed', 'generated', 'keyword', 'keyword_generated'];
 
-    const dispatch = d3.dispatch('nodeCreated','titleUpdated','favUpdated', 'typeUpdated');
+	const dispatch = d3.dispatch('nodeCreated', 'titleUpdated', 'favUpdated', 'typeUpdated');
 
-    onTabUpdate();
+	onTabUpdate();
 	onTabCreation();
 
 	function onTabCreation() {
-		chrome.tabs.onCreated.addListener( function(tab) {
+		chrome.tabs.onCreated.addListener(function (tab) {
 
 			// console.log('newTabEvent -', 'tabId:'+tab.id, ', parent:'+tab.openerTabId, ', url:'+tab.url); // for testing
 
-			if(!isIgnoredTab(tab)) {
-				console.log('newTab -', 'tabId:'+tab.id, ', parent:'+tab.openerTabId, ', url:'+tab.url, tab); // for testing
+			if (!isIgnoredTab(tab)) {
+				console.log('newTab -', 'tabId:' + tab.id, ', parent:' + tab.openerTabId, ', url:' + tab.url, tab); // for testing
 
 				// tab.title = 'id ' + tab.id + ' - ' + tab.title || tab.url;
 
@@ -65,13 +65,13 @@ sm.provenance.browser = function() {
 		});
 	}
 
-    function onTabUpdate() {
-        chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+	function onTabUpdate() {
+		chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 
-			if(!isIgnoredTab(tab)) {
+			if (!isIgnoredTab(tab)) {
 				// console.log('tabUpdate - ','tabid:'+tabId, ', parent:'+tab.openerTabId, ', title:'+tab.title, ' changeInfo:', changeInfo); // for testing
 
-				console.log('tab update',tabId,changeInfo,tab);
+				console.log('tab update', tabId, changeInfo, tab);
 
 				// 'changeInfo' information:
 				// - status: 'loading': if (tabCompleted) {create a new node} else {update exisiting node}
@@ -81,9 +81,7 @@ sm.provenance.browser = function() {
 					if (!tab2node[tabId] || isTabCompleted[tabId]) { // not redirection
 						addNode(tab, tab.id);
 						isTabCompleted[tabId] = false;
-					}
-
-					else { // redirection
+					} else { // redirection
 						const titleUpdate = {
 							id: tab2node[tab.id],
 							text: tab.title || tab.url
@@ -121,10 +119,10 @@ sm.provenance.browser = function() {
 					isTabCompleted[tabId] = true;
 				}
 			}
-        });
-    }
+		});
+	}
 
-	function addNode(tab,parent) {
+	function addNode(tab, parent) {
 
 		const title = tab.title || tab.url;
 
@@ -137,62 +135,24 @@ sm.provenance.browser = function() {
 			url: tab.url,
 			text: title,
 			favIconUrl: tab.favIconUrl,
-			parentTabId:parent,
+			parentTabId: parent,
 			from: tab2node[parent],
-			hidden: false
+			visibility: false
 		};
 
-		const nodeoff = {
-			id: nodeId,
-			tabId: tab.id,
-			time: time,
-			url: tab.url,
-			text: title,
-			favIconUrl: tab.favIconUrl,
-			parentTabId:parent,
-			from: tab2node[parent],
-			hidden: true
-		};
 
 		tab2node[tab.id] = nodeId;
 		tabUrl[tab.id] = tab.url;
 
-		if (AccLoggedIn == true && UserRecord == true){
+		dispatch.nodeCreated(node);
 
-            dispatch.nodeCreated(node);
-            
-            var url  = "https://sensemap-api.herokuapp.com/node/"+DBSessionPointer+"/3yARG4zzLndmE39Mw00xigqDV3lOrjEJ/";
-            var json = JSON.stringify(node);
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", url, true);
-            xhr.setRequestHeader('Content-type','application/json; charset=utf-8');
-            xhr.onload = function () {
-                var users = JSON.parse(xhr.responseText);
-            }
-            xhr.send(json);
-		}
-		else {
-
-			if (AccLoggedIn == true && UserRecord == false){
-				
-				var url  = "https://sensemap-api.herokuapp.com/node/"+DBSessionPointer+"/3yARG4zzLndmE39Mw00xigqDV3lOrjEJ/";
-				var json = JSON.stringify(nodeoff);
-				var xhr = new XMLHttpRequest();
-				xhr.open("POST", url, true);
-				xhr.setRequestHeader('Content-type','application/json; charset=utf-8');
-				xhr.onload = function () {
-					var users = JSON.parse(xhr.responseText);
-				}
-				xhr.send(json);
-			}
-			//debug
-			console.log("did not add node");
-		}
 		nodeId++;
 
 		// Update with visit type
 		if (tab.url) {
-			chrome.history.getVisits({ url: tab.url }, results => {
+			chrome.history.getVisits({
+				url: tab.url
+			}, results => {
 				// The latest one contains information about the just completely loaded page
 				const type = results && results.length ? _.last(results).transition : undefined;
 
@@ -211,10 +171,10 @@ sm.provenance.browser = function() {
 
 	/* Additional Functions for Checking */
 
-    function isIgnoredTab(tab) {
-        return ignoredUrls.some(url => tab.url.includes(url));
-    }
+	function isIgnoredTab(tab) {
+		return ignoredUrls.some(url => tab.url.includes(url));
+	}
 
-    d3.rebind(module, dispatch, 'on'); // what's this?
-    return module;
+	d3.rebind(module, dispatch, 'on'); // what's this?
+	return module;
 };

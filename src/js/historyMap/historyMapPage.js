@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
 
     // Data
     let nodes = []; // All actions added in temporal order
@@ -23,16 +23,23 @@ document.addEventListener("DOMContentLoaded", function() {
     // Rebuild vis when the window is resized
     window.onresize = _.throttle(updateVis, 100);
 
-	// this is where they are passing the information to visuals to create it.
-	//{"id":1492234782998,"time":"2017-04-15T05:39:42.998Z","url":"https://getonepush.com/demo/","text":"Demo | OnePush","type":"link","favIconUrl":"https://getonepush.com/wp-content/themes/onepush/images/favicon.ico"}
-	//{"id":1492234796532,"time":"2017-04-15T05:39:56.532Z","url":"https://getonepush.com/push/","text":"Push | OnePush","type":"link","favIconUrl":"https://getonepush.com/wp-content/themes/onepush/images/favicon.ico","from":1492234782998}
+    // this is where they are passing the information to visuals to create it.
+    //{"id":1492234782998,"time":"2017-04-15T05:39:42.998Z","url":"https://getonepush.com/demo/","text":"Demo | OnePush","type":"link","favIconUrl":"https://getonepush.com/wp-content/themes/onepush/images/favicon.ico"}
+    //{"id":1492234796532,"time":"2017-04-15T05:39:56.532Z","url":"https://getonepush.com/push/","text":"Push | OnePush","type":"link","favIconUrl":"https://getonepush.com/wp-content/themes/onepush/images/favicon.ico","from":1492234782998}
     // here ids are useds as reference.
 
-	function onNodeCreated(node) {
+    function onNodeCreated(node) {
         // console.log('createNode - tabId:'+node.tabId,', parent:'+node.from, ', url:'+node.url);
-        
-        //login functionality
-        nodes.push(node);
+
+        if (AccLoggedIn == true && UserRecord == true) {
+            nodes.push(node);
+            Node2DB(node);
+        } else if (UserRecord == true) {
+            nodes.push(node);
+        } else {
+            console.log("did not add node")
+        }
+
         redraw();
     }
 
