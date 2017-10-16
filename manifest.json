@@ -18,7 +18,7 @@
    },
 
     "background": {
-        "page": "src/html/background.html",
+        "page": "src/background/background.html",
         "persistent": false
     },
 
@@ -31,7 +31,7 @@
       ],
       "js": [
           "lib/jquery.min.js",
-        "src/js/browser/contentScripts.js"
+        "src/browser/contentScripts.js"
       ],
       "run_at": "document_end"
     }
@@ -58,7 +58,7 @@
 
     "web_accessible_resources": ["src/css/*.*", "tests/tests.html"],
 
-    "options_page":"/src/html/options.html",
+    "options_page":"/src/options.html",
 
     "commands": {
         "_execute_browser_action": {

@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
 	chrome.browserAction.onClicked.addListener(function() {
-		const url = chrome.extension.getURL('src/html/historyMapPage.html');
+		const url = chrome.extension.getURL('src/historyMap/historyMap.html');
 
 		// Only allow a single instance of the history map
 		if (getView(url)) return;
