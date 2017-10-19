@@ -22,116 +22,112 @@
 //     send the new 'node' to historyMap.js through an event;
 // }
 
-// var nodes = historyMap.module.nodes;
 
 historyMap.controller.browser = function() {
-	const module = {};
+	// const module = {};
 
 	var nodeId = 0; // can't use tab.id as node id because new url can be opened in the existing tab
 	var tab2node = {}; // the Id of the latest node for a given tab
 	var tabUrl = {}; // the latest url of a given tabId
 	var isTabCompleted = {}; // whether a tab completes loading (for redirection detection).
 
-    // not recording any chrome-specific url
+	var nodes = historyMap.model.nodes;
+	var redraw = historyMap.view.redraw();
+
+	// not recording any chrome-specific url
 	const ignoredUrls = [
-        'chrome://',
-        'chrome-extension://',
-        'chrome-devtools://',
-        'view-source:',
-        // 'google.co.uk/url',
-        // 'google.com/url',
-        'localhost://'
-    ],
-    bookmarkTypes = [ 'auto_bookmark' ],
-    typedTypes = [ 'typed', 'generated', 'keyword', 'keyword_generated' ];
+		'chrome://',
+		'chrome-extension://',
+		'chrome-devtools://',
+		'view-source:',
+		// 'google.co.uk/url',
+		// 'google.com/url',
+		'localhost://'
+	],
+	bookmarkTypes = [ 'auto_bookmark' ],
+	typedTypes = [ 'typed', 'generated', 'keyword', 'keyword_generated' ];
 
-    const dispatch = d3.dispatch('nodeCreated','titleUpdated','favUpdated', 'typeUpdated','urlUpdated');
+	// const dispatch = d3.dispatch('nodeCreated','titleUpdated','favUpdated', 'typeUpdated','urlUpdated');
 
-	// onTabCreation();
-    onTabUpdate();
 
-	// function onTabCreation() {
-		chrome.tabs.onCreated.addListener( function(tab) {
+	chrome.tabs.onCreated.addListener( function(tab) {
 
-			// console.log('newTabEvent -', 'tabId:'+tab.id, ', parent:'+tab.openerTabId, ', url:'+tab.url); // for testing
+		// console.log('newTabEvent -', 'tabId:'+tab.id, ', parent:'+tab.openerTabId, ', url:'+tab.url); // for testing
 
-			if(!isIgnoredTab(tab)) {
-				console.log('newTab -', 'tabId:'+tab.id, ', parent:'+tab.openerTabId, ', url:'+tab.url, tab); // for testing
+		if(!isIgnoredTab(tab)) {
+			console.log('newTab -', 'tabId:'+tab.id, ', parent:'+tab.openerTabId, ', url:'+tab.url, tab); // for testing
 
-				// tab.title = 'id ' + tab.id + ' - ' + tab.title || tab.url;
+			// tab.title = 'id ' + tab.id + ' - ' + tab.title || tab.url;
 
-				addNode(tab, tab.openerTabId);
-				isTabCompleted[tab.id] = false;
-			}
-		});
-	// }
+			addNode(tab, tab.openerTabId);
+			isTabCompleted[tab.id] = false;
+		}
+	});
 
-    function onTabUpdate() {
-        chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 
-			if(!isIgnoredTab(tab)) {
-				// console.log('tabUpdate - ','tabid:'+tabId, ', parent:'+tab.openerTabId, ', title:'+tab.title, ' changeInfo:', changeInfo); // for testing
+	chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 
-				console.log('tab update',tabId,changeInfo,tab);
-				// console.log('isComplete',isTabCompleted[tabId],', tab2node',tab2node[tabId]);
+		if(!isIgnoredTab(tab)) {
 
-				// 'changeInfo' information:
-				// - status: 'loading': if (tabCompleted) {create a new node} else {update exisiting node}
-				if (changeInfo.status == 'loading' && tab.url != tabUrl[tabId]) {
-					// console.log('urlChange -','tabId:'+tabId, ', parent:'+tab.openerTabId,', url:'+tab.url,); // for testing
+			console.log('tab update',tabId,changeInfo,tab);
 
-					if (tab2node[tabId] !== undefined && !isTabCompleted[tabId]) { // redirection
-						const titleUpdate = {
-							id: tab2node[tab.id],
-							text: tab.title || tab.url
-						};
-						dispatch.titleUpdated(titleUpdate);
+			var node = nodes[tab2node[tab.id]];
 
-						const urlUpdate = {
-							id: tab2node[tab.id],
-							url: tab.url
-						};
-						dispatch.urlUpdated(urlUpdate);
+			// 'changeInfo' information:
+			// - status: 'loading': if (tabCompleted) {create a new node} else {update exisiting node}
+			if (changeInfo.status == 'loading' && tab.url != tabUrl[tabId]) {
 
-						tabUrl[tabId] = tab.url;
-					}
-					else { // not redirection
-						addNode(tab, tab.id);
-					}
+				if (tab2node[tabId] !== undefined && !isTabCompleted[tabId]) { // redirection
+					// const titleUpdate = {
+					// 	id: tab2node[tab.id],
+					// 	text: tab.title || tab.url
+					// };
+					// dispatch.titleUpdated(titleUpdate);
+					node.text = tab.title || tab.url;
+
+					// const urlUpdate = {
+					// 	id: tab2node[tab.id],
+					// 	url: tab.url
+					// };
+					// dispatch.urlUpdated(urlUpdate);
+					node.url = tab.url;
+
+					tabUrl[tabId] = tab.url;
 				}
-
-				// - title: 'page title', {update node title}
-				if (changeInfo.title) {
-
-					const titleUpdate = {
-						id: tab2node[tab.id],
-						text: tab.title
-					};
-
-					dispatch.titleUpdated(titleUpdate);
-				}
-
-				// - favIconUrl: url, {udpate node favIcon}
-				if (changeInfo.favIconUrl) {
-					const favUpdate = {
-						id: tab2node[tab.id],
-						favUrl: tab.favIconUrl,
-					};
-
-					dispatch.favUpdated(favUpdate);
-				}
-
-				// - status: 'complete', {do nothing}
-				if (changeInfo.status == 'complete') {
-					isTabCompleted[tabId] = true;
+				else { // not redirection
+					addNode(tab, tab.id);
 				}
 			}
-        });
-    }
+
+			// - title: 'page title', {update node title}
+			if (changeInfo.title) {
+
+				// const titleUpdate = {
+				// 	id: tab2node[tab.id],
+				// 	text: tab.title
+				// };
+				// dispatch.titleUpdated(titleUpdate);
+				node.text = tab.title;
+			}
+
+			// - favIconUrl: url, {udpate node favIcon}
+			if (changeInfo.favIconUrl) {
+				// const favUpdate = {
+				// 	id: tab2node[tab.id],
+				// 	favUrl: tab.favIconUrl,
+				// };
+				// dispatch.favUpdated(favUpdate);
+				node.favIconUrl = tab.favIconUrl;
+			}
+
+			// - status: 'complete', {do nothing}
+			if (changeInfo.status == 'complete') {
+				isTabCompleted[tabId] = true;
+			}
+		}
+	});
 
 	function addNode(tab,parent) {
-
-		// console.log('addding new node',tab,parent);
 
 		const title = tab.title || tab.url;
 		const time = new Date();
@@ -150,10 +146,14 @@ historyMap.controller.browser = function() {
 		tabUrl[tab.id] = tab.url;
 		isTabCompleted[tab.id] = false;
 
-		dispatch.nodeCreated(node);
-		nodeId++;
+		// dispatch.nodeCreated(node);
+		// nodeId++;
 
-		// nodeId = nodes.push(node);
+		nodeId = nodes.push(node);
+		historyMap.view.redraw();
+		// redraw();
+
+		console.log('added new node',node);
 
 		// Update with visit type
 		if (tab.url) {
@@ -161,12 +161,12 @@ historyMap.controller.browser = function() {
 				// The latest one contains information about the just completely loaded page
 				const type = results && results.length ? _.last(results).transition : undefined;
 
-				const typeUpdate = {
-					id: tab2node[tab.id],
-					type: type
-				};
-
-				dispatch.typeUpdated(typeUpdate);
+				// const typeUpdate = {
+				// 	id: tab2node[tab.id],
+				// 	type: type
+				// };
+				// dispatch.typeUpdated(typeUpdate);
+				nodes[tab2node[tab.id]].type = type;
 			});
 		}
 		// else { // when the url is empty
@@ -176,10 +176,10 @@ historyMap.controller.browser = function() {
 
 	/* Additional Functions for Checking */
 
-    function isIgnoredTab(tab) {
-        return ignoredUrls.some(url => tab.url.includes(url));
-    }
+	function isIgnoredTab(tab) {
+		return ignoredUrls.some(url => tab.url.includes(url));
+	}
 
-    d3.rebind(module, dispatch, 'on'); // what's this?
-    return module;
-};
+	// d3.rebind(module, dispatch, 'on'); // what's this?
+	// return module;
+}
