@@ -33,7 +33,7 @@ describe("New node", function () {
         chrome.tabs.onUpdated.dispatch(tabInfo.tabId, tabInfo.changeInfo, tabInfo.tab);
 
         // Check if the last node contains information from 't'
-        const lastNode = _.last(sm.data.tree.nodes);
+        const lastNode = _.last(historyMap.model.tree.nodes);
         expect(lastNode.text).toBe(tabInfo.tab.title);
         expect(lastNode.url).toBe(tabInfo.tab.url);
         expect(lastNode.favIconUrl).toBe(tabInfo.tab.favIconUrl);

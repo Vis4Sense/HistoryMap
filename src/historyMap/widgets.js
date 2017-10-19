@@ -1,7 +1,7 @@
 /**
  * Adds zoom/pan to the given SVG node.
  */
-sm.zoom = function(container) {
+historyMap.zoom = function(container) {
     // Add invisible rectangle covering the entire space to listen to mouse event.
     // Otherwise, only zoom when mouse-overing visible items.
     var parent = d3.select(container.node().parentNode);
@@ -20,7 +20,7 @@ sm.zoom = function(container) {
 /**
  * Adds mouse wheel to pan to the given SVG node.
  */
-sm.wheelPan = function(container) {
+historyMap.wheelPan = function(container) {
     // Add invisible rectangle covering the entire space to listen to mouse event.
     // Otherwise, only zoom when mouse-overing visible items.
     var parent = d3.select(container.node().parentNode);
@@ -41,7 +41,7 @@ sm.wheelPan = function(container) {
  * Adds key arrow to pan to the given SVG node.
  * Adds Shift + mouse move to pan.
  */
-sm.addHorizontalPan = function(container, extent) {
+historyMap.addHorizontalPan = function(container, extent) {
     var pan = function(offset) {
         var t = d3.transform(container.attr("transform"));
         t.translate[0] = Math.max(-extent[1], Math.min(extent[0], t.translate[0] + offset));
@@ -89,7 +89,7 @@ sm.addHorizontalPan = function(container, extent) {
  * Adds Shift + mouse move to pan.
  * Adds wheel mouse to pan vertically.
  */
-sm.addPan = function(containers, parent, extent) {
+historyMap.addPan = function(containers, parent, extent) {
     var pan = function(offsetX, offsetY) {
         containers.forEach(container => {
             var t = d3.transform(container.attr("transform"));
@@ -147,7 +147,7 @@ sm.addPan = function(containers, parent, extent) {
 /**
  * Adds an arrow-head marker defs to the given SVG node.
  */
-sm.createArrowHeadMarker = function(parent, id, fillColor) {
+historyMap.createArrowHeadMarker = function(parent, id, fillColor) {
     d3.select(parent).append("defs").append("marker")
         .attr("id", id)
         .attr("viewBox", "-7 -3 6 6")
@@ -164,7 +164,7 @@ sm.createArrowHeadMarker = function(parent, id, fillColor) {
 /**
  * Shows a modal dialog.
  */
-sm.modal = function(head, body, draggable, x, y) {
+historyMap.modal = function(head, body, draggable, x, y) {
     var dialog = d3.select("body").append("div").attr("class", "modal fade").attr("tabindex", -1);
     var content = dialog.append("div").attr("class", "modal-dialog modal-lg")
         .append("div").attr("class", "modal-content");
@@ -196,7 +196,7 @@ sm.modal = function(head, body, draggable, x, y) {
 /**
  * Shows quick view of the given url.
  */
-sm.quickView = function(url) {
+historyMap.quickView = function(url) {
     var dialog = d3.select("body").append("div").attr("class", "modal fade").attr("tabindex", -1);
     var content = dialog.append("div").attr("class", "modal-dialog modal-lg")
         .append("div").attr("class", "modal-content");
@@ -212,7 +212,7 @@ sm.quickView = function(url) {
 /**
  * Shows provenance capture dialog
  */
-sm.showCaptureDialog = function(info, callback) {
+historyMap.showCaptureDialog = function(info, callback) {
     var dialog = d3.select("body").append("div").attr("class", "modal fade").attr("tabindex", -1);
     var content = dialog.append("div").attr("class", "modal-dialog modal-lg")
         .append("div").attr("class", "modal-content");
@@ -246,7 +246,7 @@ sm.showCaptureDialog = function(info, callback) {
 /**
  * Shows a dialog with a text input or textarea.
  */
-sm.showTextDialog = function(info, isInput, callback) {
+historyMap.showTextDialog = function(info, isInput, callback) {
     var dialog = d3.select("body").append("div").attr("class", "modal fade").attr("tabindex", -1);
     var content = dialog.append("div").attr("class", "modal-dialog modal-sm")
         .append("div").attr("class", "modal-content");
@@ -295,7 +295,7 @@ sm.showTextDialog = function(info, isInput, callback) {
 /**
  * Shows a plain dialog.
  */
-sm.showSimpleDialog = function(container, title, content, x, y, w, h) {
+historyMap.showSimpleDialog = function(container, title, content, x, y, w, h) {
     // Show a rectangle with text atop
     var dialog = container.append('g').attr('class', 'sm-simple-dialog')
         .attr('transform', 'translate(' + (x - 5) + ',' + (y - 5) + ')');
@@ -321,7 +321,7 @@ sm.showSimpleDialog = function(container, title, content, x, y, w, h) {
 /**
  * Adds bootstrap tooltip for a d3 selection.
  */
-sm.addBootstrapTooltip = function(selection) {
+historyMap.addBootstrapTooltip = function(selection) {
     selection.attr('data-toggle', 'tooltip')
         .attr('data-container', 'body')
         .attr('data-placement', 'auto bottom')

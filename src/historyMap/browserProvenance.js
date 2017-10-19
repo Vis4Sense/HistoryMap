@@ -1,5 +1,5 @@
 /**
- * captures user actions (provenance) in the Chrome browser.
+ * captures user actions (browser) in the Chrome browser.
  * part of the 'browser controller'.
  */
 
@@ -22,7 +22,9 @@
 //     send the new 'node' to historyMap.js through an event;
 // }
 
-sm.provenance.browser = function() {
+// var nodes = historyMap.module.nodes;
+
+historyMap.controller.browser = function() {
 	const module = {};
 
 	var nodeId = 0; // can't use tab.id as node id because new url can be opened in the existing tab
@@ -45,10 +47,10 @@ sm.provenance.browser = function() {
 
     const dispatch = d3.dispatch('nodeCreated','titleUpdated','favUpdated', 'typeUpdated','urlUpdated');
 
+	// onTabCreation();
     onTabUpdate();
-	onTabCreation();
 
-	function onTabCreation() {
+	// function onTabCreation() {
 		chrome.tabs.onCreated.addListener( function(tab) {
 
 			// console.log('newTabEvent -', 'tabId:'+tab.id, ', parent:'+tab.openerTabId, ', url:'+tab.url); // for testing
@@ -62,7 +64,7 @@ sm.provenance.browser = function() {
 				isTabCompleted[tab.id] = false;
 			}
 		});
-	}
+	// }
 
     function onTabUpdate() {
         chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
@@ -149,8 +151,9 @@ sm.provenance.browser = function() {
 		isTabCompleted[tab.id] = false;
 
 		dispatch.nodeCreated(node);
-
 		nodeId++;
+
+		// nodeId = nodes.push(node);
 
 		// Update with visit type
 		if (tab.url) {

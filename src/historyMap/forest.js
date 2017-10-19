@@ -1,7 +1,7 @@
 /**
  * forest provides a layout for a set of tree-like data.
  */
-sm.layout.forest = function() {
+historyMap.view.layout.forest = function() {
     var module = {};
 
     // Key function to bind data
@@ -139,7 +139,7 @@ sm.layout.forest = function() {
         // edges.forEach(e => {
         //     var centerSource = { x: e.source.x + e.source.width / 2, y: e.source.y + e.source.height / 2 },
         //         centerTarget = { x: e.target.x + e.target.width / 2, y: e.target.y + e.target.height / 2 };
-        //     e.points = [ sm.getRectEdgePoint(e.source, centerTarget), sm.getRectEdgePoint(e.target, centerSource) ];
+        //     e.points = [ historyMap.getRectEdgePoint(e.source, centerTarget), historyMap.getRectEdgePoint(e.target, centerSource) ];
         // });
     }
 

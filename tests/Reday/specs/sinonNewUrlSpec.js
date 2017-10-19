@@ -70,10 +70,10 @@ describe("Unit Testing Suit for New Node Creation", function () {
         chrome.tabs.onUpdated.dispatch(tabInfo.tabId, tabInfo.changeInfo, tabInfo.tab);
 
         // Check if the last node contains information from 'tabInfo'
-        const lastNode = _.last(sm.data.tree.nodes);
+        const lastNode = _.last(historyMap.model.tree.nodes);
 
         //Object Stored before
-        var beforeObj = sm.data.tree.nodes[0];
+        var beforeObj = historyMap.model.tree.nodes[0];
 
 
 
@@ -87,7 +87,7 @@ describe("Unit Testing Suit for New Node Creation", function () {
                 expect(lastNode.status).tobe("Loading");
             }
         //After Object
-        var afterObj = sm.data.tree.nodes[0];   
+        var afterObj = historyMap.model.tree.nodes[0];   
         
         
         			for (var property in beforeObj) {

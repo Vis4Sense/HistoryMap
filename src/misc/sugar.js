@@ -5,14 +5,14 @@ String.prototype.replaceAll = function(str1, str2, ignore) {
 /**
  * Returns an object wrapping the query string.
  */
-sm.getQueryString = function() {
-    return sm.getQueryStringFromSearch(window.location.search);
+historyMap.getQueryString = function() {
+    return historyMap.getQueryStringFromSearch(window.location.search);
 };
 
 /**
  * Returns an object wrapping the query string from the search part of a url.
  */
-sm.getQueryStringFromSearch = function(s) {
+historyMap.getQueryStringFromSearch = function(s) {
     var params = s.substr(1);
 
     if (params === "") return null;
@@ -34,7 +34,7 @@ sm.getQueryStringFromSearch = function(s) {
 /**
  * Read the content of the uploaded file.
  */
-sm.readUploadedFile = function(e, callback, isBinary) {
+historyMap.readUploadedFile = function(e, callback, isBinary) {
     var f = e.target.files[0];
     if (f) {
         var reader = new FileReader();
@@ -52,7 +52,7 @@ sm.readUploadedFile = function(e, callback, isBinary) {
 /**
  * Returns the data uri for the svg node.
  */
-sm.getURI = function(el, w, h) {
+historyMap.getURI = function(el, w, h) {
     function styles(el) {
         var css = "";
         var sheets = document.styleSheets;
@@ -105,9 +105,9 @@ sm.getURI = function(el, w, h) {
 /**
  * Submits a finding to the reasoning server.
  */
-sm.submitFinding = function(finding) {
+historyMap.submitFinding = function(finding) {
     $.ajax({
-        url: sm.host + "findings",
+        url: historyMap.host + "findings",
         type: "POST",
         data: finding
     });
@@ -116,7 +116,7 @@ sm.submitFinding = function(finding) {
 /**
  * Gets the title of the given url and excute the callback.
  */
-sm.fetchPageTitle = function(url, callback) {
+historyMap.fetchPageTitle = function(url, callback) {
     var title;
 
     $.ajax({
@@ -141,7 +141,7 @@ sm.fetchPageTitle = function(url, callback) {
 /**
  * Periodically check if all images are loaded. If yes, invoke the given callback.
  */
-sm.checkImagesLoaded = function(nodes, callback) {
+historyMap.checkImagesLoaded = function(nodes, callback) {
     var maxIterations = 10; // Max number of times checking images to prevent waiting too long
     var id = setInterval(function() {
         maxIterations--;
@@ -164,7 +164,7 @@ sm.checkImagesLoaded = function(nodes, callback) {
 /**
  * Resizes a given image in a data format and run the callback with the new image.
  */
-sm.resizeImage = function(dataUrl, maxWidth, maxHeight, callback) {
+historyMap.resizeImage = function(dataUrl, maxWidth, maxHeight, callback) {
     var canvas = document.createElement('canvas'),
         ctx = canvas.getContext('2d'),
         img = new Image();
@@ -182,7 +182,7 @@ sm.resizeImage = function(dataUrl, maxWidth, maxHeight, callback) {
 /**
  * Save data to local file.
  */
-sm.saveDataToFile = function(filename, data, isDataUrl, isBlob) {
+historyMap.saveDataToFile = function(filename, data, isDataUrl, isBlob) {
     var link = document.createElement('a');
     document.body.appendChild(link);
     link.style.display = 'none';
@@ -196,7 +196,7 @@ sm.saveDataToFile = function(filename, data, isDataUrl, isBlob) {
  * Finds where a line starting at point ({x, y}) would intersect a rectangle ({x, y, width, height})
  * if it were pointing at the rectangle's center.
  */
-sm.getRectEdgePoint = function(rect, point) {
+historyMap.getRectEdgePoint = function(rect, point) {
     var w = rect.width / 2,
         h = rect.height / 2,
         x = rect.x + w,

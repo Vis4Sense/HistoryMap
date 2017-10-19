@@ -11,7 +11,7 @@ describe("This is to test that Jasmine is working", function() {
 
 describe("history map functionality: ", function(){
 
-	// spyOn(sm.vis, "historyMap");
+	// spyOn(historyMap.view.vis, "historyMap");
 	beforeEach(function(){
       chrome = {
         runtime: {
@@ -27,14 +27,14 @@ describe("history map functionality: ", function(){
       //  }
       // }
       }
-      spyOn(sm.provenance,'browser').and.callThrough();
+      spyOn(historymap.controller.provenance,'browser').and.callThrough();
 
     });
  	 
     it('SenseMap host URL', function(){
-      expect(sm.host).toEqual("http://bigdata.mdx.ac.uk/");
+      expect(historyMap.host).toEqual("http://bigdata.mdx.ac.uk/");
       expect(true).toBe(true);
-      // expect(sm.provenance.browser.saveLastClickedUrl).toHaveBeenCalled();
+      // expect(historymap.controller.provenance.browser.saveLastClickedUrl).toHaveBeenCalled();
     });
 
     it('should call linked each time', function(){
@@ -44,7 +44,7 @@ describe("history map functionality: ", function(){
                 console.log("hello")
                     it('should call time', function(){
 
-                expect(sm.provence.browser.lastClickedUrl).toBe(sender.tab.url);
+                expect(historyMap.provence.browser.lastClickedUrl).toBe(sender.tab.url);
             });
                 }
         });

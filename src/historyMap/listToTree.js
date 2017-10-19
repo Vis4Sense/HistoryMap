@@ -3,7 +3,7 @@
  * Input: Each action is a change of data such as adding/removing a node/link.
  * Output: Combine all changes to produce the final hierarchical structure.
  */
-sm.data.listToTree = function() {
+historyMap.model.listToTree = function() {
     // The hierarchy output
     let root;
 

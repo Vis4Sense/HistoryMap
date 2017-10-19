@@ -1,7 +1,7 @@
 /**
- * historyMap visualizes user browsing process.
+ * historyMapView visualizes user browsing process.
  */
-sm.vis.historyMap = function() {
+historyMap.view.vis = function() {
     // Private members
     var width = 400, height = 250,
         margin = { top: 5, right: 5, bottom: 5, left: 5 },
@@ -27,7 +27,7 @@ sm.vis.historyMap = function() {
     });
 
     // Rendering options
-    var layout = sm.layout.forest(),
+    var layout = historyMap.view.layout.forest(),
         panExtent = [ 0, 1, 0, 1 ],
         brushing = false,
         minZoomIndex = 0,
@@ -87,9 +87,9 @@ sm.vis.historyMap = function() {
             linkContainer = container.append('g').attr('class', 'links');
             brushContainer = container.append('g').attr('class', 'brush');
 
-            sm.addPan([ nodeContainer, linkContainer ], container, panExtent);
-            sm.createArrowHeadMarker(self, 'arrow-marker', '#6e6e6e');
-            sm.createArrowHeadMarker(self, 'arrow-marker-hover', '#e74c3c');
+            historyMap.addPan([ nodeContainer, linkContainer ], container, panExtent);
+            historyMap.createArrowHeadMarker(self, 'arrow-marker', '#6e6e6e');
+            historyMap.createArrowHeadMarker(self, 'arrow-marker-hover', '#e74c3c');
             // addBrush();
         }
 
@@ -172,7 +172,7 @@ sm.vis.historyMap = function() {
     // }
 
     function computeLayout(callback) {
-        sm.checkImagesLoaded(container.selectAll('.node-container'), function() {
+        historyMap.checkImagesLoaded(container.selectAll('.node-container'), function() {
             // Compute how much space each node needs
             container.selectAll('.node').each(function(d) {
                 var r = this.getBoundingClientRect();
@@ -239,7 +239,7 @@ sm.vis.historyMap = function() {
 
         var menu = container.append('xhtml:div').attr('class', 'btn-group hide').style('top', '-2px');
         var parent = container.append('xhtml:div').attr('class', 'parent')
-            .call(sm.addBootstrapTooltip);
+            .call(historyMap.addBootstrapTooltip);
 
         // Icon
         var titleDiv = parent.append('xhtml:div').attr('class', 'node-title');
@@ -465,7 +465,7 @@ sm.vis.historyMap = function() {
         // Enter
         var subItems = container.selectAll('.sub-node').data(d.collectionShowAll ? d.children : _.take(d.children, zoomLevel.numChildren), key);
         var enterItems = subItems.enter().append('div').attr('class', 'sub-node')
-            .call(sm.addBootstrapTooltip)
+            .call(historyMap.addBootstrapTooltip)
             .on('click', function(d) {
                 if (d3.event.defaultPrevented || d3.event.shiftKey) return;
                 dispatch.nodeClicked(d);

@@ -39,7 +39,7 @@ describe('User enters URL manually', function () {
         //console.log(user_link);
 
         //calling sensemap browser.provenance
-        browser = sm.provenance.browser()
+        browser = historymap.controller.provenance.browser()
             .on('dataChanged', function(action) {
 
                 //debug
@@ -105,7 +105,7 @@ describe('Unit Testing Suit for New Node Creation', function () {
         var weirdo_link = "http://sdjfrwerlwkejrljkwerlkjwe/";
 
         //calling sensemap browser.provenance
-        browser = sm.provenance.browser()
+        browser = historymap.controller.provenance.browser()
             .on('nodeCreated', function(node) {
 
                 //checks if URL "Manual Entered Simulation" matches the Object Action URL

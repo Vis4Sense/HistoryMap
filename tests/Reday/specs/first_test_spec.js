@@ -8,7 +8,7 @@ let Statement_case = false;
   var website_url = "https://www.thefreecountry.com/";s
 
     //logic: whenever something happend on the history map do something
-        browser = sm.provenance.browser()
+        browser = historymap.controller.provenance.browser()
             .on('dataChanged', function(action) {
               
                if(action.favIconUrl === iconurl) {

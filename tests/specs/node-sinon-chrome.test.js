@@ -4,7 +4,7 @@ describe("New node", function () {
     beforeAll(function(done) {
         const manualUrl = 'http://www.mdx.ac.uk/';
 
-        browser = sm.provenance.browser()
+        browser = historymap.controller.provenance.browser()
             .on('dataChanged', function(action) {
                 if (action.url === manualUrl) caseManualUrl = true;
 
