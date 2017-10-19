@@ -32,7 +32,7 @@ historyMap.controller.browser = function() {
 	var isTabCompleted = {}; // whether a tab completes loading (for redirection detection).
 
 	var nodes = historyMap.model.nodes;
-	var redraw = historyMap.view.redraw();
+	// var redraw = historyMap.view.redraw(); // why this doesn't work?
 
 	// not recording any chrome-specific url
 	const ignoredUrls = [
@@ -47,17 +47,10 @@ historyMap.controller.browser = function() {
 	bookmarkTypes = [ 'auto_bookmark' ],
 	typedTypes = [ 'typed', 'generated', 'keyword', 'keyword_generated' ];
 
-	// const dispatch = d3.dispatch('nodeCreated','titleUpdated','favUpdated', 'typeUpdated','urlUpdated');
-
-
 	chrome.tabs.onCreated.addListener( function(tab) {
-
-		// console.log('newTabEvent -', 'tabId:'+tab.id, ', parent:'+tab.openerTabId, ', url:'+tab.url); // for testing
 
 		if(!isIgnoredTab(tab)) {
 			console.log('newTab -', 'tabId:'+tab.id, ', parent:'+tab.openerTabId, ', url:'+tab.url, tab); // for testing
-
-			// tab.title = 'id ' + tab.id + ' - ' + tab.title || tab.url;
 
 			addNode(tab, tab.openerTabId);
 			isTabCompleted[tab.id] = false;
@@ -78,19 +71,9 @@ historyMap.controller.browser = function() {
 			if (changeInfo.status == 'loading' && tab.url != tabUrl[tabId]) {
 
 				if (tab2node[tabId] !== undefined && !isTabCompleted[tabId]) { // redirection
-					// const titleUpdate = {
-					// 	id: tab2node[tab.id],
-					// 	text: tab.title || tab.url
-					// };
-					// dispatch.titleUpdated(titleUpdate);
 					node.text = tab.title || tab.url;
-
-					// const urlUpdate = {
-					// 	id: tab2node[tab.id],
-					// 	url: tab.url
-					// };
-					// dispatch.urlUpdated(urlUpdate);
 					node.url = tab.url;
+					historyMap.view.redraw();
 
 					tabUrl[tabId] = tab.url;
 				}
@@ -101,23 +84,14 @@ historyMap.controller.browser = function() {
 
 			// - title: 'page title', {update node title}
 			if (changeInfo.title) {
-
-				// const titleUpdate = {
-				// 	id: tab2node[tab.id],
-				// 	text: tab.title
-				// };
-				// dispatch.titleUpdated(titleUpdate);
 				node.text = tab.title;
+				historyMap.view.redraw();
 			}
 
 			// - favIconUrl: url, {udpate node favIcon}
 			if (changeInfo.favIconUrl) {
-				// const favUpdate = {
-				// 	id: tab2node[tab.id],
-				// 	favUrl: tab.favIconUrl,
-				// };
-				// dispatch.favUpdated(favUpdate);
 				node.favIconUrl = tab.favIconUrl;
+				historyMap.view.redraw();
 			}
 
 			// - status: 'complete', {do nothing}
@@ -146,12 +120,8 @@ historyMap.controller.browser = function() {
 		tabUrl[tab.id] = tab.url;
 		isTabCompleted[tab.id] = false;
 
-		// dispatch.nodeCreated(node);
-		// nodeId++;
-
 		nodeId = nodes.push(node);
 		historyMap.view.redraw();
-		// redraw();
 
 		console.log('added new node',node);
 
@@ -161,17 +131,9 @@ historyMap.controller.browser = function() {
 				// The latest one contains information about the just completely loaded page
 				const type = results && results.length ? _.last(results).transition : undefined;
 
-				// const typeUpdate = {
-				// 	id: tab2node[tab.id],
-				// 	type: type
-				// };
-				// dispatch.typeUpdated(typeUpdate);
 				nodes[tab2node[tab.id]].type = type;
 			});
 		}
-		// else { // when the url is empty
-		// 	console.warn('tab.url', tab.url);
-		// }
 	}
 
 	/* Additional Functions for Checking */
@@ -180,6 +142,4 @@ historyMap.controller.browser = function() {
 		return ignoredUrls.some(url => tab.url.includes(url));
 	}
 
-	// d3.rebind(module, dispatch, 'on'); // what's this?
-	// return module;
 }
