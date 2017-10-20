@@ -1,7 +1,7 @@
 const historyMap = function() {
     const historyMap = {
         model: {
-            nodes: [],
+            nodes: {},
             tree: {} // real data
         },
         view: {
@@ -19,7 +19,7 @@ const historyMap = function() {
 document.addEventListener("DOMContentLoaded", function() {
 
     // Data
-    nodes = historyMap.model.nodes;
+    nodes = historyMap.model.nodes.getArray();
 
     // Instantiate vis
     const historyMapView = historyMap.view.vis()

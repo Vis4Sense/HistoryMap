@@ -50,7 +50,7 @@ historyMap.controller.browser = function() {
 	chrome.tabs.onCreated.addListener( function(tab) {
 
 		if(!isIgnoredTab(tab)) {
-			console.log('newTab -', 'tabId:'+tab.id, ', parent:'+tab.openerTabId, ', url:'+tab.url, tab); // for testing
+			// console.log('newTab -', 'tabId:'+tab.id, ', parent:'+tab.openerTabId, ', url:'+tab.url, tab); // for testing
 
 			addNode(tab, tab.openerTabId);
 			isTabCompleted[tab.id] = false;
@@ -62,9 +62,9 @@ historyMap.controller.browser = function() {
 
 		if(!isIgnoredTab(tab)) {
 
-			console.log('tab update',tabId,changeInfo,tab);
+			// console.log('tab update',tabId,changeInfo,tab);
 
-			var node = nodes[tab2node[tab.id]];
+			var node = nodes.getNode(tab2node[tab.id]);
 
 			// 'changeInfo' information:
 			// - status: 'loading': if (tabCompleted) {create a new node} else {update exisiting node}
@@ -120,10 +120,10 @@ historyMap.controller.browser = function() {
 		tabUrl[tab.id] = tab.url;
 		isTabCompleted[tab.id] = false;
 
-		nodeId = nodes.push(node);
+		nodeId = nodes.addNode(node);
 		historyMap.view.redraw();
 
-		console.log('added new node',node);
+		// console.log('added new node',node);
 
 		// Update with visit type
 		if (tab.url) {
@@ -131,7 +131,7 @@ historyMap.controller.browser = function() {
 				// The latest one contains information about the just completely loaded page
 				const type = results && results.length ? _.last(results).transition : undefined;
 
-				nodes[tab2node[tab.id]].type = type;
+				nodes.getNode(tab2node[tab.id]).type = type;
 			});
 		}
 	}

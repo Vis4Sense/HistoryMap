@@ -31,7 +31,7 @@
       ],
       "js": [
           "lib/jquery.min.js",
-        "src/browser/contentScripts.js"
+        "src/contentScript/contentScripts.js"
       ],
       "run_at": "document_end"
     }
