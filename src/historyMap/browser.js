@@ -40,8 +40,8 @@ historyMap.controller.browser = function() {
 		'chrome-extension://',
 		'chrome-devtools://',
 		'view-source:',
-		// 'google.co.uk/url',
-		// 'google.com/url',
+		'google.co.uk/url',
+		'google.com/url',
 		'localhost://'
 	],
 	bookmarkTypes = [ 'auto_bookmark' ],
