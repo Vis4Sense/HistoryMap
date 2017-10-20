@@ -1,6 +1,6 @@
 describe("New node", function () {
     it('should appear on the history map when url is updated', function() {
-        // I got this from console log in browserProvenance.js
+        // I got this from console log in browser.js
         const tabInfo = {
             "tabId": 828,
             "changeInfo": {

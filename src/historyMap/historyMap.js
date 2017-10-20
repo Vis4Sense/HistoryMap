@@ -13,7 +13,6 @@ const historyMap = function() {
             browser: {}
         }
     };
-
     return historyMap;
 }();
 
