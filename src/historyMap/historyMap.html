@@ -1,50 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="Captures and visualizes browsing sessions.">
-        <meta name="author" content="phongvis - Phong Nguyen">
-        <title>History Map</title>
 
-        <link rel="icon" href="/logo/sm-logo-19.png">
-		<link rel="stylesheet" href="/lib/bootstrap-sm.min.css">
-        <link rel="stylesheet" href="/lib/fontawesome/css/font-awesome.min.css">
-        <link rel="stylesheet" href="core.css">
-        <link rel="stylesheet" href="sensemap.css">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Captures and visualizes browsing sessions.">
+    <meta name="author" content="phongvis - Phong Nguyen">
+    <title>History Map</title>
 
-        <style>
-            body {
-                overflow: hidden;
-            }
+    <link rel="icon" href="/logo/sm-logo-19.png">
+    <link rel="stylesheet" href="/lib/bootstrap-sm.min.css">
+    <link rel="stylesheet" href="/lib/fontawesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="core.css">
+    <link rel="stylesheet" href="sensemap.css">
 
-            .sm-history-map-container {
-                overflow: hidden;
-                position: relative;
-                width: 100%;
-                height: 100%;
-            }
-        </style>
-    </head>
+    <style>
+        body {
+            overflow: hidden;
+        }
 
-    <body>
-        <svg class="sm-history-map-container"></svg>
+        .sm-history-map-container {
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
 
-        <script src="/lib/jquery.min.js"></script>
-        <script src="/lib/jquery-ui.min.js"></script>
-        <script src="/lib/d3.min.js"></script>
-        <script src="/lib/lodash.min.js"></script>
-        <script src="/lib/mxClient.js"></script>
+        #profileIMG {
+            border-radius: 50%;
+            float: left;
+        }
 
-        <!-- <script src="../core.js"></script> -->
-        <script src="historyMap.js"></script>
-        <script src="../misc/sugar.js"></script>
-        <script src="widgets.js"></script>
-        <script src="browser.js"></script>
-        <script src="listToTree.js"></script>
-        <script src="forest.js"></script>
-        <script src="historyMapVis.js"></script>
-        <script src="historyMapData.js"></script>
-        
-    </body>
+        .ProfileDiv {
+            float: left;
+            border: 0.1px solid darkmagenta;
+            padding: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <svg class="sm-history-map-container"></svg>
+
+    <script src="/lib/jquery.min.js"></script>
+    <script src="/lib/jquery-ui.min.js"></script>
+    <script src="/lib/d3.min.js"></script>
+    <script src="/lib/lodash.min.js"></script>
+    <script src="/lib/mxClient.js"></script>
+
+    <!-- <script src="../core.js"></script> -->
+    <script src="historyMap.js"></script>
+    <script src="../misc/sugar.js"></script>
+    <script src="widgets.js"></script>
+    <script src="browser.js"></script>
+    <script src="listToTree.js"></script>
+    <script src="forest.js"></script>
+    <script src="historyMapVis.js"></script>
+    <script src="historyMapData.js"></script>
+
+</body>
+
 </html>

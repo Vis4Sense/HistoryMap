@@ -1,0 +1,114 @@
+/*
+//Made by Reday Yahya | @RedayY
+//CSS Document for SenseMap Control Panel
+*/
+body
+{
+    min-width: 250px;
+    margin: 0px;
+    font-family: Segoe UI, Arial, sans-serif;
+    font-size: 13px;
+    background-color: whitesmoke;
+    align-content: Center;
+}
+
+header
+{
+  padding: 10px 35px;
+  border-bottom: 1px solid #e1ddd8;
+  background-color: gainsboro;
+}
+
+#titles
+{
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 20px;
+    color: darkmagenta;
+}
+
+#logoT
+{
+  display: block;
+  position: relative;
+  top: 15px;
+  margin: 0px auto;
+  height: 64px;
+  width: 64px;
+  float: left;
+}
+
+#logoB
+{
+  display: block;
+  position: relative;
+  top: 15px;
+  margin: 0px auto;
+  height: 64px;
+  width: 64px;
+}
+
+footer
+{
+  padding: 10px 35px;
+  border-top: 1px solid #e1ddd8;
+  background-color: gainsboro;
+}
+
+footer .icon
+{
+  background-position: -50px -65px;
+}
+
+button {
+    border: black;
+    outline: 1;
+    display: inline-block;
+    padding: 10px;
+    margin: 2px;
+    color: darkmagenta;
+    background-color: whitesmoke;
+    text-align: center;
+    cursor: pointer;
+    width: 96%;
+    font-size: 18px;
+}
+
+button:hover
+{
+    box-shadow: 0 0 2px darkmagenta;
+}
+
+#profileIMG
+{
+    padding-left: 5px;
+    border-radius: 50%;
+    margin-right: 16px;
+    float: left;
+}
+
+#profileName
+{
+    padding-left: 5px;
+    border-radius: 50%;
+    margin-right: 8px;
+    float: left;
+    padding: 10px 35px;
+    border-top: 0.2px solid #e1ddd8;
+    background-color: gainsboro;
+}
+
+#profileBio
+{
+    padding-left: 10px;
+    align-content: center;
+}
+
+#profileIMG {
+    border-radius: 50%;
+    float: left;
+}
+
+#ProfileDiv {
+    font-size: 20px;
+    padding: 5px;
+}
