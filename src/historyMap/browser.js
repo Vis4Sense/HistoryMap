@@ -105,16 +105,17 @@ historyMap.controller.browser = function() {
 
 		const title = tab.title || tab.url;
 		const time = new Date();
-		const node = {
-			id: nodeId,
-			tabId: tab.id,
-			time: time,
-			url: tab.url,
-			text: title,
-			favIconUrl: tab.favIconUrl,
-			parentTabId:parent,
-			from: tab2node[parent]
-		};
+		// const node = {
+		// 	id: nodeId,
+		// 	tabId: tab.id,
+		// 	time: time,
+		// 	url: tab.url,
+		// 	text: title,
+		// 	favIconUrl: tab.favIconUrl,
+		// 	parentTabId:parent,
+		// 	from: tab2node[parent]
+		// };
+		const node = new Node(nodeId, tab.id, time, tab.url, title, tab.favIconUrl, parent, tab2node[parent]);
 
 		tab2node[tab.id] = nodeId;
 		tabUrl[tab.id] = tab.url;

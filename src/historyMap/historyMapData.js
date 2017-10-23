@@ -18,3 +18,14 @@ historyMap.model.nodes = {
         return this.nodes;
     }
 }
+
+function Node(id, tabId, time, url, title, favIconUrl, parentTabId, from) {
+    this.id = id;
+    this.tabId = tabId;
+    this.time = time;
+    this.url = url;
+    this.text = title;
+    this.favIconUrl = favIconUrl;
+    this.parentTabId = parentTabId;
+    this.from = from;
+}
