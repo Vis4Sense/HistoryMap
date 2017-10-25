@@ -2,7 +2,8 @@ const historyMap = function() {
     const historyMap = {
         model: {
             nodes: {},
-            tree: {} // real data
+            tree: {}, // real data
+            sessions: {}
         },
         view: {
             vis: {},

@@ -29,3 +29,9 @@ function Node(id, tabId, time, url, title, favIconUrl, parentTabId, from) {
     this.parentTabId = parentTabId;
     this.from = from;
 }
+
+historyMap.model.sessions = {
+    sessions: [],
+};
+
+// code for save and load in this file.
