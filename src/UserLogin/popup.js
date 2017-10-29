@@ -17,27 +17,34 @@ $(function () {
     $('#btn_logout').click(function () {
         google_Logout();
     });
-    // $('#btn_start').click(function () {
-    //   UserRecord = true;
-    //   btn_pause_start_conf();
-    // });
-    // $('#btn_pause').click(function () {
-    //   UserRecord = false;
-    //   btn_pause_start_conf();
-    // });
-    // $('#btn_new').click(function () {
-    //   reset_sense();
-    // });
-    // $('#btn_load').click(function () {
-    //   load_session();
-    // });
+    $('#btn_start').click(function () {
+      UserRecord = true;
+      btn_pause_start_conf();
+    });
+    $('#btn_pause').click(function () {
+      UserRecord = false;
+      btn_pause_start_conf();
+    });
+    $('#btn_new').click(function () {
+      reset_sense();
+    });
+    $('#btn_load').click(function () {
+      load_session();
+    });
 });
 
 //Profile specific Variables
-let AccLoggedIn;
 let UserRecord = true;
 let UserEmail;
 let UserProfile;
+let DBnodes = [];
+
+//API (Save and Load) specific Variables
+var baseURL = "https://sensemap-api.herokuapp.com/";
+let APIKey;
+let apiinput;
+let DBSessionPointer;
+
 
 function google_Login() {
 
@@ -80,6 +87,8 @@ window.onload = function button_config() {
     document.getElementById("btn_logout").style.color = "red";
     document.getElementById("btn_login").style.color = "darkmagenta";
 
+    btn_pause_start_conf();
+
     chrome.tabs.query({
         'url': 'chrome-extension://'+ chrome.runtime.id + '/src/historyMap/historyMap.html'
     }, function (results) {
@@ -95,31 +104,20 @@ function btn_reset() {
     document.getElementById("btn_login").style.color = "darkmagenta";
 }
 
-// function btn_pause_start_conf() {
+function btn_pause_start_conf() {
 
-//     if (UserRecord == true) {
-//         document.getElementById("btn_start").disabled = true;
-//         document.getElementById("btn_pause").disabled = false;
-//         document.getElementById("btn_pause").style.color = "darkmagenta";
-//         document.getElementById("btn_start").style.color = "red";
-//     } else {
-//         document.getElementById("btn_pause").disabled = true;
-//         document.getElementById("btn_start").disabled = false;
-//         document.getElementById("btn_pause").style.color = "red";
-//         document.getElementById("btn_start").style.color = "darkmagenta";
-//     }
-
-// }
-
-function askForSession() {
-    var UserInput = prompt("Please enter a Session Name");
-    if (UserInput == null || UserInput == "" || UserInput == " ") {
-        window.alert("Please enter a suitable Session Name");
-        askForSession();
+    if (UserRecord == true) {
+        document.getElementById("btn_start").disabled = true;
+        document.getElementById("btn_pause").disabled = false;
+        document.getElementById("btn_pause").style.color = "darkmagenta";
+        document.getElementById("btn_start").style.color = "red";
     } else {
-        SessionName = UserInput;
-        window.alert("Using Session Name: " + UserInput);
+        document.getElementById("btn_pause").disabled = true;
+        document.getElementById("btn_start").disabled = false;
+        document.getElementById("btn_pause").style.color = "red";
+        document.getElementById("btn_start").style.color = "darkmagenta";
     }
+
 }
 
 function reset_sense() {
@@ -139,7 +137,6 @@ hello.on('auth.login', function (r) {
 
         btn_format();
         draw_profile();
-        // askForSession();
         AccLoggedIn = true;
         UserEmail = p.email;
 

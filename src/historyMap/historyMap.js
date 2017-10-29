@@ -1,4 +1,4 @@
-const historyMap = function() {
+const historyMap = function () {
     const historyMap = {
         model: {
             nodes: {},
@@ -17,7 +17,7 @@ const historyMap = function() {
     return historyMap;
 }();
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
 
     // Data
     nodes = historyMap.model.nodes.getArray();
@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Rebuild vis when the window is resized
     // window.onresize = _.throttle(updateVis, 100);
 
-    historyMap.view.redraw = function() {
+    historyMap.view.redraw = function () {
         historyMap.model.tree = listToTree(nodes);
         historyMapView.width(window.innerWidth).height(window.innerHeight);
         d3.select('.sm-history-map-container').datum(historyMap.model.tree).call(historyMapView);
