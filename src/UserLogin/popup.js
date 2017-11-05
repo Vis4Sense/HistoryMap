@@ -4,8 +4,8 @@
 hello.init({
     google: '216563153005-rf4vuggusohpth9qm5korfclfo8lah39.apps.googleusercontent.com'
 }, {
-    redirect_uri: 'https://' + chrome.runtime.id + '.chromiumapp.org/src/UserLogin/popup.html'
-})
+        redirect_uri: 'https://' + chrome.runtime.id + '.chromiumapp.org/src/UserLogin/popup.html'
+    })
 
 // Please make sure to update redirect URI to match ur client machine in chrome developer api console.
 
@@ -18,18 +18,18 @@ $(function () {
         google_Logout();
     });
     $('#btn_start').click(function () {
-      UserRecord = true;
-      btn_pause_start_conf();
+        UserRecord = true;
+        btn_pause_start_conf();
     });
     $('#btn_pause').click(function () {
-      UserRecord = false;
-      btn_pause_start_conf();
+        UserRecord = false;
+        btn_pause_start_conf();
     });
     $('#btn_new').click(function () {
-      reset_sense();
+        reset_sense();
     });
     $('#btn_load').click(function () {
-      load_session();
+        load_session();
     });
 });
 
@@ -79,7 +79,7 @@ function openSensemap() {
     chrome.windows.create({
         'url': 'src/historyMap/historyMap.html',
         'type': 'popup'
-    }, function (window) {});
+    }, function (window) { });
 };
 
 window.onload = function button_config() {
@@ -90,7 +90,7 @@ window.onload = function button_config() {
     btn_pause_start_conf();
 
     chrome.tabs.query({
-        'url': 'chrome-extension://'+ chrome.runtime.id + '/src/historyMap/historyMap.html'
+        'url': 'chrome-extension://' + chrome.runtime.id + '/src/historyMap/historyMap.html'
     }, function (results) {
         if (results.length == 0) {
             openSensemap();
@@ -132,11 +132,49 @@ function reset_sense() {
 // Listens to Login requests and executes functions upon verification
 hello.on('auth.login', function (r) {
 
-    // Get Profile
+    // Get Profiles
     hello(r.network).api('/me').then(function (p) {
 
         btn_format();
-        draw_profile();
+
+        var value = "";
+        chrome.storage.local.get('Profile-Username', function (result) {
+            value = result;
+        });
+
+
+        if (value == "") {
+
+            //stores Image and Profile E-Mail in localstorage
+
+            profilename = p.name;
+
+            chrome.storage.sync.set({ "ProfileName" : profilename  }, function () {
+                console.log("Profile Saved in Localstorage :" + profilename)
+            });
+
+            draw_profile();
+
+        }
+
+        else {
+
+            var ProfileName = "";
+            var ProfilePicture = "";
+
+            chrome.storage.local.get('ProfileUsername', function (result) {
+                ProfileName = result;
+            });
+
+            chrome.storage.local.get('Profile-Username', function (result) {
+                ProfilePicture = result;
+            });
+
+            document.getElementById("networkName").innerHTML = "<p>" + ProfileName + "</p>";
+            document.getElementById("Image").innerHTML = "<img src='" + ProfilePicture + "'id='profileIMG'/>";
+
+        }
+
         AccLoggedIn = true;
         UserEmail = p.email;
 
