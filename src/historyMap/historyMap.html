@@ -11,12 +11,14 @@
     <link rel="icon" href="/logo/sm-logo-19.png">
     <link rel="stylesheet" href="/lib/bootstrap-sm.min.css">
     <link rel="stylesheet" href="/lib/fontawesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/lib/new-fontawesome/fontello.css">
     <link rel="stylesheet" href="core.css">
     <link rel="stylesheet" href="sensemap.css">
 
     <style>
         body {
             overflow: hidden;
+            margin-top: 90px;
         }
 
         .sm-history-map-container {
@@ -58,6 +60,22 @@
     <script src="historyMapVis.js"></script>
     <script src="historyMapData.js"></script>
     <script src="session.js"></script>
+
+
+    <div id='settings'>
+        <div class="btn-toolbar">
+            <div class="btn-group">
+                <button id='btn_load' class="btn btn-default">
+                    <i class="demo-icon icon-upload"></i> Load</button>
+                <button id='btn_new' class="btn btn-default">
+                    <i class="demo-icon icon-doc"></i> New</button>
+                <button id='btn_start' class="btn btn-default">
+                    <i class="demo-icon icon-play"></i> Start</button>
+                <button id='btn_pause' class="btn btn-default">
+                    <i class="demo-icon icon-pause"></i> Pause</button>
+            </div>
+        </div>
+    </div>
 
 </body>
 
