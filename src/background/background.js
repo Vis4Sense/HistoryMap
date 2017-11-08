@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
+	createContextMenus();
+	var urlToHighlight = contentScript.model.urlToHighlight;
 	chrome.browserAction.onClicked.addListener(function() {
 		const url = chrome.extension.getURL('src/historyMap/historyMap.html');
 
@@ -34,6 +36,62 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 		});
 	});
+
+	function createContextMenus() {
+        chrome.contextMenus.removeAll();
+
+        // To highlight selected text
+        chrome.contextMenus.create({
+            id: 'sm-highlight',
+            title: 'Highlight',
+            contexts: ['selection']
+        });
+
+        // To save image
+        chrome.contextMenus.create({
+            id: 'sm-save-image',
+            title: 'Set as Page Image',
+            contexts: ['image']
+		});
+		
+        //function on contextMenuClicked
+        chrome.contextMenus.onClicked.addListener((info, tab) => {
+            if (info.menuItemId === 'sm-highlight') {
+				chrome.tabs.sendMessage(tab.id, { type: 'highlightSelection' }, response => {
+					if (response) {
+						if (!urlToHighlight[tab.url]) {
+							urlToHighlight[tab.url] = []; 
+						}
+						//urlToHighlight[tab.url].push({type: 'highlight', path: d.path, text: d.text, classId: d.classId});
+						urlToHighlight.addHighlight(url, {type: 'highlight', path: d.path, text: d.text, classId: d.classId});
+					}
+                });
+            } else if (info.menuItemId === 'sm-save-image') {
+				// Overwrite existing image
+				chrome.tabs.sendMessage(tab.id, {type: 'highlightImage', srcUrl: info.srcUrl, pageUrl: info.pageUrl}, response => {
+					if (response) {
+					}
+					if (!urlToHighlight[tab.url]) {
+						urlToHighlight[tab.url] = []; 
+					}
+					 //urlToHighlight[tab.url].push({type: 'highlightImage', srcUrl: info.srcUrl, pageUrl: info.pageUrl});
+					 urlToHighlight.addHighlight(url, {type: 'highlightImage', srcUrl: info.srcUrl, pageUrl: info.pageUrl})
+                });
+
+				//To remove image (created once an image is saved)
+				chrome.contextMenus.create({
+					id: 'sm-remove-image',
+					title: 'Remove Page Image',
+					contexts: ['image']
+        		});
+			} else if (info.menuItemId === 'sm-remove-image') {
+				chrome.tabs.sendMessage(tab.id, {type: 'removeHighlightImage', srcUrl: info.srcUrl, pageUrl: info.pageUrl}, response => {
+					if (response) {
+					}
+				});
+			}
+        });
+    }
 
 	/**
 	 * Returns an extension page by url.
