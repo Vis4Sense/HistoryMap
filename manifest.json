@@ -7,9 +7,9 @@
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
 
     "browser_action": {
-        "default_popup": "src/UserLogin/popup.html",
+        // "default_popup": "src/UserLogin/popup.html",
         "default_icon": {
-            "19": "logo/sm-logo-19.png"
+            "19": "logo/sm-logo-19-bw.png"
         },
         "default_title": "Open SenseMap"
     },
