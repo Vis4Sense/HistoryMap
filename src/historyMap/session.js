@@ -4,26 +4,6 @@
 let SessionName;
 let UserRecord = true;
 
-function askForSession() {
-    var UserInput = prompt("Please enter a Session Name");
-    if (UserInput == null || UserInput == "" || UserInput == " ") {
-        window.alert("Please enter a suitable Session Name");
-        askForSession();
-    } else {
-        SessionName = UserInput;
-        window.alert("Using Session Name: " + UserInput);
-    }
-}
-
-window.onload = function () {
-    
-    askForSession();
-
-    if (ProfileName != null){
-        askForAPIKey();
-    }
-}
-
 $(function () {
     $('#btn_start').click(function () {
         UserRecord = true;
@@ -44,7 +24,6 @@ $(function () {
 
 window.onload = function () {
     btn_pause_start_conf();
-    
 }
 
 function btn_pause_start_conf() {
@@ -70,14 +49,4 @@ function reset_sense() {
     } else {
         window.alert("SenseMap did not restart, carry on!")
     }
-}
-
-function askForAPIKey() {
-	var apik = prompt("Please enter the API Key ");
-	if (apik == null || apik == "" || apik == " ") {
-		window.alert("Please enter a suitable api key");
-		askForAPIKey();
-	} else {
-		APIKey = "/" + apik + "/";
-	}
 }

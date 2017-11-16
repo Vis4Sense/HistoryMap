@@ -8,6 +8,9 @@ historyMap.model.nodes = {
 
     addNode: function (node) {
         return this.nodes.push(node);
+        if (UserRecord == true && UserProfile != null){
+            Node2DB(node);
+        }
     },
 
     updateNode: function (index, node) {
@@ -52,10 +55,32 @@ let ProfileName = localStorage.getItem('ProfileName');
 
 //execute save and load functionality only if the user is logged in simulation
 if (up != null){
+    askForSession();
+    askForAPIKey();
     pushToDB();
     pushSessToDB();
 }
 
+function askForSession() {
+    var UserInput = prompt("Please enter a Session Name");
+    if (UserInput == null || UserInput == "" || UserInput == " ") {
+        window.alert("Please enter a suitable Session Name");
+        askForSession();
+    } else {
+        SessionName = UserInput;
+        window.alert("Using Session Name: " + UserInput);
+    }
+}
+
+function askForAPIKey() {
+	var apik = prompt("Please enter the API Key ");
+	if (apik == null || apik == "" || apik == " ") {
+		window.alert("Please enter a suitable api key");
+		askForAPIKey();
+	} else {
+		APIKey = "/" + apik + "/";
+	}
+}
 
 function pushSessToDB() {
     var url = baseURL + "session/" + UserEmail + APIKey;
