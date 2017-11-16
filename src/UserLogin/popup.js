@@ -70,6 +70,7 @@ hello.on('auth.login', function (r) {
     // Get Profiles
     hello(r.network).api('/me').then(function (p) {
 
+        
         btn_format();
         AccLoggedIn = true;
         UserEmail = p.email;
@@ -134,7 +135,7 @@ function draw_profile() {
 
 
 function saveProfile() {
-
+    localStorage.setItem("UserProfile", JSON.stringify(UserProfile));
     if (localStorage.getItem('ProfileName') === null) {
 
         //stores Image and Profile E-Mail in localstorage

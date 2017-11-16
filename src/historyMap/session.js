@@ -1,7 +1,7 @@
 // Made by Reday Yahya | @RedayY
 // JavaScript Document for Save and Load Control
 
-var SessionName;
+let SessionName;
 let UserRecord = true;
 
 function askForSession() {
@@ -16,7 +16,12 @@ function askForSession() {
 }
 
 window.onload = function () {
+    
     askForSession();
+
+    if (ProfileName != null){
+        askForAPIKey();
+    }
 }
 
 $(function () {
@@ -39,6 +44,7 @@ $(function () {
 
 window.onload = function () {
     btn_pause_start_conf();
+    
 }
 
 function btn_pause_start_conf() {
@@ -64,4 +70,14 @@ function reset_sense() {
     } else {
         window.alert("SenseMap did not restart, carry on!")
     }
+}
+
+function askForAPIKey() {
+	var apik = prompt("Please enter the API Key ");
+	if (apik == null || apik == "" || apik == " ") {
+		window.alert("Please enter a suitable api key");
+		askForAPIKey();
+	} else {
+		APIKey = "/" + apik + "/";
+	}
 }
