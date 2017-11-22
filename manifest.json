@@ -65,6 +65,11 @@
     "web_accessible_resources": [
         "src/css/*.*", 
         "tests/tests.html", 
+        "lib/new-fontawesome/fontello.css", 
+        "lib/new-fontawesome/css/fontello.css", 
+        "lib/new-fontawesome/font/fontello.woff", 
+        "lib/new-fontawesome/font/fontello.woff2", 
+        "lib/new-fontawesome/font/fontello.ttf"
     ],
 
     "options_page":"/src/options.html",
