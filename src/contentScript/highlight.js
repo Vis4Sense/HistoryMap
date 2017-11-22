@@ -1,3 +1,4 @@
+highlight = function () {
 /**
  * Highlights the given selection and returns the serialized path of the selection.
  */ 
@@ -291,3 +292,4 @@ $.openNote = function(x, y, noteWrap) {
 
     //dialog.find(".sm-modal-content").draggable();
 };
+}

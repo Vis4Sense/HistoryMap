@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
 	createContextMenus();
-	var urlToHighlight = contentScript.model.urlToHighlight;
+	//var urlToHighlight = contentScript.model.urlToHighlight;
 	chrome.browserAction.onClicked.addListener(function() {
 		const url = chrome.extension.getURL('src/historyMap/historyMap.html');
 

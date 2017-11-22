@@ -32,8 +32,9 @@
       ],
       "js": [
           "lib/jquery.min.js",
-          "src/contentScript/contentScripts.js",
-          "src/contentScript/highlight.js"
+          "src/contentScript/contentScriptsController.js",
+          "src/contentScript/highlight.js",
+          "src/contentScript/contentScripts.js"
       ],
 	  "css": [
 		  "src/contentScript/content.css"
@@ -61,7 +62,10 @@
         ]
     },
 
-    "web_accessible_resources": ["src/css/*.*", "tests/tests.html"],
+    "web_accessible_resources": [
+        "src/css/*.*", 
+        "tests/tests.html", 
+    ],
 
     "options_page":"/src/options.html",
 
