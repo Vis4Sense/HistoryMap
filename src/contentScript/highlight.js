@@ -1,8 +1,9 @@
 highlight = function () {
-	/**
-	 * Highlights the given selection and returns the serialized path of the selection.
-	 */ 
-	var icon = "src/contentScript/fa-edit.png";
+	//Creating css link for fontello and inserting into header of webpage
+	var cssLink = getCssHeaderLink("fontello");
+	document.getElementsByTagName("head")[0].appendChild(cssLink);	
+
+	//Highlights the given selection and returns the serialized path of the selection.
 	$.highlight = function(selection, classId, noteWrap) {
 		if (!selection || selection.type !== "Range") return null;
 
@@ -76,7 +77,6 @@ highlight = function () {
 		}
 	}
 
-	//applies span (for note icon), mark tags to text node and finally the annotation buttons. 
 	function highlighTextNode(node, classId, startOffset, endOffset, noteWrap) {
 		// Ignore white-space text
 		var text = node.nodeValue;
@@ -92,15 +92,12 @@ highlight = function () {
 		// Span node to indicate a note
 		var noteNode;
 		if (noteWrap) {
-			noteNode = document.createElement("img");
-			var id = noteWrap.id || "img-" + (+new Date());
-			noteNode.setAttribute("id", id);
+			iconNoteNode = getIconNoteNode();
 			noteWrap.id = id;
-			noteNode.src = chrome.extension.getURL(icon);
-			noteNode.setAttribute("title", noteWrap.text);
-			noteNode.classList.add("sm-note-icon");
-			noteNode.classList.add(classId);
-			node.parentNode.insertBefore(noteNode, node.nextSibling);
+			var id = noteWrap.id || "img-" + (+new Date());
+			iconNoteNode.setAttribute("id", id);
+			//noteNode.setAttribute("title", noteWrap.text);
+			node.parentNode.insertBefore(iconNoteNode, node.nextSibling);
 		}
 
 		// An mark node surrounding highlight text
@@ -116,7 +113,7 @@ highlight = function () {
 				var buttons = $(".sm-highlight-buttons");
 				if (!buttons.length) {
 					buttons = $("<div class='sm-highlight-buttons sm-btn-group'></div>").appendTo(markNode).css({ position: "fixed" });
-					$("<button class='sm-btn sm-btn-default' id='sm-btns' style='opacity: 0.8'>Remove</button>").appendTo(buttons)
+					$("<button class='sm-btn sm-btn-default' style='opacity: 0.8'>Remove</button>").appendTo(buttons)
 						.click(function(e) {
 							// Remove image
 							var imgNode = markNode.parentNode.querySelector(".sm-note-icon");
@@ -143,7 +140,7 @@ highlight = function () {
 						});
 
 					if (noteWrap) {
-						$("<button class='sm-btn sm-btn-default' id='sm-btns' style='opacity: 0.8'>Edit</button>").appendTo(buttons)
+						$("<button class='sm-btn sm-btn-default style='opacity: 0.8'>Edit</button>").appendTo(buttons)
 							.click(function(e) {
 								$.openNote(e.clientX, e.clientY, noteWrap);
 								e.preventDefault();
@@ -151,19 +148,16 @@ highlight = function () {
 								$(".sm-highlight-buttons").remove();
 							});
 					} else {
-						$("<button class='sm-btn sm-btn-default' id='sm-btns' style='opacity: 0.8;'>Add Note</button>").appendTo(buttons)
+						$("<button class='sm-btn sm-btn-default' style='opacity: 0.8'>Add Note</button>").appendTo(buttons)
 							.click(function(e) {
 								$("." + classId).last().each(function() {
-									noteNode = document.createElement("img");
 									var id = "img-" + (+new Date());
-									noteNode.setAttribute("id", id);
 									noteWrap = { id: id, classId: classId };
-									noteNode.src = chrome.extension.getURL(icon);
-									noteNode.classList.add("sm-note-icon");
-									noteNode.classList.add(classId);
-									this.parentNode.insertBefore(noteNode, this.nextSibling);
-
-									$.openNote(e.clientX, e.clientY, noteWrap);
+									iconNoteNode = getIconNoteNode();
+									iconNoteNode.setAttribute("id", id);
+									iconNoteNode.classList.add("sm-note-icon");
+									iconNoteNode.classList.add(classId);
+									this.parentNode.insertBefore(iconNoteNode, this.nextSibling);$.openNote(e.clientX, e.clientY, noteWrap);
 								});
 
 								e.preventDefault();
@@ -268,28 +262,51 @@ highlight = function () {
 		content.find("textarea").val(noteWrap.text);
 
 		var footer = $("<div class='sm-modal-footer'></div>").appendTo(content);
-		footer.append("<button id='btnSaveNote' class='sm-btn sm-btn-primary'>Save</button><button class='sm-btn sm-btn-default' id='sm-btn-cancel-note'>Cancel</button>");
+		footer.append("<button id='btnSaveNote' class='sm-btn sm-btn-primary'>Save</button><button id='btnCancelNote' class='sm-btn sm-btn-default'>Cancel</button>");
 		footer.find("#btnSaveNote").click(function() {
 			// Tell the extension
 			var note = dialog.find("textarea").val();
 			$("#" + noteWrap.id).attr("title", note);
 			noteWrap.text = note;
 
+			//dialog.modal("hide");
 			dialog.hide();
-
+			console.log("notewrap is ", noteWrap);
 			chrome.runtime.sendMessage({ type: "noted", data: noteWrap });
 		});
-		footer.find("#sm-btn-cancel-note").click(function() {
-			dialog.hide();
+		footer.find("#btnCancelNote").click(function() {
+			dialog.modal("hide");
 		});
-
 		/*
 		dialog.modal().on('shown.bs.modal', function() {
 			dialog.find("textarea").focus();
 		});
 		*/
-		dialog.find(".sm-modal-dialog").css({ position: "fixed", left: x, top: y, margin: 0 });
+	  dialog.find(".sm-modal-dialog").css({ position: "fixed", left: x, top: y, margin: 0 });
 
 		//dialog.find(".sm-modal-content").draggable();
 	};
+
+	function getIconNoteNode(){
+		iconNoteNode = document.createElement("i");
+		iconNoteNode.classList.add("icon-doc-text");
+		
+		return iconNoteNode;
+	}
+
+	function getCssHeaderLink(iconSource) {
+		if (iconSource == "fontello"){
+			url = "lib/new-fontawesome/css/fontello.css";
+		} else if (iconSource == "fontawesome") {
+			//add to web accessible resources in manifest.json if font-awesome
+			url = "https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css";
+		}
+		
+		var link = document.createElement("link");
+		link.href = chrome.extension.getURL(url);
+		link.type = "text/css";
+		link.rel = "stylesheet";
+		
+		return link;
+	}
 }
