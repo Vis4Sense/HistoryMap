@@ -10,9 +10,9 @@
 
 // function onTabUpdate(tab) {
 //     if ('loading') {
-			// if (non-redireciton) addNode(tab);
-			// else {update existing node}; // redirection
-		// }
+// if (non-redireciton) addNode(tab);
+// else {update existing node}; // redirection
+// }
 //     if (title updated) send the new title to historyMap.js through an event;
 //     if (favIconUrl updated) send the new favIconUrl to historyMap.js through an event;
 // }
@@ -23,7 +23,7 @@
 // }
 
 
-historyMap.controller.browser = function() {
+historyMap.controller.browser = function () {
 	// const module = {};
 
 	var nodeId = 0; // can't use tab.id as node id because new url can be opened in the existing tab
@@ -36,20 +36,20 @@ historyMap.controller.browser = function() {
 
 	// not recording any chrome-specific url
 	const ignoredUrls = [
-		'chrome://',
-		'chrome-extension://',
-		'chrome-devtools://',
-		'view-source:',
-		'google.co.uk/url',
-		'google.com/url',
-		'localhost://'
-	],
-	bookmarkTypes = [ 'auto_bookmark' ],
-	typedTypes = [ 'typed', 'generated', 'keyword', 'keyword_generated' ];
+			'chrome://',
+			'chrome-extension://',
+			'chrome-devtools://',
+			'view-source:',
+			'google.co.uk/url',
+			'google.com/url',
+			'localhost://'
+		],
+		bookmarkTypes = ['auto_bookmark'],
+		typedTypes = ['typed', 'generated', 'keyword', 'keyword_generated'];
 
-	chrome.tabs.onCreated.addListener( function(tab) {
+	chrome.tabs.onCreated.addListener(function (tab) {
 
-		if(!isIgnoredTab(tab)) {
+		if (!isIgnoredTab(tab)) {
 			// console.log('newTab -', 'tabId:'+tab.id, ', parent:'+tab.openerTabId, ', url:'+tab.url, tab); // for testing
 
 			addNode(tab, tab.openerTabId);
@@ -58,9 +58,9 @@ historyMap.controller.browser = function() {
 	});
 
 
-	chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+	chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 
-		if(!isIgnoredTab(tab)) {
+		if (!isIgnoredTab(tab)) {
 
 			// console.log('tab update',tabId,changeInfo,tab);
 
@@ -76,8 +76,7 @@ historyMap.controller.browser = function() {
 					historyMap.view.redraw();
 
 					tabUrl[tabId] = tab.url;
-				}
-				else { // not redirection
+				} else { // not redirection
 					addNode(tab, tab.id);
 				}
 			}
@@ -101,7 +100,7 @@ historyMap.controller.browser = function() {
 		}
 	});
 
-	function addNode(tab,parent) {
+	function addNode(tab, parent) {
 
 		const title = tab.title || tab.url;
 		const time = new Date();
@@ -128,7 +127,9 @@ historyMap.controller.browser = function() {
 
 		// Update with visit type
 		if (tab.url) {
-			chrome.history.getVisits({ url: tab.url }, results => {
+			chrome.history.getVisits({
+				url: tab.url
+			}, results => {
 				// The latest one contains information about the just completely loaded page
 				const type = results && results.length ? _.last(results).transition : undefined;
 
@@ -144,3 +145,114 @@ historyMap.controller.browser = function() {
 	}
 
 }
+
+// Made by Reday Yahya | @RedayY
+// JavaScript Document for Login Functionality and popup layout control
+
+
+// //API (Save and Load) specific Variables
+// let baseURL = "https://sensemap-api.herokuapp.com/";
+// let APIKey;
+// let apiinput;
+// let DBSessionPointer;
+
+// function google_Login() {
+// 	// HelloJS network identifier
+// 	var google = hello('google');
+
+// 	// Forcing E-Mail out of profile Object
+// 	google.login({
+// 		scope: 'email',
+// 		force: true
+// 	}).then(function () {
+// 		return google.api('me');
+// 	})
+// };
+
+// function google_Logout() {
+// 	var answer = confirm("Logging Out will reload SenseMap, do you wish to Continue?")
+// 	if (answer) {
+// 		hello('google').logout().then(function () {
+// 			alert('Signed out');
+// 			btn_reset();
+// 			LoggedIn = false;
+// 			location.reload();
+// 		}, function (e) {
+// 			alert('Signed out error: ' + e.error.message);
+// 		});
+// 	};
+// }
+
+// Listens to Login requests and executes functions upon verification
+
+
+function openSensemap() {
+	chrome.windows.create({
+		'url': 'src/historyMap/historyMap.html',
+		'type': 'popup'
+	}, function (window) {});
+};
+
+// window.onload = function button_config() {
+// 	saveProfile();
+// 	btn_reset();
+// 	//btn_pause_start_conf();
+// 	chrome.tabs.query({
+// 		'url': 'chrome-extension://' + chrome.runtime.id + '/src/historyMap/historyMap.html'
+// 	}, function (results) {
+// 		if (results.length == 0) {
+// 			openSensemap();
+// 		}
+// 	});
+
+// };
+
+function btn_reset() {
+	document.getElementById("btn_logout").disabled = true;
+	document.getElementById("btn_login").style.color = "darkmagenta";
+	document.getElementById("btn_logout").style.color = "red";
+}
+
+function btn_format() {
+	document.getElementById("btn_login").disabled = true;
+	document.getElementById("btn_logout").disabled = false;
+	document.getElementById("btn_logout").style.color = "darkmagenta";
+	document.getElementById("btn_login").style.color = "red";
+
+};
+
+
+function draw_profile() {
+	hello('google').api('me').then(function (upp) {
+		document.getElementById("networkName").innerHTML = "<p>" + upp.name;
+		document.getElementById("Image").innerHTML = "<img src='" + upp.thumbnail + "'id='profileIMG'/>";
+	})
+}
+
+function saveProfile() {
+	localStorage.setItem("UserProfile", JSON.stringify(UserProfile));
+	if (localStorage.getItem('ProfileName') === null) {
+
+		//stores Image and Profile E-Mail in localstorage
+
+		profilename = UserProfile.name;
+		profileimg = UserProfile.thumbnail;
+		console.log(profilename + " " + profileimg)
+
+		localStorage.setItem("ProfileName", profilename);
+		localStorage.setItem("ProfileIMGURL", profileimg);
+
+		draw_profile();
+
+	} else {
+
+		ProfileName = localStorage.getItem('ProfileName');
+		ProfilePicture = localStorage.getItem('ProfileIMGURL');
+
+		document.getElementById("networkName").innerHTML = "<p>" + ProfileName + "</p>";
+		document.getElementById("Image").innerHTML = "<img src='" + ProfilePicture + "'id='profileIMG'/>";
+
+	}
+}
+
+//var little_helper = 'https://' + chrome.runtime.id + '.chromiumapp.org/src/UserLogin/popup.html';

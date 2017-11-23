@@ -8,7 +8,7 @@ historyMap.model.nodes = {
 
     addNode: function (node) {
         return this.nodes.push(node);
-        if (UserRecord == true && UserProfile != null){
+        if (UserRecord == true && UserProfile != null) {
             Node2DB(node);
         }
     },
@@ -41,22 +41,21 @@ function Node(id, tabId, time, url, title, favIconUrl, parentTabId, from) {
 //Profile specific Variables
 let AccLoggedIn;
 let DBnodes = [];
-let UserEmail;
 let UserProfile;
-let up = localStorage.getItem('UserProfile');
-
+let ProfileName = localStorage.getItem('ProfileName');
 
 //API (Save and Load) specific Variables
 var baseURL = "https://sensemap-api.herokuapp.com/";
-let APIKey;
+let up = JSON.parse(localStorage.getItem('UserProfile'));
+let UserEmail = localStorage.getItem("UserEmail");
+let APIKey = localStorage.getItem("UserAccessKey");
 let apiinput;
 let DBSessionPointer;
-let ProfileName = localStorage.getItem('ProfileName');
+
 
 //execute save and load functionality only if the user is logged in simulation
-if (up != null){
+if (up != null) {
     askForSession();
-    askForAPIKey();
     pushToDB();
     pushSessToDB();
 }
@@ -72,18 +71,8 @@ function askForSession() {
     }
 }
 
-function askForAPIKey() {
-	var apik = prompt("Please enter the API Key ");
-	if (apik == null || apik == "" || apik == " ") {
-		window.alert("Please enter a suitable api key");
-		askForAPIKey();
-	} else {
-		APIKey = "/" + apik + "/";
-	}
-}
-
 function pushSessToDB() {
-    var url = baseURL + "session/" + UserEmail + APIKey;
+    var url = baseURL + "session/" + UserEmail + "/" + APIKey;
     var data = {};
     data.sessionname = SessionName;
     var json = JSON.stringify(data);
@@ -92,7 +81,7 @@ function pushSessToDB() {
     xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
     xhr.onload = function () {
         var users = JSON.parse(xhr.responseText);
-        if (xhr.readyState == 4 && xhr.status == "201") { } else {
+        if (xhr.readyState == 4 && xhr.status == "201") {} else {
             //debug
             console.error(users);
             var indexNo = users["sessions"].length - 1;
@@ -114,7 +103,7 @@ function add_user_to_db() {
     };
 
     // Adding the User to the DB
-    var url = baseURL + "users" + APIKey;
+    var url = baseURL + "userinsert";
     var json = JSON.stringify(new_stuff);
     var xhr = new XMLHttpRequest();
     xhr.open("POST", url, true);
@@ -129,8 +118,6 @@ function add_user_to_db() {
 function pushToDB() {
 
     //Creating the Object for the DB
-
-
     var UserProfileObject = {
         "name": up.name,
         "emailAddress": up.email,
@@ -141,7 +128,7 @@ function pushToDB() {
     //Code is based on Shaz example
 
     //check if email is in db
-    var url = baseURL + "userbyemail/" + up.email + APIKey;
+    var url = baseURL + "userbyemail/" + up.email + "/" + APIKey;
     var xhr = new XMLHttpRequest()
     xhr.open('GET', url, true)
     xhr.onload = function () {
@@ -159,11 +146,11 @@ function pushToDB() {
 
 function Node2DB(node) {
 
-    if (AccLoggedIn == true && UserRecord == true) {
+    if (UserRecord == true) {
 
         node.visibility = false;
 
-        var url = baseURL + "node/" + DBSessionPointer + APIKey;
+        var url = baseURL + "node/" + DBSessionPointer + "/" + APIKey;
         var json = JSON.stringify(node);
         var xhr = new XMLHttpRequest();
         xhr.open("POST", url, true);
@@ -176,7 +163,7 @@ function Node2DB(node) {
 
         if (AccLoggedIn == true && UserRecord == false) {
             node.visibility = true;
-            var url = baseURL + "node/" + DBSessionPointer + APIKey;
+            var url = baseURL + "node/" + DBSessionPointer + "/" + APIKey;
             var json = JSON.stringify(node);
             var xhr = new XMLHttpRequest();
             xhr.open("POST", url, true);
@@ -192,8 +179,7 @@ function Node2DB(node) {
 
     return node;
 }
+
 historyMap.model.sessions = {
     sessions: [],
 };
-
-// code for save and load in this file.
