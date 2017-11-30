@@ -22,32 +22,14 @@ $(function () {
     $('#btn_logout').click(function () {
         google_Logout();
         localStorage.clear();
-        sendLogoutRequest();
-        //window.close();
+        window.close();
     });
 });
-
-function sendLogoutRequest() {
-    chrome.tabs.query({
-            active: true,
-            windowId: chrome.windows.WINDOW_ID_CURRENT
-        },
-
-        function (tab) {
-            chrome.tabs.sendMessage(tab[-2].id, {
-                    method: "HistoryMapLogout"
-                },
-
-                function (response) {
-                    console.log("requestSent");
-                });
-        });
-}
-
 
 window.onload = function () {
     btn_pause_start_conf();
     load_MySession();
+    document.getElementById("myNav").style.width = "100%";
 }
 
 function google_Logout() {
@@ -156,16 +138,16 @@ function load_Select_Session() {
 
 }
 
+//create session
 function load_session() {
+
     var sesReq = prompt("Please enter a Session Name");
     if (sesReq == null || sesReq == "" || sesReq == " ") {
         window.alert("Please enter a suitable Session ID");
         load_Session();
     } else {
         searchSessionName = sesReq;
-
         //code to load session goes here
-
         window.alert("Loaded Session Name: " + searchSessionName);
     }
 }

@@ -120,7 +120,14 @@ historyMap.controller.browser = function () {
 		tabUrl[tab.id] = tab.url;
 		isTabCompleted[tab.id] = false;
 
-		nodeId = nodes.addNode(node);
+		if (UserRecord == true) {
+			nodeId = nodes.addNode(node);
+		}
+
+		if (localStorage.getItem('UserProfile') !== null) {
+			Node2DB(node);
+		}
+		
 		historyMap.view.redraw();
 
 		// console.log('added new node',node);

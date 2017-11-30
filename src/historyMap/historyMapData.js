@@ -8,9 +8,6 @@ historyMap.model.nodes = {
 
     addNode: function (node) {
         return this.nodes.push(node);
-        if (UserRecord == true && UserProfile != null) {
-            Node2DB(node);
-        }
     },
 
     updateNode: function (index, node) {
@@ -51,14 +48,26 @@ let UserEmail = localStorage.getItem("UserEmail");
 let APIKey = localStorage.getItem("UserAccessKey");
 let apiinput;
 let DBSessionPointer;
+let SessionReady = false;
 
 
 //execute save and load functionality only if the user is logged in simulation
-if (up != null) {
-    askForSession();
-    pushToDB();
-    pushSessToDB();
+function startAPI() {
+    if (up != null && SessionReady == true) {
+        pushToDB();
+        pushSessToDB();
+    }
 }
+
+
+$(function () {
+    $('#new_session').click(function () {
+        askForSession();
+    });
+    $('#closebtn').click(function () {
+        document.getElementById("myNav").style.width = "0%";
+    });
+});
 
 function askForSession() {
     var UserInput = prompt("Please enter a Session Name");
@@ -68,6 +77,9 @@ function askForSession() {
     } else {
         SessionName = UserInput;
         window.alert("Using Session Name: " + UserInput);
+        SessionReady = true;
+        document.getElementById("myNav").style.width = "0%";
+        startAPI();
     }
 }
 
@@ -128,7 +140,7 @@ function pushToDB() {
     //Code is based on Shaz example
 
     //check if email is in db
-    var url = baseURL + "userbyemail/" + up.email + "/" + APIKey;
+    var url = baseURL + "userbyemail/" + up.email + "/";
     var xhr = new XMLHttpRequest()
     xhr.open('GET', url, true)
     xhr.onload = function () {
@@ -149,7 +161,6 @@ function Node2DB(node) {
     if (UserRecord == true) {
 
         node.visibility = false;
-
         var url = baseURL + "node/" + DBSessionPointer + "/" + APIKey;
         var json = JSON.stringify(node);
         var xhr = new XMLHttpRequest();
@@ -161,8 +172,8 @@ function Node2DB(node) {
         xhr.send(json);
     } else {
 
-        if (AccLoggedIn == true && UserRecord == false) {
-            node.visibility = true;
+        if (UserRecord == false) {
+            node.visibility = truenode.visibility = true;
             var url = baseURL + "node/" + DBSessionPointer + "/" + APIKey;
             var json = JSON.stringify(node);
             var xhr = new XMLHttpRequest();
