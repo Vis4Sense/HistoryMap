@@ -3,6 +3,9 @@
 
 let SessionName;
 let UserRecord = true;
+let SessionProfile;
+let SessionCount;
+
 
 $(function () {
     $('#btn_start').click(function () {
@@ -85,6 +88,10 @@ function load_MySession() {
         var users = JSON.parse(xhr.responseText);
         if (xhr.readyState == 4 && xhr.status == "200") {
 
+            //picking out Session Information from User Account
+            SessionProfile = users["sessions"];
+            SessionCount = users["sessions"].length - 1;
+
             // Managing generated HTML Elements
             var Div = document.getElementById("Select-Option");
             var selectList = document.createElement("select");
@@ -92,12 +99,12 @@ function load_MySession() {
             Div.appendChild(selectList);
 
             // Looping thorugh Data and generating selects
-            for (var i = 0; i => SessionCount; i++) {
+            for (var i = 0; i <= SessionCount; i++) {
 
                 // Generating Option for Select List in combination of Data
                 var option = document.createElement("option");
-                option.value = UserProfile[i]._id;
-                option.text = UserProfile[i].sessionname;
+                option.value = SessionProfile[i]._id;
+                option.text = SessionProfile[i].sessionname;
                 selectList.appendChild(option);
             }
 
@@ -113,28 +120,21 @@ function load_MySession() {
 function load_Select_Session() {
 
     select_Val = document.getElementById("mySelect").value;
+    for (var i = 0; i < SessionProfile.length; i++) {
+        if (SessionProfile[i]._id == select_Val) {
 
-    var url = baseURL + "node/" + select_Val + "/" + APIKey;
-    var xhr = new XMLHttpRequest()
-    xhr.open('GET', url, true)
-    xhr.onload = function () {
-        var users = JSON.parse(xhr.responseText);
-        if (xhr.readyState == 4 && xhr.status == "200") {
+            var result = SessionProfile[i];
+            load_SelectedSession(result);
+
+            //remove menu
+            SessionName = result.sessionname;
+            SessionReady = true;
+            document.getElementById("myNav").style.width = "0%";
+            startAPI();
 
 
-            for (var i = 0; i => UserProfile.length; i++) {
-                if (UserProfile[i]._id == select_Val) {
-                    var result = UserProfile[i];
-                    console.log(result);
-                    //load_SelectedSession(result);
-                    break;
-                }
-            }
-
-        } else {}
+        }
     }
-    xhr.send(null);
-
 
 }
 
@@ -150,6 +150,7 @@ function load_session() {
         //code to load session goes here
         window.alert("Loaded Session Name: " + searchSessionName);
     }
+
 }
 
 function load_SelectedSession(i) {

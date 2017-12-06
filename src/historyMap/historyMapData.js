@@ -50,7 +50,6 @@ let apiinput;
 let DBSessionPointer;
 let SessionReady = false;
 
-
 //execute save and load functionality only if the user is logged in simulation
 function startAPI() {
     if (up != null && SessionReady == true) {
@@ -70,17 +69,14 @@ $(function () {
 });
 
 function askForSession() {
-    var UserInput = prompt("Please enter a Session Name");
-    if (UserInput == null || UserInput == "" || UserInput == " ") {
-        window.alert("Please enter a suitable Session Name");
-        askForSession();
-    } else {
-        SessionName = UserInput;
-        window.alert("Using Session Name: " + UserInput);
+
+    var NewSessionName = document.getElementById("NewSessionName").value;
+        SessionName = NewSessionName;
+        window.alert("Using Session Name: " + SessionName);
         SessionReady = true;
         document.getElementById("myNav").style.width = "0%";
         startAPI();
-    }
+    
 }
 
 function pushSessToDB() {
@@ -95,11 +91,9 @@ function pushSessToDB() {
         var users = JSON.parse(xhr.responseText);
         if (xhr.readyState == 4 && xhr.status == "201") {} else {
             //debug
-            console.error(users);
             var indexNo = users["sessions"].length - 1;
             DBSessionPointer = users["sessions"][indexNo]._id;
             UserProfile = users["sessions"];
-            SessionCount = users["sessions"].length - 1;
         }
     }
     xhr.send(json);
@@ -140,9 +134,9 @@ function pushToDB() {
     //Code is based on Shaz example
 
     //check if email is in db
-    var url = baseURL + "userbyemail/" + up.email + "/";
-    var xhr = new XMLHttpRequest()
-    xhr.open('GET', url, true)
+    var url = baseURL + "userbyemail/" + up.email + "/" + APIKey;
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
     xhr.onload = function () {
         var users = JSON.parse(xhr.responseText);
         if (xhr.readyState == 4 && xhr.status == "200") {
