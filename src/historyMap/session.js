@@ -92,22 +92,41 @@ function load_MySession() {
             SessionProfile = users["sessions"];
             SessionCount = users["sessions"].length - 1;
 
-            // Managing generated HTML Elements
+            // // Managing generated HTML Elements
+            // var Div = document.getElementById("Select-Option");
+            // var selectList = document.createElement("select");
+            // selectList.id = "mySelect";
+            // Div.appendChild(selectList);
+
+            // // Looping thorugh Data and generating selects
+            // for (var i = 0; i <= SessionCount; i++) {
+
+            //     // Generating Option for Select List in combination of Data
+            //     var option = document.createElement("option");
+            //     option.value = SessionProfile[i]._id;
+            //     option.text = SessionProfile[i].sessionname;
+            //     selectList.appendChild(option);
+            // }
+
+            //Managing generated HTML Elements RADIO BUTTON
             var Div = document.getElementById("Select-Option");
-            var selectList = document.createElement("select");
-            selectList.id = "mySelect";
-            Div.appendChild(selectList);
+            //var selectList = document.createElement("select");
+            //selectList.id = "mySelect";
+            //Div.appendChild(selectList);
 
             // Looping thorugh Data and generating selects
             for (var i = 0; i <= SessionCount; i++) {
 
-                // Generating Option for Select List in combination of Data
-                var option = document.createElement("option");
+                // Generating Option for Select List in combination of Data RADIO BOX VERSION
+                var option = document.createElement("input");
+                option.type = "radio";
                 option.value = SessionProfile[i]._id;
-                option.text = SessionProfile[i].sessionname;
-                selectList.appendChild(option);
+                option.name = SessionProfile[i].sessionname;
+                Div.appendChild(option);
+                Div.append(SessionProfile[i].sessionname);
             }
 
+            // End of Radio Button Version
         } else {
 
             window.alert("You do not have any saved sessions under this Account");
@@ -131,8 +150,6 @@ function load_Select_Session() {
             SessionReady = true;
             document.getElementById("myNav").style.width = "0%";
             startAPI();
-
-
         }
     }
 
@@ -156,4 +173,5 @@ function load_session() {
 function load_SelectedSession(i) {
     nodes.length = 0;
     nodes = i.nodes;
+    historyMap.view.redraw();
 }
