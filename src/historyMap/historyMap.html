@@ -41,56 +41,9 @@
 
         #btn_new,
         #btn_start,
-        #btn_logout,
-        #btn_load {
+        #btn_logout, #btn_load {
             display: none;
         }
-       
-        /*Lightbox CSS */
-
-        .overlay {
-            height: 100%;
-            width: 0;
-            position: fixed;
-            z-index: 1;
-            top: 0;
-            left: 0;
-            background-color: rgb(0, 0, 0);
-            background-color: rgba(0, 0, 0, 0.9);
-            overflow-x: hidden;
-            transition: 0.5s;
-        }
-
-        .overlay-content {
-            position: relative;
-            top: 25%;
-            width: 100%;
-            text-align: center;
-            margin-top: 30px;
-        }
-
-        .overlay a {
-            padding: 8px;
-            text-decoration: none;
-            font-size: 36px;
-            color: #818181;
-            display: block;
-            transition: 0.3s;
-        }
-
-        .overlay a:hover,
-        .overlay a:focus {
-            color: #f1f1f1;
-        }
-        /* .overlay #closebtn {
-            position: absolute;
-            top: 20px;
-            right: 45px;
-            font-size: 10px;
-            background-color: black;
-            border-color: black;
-            color: white;
-        } */
     </style>
 </head>
 
@@ -133,25 +86,6 @@
                 <button id='btn_logout' class="btn btn-default">
                     <i class="demo-icon icon-logout-1"></i> Logout</button>
             </div>
-        </div>
-    </div>
-
-    <div id="myNav" class="overlay">
-        <div class="overlay-content">
-            <input type="text" name="NewSessionName" id="NewSessionName">
-            <button id='new_session'>
-                <i class="demo-icon icon-doc"></i> Create New Session</button>
-            <!-- <button id='new_session' class="btn btn-default">
-                                <i class="demo-icon icon-doc"></i> Create New Session</button> -->
-            </br>
-            </br>
-            <form action="" id="Select-Option">
-                <button id='btn_load'>
-                    <i class="demo-icon icon-upload"></i> Load</button>
-            </form>
-            <!-- <button id='btn_load' class="btn btn-default">
-                                    <i class="demo-icon icon-upload"></i> Load</button> -->
-
         </div>
     </div>
 
