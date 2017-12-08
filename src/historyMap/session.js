@@ -2,19 +2,20 @@
 // JavaScript Document for Save and Load Control
 
 let SessionName;
-let UserRecord = true;
 let SessionProfile;
 let SessionCount;
 
+let recording = true; // whether new noded is added to historymap or not
+let loggedIn = false; // whether user is logged in
 
 $(function () {
     $('#btn_start').click(function () {
-        UserRecord = true;
-        btn_pause_start_conf();
+        recording = true;
+        btnDisplay();
     });
     $('#btn_pause').click(function () {
-        UserRecord = false;
-        btn_pause_start_conf();
+        recording = false;
+        btnDisplay();
     });
     $('#btn_new').click(function () {
         reset_sense();
@@ -27,12 +28,15 @@ $(function () {
         localStorage.clear();
         window.close();
     });
+    $('#btn_login').click(function () {
+        // run hello.js google+ login 
+    })
 });
 
 window.onload = function () {
-    btn_pause_start_conf();
+    btnDisplay();
     load_MySession();
-    document.getElementById("myNav").style.width = "100%";
+    // document.getElementById("myNav").style.width = "100%";
 }
 
 function google_Logout() {
@@ -50,18 +54,34 @@ function google_Logout() {
     };
 }
 
-function btn_pause_start_conf() {
+function btnDisplay() {
 
-    if (UserRecord == true) {
-        document.getElementById("btn_start").disabled = true;
-        document.getElementById("btn_pause").disabled = false;
-        // document.getElementById("btn_pause").style.color = "darkmagenta";
-        // document.getElementById("btn_start").style.color = "red";
+    // make only the relevant button visible
+
+    if (recording) {
+        document.getElementById("btn_start").style.display = "none";
+        document.getElementById("btn_pause").style.display = "initial";
     } else {
-        document.getElementById("btn_pause").disabled = true;
-        document.getElementById("btn_start").disabled = false;
-        document.getElementById("btn_pause").style.color = "red";
-        document.getElementById("btn_start").style.color = "darkmagenta";
+        document.getElementById("btn_start").style.display = "initial";
+        document.getElementById("btn_pause").style.display = "none";
+    }
+
+    if (loggedIn) {
+        document.getElementById("btn_login").style.display = "none";
+        document.getElementById("btn_logout").style.display = "initial";
+
+        // (toBeComplete) if user has saved sessions, load button is visible, else;
+        document.getElementById("btn_load").style.display = 'none';
+    }
+    else {
+        document.getElementById("btn_login").style.display = "initial";
+        document.getElementById("btn_logout").style.display = "none";
+        document.getElementById("btn_load").style.display = "none";        
+    }
+
+    // if history map is empty, 'new' button is hidden.
+    if (historyMap.model.nodes.getArray.length === 0) {
+        document.getElementById("btn_new").style.display = 'none';
     }
 
 }

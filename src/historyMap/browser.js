@@ -120,7 +120,7 @@ historyMap.controller.browser = function () {
 		tabUrl[tab.id] = tab.url;
 		isTabCompleted[tab.id] = false;
 
-		if (UserRecord == true) {
+		if (recording == true) {
 			nodeId = nodes.addNode(node);
 		}
 

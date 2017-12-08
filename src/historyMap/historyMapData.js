@@ -152,7 +152,7 @@ function pushToDB() {
 
 function Node2DB(node) {
 
-    if (UserRecord == true) {
+    if (recording) {
 
         node.visibility = false;
         var url = baseURL + "node/" + DBSessionPointer + "/" + APIKey;
@@ -166,7 +166,7 @@ function Node2DB(node) {
         xhr.send(json);
     } else {
 
-        if (UserRecord == false) {
+        if (!recording) {
             node.visibility = truenode.visibility = true;
             var url = baseURL + "node/" + DBSessionPointer + "/" + APIKey;
             var json = JSON.stringify(node);
