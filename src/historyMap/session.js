@@ -55,8 +55,8 @@ function btn_pause_start_conf() {
     if (UserRecord == true) {
         document.getElementById("btn_start").disabled = true;
         document.getElementById("btn_pause").disabled = false;
-        document.getElementById("btn_pause").style.color = "darkmagenta";
-        document.getElementById("btn_start").style.color = "red";
+        // document.getElementById("btn_pause").style.color = "darkmagenta";
+        // document.getElementById("btn_start").style.color = "red";
     } else {
         document.getElementById("btn_pause").disabled = true;
         document.getElementById("btn_start").disabled = false;
