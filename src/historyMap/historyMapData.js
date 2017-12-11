@@ -7,7 +7,7 @@ historyMap.model.nodes = {
     },
 
     addNode: function (node) {
-        return this.nodes.push(node);
+        return this.nodes.push(node);     
     },
 
     updateNode: function (index, node) {
@@ -20,8 +20,12 @@ historyMap.model.nodes = {
 
     getSize: function() {
         return this.nodes.length;
-    }
+    },
 
+    empty: function() {
+        this.nodes.length = 0;
+        historyMap.view.redraw();
+    }
 }
 
 function Node(id, tabId, time, url, title, favIconUrl, parentTabId, from) {

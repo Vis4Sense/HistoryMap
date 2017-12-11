@@ -89,15 +89,36 @@ function btnDisplay() {
 }
 
 function newHistoryMap() {
-    if (!loggedIn && historyMap.model.nodes.getSize > 0) {
-        var answer = confirm("Becuase you are not logged in,  all the progress will be lost. Are you sure?")
-        if (answer) {
-            location.reload();
-        } 
-        // else {
-        //     window.alert("SenseMap did not restart, carry on!")
-        // }
+    var confirmation = confirm("Do you want to start a new session? All the progress will be lost if you are not logged in.")
+
+    if (confirmation) {
+        historyMap.model.nodes.empty();
+
+        if (loggedIn) {
+            // so user can't create press the 'new' button more than once.
+            document.getElementById('btn_new').disabled = true;
+            
+            // add a text field
+            var input = document.createElement('input');
+            input.type = 'text';
+            input.placeholder = 'session name';
+            input.id = 'sessionName';
+            document.getElementById('settings').appendChild(input);
+            input.focus();
+
+            // add a button
+            var button = document.createElement('button');
+            button.type = 'button';
+            button.innerHTML = 'Create';
+            button.onclick = 'newSession';
+            document.getElementById('settings').appendChild(button);
+        }
     }
+}
+
+function newSession() {
+    var sessionName = document.getElementById('sessionName').value;
+    // create a new session (to be completed)
 }
 
 // DB LOAD Document
