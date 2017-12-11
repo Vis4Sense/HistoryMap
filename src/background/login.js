@@ -1,20 +1,14 @@
 //Profile specific Variables
-let UserEmail;
-let UserProfile;
-let DBnodes = [];
-let ProfileName = "";
-let ProfilePicture = "";
-let AccLoggedIn = false;
-let UserAccessKey;
-var baseURL = "https://sensemap-api.herokuapp.com/";
+// let UserEmail;
+// let UserProfile;
+// let DBnodes = [];
+// let ProfileName = "";
+// let ProfilePicture = "";
+// let AccLoggedIn = false;
+// let UserAccessKey;
+// var baseURL = "https://sensemap-api.herokuapp.com/";
+// everything related to the backend should be in the historyMap (such as session.js)
 
-chrome.extension.onMessage.addListener(function (request, sender, sendResponse) {
-    if (request.method = "HistoryMapLogout") {
-        sendResponse(AccLoggedIn = false);
-    } else {
-        sendResponse({});
-    }
-});
 
 //Hello.js Initialization spec
 hello.init({
@@ -24,7 +18,7 @@ hello.init({
 })
 
 //login function
-function google_Login() {
+function googleLogin() {
     // HelloJS network identifier
     var google = hello('google');
 
@@ -37,47 +31,52 @@ function google_Login() {
     })
 };
 
-//localstorage save function
-function saveProfile() {
-    localStorage.setItem("UserProfile", JSON.stringify(UserProfile));
-    if (localStorage.getItem('ProfileName') === null) {
-
-        //stores Image and Profile E-Mail in localstorage
-        profilename = UserProfile.name;
-        profileimg = UserProfile.thumbnail;
-        console.log(profilename + " " + profileimg)
-        localStorage.setItem("ProfileName", profilename);
-        localStorage.setItem("ProfileIMGURL", profileimg);
-
+// handle the 'login' button on historyMap
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    if (request.text === "login") {
+        googleLogin();
+        sendResponse({text:'using google+ login'})
     } else {
-        ProfileName = localStorage.getItem('ProfileName');
-        ProfilePicture = localStorage.getItem('ProfileIMGURL');
-        document.getElementById("networkName").innerHTML = "<p>" + ProfileName + "</p>";
-        document.getElementById("Image").innerHTML = "<img src='" + ProfilePicture + "'id='profileIMG'/>";
+        sendResponse({text:'do not understand the message' + request.text});
     }
-}
+});
+
+// handle the 'logout' button on historyMap
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    if (request.text === "logout") {
+        hello('google').logout();
+        localStorage.clear();
+        sendResponse({text:'google+ logged out'})
+    } else {
+        sendResponse({text:'do not understand the message' + request.text});
+    }
+});
 
 // Listens to Login requests and executes functions upon verification
 hello.on('auth.login', function (r) {
 
     // Get Profiles
-    hello(r.network).api('/me').then(function (p) {
+    hello(r.network).api('/me').then(function (user) {
+
+        localStorage.setItem('user',JSON.stringify(user));
+
+        chrome.runtime.sendMessage({text:'loggedin',user: user});
 
         // btn_format();
-        AccLoggedIn = true;
-        UserEmail = p.email;
-        localStorage.setItem("UserEmail", p.email);
-        UserProfile = p;
-        getUACKey();
-        saveProfile();
+        // AccLoggedIn = true;
+        // UserEmail = user.email;
+        // localStorage.setItem("UserEmail", user.email);
+        // UserProfile = user;
+        // getUACKey();  // this should be in session.js
+        // saveProfile();
         // document.dispatchEvent(DOMContentLoaded);
-        openSensemap();
+        // openSensemap();
 
         // On chrome apps we're not able to get remote images
         // This is a workaround
-        if (typeof (chrome) === 'object') {
-            img_xhr(label.getElementsByTagName('img')[0], p.thumbnail);
-        }
+        // if (typeof (chrome) === 'object') {
+        //     img_xhr(label.getElementsByTagName('img')[0], user.thumbnail);
+        // }
     });
 });
 

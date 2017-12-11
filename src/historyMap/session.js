@@ -18,41 +18,46 @@ $(function () {
         btnDisplay();
     });
     $('#btn_new').click(function () {
-        reset_sense();
+        newHistoryMap();
     });
     $('#btn_load').click(function () {
         load_Select_Session();
     });
     $('#btn_logout').click(function () {
-        google_Logout();
-        localStorage.clear();
-        window.close();
+        chrome.runtime.sendMessage({text:'logout', function (response) {
+            console.log('response from login.js',response.text);    
+        }}); 
+        location.reload();
+        loggedIn = false;
+        btnDisplay();
     });
     $('#btn_login').click(function () {
-        // run hello.js google+ login 
+        // run hello.js google+ login
+        chrome.runtime.sendMessage({text:'login', function (response) {
+            console.log('response from login.js',response.text);    
+        }}); 
     })
 });
 
 window.onload = function () {
+
+    if (localStorage.getItem('user') !== null) {
+        loggedIn = true;
+        historyMap.model.user = JSON.parse(localStorage.getItem('user'));
+    }
+
     btnDisplay();
-    load_MySession();
+    // load_MySession();
     // document.getElementById("myNav").style.width = "100%";
 }
 
-function google_Logout() {
-
-    var answer = confirm("Logging Out will reload SenseMap, do you wish to Continue?")
-    if (answer) {
-        hello('google').logout().then(function () {
-            alert('Signed out');
-            btn_reset();
-            LoggedIn = false;
-            location.reload();
-        }, function (e) {
-            alert('Signed out error: ' + e.error.message);
-        });
-    };
-}
+chrome.runtime.onMessage.addListener(function (request) {
+    if (request.text === 'loggedin') {
+        loggedIn = true;
+        historyMap.model.user = request.user;
+        btnDisplay();
+    }
+});
 
 function btnDisplay() {
 
@@ -69,6 +74,8 @@ function btnDisplay() {
     if (loggedIn) {
         document.getElementById("btn_login").style.display = "none";
         document.getElementById("btn_logout").style.display = "initial";
+        document.getElementById('userImage').style.display = "initial";
+        userImage.src = historyMap.model.user.image.url;
 
         // (toBeComplete) if user has saved sessions, load button is visible, else;
         document.getElementById("btn_load").style.display = 'none';
@@ -76,22 +83,20 @@ function btnDisplay() {
     else {
         document.getElementById("btn_login").style.display = "initial";
         document.getElementById("btn_logout").style.display = "none";
-        document.getElementById("btn_load").style.display = "none";        
+        document.getElementById("btn_load").style.display = "none";
+        document.getElementById('userImage').style.display = "none";        
     }
-
-    // if history map is empty, 'new' button is hidden.
-    if (historyMap.model.nodes.getArray.length === 0) {
-        document.getElementById("btn_new").style.display = 'none';
-    }
-
 }
 
-function reset_sense() {
-    var answer = confirm("Would you like to start over again, this do not log you out, does you still wish to Continue?")
-    if (answer) {
-        location.reload();
-    } else {
-        window.alert("SenseMap did not restart, carry on!")
+function newHistoryMap() {
+    if (!loggedIn && historyMap.model.nodes.getSize > 0) {
+        var answer = confirm("Becuase you are not logged in,  all the progress will be lost. Are you sure?")
+        if (answer) {
+            location.reload();
+        } 
+        // else {
+        //     window.alert("SenseMap did not restart, carry on!")
+        // }
     }
 }
 

@@ -16,6 +16,10 @@ historyMap.model.nodes = {
 
     getArray: function () {
         return this.nodes;
+    },
+
+    getSize: function() {
+        return this.nodes.length;
     }
 
 }
@@ -36,7 +40,7 @@ function Node(id, tabId, time, url, title, favIconUrl, parentTabId, from) {
 // Functions for Saving are found in this document
 
 //Profile specific Variables
-let AccLoggedIn;
+// let AccLoggedIn;
 let DBnodes = [];
 let UserProfile;
 let ProfileName = localStorage.getItem('ProfileName');
