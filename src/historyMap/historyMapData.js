@@ -7,11 +7,15 @@ historyMap.model.nodes = {
     },
 
     addNode: function (node) {
-        return this.nodes.push(node);     
+        var index = this.nodes.push(node);
+        historyMap.view.redraw();
+        return index;     
     },
 
     updateNode: function (index, node) {
-        return this.nodes[index] = node;
+        var result = (this.nodes[index] = node);
+        historyMap.view.redraw();
+        return result;
     },
 
     getArray: function () {

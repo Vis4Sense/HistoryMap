@@ -128,7 +128,7 @@ historyMap.controller.browser = function () {
 			Node2DB(node);
 		}
 		
-		historyMap.view.redraw();
+		// historyMap.view.redraw();
 
 		// console.log('added new node',node);
 
