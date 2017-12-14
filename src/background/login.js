@@ -26,6 +26,7 @@ function googleLogin() {
     google.login({
         scope: 'email',
         force: true
+        // maybe add here the configuration that do not remember password
     }).then(function () {
         return google.api('me');
     })
@@ -80,7 +81,7 @@ hello.on('auth.login', function (r) {
     });
 });
 
-//gets UACkey from DB
+//gets UACkey from DB // will be moved to historyMap.model
 function getUACKey() {
     // Update a user
     var url = baseURL + "userGenerateAccessKey/" + UserEmail + "/";
@@ -102,10 +103,3 @@ function getUACKey() {
     }
     xhr.send();
 }
-
-function openSensemap() {
-    chrome.windows.create({
-        'url': '/src/historyMap/historyMap.html',
-        'type': 'popup'
-    }, function (window) {});
-};

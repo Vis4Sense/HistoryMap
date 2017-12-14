@@ -42,7 +42,7 @@ $(function () {
 window.onload = function () {
 
     if (localStorage.getItem('user') !== null) {
-        loggedIn = true;
+        loggedIn = true; // not always, user may still need to enter the password
         historyMap.model.user = JSON.parse(localStorage.getItem('user'));
     }
 
@@ -91,7 +91,10 @@ function btnDisplay() {
 function newHistoryMap() {
     var confirmation = confirm("Do you want to start a new session? All the progress will be lost if you are not logged in.")
 
+    // this message box will be updated so depends on whether user is logged in or not, different message and options (such as 'enter session name' or 'login') will be displayed.
+
     if (confirmation) {
+
         historyMap.model.nodes.empty();
 
         if (loggedIn) {
