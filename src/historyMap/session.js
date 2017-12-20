@@ -24,18 +24,24 @@ $(function () {
         load_Select_Session();
     });
     $('#btn_logout').click(function () {
-        chrome.runtime.sendMessage({text:'logout', function (response) {
-            console.log('response from login.js',response.text);    
-        }}); 
+        chrome.runtime.sendMessage({
+            text: 'logout',
+            function (response) {
+                console.log('response from login.js', response.text);
+            }
+        });
         location.reload();
         loggedIn = false;
         btnDisplay();
     });
     $('#btn_login').click(function () {
         // run hello.js google+ login
-        chrome.runtime.sendMessage({text:'login', function (response) {
-            console.log('response from login.js',response.text);    
-        }}); 
+        chrome.runtime.sendMessage({
+            text: 'login',
+            function (response) {
+                console.log('response from login.js', response.text);
+            }
+        });
     })
 });
 
@@ -77,14 +83,19 @@ function btnDisplay() {
         document.getElementById('userImage').style.display = "initial";
         userImage.src = historyMap.model.user.image.url;
 
-        // (toBeComplete) if user has saved sessions, load button is visible, else;
-        document.getElementById("btn_load").style.display = 'none';
-    }
-    else {
+        //checks if User has Sessions Saved, displays load if true
+        if (SessionCount == null){
+            document.getElementById("btn_load").style.display = 'none';
+        }
+        else{
+            document.getElementById("btn_load").style.display = 'initial';
+        }
+
+    } else {
         document.getElementById("btn_login").style.display = "initial";
         document.getElementById("btn_logout").style.display = "none";
         document.getElementById("btn_load").style.display = "none";
-        document.getElementById('userImage').style.display = "none";        
+        document.getElementById('userImage').style.display = "none";
     }
 }
 
@@ -100,7 +111,7 @@ function newHistoryMap() {
         if (loggedIn) {
             // so user can't create press the 'new' button more than once.
             document.getElementById('btn_new').disabled = true;
-            
+
             // add a text field
             var input = document.createElement('input');
             input.type = 'text';
@@ -123,6 +134,7 @@ function newSession() {
     var sessionName = document.getElementById('sessionName').value;
     // create a new session (to be completed)
 }
+
 
 // DB LOAD Document
 // Made by Reday Yahya | @RedayY

@@ -60,8 +60,11 @@ hello.on('auth.login', function (r) {
     hello(r.network).api('/me').then(function (user) {
 
         localStorage.setItem('user',JSON.stringify(user));
+        console.log("LOGGIN IN");
 
         chrome.runtime.sendMessage({text:'loggedin',user: user});
+
+        //chrome.runetime.sendmessage({text:'logininfo',user: user});
 
         // btn_format();
         // AccLoggedIn = true;
@@ -72,34 +75,5 @@ hello.on('auth.login', function (r) {
         // saveProfile();
         // document.dispatchEvent(DOMContentLoaded);
         // openSensemap();
-
-        // On chrome apps we're not able to get remote images
-        // This is a workaround
-        // if (typeof (chrome) === 'object') {
-        //     img_xhr(label.getElementsByTagName('img')[0], user.thumbnail);
-        // }
     });
 });
-
-//gets UACkey from DB // will be moved to historyMap.model
-function getUACKey() {
-    // Update a user
-    var url = baseURL + "userGenerateAccessKey/" + UserEmail + "/";
-    var xhr = new XMLHttpRequest();
-    xhr.open("PUT", url, true);
-    xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-    xhr.onload = function () {
-        var users = JSON.parse(xhr.responseText);
-        if (xhr.readyState == 4 && xhr.status == "200") {
-            // console.table(users);
-            // console.log(users.accessKey);
-            UserAccessKey = users.accessKey;
-            localStorage.setItem("UserAccessKey", UserAccessKey);
-        } else {
-            // console.error(users);
-            UserAccessKey = users.accessKey;
-            localStorage.setItem("UserAccessKey", UserAccessKey);
-        }
-    }
-    xhr.send();
-}

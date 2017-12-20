@@ -9,7 +9,7 @@ historyMap.model.nodes = {
     addNode: function (node) {
         var index = this.nodes.push(node);
         historyMap.view.redraw();
-        return index;     
+        return index;
     },
 
     updateNode: function (index, node) {
@@ -22,11 +22,11 @@ historyMap.model.nodes = {
         return this.nodes;
     },
 
-    getSize: function() {
+    getSize: function () {
         return this.nodes.length;
     },
 
-    empty: function() {
+    empty: function () {
         this.nodes.length = 0;
         historyMap.view.redraw();
     }
@@ -51,13 +51,31 @@ function Node(id, tabId, time, url, title, favIconUrl, parentTabId, from) {
 // let AccLoggedIn;
 let DBnodes = [];
 let UserProfile;
-let ProfileName = localStorage.getItem('ProfileName');
+let ProfileName;
+let up;
+let UserEmail;
+let APIKey;
+
+//Gets Info direct from login instead of localstorage (thank you kai, used your code to make it work)
+//Howeverk, with this new logic, it only sends thoose via autentification. Authentification now runs onload.
+//I think we should make a "Create Session Button". 
+//This will initialize and setup the backend and ask the user to login
+chrome.runtime.onMessage.addListener(function (request) {
+    if (request.text === 'loggedin') {
+        ProfileName = request.user.name;
+        up = request.user;
+        UserEmail = request.user.email;
+        getUACKey();
+
+        //This bit will intialize Session Screen, well it should atleast.
+        //askForSession();
+
+        // after this is set, startAPI needs to be called once the session has been set.
+    }
+});
 
 //API (Save and Load) specific Variables
 var baseURL = "https://sensemap-api.herokuapp.com/";
-let up = JSON.parse(localStorage.getItem('UserProfile'));
-let UserEmail = localStorage.getItem("UserEmail");
-let APIKey = localStorage.getItem("UserAccessKey");
 let apiinput;
 let DBSessionPointer;
 let SessionReady = false;
@@ -70,7 +88,6 @@ function startAPI() {
     }
 }
 
-
 $(function () {
     $('#new_session').click(function () {
         askForSession();
@@ -81,14 +98,34 @@ $(function () {
 });
 
 function askForSession() {
-
     var NewSessionName = document.getElementById("NewSessionName").value;
-        SessionName = NewSessionName;
-        window.alert("Using Session Name: " + SessionName);
-        SessionReady = true;
-        document.getElementById("myNav").style.width = "0%";
-        startAPI();
-    
+    SessionName = NewSessionName;
+    window.alert("Using Session Name: " + SessionName);
+    SessionReady = true;
+    document.getElementById("myNav").style.width = "0%";
+    startAPI();
+
+}
+
+//gets UACkey from DB // will be moved to historyMap.model
+function getUACKey() {
+    // Update a user
+    var url = baseURL + "userGenerateAccessKey/" + UserEmail + "/";
+    var xhr = new XMLHttpRequest();
+    xhr.open("PUT", url, true);
+    xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+    xhr.onload = function () {
+        var users = JSON.parse(xhr.responseText);
+        if (xhr.readyState == 4 && xhr.status == "200") {
+            // console.table(users);
+            // console.log(users.accessKey);
+            APIKey = users.accessKey;
+        } else {
+            // console.error(users);
+            APIKey = users.accessKey;
+        }
+    }
+    xhr.send();
 }
 
 function pushSessToDB() {
