@@ -123,8 +123,16 @@ historyMap.controller.browser = function () {
 		if (recording == true) {
 			nodeId = nodes.addNode(node);
 		}
+		
+		let sessionstarted;
 
-		if (localStorage.getItem('UserProfile') !== null) {
+		chrome.runtime.onMessage.addListener(function (request) {
+			if (request.text === 'sessionstart') {
+				sessionstarted = true;
+			}
+		}); 
+
+		if (sessionstarted == true){
 			Node2DB(node);
 		}
 		

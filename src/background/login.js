@@ -60,7 +60,6 @@ hello.on('auth.login', function (r) {
     hello(r.network).api('/me').then(function (user) {
 
         localStorage.setItem('user',JSON.stringify(user));
-        console.log("LOGGIN IN");
 
         chrome.runtime.sendMessage({text:'loggedin',user: user});
 

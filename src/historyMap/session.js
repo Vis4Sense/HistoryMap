@@ -23,6 +23,9 @@ $(function () {
     $('#btn_load').click(function () {
         load_Select_Session();
     });
+    $('#btn_new_sess').click(function () {
+        newSession();
+    });
     $('#btn_logout').click(function () {
         chrome.runtime.sendMessage({
             text: 'logout',
@@ -115,7 +118,9 @@ function newHistoryMap() {
             // add a text field
             var input = document.createElement('input');
             input.type = 'text';
-            input.placeholder = 'session name';
+            var today = new Date();
+            //input.placeholder = today;
+            input.value = today.getDate() + '.' + (today.getMonth() + 1)  + '.' + today.getFullYear();
             input.id = 'sessionName';
             document.getElementById('settings').appendChild(input);
             input.focus();
@@ -124,15 +129,26 @@ function newHistoryMap() {
             var button = document.createElement('button');
             button.type = 'button';
             button.innerHTML = 'Create';
-            button.onclick = 'newSession';
+            button.id = 'btn_new_sess';
             document.getElementById('settings').appendChild(button);
         }
     }
 }
 
 function newSession() {
-    var sessionName = document.getElementById('sessionName').value;
-    // create a new session (to be completed)
+    var SessionName = document.getElementById('sessionName').value;
+
+    console.log(SessionName);
+    console.log("TESTING IF IT LINKS");
+
+    
+    //Starts up API and prepares Session
+    pushToDB();
+    pushSessToDB();
+
+    //sends message asking to start recording for the session
+    chrome.runtime.sendMessage({text:'sessionstart'});
+
 }
 
 
