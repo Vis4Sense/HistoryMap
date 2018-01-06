@@ -1,17 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () { 
-
-	console.log("starting contextmenu.js " + new Date().getTime());
-	
-	//var urlToHighlight = contentScript.model.urlToHighlight;
-	//alert("want to define model here " + new Date().getTime());
-	chrome.runtime.sendMessage({type: 'contentScriptDefine'}, response => {
-		console.log("sending script define message " + new Date().getTime());
-		
-		alert("sending script define message " + new Date().getTime());
-		if (response){
-			//alert("got contentScript definition here (not yet)");
-		}
-	});					
+	console.log("starting contextmenu.js " + new Date().getTime());			
 	createContextMenus();
 	
 	function createContextMenus() {
@@ -35,24 +23,25 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (info.menuItemId === 'sm-highlight') {
 				chrome.tabs.sendMessage(tab.id, { type: 'highlightSelection' }, response => {
 					if (response) {
-						console.log("reading response context menu " + new Date().getTime());
-						if (!urlToHighlight[tab.url]) {
-							urlToHighlight[tab.url] = []; 
-						}
-						//urlToHighlight[tab.url].push({type: 'highlight', path: d.path, text: d.text, classId: d.classId});
-						urlToHighlight.addHighlight(url, {type: 'highlight', path: d.path, text: d.text, classId: d.classId});
+						console.log("the response is " + JSON.stringify(response));
+						chrome.tabs.sendMessage(tab.id, {type: 'updateModel', innerType:'highlightSelection', tabUrl: tab.url, path:response.path, text: response.text, classId: response.classId}, response2 => {
+							if (response2){
+								console.log("model has been updated with text");
+							}
+						});
 					}
 				});
 			} else if (info.menuItemId === 'sm-save-image') {
 				// Overwrite existing image
-				chrome.tabs.sendMessage(tab.id, {type: 'highlightImage', srcUrl: info.srcUrl, pageUrl: info.pageUrl}, response => {
+				chrome.tabs.sendMessage(tab.id, {type: 'highlightImage', tabUrl: tab.url, srcUrl: info.srcUrl, pageUrl: info.pageUrl}, response => {
 					if (response) {
+						console.log("the response is " + response);
+						chrome.tabs.sendMessage(tab.id, {type: 'updateModel', innerType:'highlightImage', tabUrl: tab.url, srcUrl: info.srcUrl, pageUrl: info.pageUrl}, response2 => {
+							if (response2){
+								console.log("model has been updated with image addition");
+							}
+						});
 					}
-					if (!urlToHighlight[tab.url]) {
-						urlToHighlight[tab.url] = []; 
-					}
-					 //urlToHighlight[tab.url].push({type: 'highlightImage', srcUrl: info.srcUrl, pageUrl: info.pageUrl});
-					 urlToHighlight.addHighlight(url, {type: 'highlightImage', srcUrl: info.srcUrl, pageUrl: info.pageUrl})
 				});
 
 				//To remove image (created once an image is saved)
@@ -64,6 +53,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			} else if (info.menuItemId === 'sm-remove-image') {
 				chrome.tabs.sendMessage(tab.id, {type: 'removeHighlightImage', srcUrl: info.srcUrl, pageUrl: info.pageUrl}, response => {
 					if (response) {
+						console.log("the response is " + response);
+						chrome.tabs.sendMessage(tab.id, {type: 'updateModel', innerType:'removeHighlightImage', tabUrl: tab.url, srcUrl: info.srcUrl, pageUrl: info.pageUrl}, response2 => {
+							if (response2){
+								console.log("model has been updated with image removal");
+							}
+						});
 					}
 				});
 			}

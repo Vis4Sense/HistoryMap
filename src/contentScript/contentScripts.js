@@ -30,28 +30,20 @@ loadHighlights  = function () {
 		console.log("loadHighlights listener has been registered");
 }
 
-contentScript.view.loadHighlights = loadHighlights;
 //loadHighlights called by contentScriptController
+contentScript.view.loadHighlights = loadHighlights;
 
 contentScript.controller.contentScriptController = contentScriptController;
 contentScriptController();
 
 contentScript.view.highlight = highlight;
 highlight();
-console.log("Content script highlight and controller have been logged " + new Date().getTime());
-console.log("before adding event listeners"+ new Date().getTime());
 
-		alert("before adding event listeners " + new Date().getTime());
+//in case contentScript model needs to be passed to background.js 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-	console.log("got a runtime message " + JSON.stringify(request));
-			if (request.type === 'getModel') { // To respond that the background page is currently active
-				console.log("getmodel received");
-				sendResponse({data: "hello"});
-			}
-			
-			if (request.type === 'contentScriptDefine'){
-				console.log("got contentScriptDefine message");
-			}
+	if (request.type === 'getModel') {
+		//wrong method to access model
+		sendResponse({data: contentScript.model.urlToHighlight});
+	}
 });
-console.log("after adding event listeners");
     

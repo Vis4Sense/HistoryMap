@@ -55,14 +55,18 @@ function respondExtension() {
             changeHighlightImage(request.srcUrl, request.pageUrl, true, sendResponse);
         } else if (request.type === 'removeHighlightImage') {
             changeHighlightImage(request.srcUrl, request.pageUrl, false, sendResponse);
+        } else if (request.type === "updateModel"){
+            updateModel(request);
         }
     });
 }
 
 function highlightSelection(sendResponse) {
+    var highlightReponse;
     var selection = getSelection();
     if (!selection || selection.type !== "Range") return;
-    sendResponse($.highlight(selection));
+    highlightResponse = $.highlight(selection);
+    sendResponse(highlightResponse);
     selection.empty();
 }
 
@@ -150,4 +154,18 @@ function completePendingTask() {
             scrollTo(response);
         }
     });
+}
+
+function updateModel(response){
+    console.log("updating model: add this to the model ");  
+    console.log("the reponse to add is ... "+ JSON.stringify(response));
+/*
+//old method of adding for the different context menu interactions
+if (!urlToHighlight[tab.url]) {
+    urlToHighlight[tab.url] = []; 
+}
+urlToHighlight.addHighlight(url, {type: 'highlight', path: d.path, text: d.text, classId: d.classId});
+urlToHighlight.addHighlight(url, {type: 'highlightImage', srcUrl: info.srcUrl, pageUrl: info.pageUrl})
+urlToHighlight.addHighlight(url, {type: 'note', classId: request.data.classId, text: request.data.text, url: sender.tab.url, path: request.data.path});
+*/		
 }

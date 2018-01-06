@@ -4,26 +4,6 @@ document.addEventListener('DOMContentLoaded', function () {
 	console.log("starting background.js " + new Date().getTime());
 	chrome.browserAction.onClicked.addListener(function() {
 		const url = chrome.extension.getURL('src/historyMap/historyMap.html');
-		//to store a reference to the contentScript model
-		/*chrome.runtime.sendMessage({ type: "getModel" }, function(response) {
-			console.log("sent getModel message");
-			if (response){
-				console.log("got urlToHighlight " + response.data);
-				urlToHighlight = response.data;
-			}
-		});*/
-		
-		chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
-			console.log("getting activetab " + tabs[0]);
-			chrome.tabs.sendMessage(tabs[0].id, {type: "getModel"}, function(response) {
-				console.log("sending getModel");
-			if (response){
-				console.log("got getModel urlToHighlight " + response.data);
-				console.log("got urlToHighlight " + response.data);
-				urlToHighlight = response.data;
-			}
-			});  
-		});
 		// Only allow a single instance of the history map
 		if (getView(url)){
 			return;
