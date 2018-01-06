@@ -2,7 +2,6 @@ contentScriptController = function () {
     // Only run after the background page opens. 
     chrome.runtime.sendMessage({ type: "backgroundOpened" }, function (response) {
         /*if (!response){
-			
          return;}*/
 
         // If page uses ajax, we don't know when it's actually complete such as google search result page.
@@ -18,7 +17,6 @@ contentScriptController = function () {
         respondExtension();
         console.log("SensePath: content script controller loaded");
     });
-    //});
 };
 
 function injectLinks() {
@@ -27,11 +25,6 @@ function injectLinks() {
         chrome.runtime.sendMessage({ type: "linkClicked" });
     });
 }
-
-/**
- * Loads existing highlights to the page.
- */
-//load highlights was previously defined here
 
 /**
  * Captures page activities to be able to infer if the page is idle or not.
@@ -51,12 +44,12 @@ function handle() {
 
 function respondExtension() {
     chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+		console.log("controller got a message " + JSON.stringify(request));
         if (request.type === "scrollToElement") {
             scrollTo(request);
         } else if (request.type === 'askReferrer') {
             sendResponse(document.referrer);
         } else if (request.type === 'highlightSelection') {
-            console.log("got highlightSelection");
             highlightSelection(sendResponse);
         } else if (request.type === 'highlightImage') {
             changeHighlightImage(request.srcUrl, request.pageUrl, true, sendResponse);

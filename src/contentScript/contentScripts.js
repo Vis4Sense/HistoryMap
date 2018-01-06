@@ -27,7 +27,7 @@ loadHighlights  = function () {
 				}
 			});
 		});
-		console.log("loadHighlghts listener has been registered");
+		console.log("loadHighlights listener has been registered");
 }
 
 contentScript.view.loadHighlights = loadHighlights;
@@ -38,6 +38,20 @@ contentScriptController();
 
 contentScript.view.highlight = highlight;
 highlight();
+console.log("Content script highlight and controller have been logged " + new Date().getTime());
+console.log("before adding event listeners"+ new Date().getTime());
 
-
+		alert("before adding event listeners " + new Date().getTime());
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+	console.log("got a runtime message " + JSON.stringify(request));
+			if (request.type === 'getModel') { // To respond that the background page is currently active
+				console.log("getmodel received");
+				sendResponse({data: "hello"});
+			}
+			
+			if (request.type === 'contentScriptDefine'){
+				console.log("got contentScriptDefine message");
+			}
+});
+console.log("after adding event listeners");
     
