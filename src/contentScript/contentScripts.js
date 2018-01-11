@@ -38,12 +38,4 @@ contentScriptController();
 
 contentScript.view.highlight = highlight;
 highlight();
-
-//in case contentScript model needs to be passed to background.js 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-	if (request.type === 'getModel') {
-		//wrong method to access model
-		sendResponse({data: contentScript.model.urlToHighlight});
-	}
-});
     

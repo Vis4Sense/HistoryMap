@@ -159,6 +159,7 @@ function completePendingTask() {
 function updateModel(response){
     console.log("updating model: add this to the model ");  
     console.log("the reponse to add is ... "+ JSON.stringify(response));
+    console.log(contentScript.model.urlToHighlight.getArray());
 /*
 //old method of adding for the different context menu interactions
 if (!urlToHighlight[tab.url]) {
