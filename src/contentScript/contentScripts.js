@@ -27,17 +27,15 @@ loadHighlights  = function () {
 				}
 			});
 		});
-		console.log("loadHighlghts listener has been registered");
+		console.log("loadHighlights listener has been registered");
 }
 
-contentScript.view.loadHighlights = loadHighlights;
 //loadHighlights called by contentScriptController
+contentScript.view.loadHighlights = loadHighlights;
 
 contentScript.controller.contentScriptController = contentScriptController;
 contentScriptController();
 
 contentScript.view.highlight = highlight;
 highlight();
-
-
     

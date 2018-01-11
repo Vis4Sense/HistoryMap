@@ -1,6 +1,6 @@
 contentScript.model.urlToHighlight = {
     //this will store all the highlight/annotation nodes
-    urlToHighlight: [],
+    urlToHighlight: ["fake model"],
 
 	getArray: function () {
 		return this.urlToHighlight;

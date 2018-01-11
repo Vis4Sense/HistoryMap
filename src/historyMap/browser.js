@@ -33,7 +33,7 @@ historyMap.controller.browser = function() {
 
 	var nodes = historyMap.model.nodes;
 	// var redraw = historyMap.view.redraw(); // why this doesn't work?
-
+	
 	// not recording any chrome-specific url
 	const ignoredUrls = [
 		'chrome://',
@@ -142,5 +142,99 @@ historyMap.controller.browser = function() {
 	function isIgnoredTab(tab) {
 		return ignoredUrls.some(url => tab.url.includes(url));
 	}
+	function isEmbeddedType(type) {
+        return [ 'highlight', 'note', 'filter' ].includes(type);
+    }
+	
+	function createNewAction(tab, type, text, path, classId, pic) {
+		// Still need to check the last time before creating a new action
+        // because two updates can happen in a very short time, thus the second one
+        // happens even before a new action is added in the first update
+		var action;
+		if (type === 'highlight') {
+            action = createActionObject(tab.id, tab.url, text, type, undefined, path, classId, tab2node[tab.id], undefined, false);
+		} else if (type === 'save-image') {
+			action = createActionObject(tab.id, tab.url, undefined, type, undefined, undefined, undefined, tab2node[tab.id], pic, true);
+		}
+		return action;
+	}
+
+	var lastDate;
+
+	//using old style of creating nodes(actions)
+	function createActionObject(tabId, url, text, type, favIconUrl, path, classId, from, pic, hidden) {
+	    var time = new Date(),
+            action = {
+                id: nodeId,
+                time: time,
+                url: url,
+                text: text,
+                type: type,
+                showImage: true,
+				hidden: hidden
+            };
+
+        if (favIconUrl) action.favIconUrl = favIconUrl;
+        if (path) action.path = path;
+        if (classId) action.classId = classId;
+		
+		if (pic) {
+			action.value = pic;
+			action.id = tab2node[tabId];
+		}
+        if (!isEmbeddedType(type)) {
+            // End time
+            action.endTime = action.id + 1;
+        } else {
+            action.embedded = true;
+        }
+
+        if (lastDate && action.id === +lastDate) action.id += 1;
+        lastDate = time;
+
+        // Referrer
+        //cant use if(action.from) because action.from = node.id,
+		//which has range of 0 to n  
+        if (typeof from !== "undefined") {
+            action.from = from;
+        } else {
+			if(tabId) {
+                action.from = tab2node[tabId];
+            }
+        }
+
+		dispatch.nodeCreated(action);
+        nodeId++;
+        return action;
+    }
+
+	/* Additional Functions for Checking */
+
+    function isIgnoredTab(tab) {
+        return ignoredUrls.some(url => tab.url.includes(url));
+	}	
+
+
+	function onMessageReceived(request, sender, sendResponse) {
+		if (request.type === 'highlightRemoved') {
+            dispatch.nodeRemoved(request.classId, sender.tab.url);
+	   } else if (request.type === 'noted') {
+			const typeUpdate = {
+				classId: request.data.classId,
+				text: request.data.text,
+				type: 'note',
+				url: sender.tab.url
+			};
+			dispatch.typeUpdated(typeUpdate);
+	   	} else if (request.type === 'loadHighlights') {
+			   //will not be called yet....
+			// Get highlights, notes for the requested item
+			var tab = sender.tab;
+			//var highlightObject = checkIfUrlContainsHighlights(tab.url);
+			sendResponse(highlightObject);
+		}
+	}
+	
+
 
 }

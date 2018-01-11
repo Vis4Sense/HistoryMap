@@ -2,7 +2,6 @@ contentScriptController = function () {
     // Only run after the background page opens. 
     chrome.runtime.sendMessage({ type: "backgroundOpened" }, function (response) {
         /*if (!response){
-			
          return;}*/
 
         // If page uses ajax, we don't know when it's actually complete such as google search result page.
@@ -18,7 +17,6 @@ contentScriptController = function () {
         respondExtension();
         console.log("SensePath: content script controller loaded");
     });
-    //});
 };
 
 function injectLinks() {
@@ -27,11 +25,6 @@ function injectLinks() {
         chrome.runtime.sendMessage({ type: "linkClicked" });
     });
 }
-
-/**
- * Loads existing highlights to the page.
- */
-//load highlights was previously defined here
 
 /**
  * Captures page activities to be able to infer if the page is idle or not.
@@ -51,25 +44,29 @@ function handle() {
 
 function respondExtension() {
     chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+		console.log("controller got a message " + JSON.stringify(request));
         if (request.type === "scrollToElement") {
             scrollTo(request);
         } else if (request.type === 'askReferrer') {
             sendResponse(document.referrer);
         } else if (request.type === 'highlightSelection') {
-            console.log("got highlightSelection");
             highlightSelection(sendResponse);
         } else if (request.type === 'highlightImage') {
             changeHighlightImage(request.srcUrl, request.pageUrl, true, sendResponse);
         } else if (request.type === 'removeHighlightImage') {
             changeHighlightImage(request.srcUrl, request.pageUrl, false, sendResponse);
+        } else if (request.type === "updateModel"){
+            updateModel(request);
         }
     });
 }
 
 function highlightSelection(sendResponse) {
+    var highlightReponse;
     var selection = getSelection();
     if (!selection || selection.type !== "Range") return;
-    sendResponse($.highlight(selection));
+    highlightResponse = $.highlight(selection);
+    sendResponse(highlightResponse);
     selection.empty();
 }
 
@@ -157,4 +154,19 @@ function completePendingTask() {
             scrollTo(response);
         }
     });
+}
+
+function updateModel(response){
+    console.log("updating model: add this to the model ");  
+    console.log("the reponse to add is ... "+ JSON.stringify(response));
+    console.log(contentScript.model.urlToHighlight.getArray());
+/*
+//old method of adding for the different context menu interactions
+if (!urlToHighlight[tab.url]) {
+    urlToHighlight[tab.url] = []; 
+}
+urlToHighlight.addHighlight(url, {type: 'highlight', path: d.path, text: d.text, classId: d.classId});
+urlToHighlight.addHighlight(url, {type: 'highlightImage', srcUrl: info.srcUrl, pageUrl: info.pageUrl})
+urlToHighlight.addHighlight(url, {type: 'note', classId: request.data.classId, text: request.data.text, url: sender.tab.url, path: request.data.path});
+*/		
 }
