@@ -6,6 +6,10 @@ historyMap.model.nodes = {
         return this.nodes[index];
     },
 
+    getNodeIndex: function (node) {
+        return this.nodes.indexOf(node);
+    },
+
     addNode: function (node) {
         var index = this.nodes.push(node);
         historyMap.view.redraw();

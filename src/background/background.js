@@ -1,3 +1,5 @@
+var urlToHighlight;
+
 document.addEventListener('DOMContentLoaded', function () {
 	chrome.browserAction.onClicked.addListener(function () {
 
@@ -6,12 +8,12 @@ document.addEventListener('DOMContentLoaded', function () {
 		chrome.browserAction.setIcon({
 			path: "/logo/sm-logo-19.png"
 		});
-
 		const url = chrome.extension.getURL('src/historyMap/historyMap.html');
-
 		// Only allow a single instance of the history map
-		if (getView(url)) return;
-
+		if (getView(url)){
+			return;
+		} 
+		
 		// Adjust location and size of the current window, where the extension button is clicked
 		chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {
 			// left: Math.floor(screen.width * 0.33), top: 0, width: Math.floor(screen.width * 0.67), height: screen.height
