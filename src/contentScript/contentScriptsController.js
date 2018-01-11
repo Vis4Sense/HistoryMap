@@ -44,8 +44,8 @@ function handle() {
 
 function respondExtension() {
     chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-		console.log("controller got a message " + JSON.stringify(request));
-        if (request.type === "scrollToElement") {
+        console.log("controller got a message " + JSON.stringify(request));    
+		if (request.type === "scrollToElement") {
             scrollTo(request);
         } else if (request.type === 'askReferrer') {
             sendResponse(document.referrer);
@@ -56,7 +56,7 @@ function respondExtension() {
         } else if (request.type === 'removeHighlightImage') {
             changeHighlightImage(request.srcUrl, request.pageUrl, false, sendResponse);
         } else if (request.type === "updateModel"){
-            updateModel(request);
+            updateModel(request, sendResponse);
         }
     });
 }
@@ -156,10 +156,27 @@ function completePendingTask() {
     });
 }
 
-function updateModel(response){
-    console.log("updating model: add this to the model ");  
-    console.log("the reponse to add is ... "+ JSON.stringify(response));
-    console.log(contentScript.model.urlToHighlight.getArray());
+function updateModel(request, sendReponse){ 
+    console.log("the request to add is ... "+ JSON.stringify(request));
+    var highlightToAdd;
+    var tabUrl = request.tabUrl;
+    if (request.innerType == "highlightSelection"){
+        highlightToAdd = {type: request.innerType, path:request.path, text: request.text, classId: request.classId};
+        contentScript.model.urlToHighlight.addHighlight(tabUrl, highlightToAdd);
+        console.log(contentScript.model.urlToHighlight.getHighlights(tabUrl));
+    } else if (request.innerType == "highlightImage"){
+        highlightToAdd = {type: request.innerType, srcUrl: request.srcUrl, pageUrl: request.pageUrl};
+        contentScript.model.urlToHighlight.addHighlight(tabUrl, highlightToAdd);
+        console.log(contentScript.model.urlToHighlight.getHighlights(tabUrl));
+    } else if (request.innerType == "removeHighlightImage"){
+        var highlightToRemove = {type: request.innerType, srcUrl: request.srcUrl, pageUrl: request.pageUrl}; 
+        contentScript.model.urlToHighlight.removeHighlight(tabUrl, highlightToRemove);
+        console.log(contentScript.model.urlToHighlight.getHighlights(tabUrl)); 
+    } else if (request.innerType == "note"){
+        highlightToAdd = {type: request.innerType, classId: request.classId, text: request.text, url: request.url, path: request.path};
+        contentScript.model.urlToHighlight.addHighlight(tabUrl, highlightToAdd);
+        console.log(contentScript.model.urlToHighlight.getHighlights(tabUrl));
+    }
 /*
 //old method of adding for the different context menu interactions
 if (!urlToHighlight[tab.url]) {
@@ -168,5 +185,5 @@ if (!urlToHighlight[tab.url]) {
 urlToHighlight.addHighlight(url, {type: 'highlight', path: d.path, text: d.text, classId: d.classId});
 urlToHighlight.addHighlight(url, {type: 'highlightImage', srcUrl: info.srcUrl, pageUrl: info.pageUrl})
 urlToHighlight.addHighlight(url, {type: 'note', classId: request.data.classId, text: request.data.text, url: sender.tab.url, path: request.data.path});
-*/		
+*/	
 }

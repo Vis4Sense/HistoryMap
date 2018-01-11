@@ -23,7 +23,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (info.menuItemId === 'sm-highlight') {
 				chrome.tabs.sendMessage(tab.id, { type: 'highlightSelection' }, response => {
 					if (response) {
-						console.log("the response is " + JSON.stringify(response));
 						chrome.tabs.sendMessage(tab.id, {type: 'updateModel', innerType:'highlightSelection', tabUrl: tab.url, path:response.path, text: response.text, classId: response.classId}, response2 => {
 							if (response2){
 								console.log("model has been updated with text");
