@@ -10,9 +10,9 @@
 
 // function onTabUpdate(tab) {
 //     if ('loading') {
-			// if (non-redireciton) addNode(tab);
-			// else {update existing node}; // redirection
-		// }
+// if (non-redireciton) addNode(tab);
+// else {update existing node}; // redirection
+// }
 //     if (title updated) send the new title to historyMap.js through an event;
 //     if (favIconUrl updated) send the new favIconUrl to historyMap.js through an event;
 // }
@@ -23,7 +23,7 @@
 // }
 
 
-historyMap.controller.browser = function() {
+historyMap.controller.browser = function () {
 	// const module = {};
 
 	var nodeId = 0; // can't use tab.id as node id because new url can be opened in the existing tab
@@ -36,20 +36,20 @@ historyMap.controller.browser = function() {
 	
 	// not recording any chrome-specific url
 	const ignoredUrls = [
-		'chrome://',
-		'chrome-extension://',
-		'chrome-devtools://',
-		'view-source:',
-		'google.co.uk/url',
-		'google.com/url',
-		'localhost://'
-	],
-	bookmarkTypes = [ 'auto_bookmark' ],
-	typedTypes = [ 'typed', 'generated', 'keyword', 'keyword_generated' ];
+			'chrome://',
+			'chrome-extension://',
+			'chrome-devtools://',
+			'view-source:',
+			'google.co.uk/url',
+			'google.com/url',
+			'localhost://'
+		],
+		bookmarkTypes = ['auto_bookmark'],
+		typedTypes = ['typed', 'generated', 'keyword', 'keyword_generated'];
 
-	chrome.tabs.onCreated.addListener( function(tab) {
+	chrome.tabs.onCreated.addListener(function (tab) {
 
-		if(!isIgnoredTab(tab)) {
+		if (!isIgnoredTab(tab)) {
 			// console.log('newTab -', 'tabId:'+tab.id, ', parent:'+tab.openerTabId, ', url:'+tab.url, tab); // for testing
 
 			addNode(tab, tab.openerTabId);
@@ -58,9 +58,9 @@ historyMap.controller.browser = function() {
 	});
 
 
-	chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+	chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 
-		if(!isIgnoredTab(tab)) {
+		if (!isIgnoredTab(tab)) {
 
 			// console.log('tab update',tabId,changeInfo,tab);
 
@@ -76,8 +76,7 @@ historyMap.controller.browser = function() {
 					historyMap.view.redraw();
 
 					tabUrl[tabId] = tab.url;
-				}
-				else { // not redirection
+				} else { // not redirection
 					addNode(tab, tab.id);
 				}
 			}
@@ -101,7 +100,7 @@ historyMap.controller.browser = function() {
 		}
 	});
 
-	function addNode(tab,parent) {
+	function addNode(tab, parent) {
 
 		const title = tab.title || tab.url;
 		const time = new Date();
@@ -121,14 +120,31 @@ historyMap.controller.browser = function() {
 		tabUrl[tab.id] = tab.url;
 		isTabCompleted[tab.id] = false;
 
-		nodeId = nodes.addNode(node);
-		historyMap.view.redraw();
+		if (recording == true) {
+			nodeId = nodes.addNode(node);
+		}
+		
+		let sessionstarted;
+
+		chrome.runtime.onMessage.addListener(function (request) {
+			if (request.text === 'sessionstart') {
+				sessionstarted = true;
+			}
+		}); 
+
+		if (sessionstarted == true){
+			Node2DB(node);
+		}
+		
+		// historyMap.view.redraw();
 
 		// console.log('added new node',node);
 
 		// Update with visit type
 		if (tab.url) {
-			chrome.history.getVisits({ url: tab.url }, results => {
+			chrome.history.getVisits({
+				url: tab.url
+			}, results => {
 				// The latest one contains information about the just completely loaded page
 				const type = results && results.length ? _.last(results).transition : undefined;
 

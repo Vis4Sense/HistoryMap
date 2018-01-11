@@ -1,8 +1,13 @@
 var urlToHighlight;
 
 document.addEventListener('DOMContentLoaded', function () {
-	console.log("starting background.js " + new Date().getTime());
-	chrome.browserAction.onClicked.addListener(function() {
+	chrome.browserAction.onClicked.addListener(function () {
+
+		// change the extension icon to the coloured one, which should be used when SenseMap is active
+
+		chrome.browserAction.setIcon({
+			path: "/logo/sm-logo-19.png"
+		});
 		const url = chrome.extension.getURL('src/historyMap/historyMap.html');
 		// Only allow a single instance of the history map
 		if (getView(url)){
@@ -12,27 +17,37 @@ document.addEventListener('DOMContentLoaded', function () {
 		// Adjust location and size of the current window, where the extension button is clicked
 		chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {
 			// left: Math.floor(screen.width * 0.33), top: 0, width: Math.floor(screen.width * 0.67), height: screen.height
-			left: 0, top: 0, width: Math.floor(screen.width/2), height: Math.floor(screen.height*0.7)
+			left: 0,
+			top: 0,
+			width: Math.floor(screen.width / 2),
+			height: Math.floor(screen.height * 0.7)
 		});
 
 		// Create an instance of the history map
-		chrome.windows.create({
-	    	url: url,
-	    	type: 'popup',
-	    	// left: 0,
-	    	// top: 0,
-	    	// width: Math.floor(screen.width * 0.33),
-	    	// height: screen.height
-	    	left: 0,
-	    	top: Math.floor(screen.height * 0.7 + 25),
-	    	width: Math.floor(screen.width/2),
-	    	height: Math.floor(screen.height * 0.3 - 25)
-	    }, function(w) {
-	    	chrome.windows.update(w.id, { focused: true });
-	    });
+		// if (ProfileName = localStorage.getItem('ProfileName') !== null) {
+			chrome.windows.create({
+				url: url,
+				type: 'popup',
+				// left: 0,
+				// top: 0,
+				// width: Math.floor(screen.width * 0.33),
+				// height: screen.height
+				left: 0,
+				top: Math.floor(screen.height * 0.7 + 25),
+				width: Math.floor(screen.width / 2),
+				height: Math.floor(screen.height * 0.3 - 25)
+			}, function (w) {
+				chrome.windows.update(w.id, {
+					focused: true
+				});
+			});
+		// }
+		// else {
+		// 	google_Login();
+		// }
 
 		// Listen to content script
-		chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+		chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 			if (request.type === 'backgroundOpened') { // To respond that the background page is currently active
 				sendResponse(true);
 			}

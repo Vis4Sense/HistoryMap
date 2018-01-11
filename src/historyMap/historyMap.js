@@ -3,6 +3,7 @@ const historyMap = function () {
         model: {
             nodes: {},
             tree: {}, // real data
+            user: {},
             sessions: {}
         },
         view: {
