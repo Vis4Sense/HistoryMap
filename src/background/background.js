@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function () {
 					type: 'note',
 					url: sender.tab.url
 				};
-				chrome.tabs.sendMessage(sender.tab.id, {type: 'updateModel', innerType:'noted', typeUpdate}, response2 => {
+				chrome.tabs.sendMessage(sender.tab.id, {type: 'updateModel', innerType:'noted', tabUrl: sender.tab.url, data: typeUpdate}, response2 => {
 					if (response2){
 						console.log("model has been updated with note");
 					}

@@ -175,17 +175,8 @@ function updateModel(request, sendResponse){
         //console.log(contentScript.model.urlToHighlight.getHighlights(tabUrl)); 
         sendResponse(true);
     } else if (request.innerType == "noted"){
-        contentScript.model.urlToHighlight.updateHighlight()
-        console.log(contentScript.model.urlToHighlight.getHighlights(tabUrl));
-        //sendResponse(true); 
+        contentScript.model.urlToHighlight.updateType(request.data);
+        //console.log(contentScript.model.urlToHighlight.getHighlights(tabUrl));
+        sendResponse(true); 
     }
-/*
-//old method of adding for the different context menu interactions
-if (!urlToHighlight[tab.url]) {
-    urlToHighlight[tab.url] = []; 
-}
-urlToHighlight.addHighlight(url, {type: 'highlight', path: d.path, text: d.text, classId: d.classId});
-urlToHighlight.addHighlight(url, {type: 'highlightImage', srcUrl: info.srcUrl, pageUrl: info.pageUrl})
-urlToHighlight.addHighlight(url, {type: 'note', classId: request.data.classId, text: request.data.text, url: sender.tab.url, path: request.data.path});
-*/	
 }

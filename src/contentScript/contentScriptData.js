@@ -22,8 +22,17 @@ contentScript.model.urlToHighlight = {
         this.prepareUrlForHighlights(url);
     },
     
-    updateHighlight: function() {
-        //find original highlight node, modify the type and update its text 
+    updateType: function(typeUpdate) {
+        //locates the original highlight, updates its text and type
+        if (typeUpdate.type === 'note') {
+            var highlights = this.urlToHighlight[typeUpdate.url];
+            var foundNode = highlights.find(a => a.classId === typeUpdate.classId)
+            foundNode.text = typeUpdate.text;
+            foundNode.type = typeUpdate.type;
+            return foundNode;
+        } else {
+            nodes[typeUpdate.id].type = typeUpdate.type;
+        }
     },
 
     prepareUrlForHighlights: function (url) {
