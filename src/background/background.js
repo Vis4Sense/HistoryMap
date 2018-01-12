@@ -48,8 +48,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		// Listen to content script
 		chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+			//console.log("background got a message " + JSON.stringify(request));    
 			if (request.type === 'backgroundOpened') { // To respond that the background page is currently active
 				sendResponse(true);
+			} else if (request.type === "noted") {
+				console.log("need to update model with note")
+				const typeUpdate = {
+					classId: request.data.classId,
+					text: request.data.text,
+					type: 'note',
+					url: sender.tab.url
+				};
+				chrome.tabs.sendMessage(sender.tab.id, {type: 'updateModel', innerType:'noted', typeUpdate}, response2 => {
+					if (response2){
+						console.log("model has been updated with note");
+					}
+				});
+				//dispatch.typeUpdated(typeUpdate);
 			}
 		});
 	});

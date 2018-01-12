@@ -156,26 +156,28 @@ function completePendingTask() {
     });
 }
 
-function updateModel(request, sendReponse){ 
-    console.log("the request to add is ... "+ JSON.stringify(request));
+function updateModel(request, sendResponse){
     var highlightToAdd;
     var tabUrl = request.tabUrl;
     if (request.innerType == "highlightSelection"){
         highlightToAdd = {type: request.innerType, path:request.path, text: request.text, classId: request.classId};
         contentScript.model.urlToHighlight.addHighlight(tabUrl, highlightToAdd);
-        console.log(contentScript.model.urlToHighlight.getHighlights(tabUrl));
+        //console.log(contentScript.model.urlToHighlight.getHighlights(tabUrl));
+        sendResponse(true);
     } else if (request.innerType == "highlightImage"){
         highlightToAdd = {type: request.innerType, srcUrl: request.srcUrl, pageUrl: request.pageUrl};
         contentScript.model.urlToHighlight.addHighlight(tabUrl, highlightToAdd);
-        console.log(contentScript.model.urlToHighlight.getHighlights(tabUrl));
+        //console.log(contentScript.model.urlToHighlight.getHighlights(tabUrl));
+        sendResponse(true);
     } else if (request.innerType == "removeHighlightImage"){
         var highlightToRemove = {type: request.innerType, srcUrl: request.srcUrl, pageUrl: request.pageUrl}; 
         contentScript.model.urlToHighlight.removeHighlight(tabUrl, highlightToRemove);
-        console.log(contentScript.model.urlToHighlight.getHighlights(tabUrl)); 
-    } else if (request.innerType == "note"){
-        highlightToAdd = {type: request.innerType, classId: request.classId, text: request.text, url: request.url, path: request.path};
-        contentScript.model.urlToHighlight.addHighlight(tabUrl, highlightToAdd);
+        //console.log(contentScript.model.urlToHighlight.getHighlights(tabUrl)); 
+        sendResponse(true);
+    } else if (request.innerType == "noted"){
+        contentScript.model.urlToHighlight.updateHighlight()
         console.log(contentScript.model.urlToHighlight.getHighlights(tabUrl));
+        //sendResponse(true); 
     }
 /*
 //old method of adding for the different context menu interactions

@@ -271,7 +271,7 @@ highlight = function () {
 
 			//dialog.modal("hide");
 			dialog.hide();
-			console.log("notewrap is ", noteWrap);
+			console.log(noteWrap);
 			chrome.runtime.sendMessage({ type: "noted", data: noteWrap });
 		});
 		footer.find("#btnCancelNote").click(function() {

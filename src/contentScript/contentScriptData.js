@@ -21,11 +21,14 @@ contentScript.model.urlToHighlight = {
     removeHighlight: function(url, highlight) {
         this.prepareUrlForHighlights(url);
     },
+    
+    updateHighlight: function() {
+        //find original highlight node, modify the type and update its text 
+    },
 
     prepareUrlForHighlights: function (url) {
         //if url array does not exist, create one
         if(!this.urlToHighlight[url]){
-            console.log("url does not contain highlights");
             this.urlToHighlight[url] = [];
         }
     }

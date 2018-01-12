@@ -234,15 +234,7 @@ historyMap.controller.browser = function () {
 	function onMessageReceived(request, sender, sendResponse) {
 		if (request.type === 'highlightRemoved') {
             dispatch.nodeRemoved(request.classId, sender.tab.url);
-	   } else if (request.type === 'noted') {
-			const typeUpdate = {
-				classId: request.data.classId,
-				text: request.data.text,
-				type: 'note',
-				url: sender.tab.url
-			};
-			dispatch.typeUpdated(typeUpdate);
-	   	} else if (request.type === 'loadHighlights') {
+	   } else if (request.type === 'loadHighlights') {
 			   //will not be called yet....
 			// Get highlights, notes for the requested item
 			var tab = sender.tab;
