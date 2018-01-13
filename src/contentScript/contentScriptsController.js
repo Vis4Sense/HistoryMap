@@ -1,13 +1,15 @@
 contentScriptController = function () {
     // Only run after the background page opens. 
     chrome.runtime.sendMessage({ type: "backgroundOpened" }, function (response) {
-        /*if (!response){
-         return;}*/
-
+        if (!response){
+         return;}
+         console.log(response);
+         console.log("background is opened, url to load highlights from is");
+         console.log(response.url);
         // If page uses ajax, we don't know when it's actually complete such as google search result page.
         // Naively wait one more second.
         setTimeout(function () {
-            loadHighlights();
+            loadHighlights(response.url);
         }, 2000);
 
 
@@ -44,7 +46,7 @@ function handle() {
 
 function respondExtension() {
     chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-        console.log("controller got a message " + JSON.stringify(request));    
+        //console.log("controller got a message " + JSON.stringify(request));    
 		if (request.type === "scrollToElement") {
             scrollTo(request);
         } else if (request.type === 'askReferrer') {
@@ -57,7 +59,14 @@ function respondExtension() {
             changeHighlightImage(request.srcUrl, request.pageUrl, false, sendResponse);
         } else if (request.type === "updateModel"){
             updateModel(request, sendResponse);
-        }
+        } else if (request.type === 'loadHighlights') {
+            console.log("**** got load highlight message ****");
+                //will not be called yet....
+             // Get highlights, notes for the requested item
+             var tab = sender.tab;
+             //var highlightObject = checkIfUrlContainsHighlights(tab.url);
+             //sendResponse(highlightObject);
+         }
     });
 }
 
@@ -162,21 +171,17 @@ function updateModel(request, sendResponse){
     if (request.innerType == "highlightSelection"){
         highlightToAdd = {type: request.innerType, path:request.path, text: request.text, classId: request.classId};
         contentScript.model.urlToHighlight.addHighlight(tabUrl, highlightToAdd);
-        //console.log(contentScript.model.urlToHighlight.getHighlights(tabUrl));
         sendResponse(true);
     } else if (request.innerType == "highlightImage"){
         highlightToAdd = {type: request.innerType, srcUrl: request.srcUrl, pageUrl: request.pageUrl};
         contentScript.model.urlToHighlight.addHighlight(tabUrl, highlightToAdd);
-        //console.log(contentScript.model.urlToHighlight.getHighlights(tabUrl));
         sendResponse(true);
     } else if (request.innerType == "removeHighlightImage"){
         var highlightToRemove = {type: request.innerType, srcUrl: request.srcUrl, pageUrl: request.pageUrl}; 
         contentScript.model.urlToHighlight.removeHighlight(tabUrl, highlightToRemove);
-        //console.log(contentScript.model.urlToHighlight.getHighlights(tabUrl)); 
         sendResponse(true);
     } else if (request.innerType == "noted"){
         contentScript.model.urlToHighlight.updateType(request.data);
-        //console.log(contentScript.model.urlToHighlight.getHighlights(tabUrl));
         sendResponse(true); 
     }
 }

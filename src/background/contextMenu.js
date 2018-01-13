@@ -1,5 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () { 
-	console.log("starting contextmenu.js " + new Date().getTime());			
+document.addEventListener('DOMContentLoaded', function () { 		
 	createContextMenus();
 	
 	function createContextMenus() {
@@ -34,7 +33,6 @@ document.addEventListener('DOMContentLoaded', function () {
 				// Overwrite existing image
 				chrome.tabs.sendMessage(tab.id, {type: 'highlightImage', tabUrl: tab.url, srcUrl: info.srcUrl, pageUrl: info.pageUrl}, response => {
 					if (response) {
-						console.log("the response is " + response);
 						chrome.tabs.sendMessage(tab.id, {type: 'updateModel', innerType:'highlightImage', tabUrl: tab.url, srcUrl: info.srcUrl, pageUrl: info.pageUrl}, response2 => {
 							if (response2){
 								console.log("model has been updated with image addition");
@@ -52,7 +50,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			} else if (info.menuItemId === 'sm-remove-image') {
 				chrome.tabs.sendMessage(tab.id, {type: 'removeHighlightImage', srcUrl: info.srcUrl, pageUrl: info.pageUrl}, response => {
 					if (response) {
-						console.log("the response is " + response);
 						chrome.tabs.sendMessage(tab.id, {type: 'updateModel', innerType:'removeHighlightImage', tabUrl: tab.url, srcUrl: info.srcUrl, pageUrl: info.pageUrl}, response2 => {
 							if (response2){
 								console.log("model has been updated with image removal");

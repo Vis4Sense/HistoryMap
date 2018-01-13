@@ -48,11 +48,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		// Listen to content script
 		chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-			//console.log("background got a message " + JSON.stringify(request));    
+			console.log("background got a message " + JSON.stringify(request)); 
+			console.log("from " + sender.tab.url);   
 			if (request.type === 'backgroundOpened') { // To respond that the background page is currently active
-				sendResponse(true);
+				sendResponse({backgroundOpened: true, url: sender.tab.url});
 			} else if (request.type === "noted") {
-				console.log("need to update model with note")
 				const typeUpdate = {
 					classId: request.data.classId,
 					text: request.data.text,
@@ -64,7 +64,6 @@ document.addEventListener('DOMContentLoaded', function () {
 						console.log("model has been updated with note");
 					}
 				});
-				//dispatch.typeUpdated(typeUpdate);
 			}
 		});
 	});

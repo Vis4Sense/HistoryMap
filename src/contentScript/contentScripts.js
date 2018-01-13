@@ -12,8 +12,9 @@ const contentScript = function () {
     return contentScript;
 }();
 
-loadHighlights  = function () {
+loadHighlights  = function (url) {
 		// Get data from the extension
+		console.log("highlights to be loaded for url " + url);
 		chrome.runtime.sendMessage({ type: "loadHighlights" }, function(response) {
 			if (!response) return;
 			
