@@ -3,10 +3,12 @@
 
 let SessionName;
 let SessionProfile;
-let SessionCount;
+// let SessionCount = 1;
 
 let recording = true; // whether new noded is added to historymap or not
 let loggedIn = false; // whether user is logged in
+let sessions = historyMap.model.sessions.getSessions(); // store the list of user sessions
+sessions = ['session1','session2','session3','session4','session5']; // for dev only when no session data is retrieved from API
 
 $(function () {
     $('#btn_start').click(function () {
@@ -21,7 +23,7 @@ $(function () {
         newHistoryMap();
     });
     $('#btn_load').click(function () {
-        load_Select_Session();
+        displaySessions();
     });
     $('#btn_new_sess').click(function () {
         newSession();
@@ -87,7 +89,7 @@ function btnDisplay() {
         userImage.src = historyMap.model.user.image.url;
 
         //checks if User has Sessions Saved, displays load if true
-        if (SessionCount == null){
+        if (sessions.length == 0){
             document.getElementById("btn_load").style.display = 'none';
         }
         else{
@@ -120,7 +122,7 @@ function newHistoryMap() {
             input.type = 'text';
             var today = new Date();
             //input.placeholder = today;
-            input.value = today.getDate() + '.' + (today.getMonth() + 1)  + '.' + today.getFullYear();
+            input.value = today.getFullYear() + '-' + (today.getMonth() + 1)  + '-' + today.getDate() + '-' + today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
             input.id = 'sessionName';
             document.getElementById('settings').appendChild(input);
             input.focus();
@@ -133,6 +135,29 @@ function newHistoryMap() {
             document.getElementById('settings').appendChild(button);
         }
     }
+}
+
+function displaySessions() {
+
+    let sessionContainer = document.createElement('div');
+    sessionContainer.id = 'sessionContainer';
+
+    let sessionList = document.createElement('ul');
+    sessionList.id = 'sessionList';
+
+    sessionContainer.appendChild(sessionList);
+
+    for (var i = 0; i < sessions.length; i++) {
+        
+        // var paragraph = document.createElement('p');
+        
+        var listItem = document.createElement('li');
+        listItem.innerHTML = sessions[i];
+
+        sessionList.appendChild(listItem);
+    }
+    document.getElementById('settings').appendChild(sessionContainer);
+    $("#sessionList").selectable();
 }
 
 function newSession() {

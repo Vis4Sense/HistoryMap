@@ -36,6 +36,14 @@ historyMap.model.nodes = {
     }
 }
 
+historyMap.model.sessions = {
+    sessions: [],
+
+    getSessions: function() {
+        return this.sessions;
+    }
+};
+
 function Node(id, tabId, time, url, title, favIconUrl, parentTabId, from) {
     this.id = id;
     this.tabId = tabId;
@@ -238,6 +246,3 @@ function Node2DB(node) {
     return node;
 }
 
-historyMap.model.sessions = {
-    sessions: [],
-};
