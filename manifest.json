@@ -33,8 +33,7 @@
           "lib/jquery.min.js",
           "src/contentScript/contentScriptsController.js",
           "src/contentScript/highlight.js",
-          "src/contentScript/contentScripts.js",
-          "src/contentScript/contentScriptData.js"
+          "src/contentScript/contentScripts.js"
       ],
 	  "css": [
 		  "src/contentScript/content.css"

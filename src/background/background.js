@@ -1,4 +1,30 @@
-var urlToHighlight;
+const contentScript = {
+	model : {
+		nodes: {}, // the annotation nodes (text, picture and note highlighting)
+		urlToHighlight: {} //to synchronise highlights across tabs (with same url)
+	}
+}
+
+function updateModel(request){
+	console.log("update model request (in background) is ");
+	console.log(request);
+    //Capture highlightRemoved, (begin to work on model for highlight removal(all annotations)
+	var highlightToAdd;
+    var tabUrl = request.tabUrl;
+    if (request.innerType == "highlightSelection"){
+        highlightToAdd = {type: request.innerType, path:request.path, text: request.text, classId: request.classId};
+        contentScript.model.urlToHighlight.addHighlight(tabUrl, highlightToAdd);
+    } else if (request.innerType == "highlightImage"){
+        highlightToAdd = {type: request.innerType, srcUrl: request.srcUrl, pageUrl: request.pageUrl};
+        contentScript.model.urlToHighlight.addHighlight(tabUrl, highlightToAdd);
+    } else if (request.innerType == "removeHighlightImage"){
+        var highlightToRemove = {type: request.innerType, srcUrl: request.srcUrl, pageUrl: request.pageUrl}; 
+        contentScript.model.urlToHighlight.removeHighlight(tabUrl, highlightToRemove);
+    } else if (request.innerType == "noted"){
+        contentScript.model.urlToHighlight.updateType(request.data);
+	}
+	contentScript.model.urlToHighlight.displayState();
+}
 
 document.addEventListener('DOMContentLoaded', function () {
 	chrome.browserAction.onClicked.addListener(function () {

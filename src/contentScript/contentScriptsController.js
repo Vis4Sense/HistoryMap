@@ -3,9 +3,6 @@ contentScriptController = function () {
     chrome.runtime.sendMessage({ type: "backgroundOpened" }, function (response) {
         if (!response){
          return;}
-         console.log(response);
-         console.log("background is opened, url to load highlights from is");
-         console.log(response.url);
         // If page uses ajax, we don't know when it's actually complete such as google search result page.
         // Naively wait one more second.
         setTimeout(function () {
@@ -57,8 +54,6 @@ function respondExtension() {
             changeHighlightImage(request.srcUrl, request.pageUrl, true, sendResponse);
         } else if (request.type === 'removeHighlightImage') {
             changeHighlightImage(request.srcUrl, request.pageUrl, false, sendResponse);
-        } else if (request.type === "updateModel"){
-            updateModel(request, sendResponse);
         } else if (request.type === 'loadHighlights') {
             console.log("**** got load highlight message ****");
                 //will not be called yet....
@@ -163,25 +158,4 @@ function completePendingTask() {
             scrollTo(response);
         }
     });
-}
-
-function updateModel(request, sendResponse){
-    var highlightToAdd;
-    var tabUrl = request.tabUrl;
-    if (request.innerType == "highlightSelection"){
-        highlightToAdd = {type: request.innerType, path:request.path, text: request.text, classId: request.classId};
-        contentScript.model.urlToHighlight.addHighlight(tabUrl, highlightToAdd);
-        sendResponse(true);
-    } else if (request.innerType == "highlightImage"){
-        highlightToAdd = {type: request.innerType, srcUrl: request.srcUrl, pageUrl: request.pageUrl};
-        contentScript.model.urlToHighlight.addHighlight(tabUrl, highlightToAdd);
-        sendResponse(true);
-    } else if (request.innerType == "removeHighlightImage"){
-        var highlightToRemove = {type: request.innerType, srcUrl: request.srcUrl, pageUrl: request.pageUrl}; 
-        contentScript.model.urlToHighlight.removeHighlight(tabUrl, highlightToRemove);
-        sendResponse(true);
-    } else if (request.innerType == "noted"){
-        contentScript.model.urlToHighlight.updateType(request.data);
-        sendResponse(true); 
-    }
 }

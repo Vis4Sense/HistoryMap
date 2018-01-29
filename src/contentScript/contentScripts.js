@@ -1,9 +1,5 @@
 const contentScript = function () {
     const contentScript = {
-        model: {
-            nodes: {}, // the annotation nodes (text, picture and note highlighting)
-            urlToHighlight: {} //to synchronise highlights across tabs (with same url)
-        },
         view: {
         },
         controller: {

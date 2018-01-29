@@ -13,16 +13,19 @@ contentScript.model.urlToHighlight = {
 	},
 	
 	addHighlight: function (url, highlight) {
+        console.log("adding highlight to model (in background)");
         this.prepareUrlForHighlights(url);
         this.urlToHighlight[url].push(highlight);
 		return this.urlToHighlight[url];
     },
     
     removeHighlight: function(url, highlight) {
+        console.log("removing highlight from (in background)");
         this.prepareUrlForHighlights(url);
     },
     
     updateType: function(typeUpdate) {
+        console.log("update type model (in background)");
         //locates the original highlight, updates its text and type
         if (typeUpdate.type === 'note') {
             var highlights = this.urlToHighlight[typeUpdate.url];
@@ -40,6 +43,11 @@ contentScript.model.urlToHighlight = {
         if(!this.urlToHighlight[url]){
             this.urlToHighlight[url] = [];
         }
+    },
+
+    //debug function
+    displayState: function() {
+        console.log(this.urlToHighlight);
     }
 }
 	
