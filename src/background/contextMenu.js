@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				chrome.tabs.sendMessage(tab.id, {type: 'removeHighlightImage', srcUrl: info.srcUrl, pageUrl: info.pageUrl}, response => {
 					if (response) {
 						modelInfo = {innerType:'removeHighlightImage', tabUrl: tab.url, srcUrl: info.srcUrl, pageUrl: info.pageUrl};
-						updateModel(info);
+						updateModel(modelInfo);
 					}
 				});
 			}

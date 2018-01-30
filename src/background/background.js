@@ -6,10 +6,7 @@ const contentScript = {
 }
 
 function updateModel(request){
-	console.log("update model request (in background) is ");
-	console.log(request);
-    //Capture highlightRemoved, (begin to work on model for highlight removal(all annotations)
-	var highlightToAdd;
+    var highlightToAdd;
     var tabUrl = request.tabUrl;
     if (request.innerType == "highlightSelection"){
         highlightToAdd = {type: request.innerType, path:request.path, text: request.text, classId: request.classId};
@@ -22,6 +19,9 @@ function updateModel(request){
         contentScript.model.urlToHighlight.removeHighlight(tabUrl, highlightToRemove);
     } else if (request.innerType == "noted"){
         contentScript.model.urlToHighlight.updateType(request.data);
+	}  else if (request.innerType == "highlightRemoved"){
+		var highlightToRemove = {innerType:request.innerType, classId: request.classId}; 
+		contentScript.model.urlToHighlight.removeHighlight(tabUrl, highlightToRemove);
 	}
 	contentScript.model.urlToHighlight.displayState();
 }
@@ -74,8 +74,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		// Listen to content script
 		chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-			console.log("background got a message " + JSON.stringify(request)); 
-			console.log("from " + sender.tab.url);   
 			if (request.type === 'backgroundOpened') { // To respond that the background page is currently active
 				sendResponse({backgroundOpened: true, url: sender.tab.url});
 			} else if (request.type === "noted") {
@@ -85,11 +83,11 @@ document.addEventListener('DOMContentLoaded', function () {
 					type: 'note',
 					url: sender.tab.url
 				};
-				chrome.tabs.sendMessage(sender.tab.id, {type: 'updateModel', innerType:'noted', tabUrl: sender.tab.url, data: typeUpdate}, response2 => {
-					if (response2){
-						console.log("model has been updated with note");
-					}
-				});
+				var modelInfo = {type: 'updateModel', innerType:'noted', tabUrl: sender.tab.url, data: typeUpdate};
+				updateModel(modelInfo);
+			} else if (request.type === "highlightRemoved"){
+				var modelInfo = {type: 'updateModel', innerType:request.type, classId: request.classId, tabUrl: sender.tab.url};
+				updateModel(modelInfo);
 			}
 		});
 	});
