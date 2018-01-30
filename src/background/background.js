@@ -88,6 +88,11 @@ document.addEventListener('DOMContentLoaded', function () {
 			} else if (request.type === "highlightRemoved"){
 				var modelInfo = {type: 'updateModel', innerType:request.type, classId: request.classId, tabUrl: sender.tab.url};
 				updateModel(modelInfo);
+			} else if (request.type === "loadHighlights"){
+				var highlightsToLoad = contentScript.model.urlToHighlight.getHighlights(sender.tab.url);
+				console.log("*** loading highlight response is: ");
+				console.log(highlightsToLoad);
+				sendResponse(highlightsToLoad);
 			}
 		});
 	});

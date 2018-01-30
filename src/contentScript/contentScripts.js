@@ -10,12 +10,13 @@ const contentScript = function () {
 
 loadHighlights  = function (url) {
 		// Get data from the extension
-		console.log("highlights to be loaded for url " + url);
 		chrome.runtime.sendMessage({ type: "loadHighlights" }, function(response) {
+			console.log("*** load highlight response is not understood by chrome");
+			console.log(response);
 			if (!response) return;
-			
 			response.forEach(function(d) {
-				if (d.type === "highlight") {
+				console.log(d);
+				if (d.type === "highlightSelection") {
 					$.highlightPath(d.path, d.classId);
 				} else if (d.type === "note") {
 					$.highlightPath(d.path, d.classId, d);

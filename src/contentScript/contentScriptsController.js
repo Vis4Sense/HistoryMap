@@ -54,14 +54,7 @@ function respondExtension() {
             changeHighlightImage(request.srcUrl, request.pageUrl, true, sendResponse);
         } else if (request.type === 'removeHighlightImage') {
             changeHighlightImage(request.srcUrl, request.pageUrl, false, sendResponse);
-        } else if (request.type === 'loadHighlights') {
-            console.log("**** got load highlight message ****");
-                //will not be called yet....
-             // Get highlights, notes for the requested item
-             var tab = sender.tab;
-             //var highlightObject = checkIfUrlContainsHighlights(tab.url);
-             //sendResponse(highlightObject);
-         }
+        }
     });
 }
 
