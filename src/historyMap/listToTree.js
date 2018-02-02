@@ -4,6 +4,7 @@
  * Output: Combine all changes to produce the final hierarchical structure.
  */
 historyMap.model.listToTree = function() {
+    var dispatch = d3.dispatch('nodeClicked', 'actionAdded');
     // The hierarchy output
     let root;
 
@@ -78,6 +79,38 @@ historyMap.model.listToTree = function() {
         p.children.push(c);
         c.parent = p;
     };
+    module.handleEvents = function(vis) {
+        vis.on('nodeClicked', d => onNodeHandled('click-node', d));
+    };
 
+    function onNodeHandled(type, d) {
+        var a = {
+            type: type,
+            id: d.id,
+            time: +new Date()
+        };
+
+        dispatch.actionAdded(a);
+        if (type === 'click-node') {
+            dispatch.nodeClicked(d, doesUrlExist(d.url));
+        } 
+    }
+
+    function doesUrlExist(urlToLocate) {
+        var foundNode = root.nodes.find(n => n.url === urlToLocate);
+        return foundNode? true : false;
+    }
+
+    /**
+     * Sets/gets the view name.
+     */
+    module.view = function(value) {
+        if (!arguments.length) return view;
+        view = value;
+        return this;
+    };
+
+    // Binds custom events
+    d3.rebind(module, dispatch, 'on');
     return module;
 };
