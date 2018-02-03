@@ -34,6 +34,8 @@ function googleLogin() {
 
 // handle the 'login' button on historyMap
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    //issue #97 cause identified here 
+    console.log("login got a message " + JSON.stringify(request)); 
     if (request.text === "login") {
         googleLogin();
         sendResponse({text:'using google+ login'})
@@ -44,6 +46,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
 // handle the 'logout' button on historyMap
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    console.log("login got a message " + JSON.stringify(request)); 
     if (request.text === "logout") {
         hello('google').logout();
         localStorage.clear();

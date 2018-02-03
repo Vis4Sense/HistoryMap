@@ -74,6 +74,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		// Listen to content script
 		chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+			 console.log("background got a message " + JSON.stringify(request));    
 			if (request.type === 'backgroundOpened') { // To respond that the background page is currently active
 				sendResponse({backgroundOpened: true, url: sender.tab.url});
 			} else if (request.type === "noted") {
@@ -94,6 +95,8 @@ document.addEventListener('DOMContentLoaded', function () {
 				console.log(highlightsToLoad);
 				sendResponse(highlightsToLoad);
 			}
+			//potentially used to make reponse asynchronous https://codereview.chromium.org/1874133002/diff/80001/chrome/common/extensions/docs/templates/articles/messaging.html
+			//return true;
 		});
 	});
 
