@@ -14,23 +14,31 @@ contentScript.model.urlToHighlight = {
 	
 	addHighlight: function (url, highlight) {
 		//adds highlighted text or image
-        console.log("adding highlight to model (in background)");
         this.prepareUrlForHighlights(url);
-        this.urlToHighlight[url].push(highlight);
-		return this.urlToHighlight[url];
+        var highlights = this.urlToHighlight[url];
+        if (highlight.type === "highlightImage"){
+            //removing an already highlighted image(if it exists)
+            var foundNode = highlights.find(a => (a.type === "highlightImage") && (a.pageUrl === highlight.pageUrl));
+            var foundNodeIndex = highlights.indexOf(foundNode);
+            if(foundNodeIndex > -1){
+                highlights.splice(foundNodeIndex, 1);
+            }
+        }
+        highlights.push(highlight);
+		return highlights;
     },
     
     removeHighlight: function(url, highlight) {
 		//removes highlighted text(and note) or image
         this.prepareUrlForHighlights(url);
-        if (highlight.innerType === "removeHighlightImage"){
+        if (highlight.type === "removeHighlightImage"){
             var highlights = this.urlToHighlight[url];
             var foundNode = highlights.find(a => (a.pageUrl === highlight.pageUrl) && (a.srcUrl === highlight.srcUrl));
             var foundNodeIndex = highlights.indexOf(foundNode);
             if(foundNodeIndex > -1){
                 highlights.splice(foundNodeIndex, 1);
             }
-        } else if (highlight.innerType === "highlightRemoved"){
+        } else if (highlight.type === "highlightRemoved"){
             var highlights = this.urlToHighlight[url];
 			//found node could be highlighted text or a note
             var foundNode = highlights.find(a => a.classId === highlight.classId);

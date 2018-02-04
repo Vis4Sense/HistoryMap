@@ -59,7 +59,7 @@ function respondExtension() {
 }
 
 function highlightSelection(sendResponse) {
-    var highlightReponse;
+    var highlightResponse;
     var selection = getSelection();
     if (!selection || selection.type !== "Range") return;
     highlightResponse = $.highlight(selection);
@@ -101,17 +101,23 @@ function changeHighlightImage(srcUrl, pageUrl, applyHighlight, sendResponse) {
             removeHighlightFromImages();
             imageElement.addClass("sm-highlight-image");
             sendResponse({ imageHighlighted: true });
+            //may be used to let history map node know that an image has been set for the node
+            if(sendResponse){
+                sendResponse({ imageHighlighted: true });
+            }
         } else {
             imageElement.removeClass("sm-highlight-image");
-            sendResponse({ imageHighlighted: false });
+            if(sendResponse){
+                sendResponse({ imageHighlighted: false });
+            }
         }
     }
 }
 
 function removeHighlightFromImages() {
-    var highlighedImageElements = $('.sm-highlight-image');
-    if (highlighedImageElements) {
-        highlighedImageElements.removeClass("sm-highlight-image");
+    var highlightedImageElements = $('.sm-highlight-image');
+    if (highlightedImageElements) {
+        highlightedImageElements.removeClass("sm-highlight-image");
     }
 }
 

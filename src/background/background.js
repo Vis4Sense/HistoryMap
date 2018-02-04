@@ -20,7 +20,7 @@ function updateModel(request){
     } else if (request.innerType == "noted"){
         contentScript.model.urlToHighlight.updateType(request.data);
 	}  else if (request.innerType == "highlightRemoved"){
-		var highlightToRemove = {innerType:request.innerType, classId: request.classId}; 
+		var highlightToRemove = {type:request.innerType, classId: request.classId}; 
 		contentScript.model.urlToHighlight.removeHighlight(tabUrl, highlightToRemove);
 	}
 	contentScript.model.urlToHighlight.displayState();
@@ -87,12 +87,11 @@ document.addEventListener('DOMContentLoaded', function () {
 				var modelInfo = {type: 'updateModel', innerType:'noted', tabUrl: sender.tab.url, data: typeUpdate};
 				updateModel(modelInfo);
 			} else if (request.type === "highlightRemoved"){
+				//received remove highlight from contentScript view (highlight.js)
 				var modelInfo = {type: 'updateModel', innerType:request.type, classId: request.classId, tabUrl: sender.tab.url};
 				updateModel(modelInfo);
 			} else if (request.type === "loadHighlights"){
 				var highlightsToLoad = contentScript.model.urlToHighlight.getHighlights(sender.tab.url);
-				console.log("*** loading highlight response is: ");
-				console.log(highlightsToLoad);
 				sendResponse(highlightsToLoad);
 			}
 			//potentially used to make reponse asynchronous https://codereview.chromium.org/1874133002/diff/80001/chrome/common/extensions/docs/templates/articles/messaging.html
