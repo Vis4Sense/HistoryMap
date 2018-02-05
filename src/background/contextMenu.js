@@ -25,6 +25,8 @@ document.addEventListener('DOMContentLoaded', function () {
 					if (response) {
 						modelInfo = {innerType:'highlightSelection', tabUrl: tab.url, path:response.path, text: response.text, classId: response.classId};
 						updateModel(modelInfo);
+						chrome.runtime.sendMessage({tab: tab, type:'highlight', text: response.text, path:response.path, classId: response.classId, picture: null}, function (response) {
+						});
 					}
 				});
 			} else if (info.menuItemId === 'sm-save-image') {
@@ -33,6 +35,8 @@ document.addEventListener('DOMContentLoaded', function () {
 					if (response) {
 						modelInfo = {innerType:'highlightImage', tabUrl: tab.url, srcUrl: info.srcUrl, pageUrl: info.pageUrl};
 						updateModel(modelInfo);
+						chrome.runtime.sendMessage({tab: tab, type:'save-image', text:tab.title, path: null, classId: null, picture: info.srcUrl}, function (response) {
+						});
 					}
 				});
 
@@ -47,6 +51,8 @@ document.addEventListener('DOMContentLoaded', function () {
 					if (response) {
 						modelInfo = {innerType:'removeHighlightImage', tabUrl: tab.url, srcUrl: info.srcUrl, pageUrl: info.pageUrl};
 						updateModel(modelInfo);
+						chrome.runtime.sendMessage({tab: tab, type:'remove-image', text:tab.title, path: null, classId: null, picture: info.srcUrl}, function (response) {
+						});
 					}
 				});
 			}
