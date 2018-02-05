@@ -30,8 +30,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Converter from an array of actions to a tree
     const listToTree = historyMap.model.listToTree();
+    //historyMapVis -> listToTree -> historyMap
     listToTree.view('historyMap')
-        //.on('actionAdded', onActionAdded)
+        .on('actionAdded', onActionAdded)
         .on('nodeClicked', onNodeClicked)
         .handleEvents(historyMapView);
 
@@ -63,10 +64,10 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    /*function onActionAdded(d) {
+    function onActionAdded(d) {
         d.time = new Date(d.time);
         nodes.push(d);
-    }*/
+    }
 
     // Provenance capture
     const historyMapController = historyMap.controller.browser();

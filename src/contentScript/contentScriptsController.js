@@ -94,13 +94,14 @@ function locateImageElement(srcAttributeValue) {
 }
 
 function changeHighlightImage(srcUrl, pageUrl, applyHighlight, sendResponse) {
+    //sendresponse only exists when this function originates from contextMenu,
+    //the other call originates from loadHighlights (with no sendResponse)
     var imageSrcAttribute = calculateImgSrcAttribute(srcUrl, pageUrl);
     var imageElement = locateImageElement(imageSrcAttribute);
     if (imageElement) {
         if (applyHighlight) {
             removeHighlightFromImages();
             imageElement.addClass("sm-highlight-image");
-            sendResponse({ imageHighlighted: true });
             //may be used to let history map node know that an image has been set for the node
             if(sendResponse){
                 sendResponse({ imageHighlighted: true });
