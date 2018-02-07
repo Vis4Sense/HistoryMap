@@ -47,12 +47,15 @@ line,
     padding-right: 5px; 
 }
 
-#sessionContainer {
+#SelectOption {
     border: 1px solid lightgrey;
     border-radius: 10px;
     padding-left: 5px;
     padding-right: 5px;
     margin-left: 19%;
     display: inline-block;
+    overflow: auto;
+    height: 200px;
+    width: 200px;
 }
 

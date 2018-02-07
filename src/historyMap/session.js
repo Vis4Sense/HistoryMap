@@ -1,14 +1,11 @@
 // Made by Reday Yahya | @RedayY
 // JavaScript Document for Save and Load Control
 
-let SessionName;
+var SessionName;
 let SessionProfile;
-// let SessionCount = 1;
 
 let recording = true; // whether new noded is added to historymap or not
 let loggedIn = false; // whether user is logged in
-let sessions = historyMap.model.sessions.getSessions(); // store the list of user sessions
-sessions = ['session1','session2','session3','session4','session5']; // for dev only when no session data is retrieved from API
 
 $(function () {
     $('#btn_start').click(function () {
@@ -24,9 +21,6 @@ $(function () {
     });
     $('#btn_load').click(function () {
         displaySessions();
-    });
-    $('#btn_new_sess').click(function () {
-        newSession();
     });
     $('#btn_logout').click(function () {
         chrome.runtime.sendMessage({
@@ -47,7 +41,7 @@ $(function () {
                 console.log('response from login.js', response.text);
             }
         });
-    })
+    });
 });
 
 window.onload = function () {
@@ -58,20 +52,22 @@ window.onload = function () {
     }
 
     btnDisplay();
-    // load_MySession();
-    // document.getElementById("myNav").style.width = "100%";
 }
 
 chrome.runtime.onMessage.addListener(function (request) {
     if (request.text === 'loggedin') {
         loggedIn = true;
         historyMap.model.user = request.user;
-        btnDisplay();
+        getUACKey();
+        // add_user_to_db();  
+
+        //Timer delay here just for debugging while inspecting the API for a potential bug
+        setTimeout(load_user_sessions, 2000);
+        setTimeout(btnDisplay, 3000);
     }
 });
 
 function btnDisplay() {
-
     // make only the relevant button visible
 
     if (recording) {
@@ -89,10 +85,9 @@ function btnDisplay() {
         userImage.src = historyMap.model.user.image.url;
 
         //checks if User has Sessions Saved, displays load if true
-        if (sessions.length == 0){
+        if (SessionProfile.length == 0) {
             document.getElementById("btn_load").style.display = 'none';
-        }
-        else{
+        } else {
             document.getElementById("btn_load").style.display = 'initial';
         }
 
@@ -122,7 +117,7 @@ function newHistoryMap() {
             input.type = 'text';
             var today = new Date();
             //input.placeholder = today;
-            input.value = today.getFullYear() + '-' + (today.getMonth() + 1)  + '-' + today.getDate() + '-' + today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
+            input.value = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + ' ' + today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
             input.id = 'sessionName';
             document.getElementById('settings').appendChild(input);
             input.focus();
@@ -133,147 +128,117 @@ function newHistoryMap() {
             button.innerHTML = 'Create';
             button.id = 'btn_new_sess';
             document.getElementById('settings').appendChild(button);
+
+            $(function () {
+                $('#btn_new_sess').click(function () {
+                    newSession();
+                })
+            });
         }
     }
 }
 
+
+//This loads the Sessions in a menu
 function displaySessions() {
 
-    let sessionContainer = document.createElement('div');
-    sessionContainer.id = 'sessionContainer';
+    document.getElementById("btn_load").setAttribute("disabled", "disabled");
 
-    let sessionList = document.createElement('ul');
-    sessionList.id = 'sessionList';
+    // Managing generated HTML Elements
+    var Div = document.getElementById("Select-Option");
+    var selectList = document.createElement("select");
+    selectList.id = "mySelect";
+    Div.appendChild(selectList);
 
-    sessionContainer.appendChild(sessionList);
+    // Looping thorugh SessionProfile and generating selects
+    for (var i = 0; i < SessionProfile.length; i++) {
 
-    for (var i = 0; i < sessions.length; i++) {
-        
-        // var paragraph = document.createElement('p');
-        
-        var listItem = document.createElement('li');
-        listItem.innerHTML = sessions[i];
+        // Generating Option for Select List in combination of Data
+        var option = document.createElement("option");
+        option.value = SessionProfile[i]._id;
+        option.text = SessionProfile[i].sessionname;
+        selectList.appendChild(option);
+    };
 
-        sessionList.appendChild(listItem);
-    }
-    document.getElementById('settings').appendChild(sessionContainer);
-    $("#sessionList").selectable();
-}
+    // Adding listener to trigger when Select makes a change
+    document.getElementById("mySelect").addEventListener("change", function (e) {
+        setSelectedSession();
+    });
 
+    // Create event and fire it.
+    var changeEvent = document.createEvent("HTMLEvents");
+    changeEvent.initEvent("change", true, true);
+
+};
+
+
+
+//This grabs the SessionName and pushes it to the DB, also checks if user is in the DB
 function newSession() {
-    var SessionName = document.getElementById('sessionName').value;
-
-    console.log(SessionName);
-    console.log("TESTING IF IT LINKS");
-
-    
-    //Starts up API and prepares Session
+    SessionName = document.getElementById('sessionName').value;
+    //Starts up API and pushes initial session information to DB
     pushToDB();
     pushSessToDB();
-
-    //sends message asking to start recording for the session
-    chrome.runtime.sendMessage({text:'sessionstart'});
-
+    //sends message asking to start recording for the session <- ? why do we do this 
+    chrome.runtime.sendMessage({
+        text: 'sessionstart'
+    });
 }
 
+//This connects to the API and loads user sessions and stores it in HistoryMapModel
+function load_user_sessions() {
 
-// DB LOAD Document
-// Made by Reday Yahya | @RedayY
-// Functions for Loading are found in this document
-
-function load_MySession() {
-
-    var url = baseURL + "session/" + UserEmail + "/" + APIKey;
+    var url = baseURL + "session/" + up.email + "/" + APIKey;
     var xhr = new XMLHttpRequest()
     xhr.open('GET', url, true)
     xhr.onload = function () {
         var users = JSON.parse(xhr.responseText);
         if (xhr.readyState == 4 && xhr.status == "200") {
-
             //picking out Session Information from User Account
             SessionProfile = users["sessions"];
-            SessionCount = users["sessions"].length - 1;
-
-            // // Managing generated HTML Elements
-            // var Div = document.getElementById("Select-Option");
-            // var selectList = document.createElement("select");
-            // selectList.id = "mySelect";
-            // Div.appendChild(selectList);
-
-            // // Looping thorugh Data and generating selects
-            // for (var i = 0; i <= SessionCount; i++) {
-
-            //     // Generating Option for Select List in combination of Data
-            //     var option = document.createElement("option");
-            //     option.value = SessionProfile[i]._id;
-            //     option.text = SessionProfile[i].sessionname;
-            //     selectList.appendChild(option);
-            // }
-
-            //Managing generated HTML Elements RADIO BUTTON
-            var Div = document.getElementById("Select-Option");
-            //var selectList = document.createElement("select");
-            //selectList.id = "mySelect";
-            //Div.appendChild(selectList);
-
-            // Looping thorugh Data and generating selects
-            for (var i = 0; i <= SessionCount; i++) {
-
-                // Generating Option for Select List in combination of Data RADIO BOX VERSION
-                var option = document.createElement("input");
-                option.type = "radio";
-                option.value = SessionProfile[i]._id;
-                option.name = SessionProfile[i].sessionname;
-                Div.appendChild(option);
-                Div.append(SessionProfile[i].sessionname);
-            }
-
-            // End of Radio Button Version
-        } else {
-
-            window.alert("You do not have any saved sessions under this Account");
-
-        }
+            historyMap.model.sessions = SessionProfile;
+            console.log("Loaded Sessions");
+        } else {}
     }
     xhr.send(null);
 }
 
-function load_Select_Session() {
+//Use this function to load Sessions into history map, requires Session Data to be used.
+function setSelectedSession() {
 
+    //fetches value from select list
     select_Val = document.getElementById("mySelect").value;
-    for (var i = 0; i < SessionProfile.length; i++) {
+
+    for (var i = 0; i => SessionProfile.length; i++) {
         if (SessionProfile[i]._id == select_Val) {
-
             var result = SessionProfile[i];
+            console.log(result);
             load_SelectedSession(result);
-
-            //remove menu
-            SessionName = result.sessionname;
-            SessionReady = true;
-            document.getElementById("myNav").style.width = "0%";
-            startAPI();
+            break;
         }
     }
-
 }
 
-//create session
-function load_session() {
+window.onbeforeunload = function () {
+    chrome.runtime.sendMessage({
+        text: 'logout',
+        function (response) {
+            console.log('response from login.js', response.text);
+        }
+    });
+};
 
-    var sesReq = prompt("Please enter a Session Name");
-    if (sesReq == null || sesReq == "" || sesReq == " ") {
-        window.alert("Please enter a suitable Session ID");
-        load_Session();
-    } else {
-        searchSessionName = sesReq;
-        //code to load session goes here
-        window.alert("Loaded Session Name: " + searchSessionName);
-    }
-
-}
 
 function load_SelectedSession(i) {
+
+    //Clear Previous Values
     nodes.length = 0;
+    SessionName = "";
+
+    //Set Values from Session of Choice
+    SessionName = i.sessionname;
     nodes = i.nodes;
+
+    //Reload History Map
     historyMap.view.redraw();
-}
+};

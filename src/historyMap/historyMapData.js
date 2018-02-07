@@ -55,12 +55,6 @@ function Node(id, tabId, time, url, title, favIconUrl, parentTabId, from) {
     this.from = from;
 }
 
-// DB SAVE Document
-// Made by Reday Yahya | @RedayY
-// Functions for Saving are found in this document
-
-//Profile specific Variables
-// let AccLoggedIn;
 let DBnodes = [];
 let UserProfile;
 let ProfileName;
@@ -69,7 +63,7 @@ let UserEmail;
 let APIKey;
 
 //Gets Info direct from login instead of localstorage (thank you kai, used your code to make it work)
-//Howeverk, with this new logic, it only sends thoose via autentification. Authentification now runs onload.
+//However, with this new logic, it only sends thoose via autentification. Authentification now runs onload.
 //I think we should make a "Create Session Button". 
 //This will initialize and setup the backend and ask the user to login
 chrome.runtime.onMessage.addListener(function (request) {
@@ -132,9 +126,13 @@ function getUACKey() {
             // console.table(users);
             // console.log(users.accessKey);
             APIKey = users.accessKey;
+            localStorage.setItem("APIKey", APIKey);
+            localStorage.setItem("UserEmail", UserEmail);
         } else {
             // console.error(users);
             APIKey = users.accessKey;
+            localStorage.setItem("APIKey", APIKey);
+            localStorage.setItem("UserEmail", UserEmail);
         }
     }
     xhr.send();
@@ -167,6 +165,7 @@ function add_user_to_db() {
         "name": up.name,
         "emailAddress": up.email,
         "addtionalinfo": JSON.stringify(Object.values(up)),
+        //change this to info when creating
     };
 
     // Adding the User to the DB
