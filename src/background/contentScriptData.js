@@ -57,8 +57,6 @@ contentScript.model.urlToHighlight = {
             foundNode.text = typeUpdate.text;
             foundNode.type = typeUpdate.type;
             return foundNode;
-        } else {
-            nodes[typeUpdate.id].type = typeUpdate.type;
         }
     },
 

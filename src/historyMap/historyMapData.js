@@ -33,7 +33,22 @@ historyMap.model.nodes = {
     empty: function () {
         this.nodes.length = 0;
         historyMap.view.redraw();
-    }
+    },
+
+    updateType: function(typeUpdate) {
+        //locates the original highlight(note), updates its text and/or type
+        if (typeUpdate.type === 'note') {
+            var foundNode = this.nodes.find(a => a.classId === typeUpdate.classId)
+            foundNode.text = typeUpdate.text;
+            foundNode.type = typeUpdate.type;
+            console.log('foundNode keys = ' + JSON.stringify(Object.keys(foundNode)));
+            console.log("class" + foundNode.classId + " id " + foundNode.id + "\n image : " + foundNode.showImage + "\n hidden : " + foundNode.hidden+ "\n embedded : " + foundNode.embedded + "\n type : " + foundNode.type+ "\n text : " + foundNode.text);
+            return foundNode;
+        } else {
+            nodes[typeUpdate.id].type = typeUpdate.type;
+        }
+        historyMap.view.redraw();
+    },
 }
 
 function Node(id, tabId, time, url, title, favIconUrl, parentTabId, from) {

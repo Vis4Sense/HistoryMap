@@ -86,6 +86,8 @@ document.addEventListener('DOMContentLoaded', function () {
 				};
 				var modelInfo = {type: 'updateModel', innerType:'noted', tabUrl: sender.tab.url, data: typeUpdate};
 				updateModel(modelInfo);
+				chrome.runtime.sendMessage({type:'notedHistoryMap', data:typeUpdate}, function (response) {
+				});
 			} else if (request.type === "highlightRemoved"){
 				//received remove highlight from contentScript view (highlight.js)
 				var modelInfo = {type: 'updateModel', innerType:request.type, classId: request.classId, tabUrl: sender.tab.url};

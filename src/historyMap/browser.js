@@ -243,6 +243,9 @@ historyMap.controller.browser = function () {
 			createNewAction(request.tab, 'save-image', request.text, request.path, request.classId, request.picture);
 	   } else if (request.type === 'remove-image'){
 			createNewAction(request.tab, 'remove-image', request.text, request.path, request.classId, request.picture);
+		} else if (request.type === 'notedHistoryMap') {
+			console.log('historymap controller got noted request');
+			historyMap.model.nodes.updateType(request.data);
 		}
 	});
 
