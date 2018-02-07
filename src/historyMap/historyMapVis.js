@@ -55,8 +55,8 @@ historyMap.view.vis = function() {
             .domain([ 'search', 'location', 'dir', 'highlight', 'note', 'filter' ])
             .range([ '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#e377c2' ]),
         searchTypes = [ 'search', 'location', 'dir' ],
-        iconClassLookup = { search: 'fa-search', location: 'fa-globe', dir: 'fa-street-view', highlight: 'fa-paint-brush',
-            note: 'fa-file-text-o', filter: 'fa-filter'
+        iconClassLookup = { search: 'icon-search', location: 'icon-globe', dir: 'icon-street-view', highlight: 'icon-brush',
+            note: 'icon-doc-text', filter: 'icon-filter'
         };
 
     // Key function to bind data
@@ -472,15 +472,17 @@ historyMap.view.vis = function() {
                 d3.event.stopPropagation(); // Prevent click fired in parent
             });
 
-        // - Icon
-        enterItems.append('xhtml:div').attr('class', 'node-icon fa fa-fw');
-
+        // - Icon placeholder
+        enterItems.append('xhtml:i').attr('class', 'node-icon fa fa-fw');
+        //enterItems.append('xhtml:i').attr("class", "icon-brush");
+		
         // - Text
         enterItems.append('xhtml:div').attr('class', 'node-label');
 
         // Update
         subItems.attr('data-original-title', label)
             .each(function(d2) {
+                //correct icon/background color is applied to placeholder
                 d3.select(this).select('.node-icon')
                     .classed(iconClassLookup.note + ' ' + iconClassLookup.highlight, false)  // reset first
                     .classed(iconClassLookup[type(d2)], true)
