@@ -92,6 +92,8 @@ document.addEventListener('DOMContentLoaded', function () {
 				//received remove highlight from contentScript view (highlight.js)
 				var modelInfo = {type: 'updateModel', innerType:request.type, classId: request.classId, tabUrl: sender.tab.url};
 				updateModel(modelInfo);
+				chrome.runtime.sendMessage({type:'removeHighlightSelection', classId:request.classId, tabUrl: sender.tab.url}, function (response) {
+				});
 			} else if (request.type === "loadHighlights"){
 				var highlightsToLoad = contentScript.model.urlToHighlight.getHighlights(sender.tab.url);
 				sendResponse(highlightsToLoad);

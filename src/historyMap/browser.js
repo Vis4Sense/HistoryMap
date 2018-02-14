@@ -244,8 +244,11 @@ historyMap.controller.browser = function () {
 	   } else if (request.type === 'remove-image'){
 			createNewAction(request.tab, 'remove-image', request.text, request.path, request.classId, request.picture);
 		} else if (request.type === 'notedHistoryMap') {
-			console.log('historymap controller got noted request');
 			historyMap.model.nodes.updateType(request.data);
+			historyMap.view.redraw();
+		} else if (request.type === 'removeHighlightSelection'){
+			historyMap.model.nodes.hideNode(request.tabUrl, request.classId);
+			historyMap.view.redraw();
 		}
 	});
 
