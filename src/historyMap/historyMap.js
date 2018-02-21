@@ -13,6 +13,10 @@ const historyMap = function () {
         },
         controller: {
             browser: {}
+        },
+        API: {
+            DBSave: {},
+            DBLoad: {}
         }
     };
     return historyMap;

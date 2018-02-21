@@ -72,11 +72,6 @@ chrome.runtime.onMessage.addListener(function (request) {
         up = request.user;
         UserEmail = request.user.email;
         getUACKey();
-
-        //This bit will intialize Session Screen, well it should atleast.
-        //askForSession();
-
-        // after this is set, startAPI needs to be called once the session has been set.
     }
 });
 
@@ -115,7 +110,6 @@ function askForSession() {
 
 //gets UACkey from DB // will be moved to historyMap.model
 function getUACKey() {
-    // Update a user
     var url = baseURL + "userGenerateAccessKey/" + UserEmail + "/";
     var xhr = new XMLHttpRequest();
     xhr.open("PUT", url, true);
@@ -128,14 +122,16 @@ function getUACKey() {
             APIKey = users.accessKey;
             localStorage.setItem("APIKey", APIKey);
             localStorage.setItem("UserEmail", UserEmail);
+
+            load_user_sessions();
+            btnDisplay();
+
+
         } else {
-            // console.error(users);
-            APIKey = users.accessKey;
-            localStorage.setItem("APIKey", APIKey);
-            localStorage.setItem("UserEmail", UserEmail);
         }
     }
     xhr.send();
+
 }
 
 function pushSessToDB() {
@@ -149,7 +145,6 @@ function pushSessToDB() {
     xhr.onload = function () {
         var users = JSON.parse(xhr.responseText);
         if (xhr.readyState == 4 && xhr.status == "201") {} else {
-            //debug
             var indexNo = users["sessions"].length - 1;
             DBSessionPointer = users["sessions"][indexNo]._id;
             UserProfile = users["sessions"];
@@ -163,7 +158,7 @@ function add_user_to_db() {
 
     var new_stuff = {
         "name": up.name,
-        "emailAddress": up.email,
+        "email": up.email,
         "addtionalinfo": JSON.stringify(Object.values(up)),
         //change this to info when creating
     };
@@ -186,7 +181,7 @@ function pushToDB() {
     //Creating the Object for the DB
     var UserProfileObject = {
         "name": up.name,
-        "emailAddress": up.email,
+        "email": up.email,
         "addtionalinfo": Object.values(up)
     };
 
@@ -210,13 +205,20 @@ function pushToDB() {
     xhr.send(null);
 }
 
-function Node2DB(node) {
+function Node2DB() {
 
+    //gets node count and fetches the last node
+    let nodeCount = historyMap.model.nodes.getSize() - 1;
+    let lastNode = nodes[nodeCount];
+
+    //pushes node to DB
     if (recording) {
 
-        node.visibility = false;
+        //node visibility changes upon state of "Recording Setting"
+        lastNode.visibility = true;
+        lastNode.nodeAdditionalInfo = JSON.stringify((Object.values(lastNode)));
         var url = baseURL + "node/" + DBSessionPointer + "/" + APIKey;
-        var json = JSON.stringify(node);
+        var json = JSON.stringify(lastNode);
         var xhr = new XMLHttpRequest();
         xhr.open("POST", url, true);
         xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
@@ -227,9 +229,11 @@ function Node2DB(node) {
     } else {
 
         if (!recording) {
-            node.visibility = truenode.visibility = true;
+            //node visibility changes upon state of "Recording Setting"
+            lastNode.visibility = false;
+            lastNode.nodeAdditionalInfo = JSON.stringify((Object.values(lastNode)));
             var url = baseURL + "node/" + DBSessionPointer + "/" + APIKey;
-            var json = JSON.stringify(node);
+            var json = JSON.stringify(lastNode);
             var xhr = new XMLHttpRequest();
             xhr.open("POST", url, true);
             xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
@@ -238,10 +242,7 @@ function Node2DB(node) {
             }
             xhr.send(json);
         }
-        //debug
-        console.log("did not add node");
     }
 
-    return node;
 }
 

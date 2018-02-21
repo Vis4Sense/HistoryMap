@@ -96,6 +96,7 @@ historyMap.controller.browser = function () {
 			// - status: 'complete', {do nothing}
 			if (changeInfo.status == 'complete') {
 				isTabCompleted[tabId] = true;
+				Node2DB();
 			}
 		}
 	});
@@ -124,17 +125,17 @@ historyMap.controller.browser = function () {
 			nodeId = nodes.addNode(node);
 		}
 		
-		let sessionstarted;
+		// let sessionstarted;
 
-		chrome.runtime.onMessage.addListener(function (request) {
-			if (request.text === 'sessionstart') {
-				sessionstarted = true;
-			}
-		}); 
+		// chrome.runtime.onMessage.addListener(function (request) {
+		// 	if (request.text === 'sessionstart') {
+		// 		sessionstarted = true;
+		// 	}
+		// }); 
 
-		if (sessionstarted == true){
-			Node2DB(node);
-		}
+		// if (sessionstarted == true){
+		// 	Node2DB(node);
+		// }
 		
 		// historyMap.view.redraw();
 

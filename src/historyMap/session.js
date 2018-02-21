@@ -3,6 +3,8 @@
 
 var SessionName;
 let SessionProfile;
+var debug_test_result;
+//let APIKey = localStorage.getItem(APIKey : )
 
 let recording = true; // whether new noded is added to historymap or not
 let loggedIn = false; // whether user is logged in
@@ -58,12 +60,11 @@ chrome.runtime.onMessage.addListener(function (request) {
     if (request.text === 'loggedin') {
         loggedIn = true;
         historyMap.model.user = request.user;
+
         getUACKey();
-        // add_user_to_db();  
 
         //Timer delay here just for debugging while inspecting the API for a potential bug
-        setTimeout(load_user_sessions, 2000);
-        setTimeout(btnDisplay, 3000);
+
     }
 });
 
@@ -85,10 +86,16 @@ function btnDisplay() {
         userImage.src = historyMap.model.user.image.url;
 
         //checks if User has Sessions Saved, displays load if true
-        if (SessionProfile.length == 0) {
-            document.getElementById("btn_load").style.display = 'none';
+
+        if (typeof (SessionProfile) != 'undefined') {
+
+            if (SessionProfile.length == 0) {
+                document.getElementById("btn_load").style.display = 'none';
+            } else {
+                document.getElementById("btn_load").style.display = 'initial';
+            }
         } else {
-            document.getElementById("btn_load").style.display = 'initial';
+            document.getElementById("btn_load").style.display = 'none';
         }
 
     } else {
@@ -197,7 +204,7 @@ function load_user_sessions() {
             //picking out Session Information from User Account
             SessionProfile = users["sessions"];
             historyMap.model.sessions = SessionProfile;
-            console.log("Loaded Sessions");
+            btnDisplay();
         } else {}
     }
     xhr.send(null);
@@ -213,6 +220,7 @@ function setSelectedSession() {
         if (SessionProfile[i]._id == select_Val) {
             var result = SessionProfile[i];
             console.log(result);
+            debug_test_result = result;
             load_SelectedSession(result);
             break;
         }
@@ -228,16 +236,21 @@ window.onbeforeunload = function () {
     });
 };
 
-
 function load_SelectedSession(i) {
 
     //Clear Previous Values
     nodes.length = 0;
     SessionName = "";
 
-    //Set Values from Session of Choice
+    //Set Values to Historymap from Session of Choice for save and load
     SessionName = i.sessionname;
-    nodes = i.nodes;
+    DBSessionPointer = i._id;
+
+    //loops through node array in retrieved session object to get nodeAdditionalinfo
+    //and then inserts it via += into nodes array in HistoryMap
+    for (j = 0; j > i.nodes.length; i++){
+        nodes += i.nodes[j].nodeAdditionalInfo;
+    }
 
     //Reload History Map
     historyMap.view.redraw();
