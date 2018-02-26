@@ -1,11 +1,9 @@
 // Made by Reday Yahya | @RedayY
 // JavaScript Document for Save and Load Control
 
-var SessionName;
+let SessionName;
 let SessionProfile;
-var debug_test_result;
-//let APIKey = localStorage.getItem(APIKey : )
-
+let debug_test_result;
 let recording = true; // whether new noded is added to historymap or not
 let loggedIn = false; // whether user is logged in
 
@@ -47,24 +45,14 @@ $(function () {
 });
 
 window.onload = function () {
-
-    if (localStorage.getItem('user') !== null) {
-        loggedIn = true; // not always, user may still need to enter the password
-        historyMap.model.user = JSON.parse(localStorage.getItem('user'));
-    }
-
     btnDisplay();
-}
+};
 
 chrome.runtime.onMessage.addListener(function (request) {
     if (request.text === 'loggedin') {
         loggedIn = true;
         historyMap.model.user = request.user;
-
         getUACKey();
-
-        //Timer delay here just for debugging while inspecting the API for a potential bug
-
     }
 });
 
@@ -167,8 +155,10 @@ function displaySessions() {
         selectList.appendChild(option);
     };
 
-    // Adding listener to trigger when Select makes a change
+    // Adding listener to trigger when Select makes a change also reset interface for next load
     document.getElementById("mySelect").addEventListener("change", function (e) {
+        document.getElementById("mySelect").remove();
+        document.getElementById("btn_load").setAttribute("enabled", "enabled");
         setSelectedSession();
     });
 
@@ -180,21 +170,26 @@ function displaySessions() {
 
 
 
-//This grabs the SessionName and pushes it to the DB, also checks if user is in the DB
+//This bit controls new Sessions
 function newSession() {
-    SessionName = document.getElementById('sessionName').value;
-    //Starts up API and pushes initial session information to DB
-    pushToDB();
-    pushSessToDB();
-    //sends message asking to start recording for the session <- ? why do we do this 
-    chrome.runtime.sendMessage({
-        text: 'sessionstart'
-    });
+    //Changing name of the SessionName before submission, so no one can abuse it in console
+    let TestSessionName = document.getElementById('sessionName').value;
+    //Looping thorugh SessionProfile
+    for (var i = 0; i < SessionProfile.length; i++) {
+        //If SessionName matches a Session Generated alert the user
+        if (TestSessionName == SessionProfile[i].name) {
+            window.alert("Session Name already exsits, please choose a different Session Name");
+        } else {
+            //Pushes Session to DB
+            SessionName = document.getElementById('sessionName').value;
+            pushSessToDB();
+        }
+    };
+
 }
 
 //This connects to the API and loads user sessions and stores it in HistoryMapModel
 function load_user_sessions() {
-
     var url = baseURL + "session/" + up.email + "/" + APIKey;
     var xhr = new XMLHttpRequest()
     xhr.open('GET', url, true)
@@ -227,15 +222,7 @@ function setSelectedSession() {
     }
 }
 
-window.onbeforeunload = function () {
-    chrome.runtime.sendMessage({
-        text: 'logout',
-        function (response) {
-            console.log('response from login.js', response.text);
-        }
-    });
-};
-
+//Function for loading
 function load_SelectedSession(i) {
 
     //Clear Previous Values
@@ -243,15 +230,28 @@ function load_SelectedSession(i) {
     SessionName = "";
 
     //Set Values to Historymap from Session of Choice for save and load
-    SessionName = i.sessionname;
+    SessionName = i.name;
     DBSessionPointer = i._id;
 
     //loops through node array in retrieved session object to get nodeAdditionalinfo
     //and then inserts it via += into nodes array in HistoryMap
-    for (j = 0; j > i.nodes.length; i++){
-        nodes += i.nodes[j].nodeAdditionalInfo;
+    for (j = 0; j > i.nodes.length; i++) {
+
+        //Since Nodes have been stringified while being sent to the DB, i parsed it back to an object
+        var fixNodes = JSON.parse(i.nodes[j].nodes);
+        nodes += fixNodes;
     }
 
     //Reload History Map
     historyMap.view.redraw();
+};
+
+//Force logout upon closing
+window.onbeforeunload = function () {
+    chrome.runtime.sendMessage({
+        text: 'logout',
+        function (response) {
+            console.log('response from login.js', response.text);
+        }
+    });
 };

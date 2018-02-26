@@ -71,73 +71,44 @@ chrome.runtime.onMessage.addListener(function (request) {
         ProfileName = request.user.name;
         up = request.user;
         UserEmail = request.user.email;
-        getUACKey();
+        DBaddUser();
     }
 });
 
 //API (Save and Load) specific Variables
 var baseURL = "https://sensemap-api.herokuapp.com/";
-let apiinput;
 let DBSessionPointer;
-let SessionReady = false;
-
-//execute save and load functionality only if the user is logged in simulation
-function startAPI() {
-    if (up != null && SessionReady == true) {
-        pushToDB();
-        pushSessToDB();
-    }
-}
-
-$(function () {
-    $('#new_session').click(function () {
-        askForSession();
-    });
-    $('#closebtn').click(function () {
-        document.getElementById("myNav").style.width = "0%";
-    });
-});
-
-function askForSession() {
-    var NewSessionName = document.getElementById("NewSessionName").value;
-    SessionName = NewSessionName;
-    window.alert("Using Session Name: " + SessionName);
-    SessionReady = true;
-    document.getElementById("myNav").style.width = "0%";
-    startAPI();
-
-}
 
 //gets UACkey from DB // will be moved to historyMap.model
 function getUACKey() {
+
+    //adjusted route
     var url = baseURL + "userGenerateAccessKey/" + UserEmail + "/";
+    console.log(url);
+
     var xhr = new XMLHttpRequest();
     xhr.open("PUT", url, true);
     xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
     xhr.onload = function () {
         var users = JSON.parse(xhr.responseText);
+        console.log(users);
         if (xhr.readyState == 4 && xhr.status == "200") {
-            // console.table(users);
-            // console.log(users.accessKey);
-            APIKey = users.accessKey;
+            //adjusted field name to accesskey 
+            APIKey = users.accesskey;
             localStorage.setItem("APIKey", APIKey);
             localStorage.setItem("UserEmail", UserEmail);
-
             load_user_sessions();
             btnDisplay();
-
-
         } else {
         }
     }
     xhr.send();
-
 }
 
 function pushSessToDB() {
     var url = baseURL + "session/" + UserEmail + "/" + APIKey;
     var data = {};
-    data.sessionname = SessionName;
+    data.name = SessionName;
     var json = JSON.stringify(data);
     var xhr = new XMLHttpRequest();
     xhr.open("POST", url, true);
@@ -153,56 +124,25 @@ function pushSessToDB() {
     xhr.send(json);
 }
 
-function add_user_to_db() {
+function DBaddUser() {
     //Creating the Object for the DB
-
     var new_stuff = {
         "name": up.name,
         "email": up.email,
-        "addtionalinfo": JSON.stringify(Object.values(up)),
-        //change this to info when creating
+        "info": JSON.stringify(Object.values(up)),
     };
 
     // Adding the User to the DB
-    var url = baseURL + "userinsert";
+    var url = baseURL + "userinsert/";
     var json = JSON.stringify(new_stuff);
     var xhr = new XMLHttpRequest();
     xhr.open("POST", url, true);
     xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
     xhr.onload = function () {
         var users = JSON.parse(xhr.responseText);
+        //might be worth calling the UAC here
     }
     xhr.send(json);
-
-}
-
-function pushToDB() {
-
-    //Creating the Object for the DB
-    var UserProfileObject = {
-        "name": up.name,
-        "email": up.email,
-        "addtionalinfo": Object.values(up)
-    };
-
-    //Crucial Bit that Adds the User to the DB, if the user has something on the DB, do not add at all cost.
-    //Code is based on Shaz example
-
-    //check if email is in db
-    var url = baseURL + "userbyemail/" + up.email + "/" + APIKey;
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', url, true);
-    xhr.onload = function () {
-        var users = JSON.parse(xhr.responseText);
-        if (xhr.readyState == 4 && xhr.status == "200") {
-            if (users.length == 0) {
-                add_user_to_db();
-            }
-        } else {
-            console.log("Could not perform action")
-        }
-    }
-    xhr.send(null);
 }
 
 function Node2DB() {
@@ -215,10 +155,15 @@ function Node2DB() {
     if (recording) {
 
         //node visibility changes upon state of "Recording Setting"
+
         lastNode.visibility = true;
-        lastNode.nodeAdditionalInfo = JSON.stringify((Object.values(lastNode)));
+
+        var new_node = {
+            "info": JSON.stringify(Object.values(lastNode))
+        };
+
         var url = baseURL + "node/" + DBSessionPointer + "/" + APIKey;
-        var json = JSON.stringify(lastNode);
+        var json = JSON.stringify(new_node);
         var xhr = new XMLHttpRequest();
         xhr.open("POST", url, true);
         xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
@@ -231,9 +176,13 @@ function Node2DB() {
         if (!recording) {
             //node visibility changes upon state of "Recording Setting"
             lastNode.visibility = false;
-            lastNode.nodeAdditionalInfo = JSON.stringify((Object.values(lastNode)));
+
+            var new_node = {
+                "info": JSON.stringify(Object.values(lastNode))
+            };
+
             var url = baseURL + "node/" + DBSessionPointer + "/" + APIKey;
-            var json = JSON.stringify(lastNode);
+            var json = JSON.stringify(new_node);
             var xhr = new XMLHttpRequest();
             xhr.open("POST", url, true);
             xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
@@ -243,6 +192,5 @@ function Node2DB() {
             xhr.send(json);
         }
     }
-
 }
 
