@@ -7,7 +7,8 @@ const contentScript = {
 
 function updateModel(request){
     var highlightToAdd;
-    var tabUrl = request.tabUrl;
+	var tabUrl = request.tabUrl;
+	var returnInfo;
     if (request.innerType == "highlightSelection"){
         highlightToAdd = {type: request.innerType, path:request.path, text: request.text, classId: request.classId};
         contentScript.model.urlToHighlight.addHighlight(tabUrl, highlightToAdd);
@@ -18,12 +19,13 @@ function updateModel(request){
         var highlightToRemove = {type: request.innerType, srcUrl: request.srcUrl, pageUrl: request.pageUrl}; 
         contentScript.model.urlToHighlight.removeHighlight(tabUrl, highlightToRemove);
     } else if (request.innerType == "noted"){
-        contentScript.model.urlToHighlight.updateType(request.data);
+        returnInfo = contentScript.model.urlToHighlight.getHighlightTextPath(request.data);
 	}  else if (request.innerType == "highlightRemoved"){
 		var highlightToRemove = {type:request.innerType, classId: request.classId}; 
 		contentScript.model.urlToHighlight.removeHighlight(tabUrl, highlightToRemove);
 	}
 	contentScript.model.urlToHighlight.displayState();
+	return returnInfo;
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -85,8 +87,12 @@ document.addEventListener('DOMContentLoaded', function () {
 					url: sender.tab.url
 				};
 				var modelInfo = {type: 'updateModel', innerType:'noted', tabUrl: sender.tab.url, data: typeUpdate};
-				updateModel(modelInfo);
-				chrome.runtime.sendMessage({type:'notedHistoryMap', data:typeUpdate}, function (response) {
+				//extract X-path from the highlighted text node
+				var highlightPath = updateModel(modelInfo);
+				typeUpdate.path = highlightPath;
+				//unique class id for note action
+				typeUpdate.classId = 'sm-' + (+new Date())
+				chrome.runtime.sendMessage({type:'notedHistoryMap', data:typeUpdate, tab: sender.tab}, function (response) {
 				});
 			} else if (request.type === "highlightRemoved"){
 				//received remove highlight from contentScript view (highlight.js)

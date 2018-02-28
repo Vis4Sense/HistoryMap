@@ -176,7 +176,9 @@ historyMap.controller.browser = function () {
 			onImageRemoved(tab2node[tab.id], pic);
 			//no need to actually create a "remove image" action?
 			//action = createActionObject(tab.id, tab.url, undefined, type, undefined, undefined, undefined, tab2node[tab.id], pic, true);
-		}
+		} else if (type === 'note') {
+			action = createActionObject(tab.id, tab.url, text, "note", undefined, path, classId, tab2node[tab.id], undefined, false);
+		} 
 		return action;
 	}
 
@@ -184,8 +186,8 @@ historyMap.controller.browser = function () {
 
 	//using old style of creating nodes(actions)
 	function createActionObject(tabId, url, text, type, favIconUrl, path, classId, from, pic, hidden) {
-	    var time = new Date(),
-            action = {
+		var time = new Date();
+        var action = {
                 id: nodeId,
                 time: time,
                 url: url,
@@ -222,8 +224,7 @@ historyMap.controller.browser = function () {
 			if(tabId) {
                 action.from = tab2node[tabId];
             }
-        }
-
+		}
 		historyMap.model.nodes.addNode(action);
         nodeId++;
         return action;
@@ -244,7 +245,7 @@ historyMap.controller.browser = function () {
 	   } else if (request.type === 'remove-image'){
 			createNewAction(request.tab, 'remove-image', request.text, request.path, request.classId, request.picture);
 		} else if (request.type === 'notedHistoryMap') {
-			historyMap.model.nodes.updateType(request.data);
+			createNewAction(request.tab, 'note', request.data.text, request.data.path, request.classId, request.picture);
 			historyMap.view.redraw();
 		} else if (request.type === 'removeHighlightSelection'){
 			historyMap.model.nodes.hideNode(request.tabUrl, request.classId);

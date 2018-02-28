@@ -49,14 +49,12 @@ contentScript.model.urlToHighlight = {
         }
     },
     
-    updateType: function(typeUpdate) {
-        //locates the original highlight(note), updates its text and/or type
+    getHighlightTextPath: function(typeUpdate) {
+        //locates the original highlighted text, returns its X-path
         if (typeUpdate.type === 'note') {
             var highlights = this.urlToHighlight[typeUpdate.url];
             var foundNode = highlights.find(a => a.classId === typeUpdate.classId)
-            foundNode.text = typeUpdate.text;
-            foundNode.type = typeUpdate.type;
-            return foundNode;
+            return foundNode.path;
         }
     },
 
