@@ -13,7 +13,7 @@ contentScript.model.urlToHighlight = {
 	},
 	
 	addHighlight: function (url, highlight) {
-		//adds highlighted text or image
+		//adds highlighted text image or note
         this.prepareUrlForHighlights(url);
         var highlights = this.urlToHighlight[url];
         if (highlight.type === "highlightImage"){
@@ -24,6 +24,7 @@ contentScript.model.urlToHighlight = {
                 highlights.splice(foundNodeIndex, 1);
             }
         }
+		//pushes "highlightImage", "highlightSelection"(text) and "noted"(note)
         highlights.push(highlight);
 		return highlights;
     },

@@ -18,11 +18,14 @@ function updateModel(request){
     } else if (request.innerType == "removeHighlightImage"){
         var highlightToRemove = {type: request.innerType, srcUrl: request.srcUrl, pageUrl: request.pageUrl}; 
         contentScript.model.urlToHighlight.removeHighlight(tabUrl, highlightToRemove);
-    } else if (request.innerType == "noted"){
+    } else if (request.innerType == "getXPathNoted"){
         returnInfo = contentScript.model.urlToHighlight.getHighlightTextPath(request.data);
 	}  else if (request.innerType == "highlightRemoved"){
 		var highlightToRemove = {type:request.innerType, classId: request.classId}; 
 		contentScript.model.urlToHighlight.removeHighlight(tabUrl, highlightToRemove);
+	} else if (request.innerType === 'noted'){
+        highlightToAdd = {type: request.innerType, path:request.path, text: request.text, classId: request.classId};
+        contentScript.model.urlToHighlight.addHighlight(tabUrl, highlightToAdd);
 	}
 	contentScript.model.urlToHighlight.displayState();
 	return returnInfo;
@@ -86,12 +89,15 @@ document.addEventListener('DOMContentLoaded', function () {
 					type: 'note',
 					url: sender.tab.url
 				};
-				var modelInfo = {type: 'updateModel', innerType:'noted', tabUrl: sender.tab.url, data: typeUpdate};
+				var modelInfo = {type: 'updateModel', innerType:'getXPathNoted', tabUrl: sender.tab.url, data: typeUpdate};
 				//extract X-path from the highlighted text node
 				var highlightPath = updateModel(modelInfo);
 				typeUpdate.path = highlightPath;
 				//unique class id for note action
 				typeUpdate.classId = 'sm-' + (+new Date())
+				//add the note to the contentScript model
+				modelInfo = {type: 'updateModel', innerType: 'noted', tabUrl: typeUpdate.url, classId: typeUpdate.classId, path: typeUpdate.path, text: typeUpdate.text, url: typeUpdate.url};
+				updateModel(modelInfo);
 				chrome.runtime.sendMessage({type:'notedHistoryMap', data:typeUpdate, tab: sender.tab}, function (response) {
 				});
 			} else if (request.type === "highlightRemoved"){
