@@ -99,7 +99,6 @@ historyMap.controller.browser = function () {
 				if (loggedIn = true) {
 					Node2DB();
 				}
-
 			}
 		}
 	});

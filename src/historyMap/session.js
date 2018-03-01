@@ -151,15 +151,15 @@ function displaySessions() {
         // Generating Option for Select List in combination of Data
         var option = document.createElement("option");
         option.value = SessionProfile[i]._id;
-        option.text = SessionProfile[i].sessionname;
+        option.text = SessionProfile[i].name;
         selectList.appendChild(option);
     };
 
     // Adding listener to trigger when Select makes a change also reset interface for next load
     document.getElementById("mySelect").addEventListener("change", function (e) {
+        setSelectedSession();
         document.getElementById("mySelect").remove();
         document.getElementById("btn_load").setAttribute("enabled", "enabled");
-        setSelectedSession();
     });
 
     // Create event and fire it.
@@ -185,7 +185,6 @@ function newSession() {
             pushSessToDB();
         }
     };
-
 }
 
 //This connects to the API and loads user sessions and stores it in HistoryMapModel
@@ -239,6 +238,7 @@ function load_SelectedSession(i) {
 
         //Since Nodes have been stringified while being sent to the DB, i parsed it back to an object
         var fixNodes = JSON.parse(i.nodes[j].nodes);
+        console.log(fixNodes);
         nodes += fixNodes;
     }
 

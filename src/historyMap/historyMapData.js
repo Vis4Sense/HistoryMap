@@ -84,8 +84,6 @@ function getUACKey() {
 
     //adjusted route
     var url = baseURL + "userGenerateAccessKey/" + UserEmail + "/";
-    console.log(url);
-
     var xhr = new XMLHttpRequest();
     xhr.open("PUT", url, true);
     xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
