@@ -89,7 +89,6 @@ function getUACKey() {
     xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
     xhr.onload = function () {
         var users = JSON.parse(xhr.responseText);
-        console.log(users);
         if (xhr.readyState == 4 && xhr.status == "200") {
             //adjusted field name to accesskey 
             APIKey = users.accesskey;
@@ -138,7 +137,7 @@ function DBaddUser() {
     xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
     xhr.onload = function () {
         var users = JSON.parse(xhr.responseText);
-        //might be worth calling the UAC here
+        getUACKey();
     }
     xhr.send(json);
 }
@@ -157,7 +156,7 @@ function Node2DB() {
         lastNode.visibility = true;
 
         var new_node = {
-            "info": JSON.stringify(Object.values(lastNode))
+            "info": JSON.stringify(lastNode)
         };
 
         var url = baseURL + "node/" + DBSessionPointer + "/" + APIKey;
@@ -176,7 +175,7 @@ function Node2DB() {
             lastNode.visibility = false;
 
             var new_node = {
-                "info": JSON.stringify(Object.values(lastNode))
+                "info": JSON.stringify(lastNode)
             };
 
             var url = baseURL + "node/" + DBSessionPointer + "/" + APIKey;

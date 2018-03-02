@@ -52,7 +52,6 @@ chrome.runtime.onMessage.addListener(function (request) {
     if (request.text === 'loggedin') {
         loggedIn = true;
         historyMap.model.user = request.user;
-        getUACKey();
     }
 });
 
@@ -155,6 +154,8 @@ function displaySessions() {
         selectList.appendChild(option);
     };
 
+    document.getElementById("mySelect").selectedIndex = -1;
+
     // Adding listener to trigger when Select makes a change also reset interface for next load
     document.getElementById("mySelect").addEventListener("change", function (e) {
         setSelectedSession();
@@ -169,22 +170,35 @@ function displaySessions() {
 };
 
 
-
-//This bit controls new Sessions
 function newSession() {
-    //Changing name of the SessionName before submission, so no one can abuse it in console
-    let TestSessionName = document.getElementById('sessionName').value;
-    //Looping thorugh SessionProfile
-    for (var i = 0; i < SessionProfile.length; i++) {
-        //If SessionName matches a Session Generated alert the user
-        if (TestSessionName == SessionProfile[i].name) {
-            window.alert("Session Name already exsits, please choose a different Session Name");
-        } else {
-            //Pushes Session to DB
-            SessionName = document.getElementById('sessionName').value;
-            pushSessToDB();
-        }
-    };
+    SessionName = document.getElementById('sessionName').value;
+    console.log("Created Session: " + SessionName);
+    pushSessToDB();
+    document.getElementById("sessionName").remove();
+    document.getElementById("btn_new_sess").remove();
+    document.getElementById('btn_new').disabled = false;
+
+    //Hacky way to prevent users from creating duplicate Sessions. Maybe let backend do this instead
+
+    // //Looping thorugh SessionProfile
+    // if (typeof SessionProfile == 'undefined' || SessionProfile == null) {
+    //     console.log("Saving Session: " + SessionName);
+    //     pushSessToDB();
+    // } else {
+    //     for (var i = 0; i < SessionProfile.length; i++) {
+    //         //If SessionName matches a Session Generated alert the user
+    //         if (SessionName == SessionProfile[i].name) {
+    //             window.alert("Session Name already exsits, please choose a different Session Name");
+    //             break;
+    //         } else {
+    //             //Pushes Session to DB
+    //             console.log("Saving Session: " + SessionName);
+    //             pushSessToDB();
+    //             break;
+    //         }
+    //     };
+    // }
+
 }
 
 //This connects to the API and loads user sessions and stores it in HistoryMapModel
@@ -209,12 +223,13 @@ function setSelectedSession() {
 
     //fetches value from select list
     select_Val = document.getElementById("mySelect").value;
+    document.getElementById("mySelect").remove();
+    document.getElementById('btn_load').disabled = false;
 
     for (var i = 0; i => SessionProfile.length; i++) {
         if (SessionProfile[i]._id == select_Val) {
             var result = SessionProfile[i];
             console.log(result);
-            debug_test_result = result;
             load_SelectedSession(result);
             break;
         }
@@ -234,12 +249,11 @@ function load_SelectedSession(i) {
 
     //loops through node array in retrieved session object to get nodeAdditionalinfo
     //and then inserts it via += into nodes array in HistoryMap
-    for (j = 0; j > i.nodes.length; i++) {
-
+    debug_test_result = JSON.parse(i.nodes[0].info);
+    for (j = 0; j < i.nodes.length; j++) {
         //Since Nodes have been stringified while being sent to the DB, i parsed it back to an object
-        var fixNodes = JSON.parse(i.nodes[j].nodes);
-        console.log(fixNodes);
-        nodes += fixNodes;
+        var fixNodes = JSON.parse(i.nodes[j].info);
+        historyMap.model.nodes.addNode(fixNodes);
     }
 
     //Reload History Map
