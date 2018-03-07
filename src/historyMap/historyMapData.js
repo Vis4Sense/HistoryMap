@@ -71,7 +71,7 @@ chrome.runtime.onMessage.addListener(function (request) {
         ProfileName = request.user.name;
         up = request.user;
         UserEmail = request.user.email;
-        DBaddUser();
+        historyMap.API.DBSave.DBaddUser();
     }
 });
 
@@ -80,7 +80,7 @@ var baseURL = "https://sensemap-api.herokuapp.com/";
 let DBSessionPointer;
 
 //gets UACkey from DB // will be moved to historyMap.model
-function getUACKey() {
+historyMap.API.DBLoad.getUACKey = function() {
 
     //adjusted route
     var url = baseURL + "userGenerateAccessKey/" + UserEmail + "/";
@@ -94,7 +94,7 @@ function getUACKey() {
             APIKey = users.accesskey;
             localStorage.setItem("APIKey", APIKey);
             localStorage.setItem("UserEmail", UserEmail);
-            load_user_sessions();
+            historyMap.API.DBLoad.loadUserSessions();
             btnDisplay();
         } else {
         }
@@ -102,7 +102,7 @@ function getUACKey() {
     xhr.send();
 }
 
-function pushSessToDB() {
+historyMap.API.DBSave.pushSessToDB = function() {
     var url = baseURL + "session/" + UserEmail + "/" + APIKey;
     var data = {};
     data.name = SessionName;
@@ -121,7 +121,7 @@ function pushSessToDB() {
     xhr.send(json);
 }
 
-function DBaddUser() {
+historyMap.API.DBSave.DBaddUser = function() {
     //Creating the Object for the DB
     var new_stuff = {
         "name": up.name,
@@ -137,12 +137,12 @@ function DBaddUser() {
     xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
     xhr.onload = function () {
         var users = JSON.parse(xhr.responseText);
-        getUACKey();
+        historyMap.API.DBLoad.getUACKey();
     }
     xhr.send(json);
 }
 
-function Node2DB() {
+historyMap.API.DBSave.Node2DB = function() {
 
     //gets node count and fetches the last node
     let nodeCount = historyMap.model.nodes.getSize() - 1;

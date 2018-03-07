@@ -20,7 +20,7 @@ $(function () {
         newHistoryMap();
     });
     $('#btn_load').click(function () {
-        displaySessions();
+        historyMap.API.DBLoad.displaySessions();
     });
     $('#btn_logout').click(function () {
         chrome.runtime.sendMessage({
@@ -125,7 +125,7 @@ function newHistoryMap() {
 
             $(function () {
                 $('#btn_new_sess').click(function () {
-                    newSession();
+                    historyMap.API.DBSave.newSession();
                 })
             });
         }
@@ -134,7 +134,7 @@ function newHistoryMap() {
 
 
 //This loads the Sessions in a menu
-function displaySessions() {
+historyMap.API.DBLoad.displaySessions = function() {
 
     document.getElementById("btn_load").setAttribute("disabled", "disabled");
 
@@ -158,7 +158,7 @@ function displaySessions() {
 
     // Adding listener to trigger when Select makes a change also reset interface for next load
     document.getElementById("mySelect").addEventListener("change", function (e) {
-        setSelectedSession();
+        historyMap.API.DBLoad.setSelectedSession();
         document.getElementById("mySelect").remove();
         document.getElementById("btn_load").setAttribute("enabled", "enabled");
     });
@@ -169,40 +169,40 @@ function displaySessions() {
 
 };
 
-
-function newSession() {
+historyMap.API.DBSave.newSession = function() {
     SessionName = document.getElementById('sessionName').value;
-    console.log("Created Session: " + SessionName);
-    pushSessToDB();
     document.getElementById("sessionName").remove();
     document.getElementById("btn_new_sess").remove();
     document.getElementById('btn_new').disabled = false;
 
-    //Hacky way to prevent users from creating duplicate Sessions. Maybe let backend do this instead
+    //Hacky way to prevent users from creating duplicate Sessions.
+    //Looping thorugh SessionProfile
+    if (typeof SessionProfile == 'undefined' || SessionProfile == null) {
+        console.log("Saving Session: " + SessionName);
+        historyMap.API.DBSave.pushSessToDB();
+    } else {
+        var noDuplicate = true;
+        
+        for (var i = 0; i < SessionProfile.length; i++) {
 
-    // //Looping thorugh SessionProfile
-    // if (typeof SessionProfile == 'undefined' || SessionProfile == null) {
-    //     console.log("Saving Session: " + SessionName);
-    //     pushSessToDB();
-    // } else {
-    //     for (var i = 0; i < SessionProfile.length; i++) {
-    //         //If SessionName matches a Session Generated alert the user
-    //         if (SessionName == SessionProfile[i].name) {
-    //             window.alert("Session Name already exsits, please choose a different Session Name");
-    //             break;
-    //         } else {
-    //             //Pushes Session to DB
-    //             console.log("Saving Session: " + SessionName);
-    //             pushSessToDB();
-    //             break;
-    //         }
-    //     };
-    // }
+            //If SessionName matches a Session Generated alert the user
+            if (SessionName == SessionProfile[i].name) {
+                noDuplicate = false;
+                window.alert("Session Name already exsits, please choose a different Session Name");
+                break;
+            }
+        };
+        if (noDuplicate) {
+            //Pushes Session to DB
+            console.log("Saving Session: " + SessionName);
+            historyMap.API.DBSave.pushSessToDB();
+        }
+    }
 
 }
 
 //This connects to the API and loads user sessions and stores it in HistoryMapModel
-function load_user_sessions() {
+historyMap.API.DBLoad.loadUserSessions = function() {
     var url = baseURL + "session/" + up.email + "/" + APIKey;
     var xhr = new XMLHttpRequest()
     xhr.open('GET', url, true)
@@ -219,7 +219,7 @@ function load_user_sessions() {
 }
 
 //Use this function to load Sessions into history map, requires Session Data to be used.
-function setSelectedSession() {
+historyMap.API.DBLoad.setSelectedSession = function() {
 
     //fetches value from select list
     select_Val = document.getElementById("mySelect").value;
@@ -230,18 +230,20 @@ function setSelectedSession() {
         if (SessionProfile[i]._id == select_Val) {
             var result = SessionProfile[i];
             console.log(result);
-            load_SelectedSession(result);
+            historyMap.API.DBLoad.loadSelectedSession(result);
             break;
         }
     }
 }
 
 //Function for loading
-function load_SelectedSession(i) {
+historyMap.API.DBLoad.loadSelectedSession = function(i) {
 
     //Clear Previous Values
     nodes.length = 0;
     SessionName = "";
+    //Reload History Map
+    historyMap.view.redraw();
 
     //Set Values to Historymap from Session of Choice for save and load
     SessionName = i.name;
@@ -255,9 +257,6 @@ function load_SelectedSession(i) {
         var fixNodes = JSON.parse(i.nodes[j].info);
         historyMap.model.nodes.addNode(fixNodes);
     }
-
-    //Reload History Map
-    historyMap.view.redraw();
 };
 
 //Force logout upon closing
