@@ -24,9 +24,7 @@ function googleLogin() {
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     if (request.text === "login") {
         googleLogin();
-        sendResponse({ text: 'using google+ login' })
-    } else {
-        sendResponse({ text: 'do not understand the message' + request.text });
+        sendResponse({text:'using google+ login'})
     }
 });
 
@@ -35,9 +33,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     if (request.text === "logout") {
         hello('google').logout();
         localStorage.clear();
-        sendResponse({ text: 'google+ logged out' })
-    } else {
-        sendResponse({ text: 'do not understand the message' + request.text });
+        sendResponse({text:'google+ logged out'})
     }
 });
 

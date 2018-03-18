@@ -271,7 +271,6 @@ highlight = function () {
 
 			//dialog.modal("hide");
 			dialog.hide();
-			console.log("notewrap is ", noteWrap);
 			chrome.runtime.sendMessage({ type: "noted", data: noteWrap });
 		});
 		footer.find("#btnCancelNote").click(function() {
@@ -296,12 +295,8 @@ highlight = function () {
 
 	function getCssHeaderLink(iconSource) {
 		if (iconSource == "fontello"){
-			url = "lib/new-fontawesome/css/fontello.css";
-		} else if (iconSource == "fontawesome") {
-			//add to web accessible resources in manifest.json if font-awesome
-			url = "https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css";
-		}
-		
+			url = "lib/fontello/css/fontello.css";
+		} 
 		var link = document.createElement("link");
 		link.href = chrome.extension.getURL(url);
 		link.type = "text/css";

@@ -1,13 +1,12 @@
 contentScriptController = function () {
     // Only run after the background page opens. 
     chrome.runtime.sendMessage({ type: "backgroundOpened" }, function (response) {
-        /*if (!response){
-         return;}*/
-
+        if (!response){
+         return;}
         // If page uses ajax, we don't know when it's actually complete such as google search result page.
         // Naively wait one more second.
         setTimeout(function () {
-            loadHighlights();
+            loadHighlights(response.url);
         }, 2000);
 
 
@@ -44,8 +43,8 @@ function handle() {
 
 function respondExtension() {
     chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-		console.log("controller got a message " + JSON.stringify(request));
-        if (request.type === "scrollToElement") {
+        //console.log("controller got a message " + JSON.stringify(request));    
+		if (request.type === "scrollToElement") {
             scrollTo(request);
         } else if (request.type === 'askReferrer') {
             sendResponse(document.referrer);
@@ -55,14 +54,12 @@ function respondExtension() {
             changeHighlightImage(request.srcUrl, request.pageUrl, true, sendResponse);
         } else if (request.type === 'removeHighlightImage') {
             changeHighlightImage(request.srcUrl, request.pageUrl, false, sendResponse);
-        } else if (request.type === "updateModel"){
-            updateModel(request);
         }
     });
 }
 
 function highlightSelection(sendResponse) {
-    var highlightReponse;
+    var highlightResponse;
     var selection = getSelection();
     if (!selection || selection.type !== "Range") return;
     highlightResponse = $.highlight(selection);
@@ -97,24 +94,31 @@ function locateImageElement(srcAttributeValue) {
 }
 
 function changeHighlightImage(srcUrl, pageUrl, applyHighlight, sendResponse) {
+    //sendresponse only exists when this function originates from contextMenu,
+    //the other call originates from loadHighlights (with no sendResponse)
     var imageSrcAttribute = calculateImgSrcAttribute(srcUrl, pageUrl);
     var imageElement = locateImageElement(imageSrcAttribute);
     if (imageElement) {
         if (applyHighlight) {
             removeHighlightFromImages();
             imageElement.addClass("sm-highlight-image");
-            sendResponse({ imageHighlighted: true });
+            //may be used to let history map node know that an image has been set for the node
+            if(sendResponse){
+                sendResponse({ imageHighlighted: true });
+            }
         } else {
             imageElement.removeClass("sm-highlight-image");
-            sendResponse({ imageHighlighted: false });
+            if(sendResponse){
+                sendResponse({ imageHighlighted: false });
+            }
         }
     }
 }
 
 function removeHighlightFromImages() {
-    var highlighedImageElements = $('.sm-highlight-image');
-    if (highlighedImageElements) {
-        highlighedImageElements.removeClass("sm-highlight-image");
+    var highlightedImageElements = $('.sm-highlight-image');
+    if (highlightedImageElements) {
+        highlightedImageElements.removeClass("sm-highlight-image");
     }
 }
 
@@ -154,19 +158,4 @@ function completePendingTask() {
             scrollTo(response);
         }
     });
-}
-
-function updateModel(response){
-    console.log("updating model: add this to the model ");  
-    console.log("the reponse to add is ... "+ JSON.stringify(response));
-    console.log(contentScript.model.urlToHighlight.getArray());
-/*
-//old method of adding for the different context menu interactions
-if (!urlToHighlight[tab.url]) {
-    urlToHighlight[tab.url] = []; 
-}
-urlToHighlight.addHighlight(url, {type: 'highlight', path: d.path, text: d.text, classId: d.classId});
-urlToHighlight.addHighlight(url, {type: 'highlightImage', srcUrl: info.srcUrl, pageUrl: info.pageUrl})
-urlToHighlight.addHighlight(url, {type: 'note', classId: request.data.classId, text: request.data.text, url: sender.tab.url, path: request.data.path});
-*/		
 }
