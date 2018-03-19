@@ -131,7 +131,7 @@
 
 .sm-sensemap .node-icon.fa {
 	color: white;
-	padding: 3px;
+	padding: 0px 0px 0px 0.5px;
 	border-radius: 4px;
 	width: 20px;
 	margin: 0 3px 0 0;
