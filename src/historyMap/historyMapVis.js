@@ -2,6 +2,7 @@
  * historyMapView visualizes user browsing process.
  */
 historyMap.view.vis = function() {
+	var activateShowAllDefault = true;
     // Private members
     var width = 400, height = 250,
         margin = { top: 5, right: 5, bottom: 5, left: 5 },
@@ -320,7 +321,8 @@ historyMap.view.vis = function() {
             }).on('mouseout', function() {
                 d3.select(this).select('.show-all-highlights').classed('hide', true);
             });
-        children.append('xhtml:button').attr('class', 'btn btn-default hide show-all-highlights').text('Show All')
+
+        children.append('xhtml:button').attr('class', 'btn btn-default hide show-all-highlights').text('Show Less')
             .on('click', function(d) {
                 d3.event.stopPropagation();
                 d3.select(this).classed('hide', true);
@@ -463,6 +465,11 @@ historyMap.view.vis = function() {
 
     function updateChildren(container, d) {
         // Enter
+		//sets initial show state to showAll
+		if (activateShowAllDefault){
+			d.collectionShowAll = true;
+			activateShowAllDefault = false;
+		}
         var subItems = container.selectAll('.sub-node').data(d.collectionShowAll ? d.children : _.take(d.children, zoomLevel.numChildren), key);
         var enterItems = subItems.enter().append('div').attr('class', 'sub-node')
             .call(historyMap.addBootstrapTooltip)
