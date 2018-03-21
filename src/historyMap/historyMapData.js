@@ -39,7 +39,7 @@ historyMap.model.nodes = {
 historyMap.model.sessions = {
     sessions: [],
 
-    getSessions: function() {
+    getSessions: function () {
         return this.sessions;
     }
 };
@@ -80,7 +80,7 @@ var baseURL = "https://sensemap-api.herokuapp.com/";
 let DBSessionPointer;
 
 //gets UACkey from DB // will be moved to historyMap.model
-historyMap.API.DBLoad.getUACKey = function() {
+historyMap.API.DBLoad.getUACKey = function () {
 
     //adjusted route
     var url = baseURL + "userGenerateAccessKey/" + UserEmail + "/";
@@ -96,13 +96,12 @@ historyMap.API.DBLoad.getUACKey = function() {
             localStorage.setItem("UserEmail", UserEmail);
             historyMap.API.DBLoad.loadUserSessions();
             btnDisplay();
-        } else {
-        }
+        } else {}
     }
     xhr.send();
 }
 
-historyMap.API.DBSave.pushSessToDB = function() {
+historyMap.API.DBSave.pushSessToDB = function () {
     var url = baseURL + "session/" + UserEmail + "/" + APIKey;
     var data = {};
     data.name = SessionName;
@@ -121,7 +120,7 @@ historyMap.API.DBSave.pushSessToDB = function() {
     xhr.send(json);
 }
 
-historyMap.API.DBSave.DBaddUser = function() {
+historyMap.API.DBSave.DBaddUser = function () {
     //Creating the Object for the DB
     var new_stuff = {
         "name": up.name,
@@ -142,52 +141,28 @@ historyMap.API.DBSave.DBaddUser = function() {
     xhr.send(json);
 }
 
-historyMap.API.DBSave.Node2DB = function() {
+historyMap.API.DBSave.Node2DB = function () {
 
-    //gets node count and fetches the last node
-    let nodeCount = historyMap.model.nodes.getSize() - 1;
-    let lastNode = nodes[nodeCount];
+    //gets HistoryMapTree
+    let currentTree = historyMap.model.tree;
 
-    //pushes node to DB
-    if (recording) {
+    let nodeTree = {
+        nodes: currentTree
+    };
 
-        //node visibility changes upon state of "Recording Setting"
-
-        lastNode.visibility = true;
-
-        var new_node = {
-            "info": JSON.stringify(lastNode)
-        };
-
-        var url = baseURL + "node/" + DBSessionPointer + "/" + APIKey;
-        var json = JSON.stringify(new_node);
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", url, true);
-        xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-        xhr.onload = function () {
-            var users = JSON.parse(xhr.responseText);
-        }
-        xhr.send(json);
-    } else {
-
-        if (!recording) {
-            //node visibility changes upon state of "Recording Setting"
-            lastNode.visibility = false;
-
-            var new_node = {
-                "info": JSON.stringify(lastNode)
-            };
-
-            var url = baseURL + "node/" + DBSessionPointer + "/" + APIKey;
-            var json = JSON.stringify(new_node);
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", url, true);
-            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-            xhr.onload = function () {
-                var users = JSON.parse(xhr.responseText);
-            }
-            xhr.send(json);
+    var url = baseURL + "sessionupdate/" + DBSessionPointer + "/" + APIKey + "/";
+    var json = JSON.stringify(nodeTree);
+    var xhr = new XMLHttpRequest();
+    xhr.open("PUT", url, true);
+    xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+    xhr.onload = function () {
+        var users = JSON.parse(xhr.responseText);
+        if (xhr.readyState == 4 && xhr.status == "200") {
+            console.table(users);
+        } else {
+            console.error(users);
         }
     }
-}
+    xhr.send(json);
 
+}

@@ -122,10 +122,8 @@ historyMap.controller.browser = function () {
 		tab2node[tab.id] = nodeId;
 		tabUrl[tab.id] = tab.url;
 		isTabCompleted[tab.id] = false;
-
-		if (recording == true) {
-			nodeId = nodes.addNode(node);
-		}
+		nodeId = nodes.addNode(node);
+		
 
 		// Update with visit type
 		if (tab.url) {
@@ -238,7 +236,4 @@ historyMap.controller.browser = function () {
 			sendResponse(highlightObject);
 		}
 	}
-
-
-
 }
