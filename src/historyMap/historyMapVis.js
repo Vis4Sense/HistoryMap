@@ -217,16 +217,22 @@ historyMap.view.vis = function() {
                     menuRect = menu.node().getBoundingClientRect(),
                     nodeRect = this.getBoundingClientRect();
                 menu.style('left', (nodeRect.right > width - menuRect.width ? 1 - menuRect.width : d.width - 1) + 'px');
-
-                // Hide tooltip
+				
                 if (brushing) {
-                    $(this.querySelector('.parent')).tooltip('hide');
+					// Hide tooltip
                     d3.select(this).selectAll('.sub-node').each(function() {
                         $(this).tooltip('hide');
                     });
                 } else if (d.curated) {
                     dispatch.nodeHovered(d, true);
-                }
+                } else {
+					d3.select(this).selectAll('.sub-node').each(function() {
+						//extract the text of the highlight node being hovered over
+						var highlightNodeText = this.getElementsByClassName("node-label")[0].innerHTML;
+						//set title attribute to create tooltip
+						$(this).attr('title', highlightNodeText);
+                    });
+				}
             }).on('mouseout', function(d) {
                 d3.select(this).select('.btn-group').classed('hide', true);
 
@@ -239,8 +245,7 @@ historyMap.view.vis = function() {
         container.append('xhtml:div').attr('class', 'node-curated fa fa-check-square hide');
 
         var menu = container.append('xhtml:div').attr('class', 'btn-group hide').style('top', '-2px');
-        var parent = container.append('xhtml:div').attr('class', 'parent')
-            .call(historyMap.addBootstrapTooltip);
+        var parent = container.append('xhtml:div').attr('class', 'parent');
 
         // Icon
         var titleDiv = parent.append('xhtml:div').attr('class', 'node-title');
@@ -472,7 +477,6 @@ historyMap.view.vis = function() {
 		}
         var subItems = container.selectAll('.sub-node').data(d.collectionShowAll ? d.children : _.take(d.children, zoomLevel.numChildren), key);
         var enterItems = subItems.enter().append('div').attr('class', 'sub-node')
-            .call(historyMap.addBootstrapTooltip)
             .on('click', function(d) {
                 if (d3.event.defaultPrevented || d3.event.shiftKey) return;
                 dispatch.nodeClicked(d);
