@@ -274,7 +274,8 @@ historyMap.view.vis = function() {
                 } else {
                     dispatch.nodeUnfavorite(d);
                 }
-            });
+            })
+			.append('xhtml:i').attr("class", "icon-star");
         menu.append('xhtml:button').attr('class', 'btn btn-default fa fa-minus')
             .attr('title', 'Minimize')
             .on('click', function(d) {
@@ -283,7 +284,8 @@ historyMap.view.vis = function() {
                 d.minimized = true;
                 update();
                 dispatch.nodeMinimized(d);
-            });
+            })
+			.append('xhtml:i').attr("class", "icon-minus");
         menu.append('xhtml:button').attr('class', 'btn btn-default fa fa-edit')
             .attr('title', 'Curate')
             .on('click', function(d) {
@@ -303,7 +305,8 @@ historyMap.view.vis = function() {
 
                 update();
                 dispatch.curated(d);
-            });
+            })
+			.append('xhtml:i').attr("class", "icon-edit");
         menu.append('xhtml:button').attr('class', 'btn btn-default fa fa-remove')
             .attr('title', 'Remove')
             .on('click', function(d) {
@@ -313,7 +316,8 @@ historyMap.view.vis = function() {
                 d.collectionRemoved = true;
                 update();
                 dispatch.nodeCollectionRemoved(d);
-            });
+            })
+			.append('xhtml:i').attr("class", "icon-cancel");
 
         // Children
         var children = container.append('xhtml:div').attr('class', 'children')
