@@ -326,8 +326,19 @@ historyMap.view.vis = function() {
             }).on('mouseout', function() {
                 d3.select(this).select('.show-all-highlights').classed('hide', true);
             });
+		//the showAll/showLess button text is assigned according to the default state
+		var buttonText = "";
+		//theDefaultState: 1 = show all highlight nodes, 0 = hide excess highlight nodes
+		var theDefaultState = 1;
+		if (theDefaultState === 1){
+			buttonText = "Show Less";
+		}	else{
+			buttonText = "Show All";
+		}
+		children.attr("data-default-state", theDefaultState);
+		children.attr("data-apply-default-state", 1);
 
-        children.append('xhtml:button').attr('class', 'btn btn-default hide show-all-highlights').text('Show Less')
+        children.append('xhtml:button').attr('class', 'btn btn-default hide show-all-highlights').text(buttonText)
             .on('click', function(d) {
                 d3.event.stopPropagation();
                 d3.select(this).classed('hide', true);
@@ -335,6 +346,7 @@ historyMap.view.vis = function() {
                 d3.select(this).text(d.collectionShowAll ? 'Show Less' : 'Show All');
                 update();
             });
+
     }
 
     /**
@@ -470,11 +482,7 @@ historyMap.view.vis = function() {
 
     function updateChildren(container, d) {
         // Enter
-		//sets initial show state to showAll
-		if (activateShowAllDefault){
-			d.collectionShowAll = true;
-			activateShowAllDefault = false;
-		}
+		applyDefaultState(container, d);
         var subItems = container.selectAll('.sub-node').data(d.collectionShowAll ? d.children : _.take(d.children, zoomLevel.numChildren), key);
         var enterItems = subItems.enter().append('div').attr('class', 'sub-node')
             .on('click', function(d) {
@@ -549,6 +557,23 @@ historyMap.view.vis = function() {
             d3.select(this).select('path').classed('straight-arrow', isThrough);
         });
     }
+	//applies the default state to all History map nodes' ShowAll/Less button
+	function applyDefaultState(container, d){
+		var divChildren = container[0][0];
+		//each children div has 2 attributes "data-apply-default-state" and "data-default-state" 
+		var state = divChildren.dataset.defaultState;
+		var applyState = divChildren.dataset.applyDefaultState;
+		//sets initial state of the button to the predefined default state
+		if (applyState == 1){
+			if (state == 1){
+				d.collectionShowAll = true;
+			} else {
+				d.collectionShowAll = false;
+			}
+			//a default state will no longer be applied to the showAll/Less button, instead it will depend on its previous state
+			divChildren.dataset.applyDefaultState = 0;
+		}
+	}
 
     /**
      * To make the line sharp.
