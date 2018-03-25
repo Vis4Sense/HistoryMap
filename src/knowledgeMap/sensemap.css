@@ -1,0 +1,383 @@
+.sm-sensemap .node {
+	display: inline-block;
+	background-color: white;
+	color: black;
+	box-shadow: 0 0 0 1px #6e6e6e, 0 0 0 2px rgba(0, 0, 0, 0);
+	border-radius: 3px;
+	transition: box-shadow 0.25s ease-in-out, border 0.25s ease-in-out, background-color 0.125s ease-in-out;
+	overflow: hidden;
+}
+
+.sm-sensemap .node.mini {
+	background-color: #6e6e6e;
+	width: 8px;
+	height: 8px;
+	border-radius: 4px;
+	margin-bottom: 7px;
+	cursor: pointer;
+	box-shadow: 0 0 0 2px #6e6e6e;
+}
+
+.sm-sensemap .node.removed {
+	cursor: pointer;
+}
+
+.sm-sensemap .node.connect {
+	cursor: e-resize;
+}
+
+.sm-sensemap .node:hover,
+.sm-sensemap .node.hovered,
+.sm-sensemap .node.brushed {
+	box-shadow: 0 0 0 2px #e74c3c !important;
+	border: none !important;
+}
+
+.sm-sensemap .node.brushed {
+	background-color: #E8A199 !important;
+}
+
+.sm-sensemap .node.not-seen:not(.mini):hover,
+.sm-sensemap .node.not-seen:not(.mini).hovered,
+.sm-sensemap .node.not-seen:not(.mini).brushed {
+	border: 1px solid #e74c3c !important;
+	box-shadow: none !important;
+}
+
+.sm-sensemap .node.mini:hover,
+.sm-sensemap .node.mini.hovered {
+	box-shadow: 0 0 0 2px #e74c3c;
+}
+
+.sm-sensemap .node.favorite {
+	background-color: #e6e600;
+}
+
+.sm-sensemap .node.highlighted {
+	background-color: cyan;
+}
+
+.sm-sensemap .node.favorite .fa-star {
+	color: #e6e600;
+}
+
+.sm-sensemap .node.not-seen:not(.mini) {
+	box-shadow: none;
+	border: 1px dashed #6e6e6e;
+}
+
+.sm-sensemap .node-title {
+	/*margin: -3px -3px 3px -3px;*/
+	padding: 3px;
+}
+
+.sm-sensemap .node-snapshot {
+	/* the next 3 lines together with set width, height for .parent to scale and crop image */
+	max-width: 100%;
+	width: auto;
+	height: auto;
+	border-bottom-left-radius: 3px;
+	border-bottom-right-radius: 3px;
+}
+
+.sm-sensemap .has-children .node-snapshot {
+	border-bottom-left-radius: 0px;
+	border-bottom-right-radius: 0px;
+}
+
+.sm-sensemap .link path {
+	fill: none;
+	stroke: #6e6e6e;
+}
+
+.sm-sensemap .link path.main-link {
+	marker-end: url(#arrow-marker);
+	stroke-width: 1.5px;
+}
+
+.sm-sensemap .link path.main-link.straight-arrow {
+	marker-end: none;
+}
+
+.sm-sensemap .link path.main-link.brushed,
+.sm-sensemap .link path.main-link.hovered {
+	stroke: #e74c3c;
+	stroke-width: 2px;
+	marker-end: url(#arrow-marker-hover);
+}
+
+.sm-sensemap .link path.hover-link {
+	opacity: 0;
+	stroke-width: 15px;
+}
+
+.sm-sensemap .link path.user-added {
+	stroke: blue;
+	marker-end: url(#arrow-marker-cursor);
+}
+
+
+/* To make icon and label in one line */
+
+.sm-sensemap .node-icon {
+	max-width: 20px;
+	max-height: 20px;
+	display: inline-block;
+	margin-right: 3px;
+}
+
+
+/* Action type icon. */
+
+.sm-sensemap .node-icon.fa {
+	color: white;
+	padding: 0px 0px 0px 0.5px;
+	border-radius: 4px;
+	width: 20px;
+	margin: 0 3px 0 0;
+	/* every 'simple' node has a height of 26px */
+}
+
+.sm-sensemap .children .node-icon.fa {
+	margin: 1px 3px 1px 0;
+}
+
+.sm-sensemap img.node-icon {
+	margin-top: -2px;
+	/* every 'simple' node has a height of 26px */
+}
+
+.sm-sensemap .node-label {
+	display: inline-block;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	vertical-align: bottom;
+	/* inline-block and overflow hidden make text move upwards */
+}
+
+.sm-sensemap .node-label.min-zoom {
+	text-overflow: clip;
+}
+
+.sm-sensemap .cursor-link {
+	stroke-width: 1.5px;
+	stroke: blue;
+	shape-rendering: auto;
+	marker-end: url(#arrow-marker-cursor);
+	pointer-events: none;
+	/* to prevent mouseover on the link, which causes mouseout from the node */
+}
+
+.sm-sensemap .parent {
+	overflow: hidden;
+	/* to crop image */
+}
+
+.sm-sensemap .parent.has-children {
+	font-weight: bold;
+	border-bottom: 1px solid #6e6e6e;
+}
+
+.sm-sensemap .children {
+	padding: 3px;
+}
+
+
+/* Node menu */
+
+.sm-sensemap .node .btn-group,
+.sm-sensemap .node-curated {
+	position: fixed;
+	color: #2ecc71;
+}
+
+.sm-sensemap .node .btn.show-all-highlights {
+	position: fixed;
+	padding: 2px 4px;
+	font-size: 14px;
+	margin-top: -4px;
+}
+
+.sm-sensemap .node-curated {
+	pointer-events: none;
+}
+
+
+/* Link menu */
+
+.sm-sensemap .menu-container .btn-group,
+.sm-sensemap .menu-container .btn {
+	position: inherit;
+}
+
+.sm-sensemap .node .btn,
+.sm-sensemap .link .btn {
+	padding: 4px 6px;
+	font-size: 18px;
+}
+
+/*to correctly position the fontello icons in the 4 buttons of a history map node */
+.sm-sensemap .node .btn {
+	padding: 0px 0px 0px 0px;
+	font-size: 18px;
+}
+
+/* Overwrite bootstrap tooltip */
+
+.tooltip.in {
+	opacity: 1 !important;
+	filter: alpha(opacity=100) !important;
+}
+
+.sm-sensemap .brush .extent {
+	stroke: #fff;
+	fill-opacity: .125;
+	shape-rendering: crispEdges;
+}
+
+#settings {
+	position: fixed;
+	float: right;
+	right: 5px;
+	top: 5px;
+}
+
+.btn-toolbar .btn {
+	padding: 4px 8px;
+}
+
+#btnCurate {
+	position: fixed;
+	float: right;
+	right: 5px;
+	bottom: 5px;
+	cursor: pointer;
+	padding: 2px 6px;
+}
+
+#groupZoom {
+	position: fixed;
+	float: right;
+	right: 5px;
+	bottom: 5px;
+}
+
+#groupZoom .btn {
+	padding: 0px 6px;
+	font-size: 20px;
+}
+
+.codesOn .i-name {
+	display: none;
+}
+
+.codesOn .i-code {
+	display: inline;
+}
+
+.i-code {
+	display: none;
+}
+
+/* @font-face {
+	font-family: 'fontello';
+	src: url('../font/fontello.eot?26643850');
+	src: url('../font/fontello.eot?26643850#iefix') format('embedded-opentype'), url('../font/fontello.woff2?26643850') format('woff2'), url('../font/fontello.woff?26643850') format('woff'), url('../font/fontello.ttf?26643850') format('truetype'), url('../font/fontello.svg?26643850#fontello') format('svg');
+	font-weight: normal;
+	font-style: normal;
+} */
+
+
+/* Chrome hack: SVG is rendered more smooth in Windozze. 100% magic, uncomment if you need it. */
+
+
+/* Note, that will break hinting! In other OS-es font will be not as sharp as it could be */
+
+
+/*
+  @media screen and (-webkit-min-device-pixel-ratio:0) {
+    @font-face {
+      font-family: 'fontello';
+      src: url('../font/fontello.svg?26643850#fontello') format('svg');
+    }
+  }
+  */
+
+[class^="icon-"]:before,
+[class*=" icon-"]:before {
+	font-family: "fontello";
+	font-style: normal;
+	font-weight: normal;
+	speak: none;
+	display: inline-block;
+	text-decoration: inherit;
+	width: 1em;
+	margin-right: .2em;
+	text-align: center;
+	/* opacity: .8; */
+	/* For safety - reset parent styles, that can break glyph codes*/
+	font-variant: normal;
+	text-transform: none;
+	/* fix buttons height, for twitter bootstrap */
+	line-height: 1em;
+	/* Animation center compensation - margins should be symmetric */
+	/* remove if not needed */
+	margin-left: .2em;
+	/* you can be more comfortable with increased icons size */
+	/* font-size: 120%; */
+	/* Font smoothing. That was taken from TWBS */
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	/* Uncomment for 3D effect */
+	/* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+}
+
+.icon-login:before {
+	content: '\e800';
+}
+
+
+/* '' */
+
+.icon-logout:before {
+	content: '\e801';
+}
+
+
+/* '' */
+
+.icon-play:before {
+	content: '\e802';
+}
+
+
+/* '' */
+
+.icon-pause:before {
+	content: '\e803';
+}
+
+
+/* '' */
+
+.icon-upload:before {
+	content: '\e804';
+}
+
+
+/* '' */
+
+.icon-doc:before {
+	content: '\e805';
+}
+
+
+/* '' */
+
+.icon-gplus:before {
+	content: '\f0d5';
+}
+
+
+/* '' */

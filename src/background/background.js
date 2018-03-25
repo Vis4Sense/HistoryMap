@@ -42,6 +42,15 @@ document.addEventListener('DOMContentLoaded', function () {
 		const url = chrome.extension.getURL('src/historyMap/historyMap.html');
 		// Only allow a single instance of the history map
 		if (getView(url)){
+			
+			console.log('view for history already exists');
+			return;
+		} 
+
+		const knowledgeMapUrl = chrome.extension.getURL('src/knowledgeMap/knowledgeMap.html');
+		// Only allow a single instance of the knowledge map
+		if (getView(knowledgeMapUrl)){
+			console.log('view for km already exists');
 			return;
 		} 
 		
@@ -76,6 +85,21 @@ document.addEventListener('DOMContentLoaded', function () {
 		// else {
 		// 	google_Login();
 		// }
+
+		//create instance of knowledge map
+			chrome.windows.create({
+				url: knowledgeMapUrl,
+				type: "popup",
+				state: "minimized"
+			}, function(w) {
+				curationWindowId = w.id;
+
+				/*setTimeout(function() {
+					var curationZoomActions = actions.filter(a => a.type === 'curation-zoom-in' || a.type === 'curation-zoom-out');
+					chrome.runtime.sendMessage({ type: 'computeZoom', values: curationZoomActions });
+					chrome.runtime.sendMessage({ type: 'redraw' });
+				}, 3000);*/
+			});
 
 		// Listen to content script
 		chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
@@ -120,11 +144,11 @@ document.addEventListener('DOMContentLoaded', function () {
 	 */
 	function getView(url) {
 		const views = chrome.extension.getViews();
-
+		console.log(views);
 		for (let i = 0; i < views.length; i++) {
 			if (views[i].location.href === url) return views[i];
 		}
-
+		console.log("view doesnt ewxits " + url);
 		return null;
 	}
 });

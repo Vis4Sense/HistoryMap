@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="SenseMap supports online sensemaking.">
+        <meta name="author" content="phongvis - Phong Nguyen">
+        <title>Knowledge Map</title>
+
+        <link rel="icon" href="../../logo/sm-logo-19.png">
+		<link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap-sm.min.css">
+        <link rel="stylesheet" href="../bower_components/fontawesome/css/font-awesome.min.css">
+        <link rel="stylesheet" href="../css/core.css">
+        <link rel="stylesheet" href="../css/sensemap.css">
+
+        <style>
+            body {
+                overflow: hidden;
+            }
+
+            .sm-curation-container {
+                overflow: hidden;
+                position: relative;
+                width: 100%;
+                height: 100%;
+            }
+
+            #groupZoom {
+                position: fixed;
+                float: right;
+                right: 5px;
+                bottom: 5px;
+            }
+
+            #groupZoom .btn {
+                padding: 0px 6px;
+                font-size: 20px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <svg class="sm-curation-container"></svg>
+
+        <div id="groupZoom" class="btn-group-vertical">
+            <button id="btnZoomIn" class="btn btn-default" title="Zoom In"><i class="fa fa-plus"></i></button>
+            <button id='btnZoomOut' class="btn btn-default" title="Zoom Out"><i class="fa fa-minus"></i></button>
+        </div>
+
+
+        <script src="../bower_components/jquery/dist/jquery.min.js"></script>
+        <script src="../bower_components/jquery-ui.min.js"></script>
+        <script src="../bower_components/d3/d3.js"></script>
+        <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+        <script src="../bower_components/lodash/lodash.min.js"></script>
+        <script src="../bower_components/mxClient.js"></script>
+
+        <script src="../js/core.js"></script>
+        <script src="../js/misc/sugar.js"></script>
+        <script src="../js/misc/widgets.js"></script>
+        <script src="../js/layout/grid.js"></script>
+        <script src="../js/layout/forest.js"></script>
+        <script src="../js/vis/curation.js"></script>
+        <script src="../js/provenance/mod.js"></script>
+        <script src="curation-view.js"></script>
+    </body>
+</html>

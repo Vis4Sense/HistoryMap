@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Displays and compares different products">
+    <title>Knowledge Map</title>
+
+    <link rel="icon" href="/logo/sm-logo-19.png">
+    <link rel="stylesheet" href="/lib/bootstrap-sm.min.css">
+    <link rel="stylesheet" href="/lib/fontello/css/fontello.css">
+    <link rel="stylesheet" href="core.css">
+    <link rel="stylesheet" href="sensemap.css">
+
+    <style>
+        body {
+            overflow: hidden;
+            margin-top: 90px;
+        }
+
+        .sm-knowledge-map-container {
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        #userImage {
+            margin-left: 10px;
+            border-radius: 50%;
+            width: 3em;
+        }
+    </style>
+</head>
+
+<body>
+    <svg class="sm-knowledge-map-container"></svg>
+
+    <script src="/lib/jquery.min.js"></script>
+    <script src="/lib/jquery-ui.min.js"></script>
+    <script src="/lib/d3.min.js"></script>
+    <script src="/lib/lodash.min.js"></script>
+    <script src="/lib/mxClient.js"></script>
+    <script src="/lib/hello.all.min.js"></script>
+
+    <script src="knowledgeMap.js"></script>
+    <!--<script src="../misc/sugar.js"></script> potentially useless -->
+    <!--<script src="widgets.js"></script> useless-->
+    <script src="browser.js"></script><!-- controller-->
+    <script src="listToTree.js"></script>
+    <script src="forest.js"></script><!-- view-->
+    <script src="knowledgeMapVis.js"></script>
+    <script src="knowledgeMapData.js"></script>
+
+</body>
+
+</html>
