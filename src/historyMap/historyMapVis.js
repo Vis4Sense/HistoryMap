@@ -304,7 +304,14 @@ historyMap.view.vis = function() {
                 d.newlyCurated = true; // Force it run the layout to find its location
 
                 update();
-                dispatch.curated(d);
+                console.log(d);
+                //remove anything related to circular reference in these nodes
+                if (d.children){
+                    d.children = undefined;
+                    d.links = undefined;
+                    d.source = undefined;
+                }
+                chrome.runtime.sendMessage({type: "addToKnowledgeMap", data: d});
             })
 			.append('xhtml:i').attr("class", "icon-edit");
         menu.append('xhtml:button').attr('class', 'btn btn-default fa fa-remove')

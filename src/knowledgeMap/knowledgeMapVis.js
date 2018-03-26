@@ -1,41 +1,17 @@
 /**
- * knowledgeMapView visualizes user browsing process.
+ * knowledgeMapView visualises products in order to compare them.
  */
 knowledgeMap.view.vis = function() {
-	var activateShowAllDefault = true;
     // Private members
     var width = 400, height = 250,
         margin = { top: 5, right: 5, bottom: 5, left: 5 },
         label = d => d.label,
+        children = d => d.rlinks,
         icon = d => d.icon,
         type = d => d.type,
         time = d => d.time, // Expect a Date object
         image = d => d.image,
-        userImage = d => d.userImage,
-        curated = false, // True to switch on selection for curation
-        paused = false; // Suspend collecting
-
-    var ZoomLevel = [
-        { width: 26, imageWidth: 50, numChildren: 0 },
-        { width: 100, numChildren: 0 },
-        { width: 125, numChildren: 1 },
-        { width: 175, numChildren: 2 }
-    ];
-    ZoomLevel.forEach(z => {
-        var f = 1;
-        z.maxHeight = z.width * f;
-        if (z.imageWidth) z.maxImageHeight = z.imageWidth * f;
-    });
-
-    // Rendering options
-    var layout = knowledgeMap.view.layout.forest(),
-        panExtent = [ 0, 1, 0, 1 ],
-        brushing = false,
-        minZoomIndex = 0,
-        maxZoomIndex = 3,
-        defaultZoomIndex = maxZoomIndex,
-        zoomLevelIndex = defaultZoomIndex,
-        zoomLevel = ZoomLevel[zoomLevelIndex];
+        userImage = d => d.userImage;
 
     // Data
     var data,
@@ -45,28 +21,28 @@ knowledgeMap.view.vis = function() {
     // DOM
     var container, // g element containing the main, non-clipped visualization
         nodeContainer, // g element containing all nodes
-        linkContainer; // g element containing all links
+        linkContainer, // g element containing all links
+        cursorLink; // to draw a link when moving mouse
 
     // d3
     var line = d3.svg.line()
             .x(d => d.x)
             .y(d => d.y),
-        brush = d3.svg.brush(),
         colorScale = d3.scale.category10()
             .domain([ 'search', 'location', 'dir', 'highlight', 'note', 'filter' ])
             .range([ '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#e377c2' ]),
         searchTypes = [ 'search', 'location', 'dir' ],
-        iconClassLookup = { search: 'icon-search', location: 'icon-globe', dir: 'icon-street-view', highlight: 'icon-brush',
-            note: 'icon-doc-text', filter: 'icon-filter'
+        iconClassLookup = { search: 'fa-search', location: 'fa-globe', dir: 'fa-street-view', highlight: 'fa-paint-brush',
+            note: 'fa-file-text-o', filter: 'fa-filter'
         };
-
-    // Key function to bind data
-    var key = d => d.id,
-        linkKey = d => key(d.source) + '-' + key(d.target);
+    var drag = d3.behavior.drag()
+        .on('dragstart', onNodeDragStart)
+        .on('drag', onNodeDrag)
+        .on('dragend', onNodeDragEnd);
 
     // Others
     var dispatch = d3.dispatch('nodeClicked', 'nodeCollectionRemoved', 'nodeCurationRemoved', 'nodeFavorite', 'nodeUnfavorite',
-        'nodeMinimized', 'nodeRestored', 'nodeMoved', 'nodeHovered', 'linkAdded', 'linkRemoved', 'curated');
+        'nodeMinimized', 'nodeRestored', 'nodeMoved', 'nodeHovered', 'linkAdded', 'linkRemoved', 'layoutDone');
 
     /**
      * Main entry of the module.
@@ -86,25 +62,21 @@ knowledgeMap.view.vis = function() {
                 .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
             nodeContainer = container.append('g').attr('class', 'nodes');
             linkContainer = container.append('g').attr('class', 'links');
-            brushContainer = container.append('g').attr('class', 'brush');
-
-            knowledgeMap.addPan([ nodeContainer, linkContainer ], container, panExtent);
+            cursorLink = container.append('line').attr('class', 'cursor-link hide');
+            //in current history map, sm is replaced with historyMap
+            knowledgeMap.addPan([ nodeContainer, linkContainer, cursorLink ], container, panExtent);
             knowledgeMap.createArrowHeadMarker(self, 'arrow-marker', '#6e6e6e');
             knowledgeMap.createArrowHeadMarker(self, 'arrow-marker-hover', '#e74c3c');
-            // addBrush();
+            knowledgeMap.createArrowHeadMarker(self, 'arrow-marker-cursor', 'blue');
         }
 
-        dataNodes = (data.nodes || []).filter(n => !n.collectionRemoved);
-        dataLinks = (data.links || []).filter(l => !l.source.collectionRemoved && !l.target.collectionRemoved && !l.userAdded);
+        dataNodes = (data.nodes || []).filter(n => n.curated && !n.curationRemoved);
+        dataLinks = (data.links || []).filter(l => dataNodes.includes(l.source) && dataNodes.includes(l.target) && !l.removed);
 
-        layout.width(width)
-            .height(height)
-            .label(label)
-            .children(d => d.links ? d.links.filter(l => dataNodes.includes(l)) : d.links)
-            .parent(d => d.sup && dataNodes.includes(d.sup) ? d.sup : null);
-
-        brush.x(d3.scale.identity().domain([0, width]))
-            .y(d3.scale.identity().domain([0, height]));
+        // Curated nodes may have smaller set of children than the corresponding in collection
+        dataNodes.filter(n => n.links).forEach(n => {
+            n.rlinks = n.links.filter(target => dataNodes.includes(target));
+        });
 
         var links = linkContainer.selectAll('.link').data(dataLinks, linkKey);
         links.enter().call(enterLinks);
@@ -115,79 +87,19 @@ knowledgeMap.view.vis = function() {
         nodes.call(updateNodes);
         nodes.exit().remove();
 
-        // Layout DAG
-        computeLayout(function() {
-            links.call(updateLinks);
-            nodes.call(updateNodePositions);
+        // Press escape to exit connecting mode
+        document.addEventListener("keydown", function(e) {
+            if (e.keyCode === 27) {
+                connecting = false;
+                dragging = false;
+                nodeContainer.selectAll('.node').each(function() {
+                    d3.select(this).classed('connect', false);
+                });
+                cursorLink.classed('hide', true);
+            }
         });
 
-        brushContainer.classed('hide', !curated);
-    }
-
-    // function addBrush() {
-    //     brush.x(d3.scale.identity().domain([0, width]))
-    //         .y(d3.scale.identity().domain([0, height]))
-    //     .on('brushstart', function () {
-    //         brushing = true;
-    //     }).on('brush', function () {
-    //         // Brush nodes and links
-    //         var brushNode = brushContainer.select('.extent').node();
-    //         nodeContainer.selectAll('.node').each(function(d) {
-    //             d.brushed = this.intersect(brushNode);
-    //             d3.select(this).classed('brushed', d.brushed);
-    //         });
-
-    //         linkContainer.selectAll('.link').each(function(l) {
-    //             l.brushed = l.source.brushed && l.target.brushed;
-    //             d3.select(this).select('path').classed('brushed', l.brushed);
-    //         });
-    //     }).on('brushend', function () {
-    //         brushing = false;
-    //         var changed = false;
-
-    //         // Remove brush effect
-    //         nodeContainer.selectAll('.node').each(function(d) {
-    //             if (d.brushed && !d.curated) {
-    //                 changed = d.curated = true;
-    //                 d.curationRemoved = false; // Make sure if this node was removed, it reappears
-    //             }
-    //             d3.select(this).classed('brushed', false);
-    //         });
-
-    //         linkContainer.selectAll('.link').each(function(l) {
-    //             if (l.brushed) {
-    //                 l.removed = false; // Make sure if this link was removed, it reappears
-    //                 changed = true;
-    //             }
-    //             d3.select(this).select('path').classed('brushed', false);
-    //         });
-
-    //         brushContainer.call(brush.clear());
-
-    //         update();
-
-    //         if (changed) dispatch.curationChanged();
-    //     });
-
-    //     brushContainer.call(brush);
-    // }
-
-    function computeLayout(callback) {
-        knowledgeMap.checkImagesLoaded(container.selectAll('.node-container'), function() {
-            // Compute how much space each node needs
-            container.selectAll('.node').each(function(d) {
-                var r = this.getBoundingClientRect();
-                d.width = r.width + 1;
-                d.height = r.height;
-            });
-
-            // DAG for nodes
-            var g = layout.vertices(dataNodes).edges(dataLinks).compute();
-            panExtent[1] = Math.max(0, g.width - width + margin.left + margin.right);
-            panExtent[3] = Math.max(0, g.height - height + margin.top + margin.bottom);
-
-            callback();
-        });
+        printGraphSize();
     }
 
     /**
@@ -199,53 +111,34 @@ knowledgeMap.view.vis = function() {
             .attr('width', '100%').attr('height', '100%')
             .attr('opacity', 0);
 
+        // Apply drag onto the 'foreignObject'
+        fo.call(drag);
+
         var container = fo.append('xhtml:div').attr('class', 'node')
             .on('click', function(d) {
-                if (d3.event.shiftKey) return;
-
-                if (d.minimized) {
-                    d.minimized = false;
-                    update();
-                    dispatch.nodeRestored(d);
-                } else {
-                    if (d3.event.defaultPrevented) return;
-                    dispatch.nodeClicked(d);
-                }
+                if (d3.event.defaultPrevented || d3.event.shiftKey) return;
+                clearTimeout(connectingTimerId);
+                dispatch.nodeClicked(d);
             }).on('mouseover', function(d) {
                 // Align menu to the right side
-                var menu = d3.select(this).select('.btn-group').classed('hide', brushing || d.minimized),
+                var menu = d3.select(this).select('.btn-group').classed('hide', dragging),
                     menuRect = menu.node().getBoundingClientRect(),
                     nodeRect = this.getBoundingClientRect();
-                menu.style('left', (nodeRect.right > width - menuRect.width ? 1 - menuRect.width : d.width - 1) + 'px');
-				
-                if (brushing) {
-					// Hide tooltip
-                    d3.select(this).selectAll('.sub-node').each(function() {
-                        $(this).tooltip('hide');
-                    });
-                } else if (d.curated) {
-                    dispatch.nodeHovered(d, true);
-                } else {
-					d3.select(this).selectAll('.sub-node').each(function() {
-						//extract the text of the highlight node being hovered over
-						var highlightNodeText = this.getElementsByClassName("node-label")[0].innerHTML;
-						//set title attribute to create tooltip
-						$(this).attr('title', highlightNodeText);
-                    });
-				}
-            }).on('mouseout', function(d) {
-                d3.select(this).select('.btn-group').classed('hide', true);
+                menu.style('left', (nodeRect.right > width - menuRect.width ? 1 - menuRect.width : d.rp.width - 1) + 'px');
 
-                if (d.curated) {
-                    dispatch.nodeHovered(d, false);
+                if (dragging) {
+                    hideTooltip(this);
+                } else {
+                    dispatch.nodeHovered(d, true);
                 }
+            }).on('mouseout', function(d) {
+                container.classed('connect', false);
+                hideMenu(this);
+                dispatch.nodeHovered(d, false)
             });
 
-        // To indicated if the node is curated
-        container.append('xhtml:div').attr('class', 'node-curated fa fa-check-square hide');
-
         var menu = container.append('xhtml:div').attr('class', 'btn-group hide').style('top', '-2px');
-        var parent = container.append('xhtml:div').attr('class', 'parent');
+        var parent = container.append('xhtml:div').attr('class', 'parent')
 
         // Icon
         var titleDiv = parent.append('xhtml:div').attr('class', 'node-title');
@@ -259,98 +152,35 @@ knowledgeMap.view.vis = function() {
         parent.append('xhtml:img').attr('class', 'node-snapshot center-block');
 
         // Menu action
-        menu.append('xhtml:button').attr('class', 'btn btn-default fa fa-star')
-            .attr('title', d => d.favorite ? 'Unfavorite' : 'Favorite')
-            .on('click', function(d) {
-                d3.event.stopPropagation();
-                d3.select(this.parentNode).classed('hide', true);
-                d.favorite = !d.favorite;
-                d3.select(this).attr('title', d.favorite ? 'Unfavorite' : 'Favorite')
-                    .style('color', d.favorite ? '#f39c12' : 'black');
-                update();
-
-                if (d.favorite) {
-                    dispatch.nodeFavorite(d);
-                } else {
-                    dispatch.nodeUnfavorite(d);
-                }
-            })
-			.append('xhtml:i').attr("class", "icon-star");
-        menu.append('xhtml:button').attr('class', 'btn btn-default fa fa-minus')
-            .attr('title', 'Minimize')
-            .on('click', function(d) {
-                d3.event.stopPropagation();
-                d3.select(this.parentNode).classed('hide', true);
-                d.minimized = true;
-                update();
-                dispatch.nodeMinimized(d);
-            })
-			.append('xhtml:i').attr("class", "icon-minus");
-        menu.append('xhtml:button').attr('class', 'btn btn-default fa fa-edit')
-            .attr('title', 'Curate')
-            .on('click', function(d) {
-                d3.event.stopPropagation();
-                d3.select(this.parentNode).classed('hide', true);
-
-                if (d.curated && !d.curationRemoved) return;
-
-                linkContainer.selectAll('.link').each(function(l) {
-                    // Curate the link if the other end is also curated
-                    // Make sure if this link was removed, it reappears
-                    if (l.source === d && l.target.curated || l.target === d && l.source.curated) l.removed = false;
-                });
-                d.curated = true;
-                d.curationRemoved = false; // Make sure if this node was removed, it reappears
-                d.newlyCurated = true; // Force it run the layout to find its location
-
-                update();
-                dispatch.curated(d);
-            })
-			.append('xhtml:i').attr("class", "icon-edit");
         menu.append('xhtml:button').attr('class', 'btn btn-default fa fa-remove')
             .attr('title', 'Remove')
             .on('click', function(d) {
                 d3.event.stopPropagation();
                 d3.select(this.parentNode).classed('hide', true);
-                d3.select(this.parentNode.parentNode).classed('hovered', false);
-                d.collectionRemoved = true;
+                d.curationRemoved = true;
+                connecting = false;
+                clearTimeout(connectingTimerId);
+
+                // Remove connected links
+                dataLinks.filter(l => l.source === d || l.target === d).forEach(l => { l.removed = true; });
+
                 update();
-                dispatch.nodeCollectionRemoved(d);
-            })
-			.append('xhtml:i').attr("class", "icon-cancel");
+                dispatch.nodeCurationRemoved(d);
+            });
 
         // Children
-        var children = container.append('xhtml:div').attr('class', 'children')
-            .on('mouseover', function(d) {
-                // Align menu to the right side
-                var menu = d3.select(this).select('.show-all-highlights').classed('hide', d.children && zoomLevel.numChildren >= d.children.length),
-                    menuRect = menu.node().getBoundingClientRect(),
-                    nodeRect = this.getBoundingClientRect();
-                menu.style('left', (nodeRect.right > width - menuRect.width ? 1 - menuRect.width : d.width - 1) + 'px');
-            }).on('mouseout', function() {
-                d3.select(this).select('.show-all-highlights').classed('hide', true);
-            });
-		//the showAll/showLess button text is assigned according to the default state
-		var buttonText = "";
-		//theDefaultState: 1 = show all highlight nodes, 0 = hide excess highlight nodes
-		var theDefaultState = 1;
-		if (theDefaultState === 1){
-			buttonText = "Show Less";
-		}	else{
-			buttonText = "Show All";
-		}
-		children.attr("data-default-state", theDefaultState);
-		children.attr("data-apply-default-state", 1);
+        container.append('xhtml:div').attr('class', 'children');
+    }
 
-        children.append('xhtml:button').attr('class', 'btn btn-default hide show-all-highlights').text(buttonText)
-            .on('click', function(d) {
-                d3.event.stopPropagation();
-                d3.select(this).classed('hide', true);
-                d.collectionShowAll = !d.collectionShowAll;
-                d3.select(this).text(d.collectionShowAll ? 'Show Less' : 'Show All');
-                update();
-            });
+    function hideMenu(self) {
+        d3.select(self).select('.btn-group').classed('hide', true);
+    }
 
+    function hideTooltip(self) {
+        $(d3.select(self).select('.parent').node()).tooltip('hide');
+        d3.select(self).selectAll('.sub-node').each(function() {
+            $(this).tooltip('hide');
+        });
     }
 
     /**
@@ -358,57 +188,47 @@ knowledgeMap.view.vis = function() {
      */
     function updateNodes(selection) {
         selection.each(function(d) {
-            d3.select(this).select('.node').classed('mini', d.minimized)
-                .attr('title', d.minimized ? 'Maximize': '');
-            d3.select(this).selectAll('.parent, .children').classed('hide', d.minimized);
-
             // Status
             d3.select(this).select('.node')
                 .classed('not-seen', !d.seen)
                 .classed('highlighted', isHighlighted(d))
-                .classed('brushed', d.collectionBrushed && !d.curationRemoved);
+                .classed('brushed', d.curationBrushed && !d.collectionRemoved);
 
             // Tooltip
-            d3.select(this).select('.parent').attr('data-original-title', buildHTMLTitle(d));
+            d3.select(this).select('.parent').attr('data-original-title', label);
 
-            if (!d.minimized) {
-                var typeVisible = searchTypes.includes(type(d)),
-                    container = d3.select(this).select('.parent');
-                container.select('img.node-icon').attr('src', icon)
-                    .classed('hide', typeVisible || !icon(d));
-                container.select('div.node-icon')
-                    .classed('hide', !typeVisible)
-                    .classed(iconClassLookup[type(d)], true)
-                    .style('background-color', colorScale(type(d)));
+            var typeVisible = searchTypes.includes(type(d)),
+                container = d3.select(this).select('.parent');
+            container.select('img.node-icon').attr('src', icon)
+                .classed('hide', typeVisible || !icon(d));
+            container.select('div.node-icon')
+                .classed('hide', !typeVisible)
+                .classed(iconClassLookup[type(d)], true)
+                .style('background-color', colorScale(type(d)));
 
-                // Show image only in min zoom
-                var showImage = isImageVisible(d);
-                if (zoomLevelIndex === minZoomIndex && showImage) {
-                    container.selectAll('.node-icon').classed('hide', true);
-                }
-                container.select('.node-title').classed('hide', zoomLevelIndex === minZoomIndex && showImage);
-
-                // Text
-                container.select('.node-label').text(label)
-                    .classed('min-zoom', zoomLevelIndex === minZoomIndex)
-                    .classed('hide', zoomLevelIndex === minZoomIndex && icon(d));
-
-                // Snapshot
-                container.select('img.node-snapshot')
-                    .attr('src', finalImage)
-                    .classed('hide', !showImage);
-                d3.select(this).select('.node').classed('favorite', d.favorite);
-
-                if (d.children) updateChildren(d3.select(this).select('.children'), d);
-                container.classed('has-children', d.children && zoomLevel.numChildren);
-                d3.select(this).select('.children').classed('hide', !d.children || !zoomLevel.numChildren);
-
-                // Set here first to limit the size before running the layout.
-                // Then set again in nodePositions when images loaded.
-                scaleNode(this);
-            } else {
-                d3.select(this).select('.node').style('width', '8px');
+            // Show image only in min zoom
+            if (zoomLevelIndex === minZoomIndex && finalImage(d)) {
+                container.selectAll('.node-icon').classed('hide', true);
             }
+            container.select('.node-title').classed('hide', zoomLevelIndex === minZoomIndex && finalImage(d));
+
+            // Text
+            container.select('.node-label').text(label)
+                .classed('min-zoom', zoomLevelIndex === minZoomIndex)
+                .classed('hide', zoomLevelIndex === minZoomIndex && icon(d));
+
+            // Snapshot
+            container.select('img.node-snapshot')
+                .attr('src', finalImage)
+                .classed('hide', !finalImage(d));
+
+            if (d.children) updateChildren(d3.select(this).select('.children'), d);
+            container.classed('has-children', d.children && zoomLevel.numChildren);
+            d3.select(this).select('.children').classed('hide', !d.children || !zoomLevel.numChildren);
+
+            // Set here first to limit the size before running the layout.
+            // Then set again in nodePositions when images loaded.
+            scaleNode(this);
         });
     }
 
@@ -416,39 +236,11 @@ knowledgeMap.view.vis = function() {
         return d.highlighted || d.children && d.children.some(c => c.highlighted);
     }
 
-    function isImageVisible(d){
-        return userImage(d) || image(d) && d.favorite;
-    }
-
     function finalImage(d) {
         return userImage(d) || image(d);
     }
 
-    function buildHTMLTitle(d) {
-        var s = '';
-        // Show image in tooltip if it's not shown in the box
-        if (!isImageVisible(d) && finalImage(d)) {
-            s += "<img class='node-snapshot img-responsive center-block' src='" + finalImage(d) + "'/>";
-        }
 
-        if (label(d)) {
-            s += label(d);
-        }
-
-        return s;
-    }
-
-    /**
-     * Scale image, text according to zoom level.
-     */
-    function scaleNode(self) {
-        var d = d3.select(self).datum(),
-            isMinZoomFavorite = zoomLevelIndex === minZoomIndex && isImageVisible(d);
-        d3.select(self).select('.node').style('width', (isMinZoomFavorite ? zoomLevel.imageWidth : zoomLevel.width) + 'px');
-
-        scaleText(self);
-        scaleImage(self);
-    }
 
     /**
      * Sets max-width for text to get text trimmed. Set for both the node and its children.
@@ -474,51 +266,6 @@ knowledgeMap.view.vis = function() {
     }
 
     /**
-     * Sets the height of image, depending on the zoom level.
-     */
-    function scaleImage(self) {
-        var d = d3.select(self).datum(),
-            isMinZoomFavorite = zoomLevelIndex === minZoomIndex && isImageVisible(d),
-            childrenHeight = self.querySelector('.children').getBoundingClientRect().height,
-            mainHeight = (isMinZoomFavorite ? zoomLevel.maxImageHeight : zoomLevel.maxHeight) - childrenHeight;
-        d3.select(self).select('.parent').style('max-height', mainHeight + 'px');
-    }
-
-    function updateChildren(container, d) {
-        // Enter
-		applyDefaultState(container, d);
-        var subItems = container.selectAll('.sub-node').data(d.collectionShowAll ? d.children : _.take(d.children, zoomLevel.numChildren), key);
-        var enterItems = subItems.enter().append('div').attr('class', 'sub-node')
-            .on('click', function(d) {
-                if (d3.event.defaultPrevented || d3.event.shiftKey) return;
-                dispatch.nodeClicked(d);
-                d3.event.stopPropagation(); // Prevent click fired in parent
-            });
-
-        // - Icon placeholder
-        enterItems.append('xhtml:i').attr('class', 'node-icon fa fa-fw');
-        //enterItems.append('xhtml:i').attr("class", "icon-brush");
-		
-        // - Text
-        enterItems.append('xhtml:div').attr('class', 'node-label');
-
-        // Update
-        subItems.attr('data-original-title', label)
-            .each(function(d2) {
-                //correct icon/background color is applied to placeholder
-                d3.select(this).select('.node-icon')
-                    .classed(iconClassLookup.note + ' ' + iconClassLookup.highlight, false)  // reset first
-                    .classed(iconClassLookup[type(d2)], true)
-                    .style('background-color', colorScale(type(d2)));
-            });
-        subItems.select('.node-label').text(label)
-            .style('max-width', (zoomLevel.width - 10) + 'px');
-
-        // Exit
-        subItems.exit().style('opacity', 0).remove();
-    }
-
-    /**
      * Separate from updateNodes() because updateNodes() needs to run first to get node sizes.
      */
     function updateNodePositions(selection) {
@@ -526,15 +273,6 @@ knowledgeMap.view.vis = function() {
             d3.select(this).transition().duration(500)
                 .attr('opacity', 1)
                 .attr('transform', 'translate(' + roundPoint(d) + ')');
-
-            // Curated indication
-            var nc = d3.select(this).select('.node-curated')
-                .classed('hide', !d.curated || d.curationRemoved)
-                .style('top', d.minimized ? '-3px' : '-1px');
-            var w = nc.node().getBoundingClientRect().width;
-            nc.style('left', (d.minimized ? -2 : d.width - w - 1) + 'px');
-
-            if (!d.minimized) scaleNode(this);
         });
     }
 
@@ -545,7 +283,56 @@ knowledgeMap.view.vis = function() {
         var container = selection.append('g').attr('class', 'link')
             .attr('opacity', 0);
 
-        container.append('path').attr('class', 'main-link');
+        // Main link
+        container.append('path')
+            .attr('id', linkKey)
+            .attr('class', 'main-link')
+            .classed('user-added', d => d.userAdded);
+
+        // Dummy link for easy selection
+        container.append('path')
+            .attr('id', linkHoverKey)
+            .attr('class', 'hover-link');
+
+        container.on('mouseover', function(d) {
+            showLinkMenu(true, this);
+        }).on('mouseout', function(d) {
+            showLinkMenu(false, this);
+        });
+
+        // Menu action
+        var menu = container.append('foreignObject')
+            .attr('class', 'menu-container')
+            .attr('width', '100%').attr('height', '100%')
+            .append('xhtml:div').attr('class', 'btn-group hide');
+
+        menu.append('xhtml:button').attr('class', 'btn btn-default fa fa-remove')
+            .attr('title', 'Remove')
+            .on('click', function(d) {
+                d3.event.stopPropagation();
+                d3.select(this.parentNode).classed('hide', true);
+                d.removed = true;
+                update();
+                dispatch.linkRemoved(d);
+            });
+
+        container.append('title');
+    }
+
+    function showLinkMenu(visible, self) {
+        // Link feedback
+        d3.select(self).select('.main-link').classed('hovered', visible);
+
+        var d = d3.select(self).datum();
+        d3.select(self).select('.btn-group').classed('hide', !visible || dragging);
+
+        // Menu: show it at the middle of the link : sometimes, menu disappear along the way
+        var m = d.rpoints.length / 2,
+            w = d3.select(self).select('.btn-group').node().getBoundingClientRect().width / 2,
+            t = [ d.rpoints.length % 2 ? d.rpoints[m - 0.5].x : (d.rpoints[m].x + d.rpoints[m - 1].x) / 2 - w,
+                d.rpoints.length % 2 ? d.rpoints[m - 0.5]. cy : (d.rpoints[m].y + d.rpoints[m - 1].y) / 2 - w ];
+
+        d3.select(self).select('.menu-container').attr('transform', 'translate(' + t + ')');
     }
 
     /**
@@ -553,42 +340,145 @@ knowledgeMap.view.vis = function() {
      */
     function updateLinks(selection) {
         selection.each(function(d) {
-            d3.select(this).transition().duration(500).attr('opacity', 1);
-            d3.select(this).select('path').transition().duration(500).attr('d', line(roundPoints(d)));
+            var container = d3.select(this);
 
-            // A straight line goes through minimized node
-            var isThrough = d.target.minimized && d.target.links && d.target.links.some(l => !l.collectionRemoved);
-            d3.select(this).select('path').classed('straight-arrow', isThrough);
+            container.transition().duration(500).attr('opacity', 1);
+
+            // Set data
+            container.selectAll('path').transition().duration(500).attr('d', line(roundPoints(d)));
         });
     }
-	//applies the default state to all History map nodes' ShowAll/Less button
-	function applyDefaultState(container, d){
-		var divChildren = container[0][0];
-		//each children div has 2 attributes "data-apply-default-state" and "data-default-state" 
-		var state = divChildren.dataset.defaultState;
-		var applyState = divChildren.dataset.applyDefaultState;
-		//sets initial state of the button to the predefined default state
-		if (applyState == 1){
-			if (state == 1){
-				d.collectionShowAll = true;
-			} else {
-				d.collectionShowAll = false;
-			}
-			//a default state will no longer be applied to the showAll/Less button, instead it will depend on its previous state
-			divChildren.dataset.applyDefaultState = 0;
-		}
-	}
 
     /**
      * To make the line sharp.
      */
-    function roundPoints(d) {
+    function roundPoints(l) {
         // stroke-width: 1.5px
-        return d.points.map(p => ({ x: Math.round(p.x) - 0.5, y: Math.round(p.y) - 0.5 }));
+        var centerSource = { x: l.source.rp.x + l.source.rp.width / 2, y: l.source.rp.y + l.source.rp.height / 2 },
+            centerTarget = { x: l.target.rp.x + l.target.rp.width / 2, y: l.target.rp.y + l.target.rp.height / 2 };
+
+        l.rpoints = [ knowledgeMap.getRectEdgePoint(l.source.rp, centerTarget), knowledgeMap.getRectEdgePoint(l.target.rp, centerSource) ];
+
+        return l.rpoints.map(p => ({ x: Math.round(p.x) - 0.5, y: Math.round(p.y) - 0.5 }));
     }
 
     function roundPoint(d) {
-        return [ Math.round(d.x), Math.round(d.y) ];
+        return [ Math.round(d.rp.x), Math.round(d.rp.y) ];
+    }
+
+    function updateDragPosition(d) {
+        d.x += d3.event.dx;
+        d.y += d3.event.dy;
+    }
+
+    function updateLinkDragPosition(d) {
+        d3.select(document.getElementById(linkKey(d))).attr('d', line(roundPoints(d)));
+        d3.select(document.getElementById(linkHoverKey(d))).attr('d', line(roundPoints(d)));
+    }
+
+    function onNodeDragStart(d) {
+        if (d3.event.sourceEvent.which === 1 && !d3.event.sourceEvent.shiftKey) {
+            var self = this;
+            connectingTimerId = setTimeout(function() {
+                connecting = true;
+                d3.select(self.querySelector('.node')).classed('connect', true);
+                hideMenu(self.querySelector('.node'));
+            }, 300);
+            dragging = true;
+            d3.event.sourceEvent.stopPropagation();
+        }
+
+        // Bootstrap tooltip appears even when moving the node => disable it
+        hideTooltip(this);
+    }
+
+    function onNodeDrag(d) {
+        if (!dragging) return;
+
+        // Already drag, no need to check
+        clearTimeout(connectingTimerId);
+        d3.select(this.querySelector('.node')).classed('connect', false);
+
+        hideMenu(this.querySelector('.node'));
+
+        if (connecting) {
+            // Draw a link from the node center to the current mouse position
+            cursorLink.classed('hide', false);
+            cursorLink
+                .attr('x1', d.rp.x + d.rp.width / 2).attr('y1', d.rp.y + d.rp.height / 2)
+                .attr('x2', d3.event.x).attr('y2', d3.event.y);
+
+            // Don't know why mouse over other nodes doesn't work. Have to do it manually
+            var self = this;
+            nodeContainer.selectAll('.node').each(function() {
+                d3.select(this).classed('hovered', this.parentNode !== self && this.containsPoint(d3.event.sourceEvent));
+            });
+        } else {
+            this.moveToFront();
+
+            // Update position of the dragging node
+            updateDragPosition(d.rp);
+            d3.select(this).attr('transform', 'translate(' + roundPoint(d) + ')');
+
+            // And also links
+            dataLinks.filter(l => l.source === d || l.target === d).forEach(updateLinkDragPosition);
+        }
+    }
+
+    function onNodeDragEnd(d) {
+        cursorLink.classed('hide', true);
+
+        if (connecting) {
+            var self = this,
+                found = false;
+            nodeContainer.selectAll('.node').each(function(d2) {
+                d3.select(this).classed('hovered', false);
+
+                if (!found && this.parentNode !== self && this.containsPoint(d3.event.sourceEvent)) {
+                    // Add a link from the dragging node to the hovering node if not existed
+                    var l = data.links.find(l => l.source === d && l.target === d2);
+                    if (!l) {
+                        var l = { source: d, target: d2, userAdded: true };
+                        data.links.push(l);
+                    } else {
+                        l.removed = false;
+                    }
+
+                    // Find position of two end-points
+                    var centerSource = { x: l.source.rp.x + l.source.rp.width / 2, y: l.source.rp.y + l.source.rp.height / 2 },
+                        centerTarget = { x: l.target.rp.x + l.target.rp.width / 2, y: l.target.rp.y + l.target.rp.height / 2 };
+                    l.rpoints = [ knowledgeMap.getRectEdgePoint(l.source.rp, centerTarget), knowledgeMap.getRectEdgePoint(l.target.rp, centerSource) ];
+
+                    found = true;
+                    update();
+                    dispatch.linkAdded(l);
+                }
+            });
+        } else {
+            // Update new graph size to make pan correctly
+            updatePanExtent();
+
+            dispatch.nodeMoved(d);
+        }
+
+        dragging = connecting = false;
+    }
+
+    function printGraphSize() {
+        console.log('nodes: ' + dataNodes.length, 'links: ' + dataLinks.length);
+    }
+
+    /**
+     * Translate nodes to accommodate the change of zoom level.
+     */
+    function translateNodes() {
+        if (zoomLevelIndex === oldZoomLevelIndex) return;
+
+        var ratio = zoomLevel.width / ZoomLevel[oldZoomLevelIndex].width;
+        dataNodes.forEach(n => {
+            n.rp.x *= ratio;
+            n.rp.y *= ratio;
+        });
     }
 
     /**
@@ -637,39 +527,33 @@ knowledgeMap.view.vis = function() {
     };
 
     /**
-     * Sets/gets the curated status.
-     */
-    module.curated = function(value) {
-        if (!arguments.length) return curated;
-        curated = value;
-        brushContainer.classed('hide', !curated);
-        return this;
-    };
-
-    /**
      * Sets brushing status of the given node.
      */
     module.setBrushed = function(id, value) {
         nodeContainer.selectAll('.node').each(function(d) {
-            d.collectionBrushed = value && key(d) === id && !d.curationRemoved;
-            d3.select(this).classed('brushed', d.collectionBrushed);
+            d.curationBrushed = value && key(d) === id && !d.collectionRemoved;
+            d3.select(this).classed('brushed', d.curationBrushed);
         });
     };
 
     /**
-     * Increases zoom level.
+     * Increase zoom level.
      */
     module.zoomIn = function() {
+        oldZoomLevelIndex = zoomLevelIndex;
         zoomLevelIndex = Math.min(maxZoomIndex, zoomLevelIndex + 1);
         zoomLevel = ZoomLevel[zoomLevelIndex];
+        translateNodes();
     };
 
     /**
-     * Reduces zoom level.
+     * Reduce zoom level.
      */
     module.zoomOut = function() {
+        oldZoomLevelIndex = zoomLevelIndex;
         zoomLevelIndex = Math.max(minZoomIndex, zoomLevelIndex - 1);
         zoomLevel = ZoomLevel[zoomLevelIndex];
+        translateNodes();
     };
 
     /**
@@ -686,8 +570,8 @@ knowledgeMap.view.vis = function() {
     module.computeZoomLevel = function(zooms) {
         zoomLevelIndex = defaultZoomIndex;
         zooms.forEach(z => {
-            if (z.type === 'collection-zoom-in') zoomLevelIndex = Math.min(maxZoomIndex, zoomLevelIndex + 1);
-            if (z.type === 'collection-zoom-out') zoomLevelIndex = Math.max(minZoomIndex, zoomLevelIndex - 1);
+            if (z.type === 'curation-zoom-in') zoomLevelIndex = Math.min(maxZoomIndex, zoomLevelIndex + 1);
+            if (z.type === 'curation-zoom-out') zoomLevelIndex = Math.max(minZoomIndex, zoomLevelIndex - 1);
         });
         zoomLevel = ZoomLevel[zoomLevelIndex];
     };

@@ -133,6 +133,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			} else if (request.type === "loadHighlights"){
 				var highlightsToLoad = contentScript.model.urlToHighlight.getHighlights(sender.tab.url);
 				sendResponse(highlightsToLoad);
+			} else if (request.type === "addToKnowledgeMap"){
+				chrome.runtime.sendMessage({type: "knowledgeMapNode", data: request.data});
 			}
 			//potentially used to make reponse asynchronous https://codereview.chromium.org/1874133002/diff/80001/chrome/common/extensions/docs/templates/articles/messaging.html
 			//return true;

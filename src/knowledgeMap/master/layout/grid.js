@@ -3,7 +3,7 @@
  * It's used together with another layout on the same data object, so it can't use standard {x, y} attributes.
  * It assigns v.rp.x and v.rp.y for vertices, and e.rpoints for edges.
  */
-sm.layout.grid = function() {
+grid = function() {
     var module = {};
 
     var vertices, edges, // data input
