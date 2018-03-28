@@ -22,13 +22,15 @@ const historyMap = function () {
     return historyMap;
 }();
 
+var historyMapView;
+
 document.addEventListener("DOMContentLoaded", function () {
 
     // Data
     nodes = historyMap.model.nodes.getArray();
 
     // Instantiate vis
-    const historyMapView = historyMap.view.vis()
+    historyMapView = historyMap.view.vis()
         .label(d => d.text)
         .icon(d => d.favIconUrl);
 
@@ -54,14 +56,26 @@ document.addEventListener("DOMContentLoaded", function () {
             var tab = tabs.find(t => t.url === d.url);
             if (tab) {
                 // Found it, tell content script to scroll to the element
-                chrome.tabs.update(tab.id, { active: true });
-                chrome.tabs.sendMessage(tab.id, { type: 'scrollToElement', path: d.path, image: d.image });
+                chrome.tabs.update(tab.id, {
+                    active: true
+                });
+                chrome.tabs.sendMessage(tab.id, {
+                    type: 'scrollToElement',
+                    path: d.path,
+                    image: d.image
+                });
                 // Get the tab/window in focused as well
-                chrome.windows.update(tab.windowId, { focused: true });
+                chrome.windows.update(tab.windowId, {
+                    focused: true
+                });
             } else {
                 // Can't find it, already closed, open new item, request scrolling later on
-                chrome.tabs.create({ url: d.url }, tab => {
-                    chrome.windows.update(tab.windowId, { focused: true });
+                chrome.tabs.create({
+                    url: d.url
+                }, tab => {
+                    chrome.windows.update(tab.windowId, {
+                        focused: true
+                    });
                     //pendingTasks[tab.id] = d; no longer defined
                 });
             }

@@ -35,14 +35,14 @@ historyMap.model.nodes = {
         historyMap.view.redraw();
     },
 
-    hideNode: function(tabUrl, classId) {
+    hideNode: function (tabUrl, classId) {
         //locates the original highlight(note), marks it as hidden
         var foundNode = this.nodes.find(a => (a.url === tabUrl) && (a.classId === classId));
         foundNode.hidden = true;
         return foundNode;
     },
 
-    updateType: function(typeUpdate) {
+    updateType: function (typeUpdate) {
         //locates the original highlight(note), updates its text and/or type
         if (typeUpdate.type === 'note') {
             var foundNode = this.nodes.find(a => a.classId === typeUpdate.classId)
@@ -162,18 +162,14 @@ historyMap.API.DBSave.Node2DB = function () {
 
     //gets HistoryMapTree
     let currentTree = historyMap.model.tree;
-
-    let nodeTree = {
-        nodes: currentTree
-    };
-
     var url = baseURL + "sessionupdate/" + DBSessionPointer + "/" + APIKey + "/";
-    var json = JSON.stringify(nodeTree);
+    var json = CircularJSON.stringify(currentTree);
+    console.log(json);
     var xhr = new XMLHttpRequest();
     xhr.open("PUT", url, true);
-    xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+    xhr.setRequestHeader('Content-type', 'text/plain; charset=utf-8');
     xhr.onload = function () {
-        var users = JSON.parse(xhr.responseText);
+        var users = xhr.responseText;
         if (xhr.readyState == 4 && xhr.status == "200") {
             console.table(users);
         } else {
@@ -181,5 +177,4 @@ historyMap.API.DBSave.Node2DB = function () {
         }
     }
     xhr.send(json);
-
 }

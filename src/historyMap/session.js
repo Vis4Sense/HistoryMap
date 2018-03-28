@@ -134,7 +134,7 @@ function newHistoryMap() {
 
 
 //This loads the Sessions in a menu
-historyMap.API.DBLoad.displaySessions = function() {
+historyMap.API.DBLoad.displaySessions = function () {
 
     document.getElementById("btn_load").setAttribute("disabled", "disabled");
 
@@ -169,7 +169,7 @@ historyMap.API.DBLoad.displaySessions = function() {
 
 };
 
-historyMap.API.DBSave.newSession = function() {
+historyMap.API.DBSave.newSession = function () {
     SessionName = document.getElementById('sessionName').value;
     document.getElementById("sessionName").remove();
     document.getElementById("btn_new_sess").remove();
@@ -182,7 +182,7 @@ historyMap.API.DBSave.newSession = function() {
         historyMap.API.DBSave.pushSessToDB();
     } else {
         var noDuplicate = true;
-        
+
         for (var i = 0; i < SessionProfile.length; i++) {
 
             //If SessionName matches a Session Generated alert the user
@@ -202,7 +202,7 @@ historyMap.API.DBSave.newSession = function() {
 }
 
 //This connects to the API and loads user sessions and stores it in HistoryMapModel
-historyMap.API.DBLoad.loadUserSessions = function() {
+historyMap.API.DBLoad.loadUserSessions = function () {
     var url = baseURL + "session/" + up.email + "/" + APIKey;
     var xhr = new XMLHttpRequest()
     xhr.open('GET', url, true)
@@ -219,7 +219,7 @@ historyMap.API.DBLoad.loadUserSessions = function() {
 }
 
 //Use this function to load Sessions into history map, requires Session Data to be used.
-historyMap.API.DBLoad.setSelectedSession = function() {
+historyMap.API.DBLoad.setSelectedSession = function () {
 
     //fetches value from select list
     select_Val = document.getElementById("mySelect").value;
@@ -237,26 +237,23 @@ historyMap.API.DBLoad.setSelectedSession = function() {
 }
 
 //Function for loading
-historyMap.API.DBLoad.loadSelectedSession = function(i) {
+historyMap.API.DBLoad.loadSelectedSession = function (i) {
 
     //Clear Previous Values
     nodes.length = 0;
     SessionName = "";
-    //Reload History Map
-    historyMap.view.redraw();
+
+    //set new values
+    tempTree = CircularJSON.parse(i.nodes);
+    historyMap.model.tree = tempTree;
+
+    //reload history map
+    historyMapView.width(window.innerWidth).height(window.innerHeight);
+    d3.select('.sm-history-map-container').datum(historyMap.model.tree).call(historyMapView);
 
     //Set Values to Historymap from Session of Choice for save and load
     SessionName = i.name;
     DBSessionPointer = i._id;
-
-    //loops through node array in retrieved session object to get nodeAdditionalinfo
-    //and then inserts it via += into nodes array in HistoryMap
-    debug_test_result = JSON.parse(i.nodes[0].info);
-    for (j = 0; j < i.nodes.length; j++) {
-        //Since Nodes have been stringified while being sent to the DB, i parsed it back to an object
-        var fixNodes = JSON.parse(i.nodes[j].info);
-        historyMap.model.nodes.addNode(fixNodes);
-    }
 };
 
 //Force logout upon closing

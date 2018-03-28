@@ -123,7 +123,7 @@ historyMap.controller.browser = function () {
 		tabUrl[tab.id] = tab.url;
 		isTabCompleted[tab.id] = false;
 		nodeId = nodes.addNode(node);
-		
+
 
 		// Update with visit type
 		if (tab.url) {
@@ -164,7 +164,7 @@ historyMap.controller.browser = function () {
 			//action = createActionObject(tab.id, tab.url, undefined, type, undefined, undefined, undefined, tab2node[tab.id], pic, true);
 		} else if (type === 'note') {
 			action = createActionObject(tab.id, tab.url, text, "note", undefined, path, classId, tab2node[tab.id], undefined, false);
-		} 
+		}
 		return action;
 	}
 
@@ -173,15 +173,15 @@ historyMap.controller.browser = function () {
 	//using old style of creating nodes(actions)
 	function createActionObject(tabId, url, text, type, favIconUrl, path, classId, from, pic, hidden) {
 		var time = new Date();
-        var action = {
-                id: nodeId,
-                time: time,
-                url: url,
-                text: text,
-                type: type,
-                showImage: true,
-				hidden: hidden
-			};
+		var action = {
+			id: nodeId,
+			time: time,
+			url: url,
+			text: text,
+			type: type,
+			showImage: true,
+			hidden: hidden
+		};
 
 		if (favIconUrl) action.favIconUrl = favIconUrl;
 		if (path) action.path = path;
@@ -204,16 +204,16 @@ historyMap.controller.browser = function () {
 		// Referrer
 		//cant use if(action.from) because action.from = node.id,
 		//which has range of 0 to n  
-        if (typeof from !== "undefined") {
-            action.from = from;
-        } else {
-			if(tabId) {
-                action.from = tab2node[tabId];
-            }
+		if (typeof from !== "undefined") {
+			action.from = from;
+		} else {
+			if (tabId) {
+				action.from = tab2node[tabId];
+			}
 		}
 		historyMap.model.nodes.addNode(action);
-        nodeId++;
-        return action;
+		nodeId++;
+		return action;
 	}
 
 	/* Additional Functions for Checking */
@@ -225,38 +225,34 @@ historyMap.controller.browser = function () {
 	chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 		if (request.type === 'highlight') {
 			createNewAction(request.tab, 'highlight', request.text, request.path, request.classId);
-	   } else if (request.type === 'save-image'){
+		} else if (request.type === 'save-image') {
 			createNewAction(request.tab, 'save-image', request.text, request.path, request.classId, request.picture);
-	   } else if (request.type === 'remove-image'){
+		} else if (request.type === 'remove-image') {
 			createNewAction(request.tab, 'remove-image', request.text, request.path, request.classId, request.picture);
 		} else if (request.type === 'notedHistoryMap') {
 			createNewAction(request.tab, 'note', request.data.text, request.data.path, request.classId, request.picture);
 			historyMap.view.redraw();
-		} else if (request.type === 'removeHighlightSelection'){
+		} else if (request.type === 'removeHighlightSelection') {
 			historyMap.model.nodes.hideNode(request.tabUrl, request.classId);
 			historyMap.view.redraw();
 		}
-<<<<<<< HEAD
-	}
-=======
 	});
 
 	function onImageSaved(id, imageUrl) {
 		var nodes = historyMap.model.nodes.getArray();
-        var foundNode = nodes.find(a => a.id === id);
-        if (foundNode) {
-            foundNode.userImage = imageUrl;
-            historyMap.view.redraw();
-        }
-    }
+		var foundNode = nodes.find(a => a.id === id);
+		if (foundNode) {
+			foundNode.userImage = imageUrl;
+			historyMap.view.redraw();
+		}
+	}
 
-    function onImageRemoved(id, imageUrl) {
+	function onImageRemoved(id, imageUrl) {
 		var nodes = historyMap.model.nodes.getArray();
 		var foundNode = nodes.find(a => a.id === id && a.userImage === imageUrl);
-        if (foundNode) {
-            delete foundNode.userImage;
-            historyMap.view.redraw();
-        }
-    }
->>>>>>> origin/rebuild-mvc
+		if (foundNode) {
+			delete foundNode.userImage;
+			historyMap.view.redraw();
+		}
+	}
 }
