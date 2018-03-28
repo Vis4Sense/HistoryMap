@@ -157,7 +157,14 @@ historyMap.controller.browser = function () {
 			action = createActionObject(tab.id, tab.url, text, type, undefined, path, classId, tab2node[tab.id], undefined, false);
 		} else if (type === 'save-image') {
 			action = createActionObject(tab.id, tab.url, undefined, type, undefined, undefined, undefined, tab2node[tab.id], pic, true);
-		}
+			onImageSaved(tab2node[tab.id], pic);
+		} else if (type === 'remove-image') {
+			onImageRemoved(tab2node[tab.id], pic);
+			//no need to actually create a "remove image" action?
+			//action = createActionObject(tab.id, tab.url, undefined, type, undefined, undefined, undefined, tab2node[tab.id], pic, true);
+		} else if (type === 'note') {
+			action = createActionObject(tab.id, tab.url, text, "note", undefined, path, classId, tab2node[tab.id], undefined, false);
+		} 
 		return action;
 	}
 
@@ -165,14 +172,14 @@ historyMap.controller.browser = function () {
 
 	//using old style of creating nodes(actions)
 	function createActionObject(tabId, url, text, type, favIconUrl, path, classId, from, pic, hidden) {
-		var time = new Date(),
-			action = {
-				id: nodeId,
-				time: time,
-				url: url,
-				text: text,
-				type: type,
-				showImage: true,
+		var time = new Date();
+        var action = {
+                id: nodeId,
+                time: time,
+                url: url,
+                text: text,
+                type: type,
+                showImage: true,
 				hidden: hidden
 			};
 
@@ -197,17 +204,16 @@ historyMap.controller.browser = function () {
 		// Referrer
 		//cant use if(action.from) because action.from = node.id,
 		//which has range of 0 to n  
-		if (typeof from !== "undefined") {
-			action.from = from;
-		} else {
-			if (tabId) {
-				action.from = tab2node[tabId];
-			}
+        if (typeof from !== "undefined") {
+            action.from = from;
+        } else {
+			if(tabId) {
+                action.from = tab2node[tabId];
+            }
 		}
-
-		dispatch.nodeCreated(action);
-		nodeId++;
-		return action;
+		historyMap.model.nodes.addNode(action);
+        nodeId++;
+        return action;
 	}
 
 	/* Additional Functions for Checking */
@@ -216,24 +222,41 @@ historyMap.controller.browser = function () {
 		return ignoredUrls.some(url => tab.url.includes(url));
 	}
 
-
-	function onMessageReceived(request, sender, sendResponse) {
-		if (request.type === 'highlightRemoved') {
-			dispatch.nodeRemoved(request.classId, sender.tab.url);
-		} else if (request.type === 'noted') {
-			const typeUpdate = {
-				classId: request.data.classId,
-				text: request.data.text,
-				type: 'note',
-				url: sender.tab.url
-			};
-			dispatch.typeUpdated(typeUpdate);
-		} else if (request.type === 'loadHighlights') {
-			//will not be called yet....
-			// Get highlights, notes for the requested item
-			var tab = sender.tab;
-			//var highlightObject = checkIfUrlContainsHighlights(tab.url);
-			sendResponse(highlightObject);
+	chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+		if (request.type === 'highlight') {
+			createNewAction(request.tab, 'highlight', request.text, request.path, request.classId);
+	   } else if (request.type === 'save-image'){
+			createNewAction(request.tab, 'save-image', request.text, request.path, request.classId, request.picture);
+	   } else if (request.type === 'remove-image'){
+			createNewAction(request.tab, 'remove-image', request.text, request.path, request.classId, request.picture);
+		} else if (request.type === 'notedHistoryMap') {
+			createNewAction(request.tab, 'note', request.data.text, request.data.path, request.classId, request.picture);
+			historyMap.view.redraw();
+		} else if (request.type === 'removeHighlightSelection'){
+			historyMap.model.nodes.hideNode(request.tabUrl, request.classId);
+			historyMap.view.redraw();
 		}
+<<<<<<< HEAD
 	}
+=======
+	});
+
+	function onImageSaved(id, imageUrl) {
+		var nodes = historyMap.model.nodes.getArray();
+        var foundNode = nodes.find(a => a.id === id);
+        if (foundNode) {
+            foundNode.userImage = imageUrl;
+            historyMap.view.redraw();
+        }
+    }
+
+    function onImageRemoved(id, imageUrl) {
+		var nodes = historyMap.model.nodes.getArray();
+		var foundNode = nodes.find(a => a.id === id && a.userImage === imageUrl);
+        if (foundNode) {
+            delete foundNode.userImage;
+            historyMap.view.redraw();
+        }
+    }
+>>>>>>> origin/rebuild-mvc
 }

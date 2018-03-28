@@ -1,5 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () { 
-	console.log("starting contextmenu.js " + new Date().getTime());			
+document.addEventListener('DOMContentLoaded', function () { 		
 	createContextMenus();
 	
 	function createContextMenus() {
@@ -20,14 +19,13 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 		//function on contextMenuClicked
 		chrome.contextMenus.onClicked.addListener((info, tab) => {
+			var modelInfo;
 			if (info.menuItemId === 'sm-highlight') {
 				chrome.tabs.sendMessage(tab.id, { type: 'highlightSelection' }, response => {
 					if (response) {
-						console.log("the response is " + JSON.stringify(response));
-						chrome.tabs.sendMessage(tab.id, {type: 'updateModel', innerType:'highlightSelection', tabUrl: tab.url, path:response.path, text: response.text, classId: response.classId}, response2 => {
-							if (response2){
-								console.log("model has been updated with text");
-							}
+						modelInfo = {innerType:'highlightSelection', tabUrl: tab.url, path:response.path, text: response.text, classId: response.classId};
+						updateModel(modelInfo);
+						chrome.runtime.sendMessage({tab: tab, type:'highlight', text: response.text, path:response.path, classId: response.classId, picture: null}, function (response) {
 						});
 					}
 				});
@@ -35,11 +33,9 @@ document.addEventListener('DOMContentLoaded', function () {
 				// Overwrite existing image
 				chrome.tabs.sendMessage(tab.id, {type: 'highlightImage', tabUrl: tab.url, srcUrl: info.srcUrl, pageUrl: info.pageUrl}, response => {
 					if (response) {
-						console.log("the response is " + response);
-						chrome.tabs.sendMessage(tab.id, {type: 'updateModel', innerType:'highlightImage', tabUrl: tab.url, srcUrl: info.srcUrl, pageUrl: info.pageUrl}, response2 => {
-							if (response2){
-								console.log("model has been updated with image addition");
-							}
+						modelInfo = {innerType:'highlightImage', tabUrl: tab.url, srcUrl: info.srcUrl, pageUrl: info.pageUrl};
+						updateModel(modelInfo);
+						chrome.runtime.sendMessage({tab: tab, type:'save-image', text:tab.title, path: null, classId: null, picture: info.srcUrl}, function (response) {
 						});
 					}
 				});
@@ -53,11 +49,9 @@ document.addEventListener('DOMContentLoaded', function () {
 			} else if (info.menuItemId === 'sm-remove-image') {
 				chrome.tabs.sendMessage(tab.id, {type: 'removeHighlightImage', srcUrl: info.srcUrl, pageUrl: info.pageUrl}, response => {
 					if (response) {
-						console.log("the response is " + response);
-						chrome.tabs.sendMessage(tab.id, {type: 'updateModel', innerType:'removeHighlightImage', tabUrl: tab.url, srcUrl: info.srcUrl, pageUrl: info.pageUrl}, response2 => {
-							if (response2){
-								console.log("model has been updated with image removal");
-							}
+						modelInfo = {innerType:'removeHighlightImage', tabUrl: tab.url, srcUrl: info.srcUrl, pageUrl: info.pageUrl};
+						updateModel(modelInfo);
+						chrome.runtime.sendMessage({tab: tab, type:'remove-image', text:tab.title, path: null, classId: null, picture: info.srcUrl}, function (response) {
 						});
 					}
 				});
