@@ -217,6 +217,11 @@
 	font-size: 18px;
 }
 
+/*to correctly position the fontello icons in the 4 buttons of a history map node */
+.sm-sensemap .node .btn {
+	padding: 0px 0px 0px 0px;
+	font-size: 18px;
+}
 
 /* Overwrite bootstrap tooltip */
 
