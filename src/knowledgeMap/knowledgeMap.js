@@ -2,14 +2,11 @@ const knowledgeMap = function () {
     const knowledgeMap = {
         model: {
             nodes: {},
-            tree: {}, // real data
-            user: {},
-            sessions: {}
         },
         view: {
-            layout: {},
             vis: {},
-            redraw: {}
+            redraw: {},
+            visualise:{}
         },
         controller: {
             browser: {}
@@ -19,9 +16,8 @@ const knowledgeMap = function () {
 }();
 
 document.addEventListener("DOMContentLoaded", function () {
-	const knowledgeMapLayout = knowledgeMap.view.layout.grid;
     // Data
-    var knowledgeMapNodes = knowledgeMap.model.nodes;//.getArray();
+    var knowledgeMapNodes = knowledgeMap.model.nodes;
     // Instantiate vis
 
     knowledgeMap.view.redraw = function () {
@@ -49,11 +45,27 @@ document.addEventListener("DOMContentLoaded", function () {
         })
     }
 
+    knowledgeMap.view.visualise = function () {
+        var theDataToBeVisualised = "stub"
+        console.log("visualsing the data ");
+        var boundedData = d3.select('body').selectAll("foreignObject").data(theDataToBeVisualised);
+        console.log(boundedData);
+        console.log(boundedData.enter());
+        console.log(boundedData.exit());
+        boundedData.enter()
+        /*.append("p")*/.insert("p", ":first-child").html(function(d){
+            console.log("in append h1 data = ", d);
+            return d.text;
+        })
+    }
+
     //maybe should be in controller
     chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         if (request.type === "knowledgeMapNode") {
             //add 2 elements
             knowledgeMapNodes.addNode(request.data);
+        } else if (request.type === "visualiseData"){
+            knowledgeMap.view.visualise(request.data);
         }
     });
 });

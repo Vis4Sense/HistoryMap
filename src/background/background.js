@@ -53,6 +53,13 @@ document.addEventListener('DOMContentLoaded', function () {
 			console.log('view for km already exists');
 			return;
 		} 
+
+		const knowledgeMapTableUrl = chrome.extension.getURL('src/knowledgeMap/table.html');
+		// Only allow a single instance of the knowledge map
+		if (getView(knowledgeMapTableUrl)){
+			console.log('view for km already exists');
+			return;
+		} 
 		
 		// Adjust location and size of the current window, where the extension button is clicked
 		chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {
@@ -99,6 +106,15 @@ document.addEventListener('DOMContentLoaded', function () {
 					chrome.runtime.sendMessage({ type: 'computeZoom', values: curationZoomActions });
 					chrome.runtime.sendMessage({ type: 'redraw' });
 				}, 3000);*/
+			});
+
+			//create instance of knowledge map
+			chrome.windows.create({
+				url: knowledgeMapTableUrl,
+				type: "popup",
+				state: "minimized"
+			}, function(w) {
+				curationWindowId = w.id;
 			});
 
 		// Listen to content script
