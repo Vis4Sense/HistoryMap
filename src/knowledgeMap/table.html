@@ -31,6 +31,7 @@ input {
   </tr>
  </tbody>
 </table>
+<button type="button" id="addAttribute" onclick="addEmptyRow()">Add Attribute (row)</button>
 
 <script>
 	function getNumberOfCellsInARow(){
@@ -139,6 +140,12 @@ input {
 		document.getElementById('testTable').appendChild(newTableRow);
 	}
 	
+	function setAllTableCellsToEditable(){
+		var cells = document.getElementsByTagName("td");
+		for (var i = 0; i < cells.length; i++){
+			cells[i].setAttribute("contenteditable", "true")
+		}
+	}
 	//get text in header relevant header input, append"-input" to it and use it as an attribute of the input tags in the new blank row
 	
 	var newElements = ["text1", "text2"];
