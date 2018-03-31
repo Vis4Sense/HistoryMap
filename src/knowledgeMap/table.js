@@ -7,8 +7,9 @@ document.getElementById("sendToKnowledgeMap").addEventListener("click", function
     console.log("clicked visualisation button ");
     var theTable = document.getElementById('testTable');
     var myJson = createJsonObjectFromTable(theTable);
-    chrome.runtime.sendMessage({type: "visualiseData", data: myJson});
-    //send to km?
+    var productArray = convertToArray(myJson);
+    //chrome.runtime.sendMessage({type: "visualiseData", data: productArray});
+    chrome.runtime.sendMessage({type: "prepareRadarChartData", data: productArray});
 });
 
 function getNumberOfCellsInARow(){
@@ -110,6 +111,12 @@ function addBlankInputRow(){
 }
 
 function setAllTableCellsToEditable(){
+    //set all product title to editable
+    var headers = document.getElementsByTagName("th");
+    for (var i = 1; i < headers.length; i++){
+        headers[i].setAttribute("contenteditable", "true")
+    }
+    //set all attributes to editable
     var cells = document.getElementsByTagName("td");
     for (var i = 0; i < cells.length; i++){
         cells[i].setAttribute("contenteditable", "true")
@@ -139,3 +146,20 @@ function createJsonObjectFromTable(tableElement){
     }
     return myJson;
 }
+
+//converts nested products object to an array of products 
+function convertToArray(JsonData){
+    var productArray = [];
+    var productTitles = Object.keys(JsonData);
+    var numberOfProducts = productTitles.length;
+    var productAttributes = Object.values(JsonData);
+    for(var i = 0;i<numberOfProducts; i++){
+        var currentProduct = {};
+        currentProduct.title = productTitles[i];
+        currentProduct.attributes = productAttributes[i];
+        productArray.push(currentProduct);
+    }
+    return productArray;
+}
+
+setAllTableCellsToEditable();

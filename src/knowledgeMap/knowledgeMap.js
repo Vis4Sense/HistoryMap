@@ -39,15 +39,13 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log(boundedData.enter());
         console.log(boundedData.exit());
         boundedData.enter()
-        /*.append("p")*/.insert("p", ":first-child").html(function(d){
+		.insert("p", ":first-child").html(function(d){
             console.log("in append h1 data = ", d);
             return d.text;
         })
     }
 
-    knowledgeMap.view.visualise = function (JsonData) {
-        var theDataToBeVisualised = convertToArray(JsonData);
-        console.log("visualising the data ", JsonData);
+    knowledgeMap.view.visualise = function (theDataToBeVisualised) {
         var boundedData = d3.select('body').selectAll("foreignObject").data(theDataToBeVisualised);
         console.log(boundedData);
         console.log(boundedData.enter());
@@ -58,28 +56,15 @@ document.addEventListener("DOMContentLoaded", function () {
         })
     }
 
-    //converts nested products object to an array of products 
-    function convertToArray(JsonData){
-        var productArray = [];
-        var productTitles = Object.keys(JsonData);
-        var numberOfProducts = productTitles.length;
-        var productAttributes = Object.values(JsonData);
-        for(var i = 0;i<numberOfProducts; i++){
-            var currentProduct = {};
-            currentProduct.title = productTitles[i];
-            currentProduct.attributes = productAttributes[i];
-            productArray.push(currentProduct);
-        }
-        return productArray;
-    }
-
     //maybe should be in controller
     chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         if (request.type === "knowledgeMapNode") {
             //add 2 elements
             knowledgeMapNodes.addNode(request.data);
+            //temporarily not being used, until a better method is discovered for alternate visualisation setups
         } else if (request.type === "visualiseData"){
-            knowledgeMap.view.visualise(request.data);
+            chrome.runtime.sendMessage({type: "prepareRadarChartData", data: request.data});           
+            //knowledgeMap.view.visualise(request.data);
         }
     });
 });
