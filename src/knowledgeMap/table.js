@@ -7,7 +7,7 @@ document.getElementById("sendToKnowledgeMap").addEventListener("click", function
     console.log("clicked visualisation button ");
     var theTable = document.getElementById('testTable');
     var myJson = createJsonObjectFromTable(theTable);
-    console.log(myJson);
+    chrome.runtime.sendMessage({type: "visualiseData", data: myJson});
     //send to km?
 });
 

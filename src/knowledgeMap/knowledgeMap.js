@@ -45,18 +45,32 @@ document.addEventListener("DOMContentLoaded", function () {
         })
     }
 
-    knowledgeMap.view.visualise = function () {
-        var theDataToBeVisualised = "stub"
-        console.log("visualsing the data ");
+    knowledgeMap.view.visualise = function (JsonData) {
+        var theDataToBeVisualised = convertToArray(JsonData);
+        console.log("visualising the data ", JsonData);
         var boundedData = d3.select('body').selectAll("foreignObject").data(theDataToBeVisualised);
         console.log(boundedData);
         console.log(boundedData.enter());
         console.log(boundedData.exit());
-        boundedData.enter()
-        /*.append("p")*/.insert("p", ":first-child").html(function(d){
-            console.log("in append h1 data = ", d);
-            return d.text;
+        boundedData.enter().insert("p", ":first-child").html(function(d){
+            console.log("the data available is", d);
+            return d.title + "\n";
         })
+    }
+
+    //converts nested products object to an array of products 
+    function convertToArray(JsonData){
+        var productArray = [];
+        var productTitles = Object.keys(JsonData);
+        var numberOfProducts = productTitles.length;
+        var productAttributes = Object.values(JsonData);
+        for(var i = 0;i<numberOfProducts; i++){
+            var currentProduct = {};
+            currentProduct.title = productTitles[i];
+            currentProduct.attributes = productAttributes[i];
+            productArray.push(currentProduct);
+        }
+        return productArray;
     }
 
     //maybe should be in controller
