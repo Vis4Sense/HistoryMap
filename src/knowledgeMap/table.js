@@ -8,8 +8,7 @@ document.getElementById("sendToKnowledgeMap").addEventListener("click", function
     var theTable = document.getElementById('testTable');
     var myJson = createJsonObjectFromTable(theTable);
     var productArray = convertToArray(myJson);
-    //chrome.runtime.sendMessage({type: "visualiseData", data: productArray});
-    chrome.runtime.sendMessage({type: "prepareRadarChartData", data: productArray});
+    chrome.runtime.sendMessage({type: "visualiseData", chart: "radar", data: productArray});
 });
 
 function getNumberOfCellsInARow(){

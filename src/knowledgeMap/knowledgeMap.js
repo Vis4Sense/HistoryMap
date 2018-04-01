@@ -61,9 +61,12 @@ document.addEventListener("DOMContentLoaded", function () {
         if (request.type === "knowledgeMapNode") {
             //add 2 elements
             knowledgeMapNodes.addNode(request.data);
-            //temporarily not being used, until a better method is discovered for alternate visualisation setups
         } else if (request.type === "visualiseData"){
-            chrome.runtime.sendMessage({type: "prepareRadarChartData", data: request.data});           
+            if(request.chart ==="radar"){
+                console.log("visualising radar chart");
+                var radarChartData = convertDataToBeUsedWithRadarChart(request.data);
+                RadarChart.draw("#chart", radarChartData, mycfg);
+            }
             //knowledgeMap.view.visualise(request.data);
         }
     });

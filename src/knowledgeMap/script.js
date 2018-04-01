@@ -1,14 +1,3 @@
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-	console.log("scripts got a message ", request.type);
- if (request.type === "prepareRadarChartData"){
-			//knowledgeMap.view.visualise(request.data);
-			console.log("scripts captured data");
-			var radarChartData = convertDataToBeUsedWithRadarChart(request.data);
-			RadarChart.draw("#chart", radarChartData, mycfg);
-			//sendResponse({data: radarChartData});
-	}
-});
-
 function convertDataToBeUsedWithRadarChart(tableData){
 	var newData=[];
 	for (var i = 0; i < tableData.length; i++){
