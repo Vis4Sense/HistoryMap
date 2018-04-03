@@ -22,7 +22,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     knowledgeMap.view.redraw = function () {
         var theNodes = knowledgeMapNodes.nodes;
-        console.log("redrawing providing these nodes as data", theNodes);
         /* this definiley works but doesn"t display the data due to svg taking up all the space in the body
         boundedData = d3.select('body').selectAll("foreignObject").data(theNodes);
         console.log(boundedData);

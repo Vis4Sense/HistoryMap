@@ -1,5 +1,5 @@
 var RadarChart = {
-  draw: function(id, d, options){
+  draw: function(id, d, options){	
   var cfg = {
 	 radius: 5,
 	 w: 600,

@@ -11,7 +11,7 @@ function convertDataToBeUsedWithRadarChart(tableData){
 			var newProduct = {};
 			tempArray.push(newProduct);
 			newProduct.axis = keys[j];
-			newProduct.value = values[j];
+			newProduct.value = parseInt(values[j]);
 		}
 	}
 	return newData;
@@ -28,16 +28,17 @@ var LegendOptions = ['Smartphone','Tablet'];
 
 
 var d = [
+		  
 		  [
-			{axis:"Effective Pixels",value:5},//12
-			{axis:"Optical Zoom",value:1},//4
-			{axis:"Screen Size",value:1}, //3
-			//{axis:"Battery life",value:100},
-		  ],[
 			{axis:"Effective Pixels",value:16},
 			{axis:"Optical Zoom",value:5},
 			{axis:"Screen Size",value:3},
 			//{axis:"Battery life",value:170},
+		  ],[
+			{axis:"Effective Pixels",value:12},
+			{axis:"Optical Zoom",value:4},
+			{axis:"Screen Size",value:3},
+			//{axis:"Battery life",value:100},
 		  ]
 		];
 
