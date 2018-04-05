@@ -4,7 +4,8 @@ const historyMap = function () {
             nodes: {},
             tree: {}, // real data
             user: {},
-            sessions: {}
+            sessions: {},
+            tabs: {} // the status of the opened tabs in the browser
         },
         view: {
             vis: {},

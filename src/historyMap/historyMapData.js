@@ -1,43 +1,55 @@
+function Node(id, tabId, time, url, title, favIconUrl, parentTabId, from, isTabClosed) {
+    this.id = id;
+    this.tabId = tabId;
+    this.time = time;
+    this.url = url;
+    this.text = title;
+    this.favIconUrl = favIconUrl;
+    this.parentTabId = parentTabId;
+    this.from = from;
+    this.isTabClosed = isTabClosed; // whether the browser tab showing the node URL is closed
+}
+
 historyMap.model.nodes = {
 
-    nodes: [],
+    nodeArray: [],
 
     getNode: function (index) {
-        return this.nodes[index];
+        return this.nodeArray[index];
     },
 
     getNodeIndex: function (node) {
-        return this.nodes.indexOf(node);
+        return this.nodeArray.indexOf(node);
     },
 
     addNode: function (node) {
-        var index = this.nodes.push(node);
+        var index = this.nodeArray.push(node);
         historyMap.view.redraw();
         return index;
     },
 
     updateNode: function (index, node) {
-        var result = (this.nodes[index] = node);
+        var result = (this.nodeArray[index] = node);
         historyMap.view.redraw();
         return result;
     },
 
     getArray: function () {
-        return this.nodes;
+        return this.nodeArray;
     },
 
     getSize: function () {
-        return this.nodes.length;
+        return this.nodeArray.length;
     },
 
     empty: function () {
-        this.nodes.length = 0;
+        this.nodeArray.length = 0;
         historyMap.view.redraw();
     },
 
     hideNode: function (tabUrl, classId) {
         //locates the original highlight(note), marks it as hidden
-        var foundNode = this.nodes.find(a => (a.url === tabUrl) && (a.classId === classId));
+        var foundNode = this.nodeArray.find(a => (a.url === tabUrl) && (a.classId === classId));
         foundNode.hidden = true;
         return foundNode;
     },
@@ -45,12 +57,23 @@ historyMap.model.nodes = {
     updateType: function (typeUpdate) {
         //locates the original highlight(note), updates its text and/or type
         if (typeUpdate.type === 'note') {
-            var foundNode = this.nodes.find(a => a.classId === typeUpdate.classId)
+            var foundNode = this.nodeArray.find(a => a.classId === typeUpdate.classId)
             foundNode.text = typeUpdate.text;
             foundNode.type = typeUpdate.type;
             return foundNode;
         }
     },
+}
+
+function Tab(tabID, nodeID, url, isCompleted) {
+    this.tabID = tabID;
+    this.nodeID = nodeID;
+    this.url = url;
+    this.isCompleted = isCompleted;
+}
+
+historyMap.model.tabs = {
+    tabArray: [] // store the tabs that are currently open
 }
 
 historyMap.model.sessions = {
@@ -61,16 +84,7 @@ historyMap.model.sessions = {
     }
 };
 
-function Node(id, tabId, time, url, title, favIconUrl, parentTabId, from) {
-    this.id = id;
-    this.tabId = tabId;
-    this.time = time;
-    this.url = url;
-    this.text = title;
-    this.favIconUrl = favIconUrl;
-    this.parentTabId = parentTabId;
-    this.from = from;
-}
+
 
 let DBnodes = [];
 let UserProfile;
