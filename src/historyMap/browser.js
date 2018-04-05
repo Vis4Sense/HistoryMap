@@ -3,16 +3,16 @@
  * part of the 'browser controller'.
  */
 
-// Pseudo code
+// Outline pseudo code
 // function onTabCreation(newTab) {
 //     addNode(newTab);
 // }
 
 // function onTabUpdate(tab) {
 //     if ('loading') {
-// if (non-redireciton) addNode(tab);
-// else {update existing node}; // redirection
-// }
+// 			if (non-redireciton) addNode(tab);
+// 			else {update existing node}; // redirection
+// 	   }
 //     if (title updated) send the new title to historyMap.js through an event;
 //     if (favIconUrl updated) send the new favIconUrl to historyMap.js through an event;
 // }
@@ -24,15 +24,13 @@
 
 
 historyMap.controller.browser = function () {
-	// const module = {};
 
 	var nodeId = 0; // can't use tab.id as node id because new url can be opened in the existing tab
 	var tab2node = {}; // the Id of the latest node for a given tab
 	var tabUrl = {}; // the latest url of a given tabId
 	var isTabCompleted = {}; // whether a tab completes loading (for redirection detection).
 
-	var nodes = historyMap.model.nodes;
-	// var redraw = historyMap.view.redraw(); // why this doesn't work?
+	let nodes = historyMap.model.nodes;
 
 	// not recording any chrome-specific url
 	const ignoredUrls = [
@@ -43,9 +41,7 @@ historyMap.controller.browser = function () {
 			'google.co.uk/url',
 			'google.com/url',
 			'localhost://'
-		],
-		bookmarkTypes = ['auto_bookmark'],
-		typedTypes = ['typed', 'generated', 'keyword', 'keyword_generated'];
+		];
 
 	chrome.tabs.onCreated.addListener(function (tab) {
 
@@ -64,7 +60,7 @@ historyMap.controller.browser = function () {
 
 			// console.log('tab update',tabId,changeInfo,tab);
 
-			var node = nodes.getNode(tab2node[tab.id]);
+			let node = nodes.getNode(tab2node[tab.id]);
 
 			// 'changeInfo' information:
 			// - status: 'loading': if (tabCompleted) {create a new node} else {update exisiting node}
@@ -105,19 +101,16 @@ historyMap.controller.browser = function () {
 
 	function addNode(tab, parent) {
 
-		const title = tab.title || tab.url;
-		const time = new Date();
-		// const node = {
-		// 	id: nodeId,
-		// 	tabId: tab.id,
-		// 	time: time,
-		// 	url: tab.url,
-		// 	text: title,
-		// 	favIconUrl: tab.favIconUrl,
-		// 	parentTabId:parent,
-		// 	from: tab2node[parent]
-		// };
-		const node = new Node(nodeId, tab.id, time, tab.url, title, tab.favIconUrl, parent, tab2node[parent]);
+		const node = new Node(
+			nodeId, 
+			tab.id, 
+			new Date(), 
+			tab.url, 
+			tab.title || tab.url, 
+			tab.favIconUrl, 
+			parent, 
+			tab2node[parent]
+		);
 
 		tab2node[tab.id] = nodeId;
 		tabUrl[tab.id] = tab.url;
@@ -125,13 +118,13 @@ historyMap.controller.browser = function () {
 		nodeId = nodes.addNode(node);
 
 
-		// Update with visit type
+		// Update with visit 'type' (the 'type' information is used in the historyMapView)
 		if (tab.url) {
 			chrome.history.getVisits({
 				url: tab.url
 			}, results => {
 				// The latest one contains information about the just completely loaded page
-				const type = results && results.length ? _.last(results).transition : undefined;
+				const type = results && results.length ? _.last(results).transition : undefined; // the 'transition' is a field of the chrome 'VisitItem' object(https://developer.chrome.com/extensions/history#type-VisitItem) and has these possible values (https://developer.chrome.com/extensions/history#type-TransitionType) 
 
 				nodes.getNode(tab2node[tab.id]).type = type;
 			});
@@ -143,6 +136,8 @@ historyMap.controller.browser = function () {
 	function isIgnoredTab(tab) {
 		return ignoredUrls.some(url => tab.url.includes(url));
 	}
+
+	// why the following text/image highlighting code is here? 
 
 	function isEmbeddedType(type) {
 		return ['highlight', 'note', 'filter'].includes(type);
@@ -217,10 +212,6 @@ historyMap.controller.browser = function () {
 	}
 
 	/* Additional Functions for Checking */
-
-	function isIgnoredTab(tab) {
-		return ignoredUrls.some(url => tab.url.includes(url));
-	}
 
 	chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 		if (request.type === 'highlight') {
