@@ -1,13 +1,12 @@
-function Node(id, tabId, time, url, title, favIconUrl, parentTabId, from, isTabClosed) {
+function Node(id, tabId, time, url, title, favIconUrl, from, isTabOpen) {
     this.id = id;
     this.tabId = tabId;
     this.time = time;
     this.url = url;
     this.text = title;
     this.favIconUrl = favIconUrl;
-    this.parentTabId = parentTabId;
     this.from = from;
-    this.isTabClosed = isTabClosed; // whether the browser tab showing the node URL is closed
+    this.isTabOpen = isTabOpen; // whether the browser tab showing the node URL is open
 }
 
 historyMap.model.nodes = {
@@ -62,18 +61,30 @@ historyMap.model.nodes = {
             foundNode.type = typeUpdate.type;
             return foundNode;
         }
-    },
+    }
 }
 
-function Tab(tabID, nodeID, url, isCompleted) {
-    this.tabID = tabID;
-    this.nodeID = nodeID;
-    this.url = url;
+function Tab(tabId, node, isCompleted) {
+    this.tabId = tabId;
+    this.node = node; // the latest node for this tab
     this.isCompleted = isCompleted;
 }
 
 historyMap.model.tabs = {
-    tabArray: [] // store the tabs that are currently open
+
+    tabArray: [], // store the tabs that are currently open
+
+    addTab: function(tab) {
+        return this.tabArray.push(tab);
+    },
+
+    getArray: function() {
+        return this.tabArray;
+    },
+
+    getTab: function(tabId) {
+        return this.tabArray.find(item => item.tabId == tabId);
+    },
 }
 
 historyMap.model.sessions = {
@@ -178,7 +189,7 @@ historyMap.API.DBSave.Node2DB = function () {
     let currentTree = historyMap.model.tree;
     var url = baseURL + "sessionupdate/" + DBSessionPointer + "/" + APIKey + "/";
     var json = CircularJSON.stringify(currentTree);
-    console.log(json);
+    // console.log(json);
     var xhr = new XMLHttpRequest();
     xhr.open("PUT", url, true);
     xhr.setRequestHeader('Content-type', 'text/plain; charset=utf-8');

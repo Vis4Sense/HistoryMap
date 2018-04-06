@@ -22,15 +22,12 @@
 //     send the new 'node' to historyMap.js through an event;
 // }
 
-
 historyMap.controller.browser = function () {
 
-	var nodeId = 0; // can't use tab.id as node id because new url can be opened in the existing tab
-	var tab2node = {}; // the Id of the latest node for a given tab
-	var tabUrl = {}; // the latest url of a given tabId
-	var isTabCompleted = {}; // whether a tab completes loading (for redirection detection).
-
 	let nodes = historyMap.model.nodes;
+	let htabs = historyMap.model.tabs;
+
+	var nodeId = 0; // can't use tab.id as node id because new url can be opened in the existing tab
 
 	// not recording any chrome-specific url
 	const ignoredUrls = [
@@ -45,35 +42,42 @@ historyMap.controller.browser = function () {
 
 	chrome.tabs.onCreated.addListener(function (tab) {
 
-		if (!isIgnoredTab(tab)) {
-			// console.log('newTab -', 'tabId:'+tab.id, ', parent:'+tab.openerTabId, ', url:'+tab.url, tab); // for testing
+		// this does not catch the event of manually created tab?
 
-			addNode(tab, tab.openerTabId);
-			isTabCompleted[tab.id] = false;
+		if (!isIgnoredTab(tab)) {
+			console.log('newTab -', 'tabId:'+tab.id, ', parent:'+tab.openerTabId, ', url:'+tab.url, tab); // for testing
+
+			let newNode = addNode(tab, findParentNodeId(tab));
+			htabs.addTab(new Tab(tab.id, newNode, false));
 		}
 	});
-
-
+	
 	chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 
 		if (!isIgnoredTab(tab)) {
 
 			// console.log('tab update',tabId,changeInfo,tab);
 
-			let node = nodes.getNode(tab2node[tab.id]);
+			// if a tab is opened before historyMap and then refreshed
+			if (!htabs.getTab(tab.id)) {
+				let newNode = addNode(tab, findParentNodeId(tab));
+				htabs.addTab(new Tab(tab.id, newNode, false));
+			}
+
+			// console.log('htabs',htabs);
+			let htab = htabs.getTab(tab.id);			
+			let node = htab.node;
 
 			// 'changeInfo' information:
 			// - status: 'loading': if (tabCompleted) {create a new node} else {update exisiting node}
-			if (changeInfo.status == 'loading' && tab.url != tabUrl[tabId]) {
+			if (changeInfo.status == 'loading' && tab.url != node.url) {
 
-				if (tab2node[tabId] !== undefined && !isTabCompleted[tabId]) { // redirection
+				if (node !== undefined && !htab.isCompleted) { // redirection
 					node.text = tab.title || tab.url;
 					node.url = tab.url;
 					historyMap.view.redraw();
-
-					tabUrl[tabId] = tab.url;
 				} else { // not redirection
-					addNode(tab, tab.id);
+					htab.node = addNode(tab, node.id);
 				}
 			}
 
@@ -91,7 +95,7 @@ historyMap.controller.browser = function () {
 
 			// - status: 'complete', {do nothing}
 			if (changeInfo.status == 'complete') {
-				isTabCompleted[tabId] = true;
+				htab.isCompleted = true;
 				if (loggedIn = true) {
 					historyMap.API.DBSave.Node2DB();
 				}
@@ -99,7 +103,7 @@ historyMap.controller.browser = function () {
 		}
 	});
 
-	function addNode(tab, parent) {
+	function addNode(tab, parentNodeId) {
 
 		const node = new Node(
 			nodeId, 
@@ -108,13 +112,10 @@ historyMap.controller.browser = function () {
 			tab.url, 
 			tab.title || tab.url, 
 			tab.favIconUrl, 
-			parent, 
-			tab2node[parent]
+			parentNodeId,
+			true
 		);
 
-		tab2node[tab.id] = nodeId;
-		tabUrl[tab.id] = tab.url;
-		isTabCompleted[tab.id] = false;
 		nodeId = nodes.addNode(node);
 
 
@@ -126,9 +127,21 @@ historyMap.controller.browser = function () {
 				// The latest one contains information about the just completely loaded page
 				const type = results && results.length ? _.last(results).transition : undefined; // the 'transition' is a field of the chrome 'VisitItem' object(https://developer.chrome.com/extensions/history#type-VisitItem) and has these possible values (https://developer.chrome.com/extensions/history#type-TransitionType) 
 
-				nodes.getNode(tab2node[tab.id]).type = type;
+				node.type = type;
 			});
 		}
+
+		historyMap.view.redraw();
+
+		return node;
+	}
+
+	function findParentNodeId(tab) {
+		let parentNodeId = null; 
+		if (tab.openerTabId && htabs.getTab(tab.openerTabId)) {
+			parentNodeId = htabs.getTab(tab.openerTabId).node.id;
+		}
+		return parentNodeId;
 	}
 
 	/* Additional Functions for Checking */
@@ -149,16 +162,16 @@ historyMap.controller.browser = function () {
 		// happens even before a new action is added in the first update
 		var action;
 		if (type === 'highlight') {
-			action = createActionObject(tab.id, tab.url, text, type, undefined, path, classId, tab2node[tab.id], undefined, false);
+			action = createActionObject(tab.id, tab.url, text, type, undefined, path, classId, tab2nodeId[tab.id], undefined, false);
 		} else if (type === 'save-image') {
-			action = createActionObject(tab.id, tab.url, undefined, type, undefined, undefined, undefined, tab2node[tab.id], pic, true);
-			onImageSaved(tab2node[tab.id], pic);
+			action = createActionObject(tab.id, tab.url, undefined, type, undefined, undefined, undefined, tab2nodeId[tab.id], pic, true);
+			onImageSaved(tab2nodeId[tab.id], pic);
 		} else if (type === 'remove-image') {
-			onImageRemoved(tab2node[tab.id], pic);
+			onImageRemoved(tab2nodeId[tab.id], pic);
 			//no need to actually create a "remove image" action?
-			//action = createActionObject(tab.id, tab.url, undefined, type, undefined, undefined, undefined, tab2node[tab.id], pic, true);
+			//action = createActionObject(tab.id, tab.url, undefined, type, undefined, undefined, undefined, tab2nodeId[tab.id], pic, true);
 		} else if (type === 'note') {
-			action = createActionObject(tab.id, tab.url, text, "note", undefined, path, classId, tab2node[tab.id], undefined, false);
+			action = createActionObject(tab.id, tab.url, text, "note", undefined, path, classId, tab2nodeId[tab.id], undefined, false);
 		}
 		return action;
 	}
@@ -184,7 +197,7 @@ historyMap.controller.browser = function () {
 
 		if (pic) {
 			action.value = pic;
-			action.id = tab2node[tabId];
+			action.id = tab2nodeId[tabId];
 		}
 		if (!isEmbeddedType(type)) {
 			// End time
@@ -203,7 +216,7 @@ historyMap.controller.browser = function () {
 			action.from = from;
 		} else {
 			if (tabId) {
-				action.from = tab2node[tabId];
+				action.from = tab2nodeId[tabId];
 			}
 		}
 		historyMap.model.nodes.addNode(action);
