@@ -27,8 +27,6 @@ historyMap.controller.browser = function () {
 	let nodes = historyMap.model.nodes;
 	let htabs = historyMap.model.tabs;
 
-	var nodeId = 0; // can't use tab.id as node id because new url can be opened in the existing tab
-
 	// not recording any chrome-specific url
 	const ignoredUrls = [
 			'chrome://',
@@ -69,7 +67,7 @@ historyMap.controller.browser = function () {
 			let node = htab.node;
 
 			// 'changeInfo' information:
-			// - status: 'loading': if (tabCompleted) {create a new node} else {update exisiting node}
+			// - status: 'loading': if (tabCompleted) {create a new node} else {update existing node}
 			if (changeInfo.status == 'loading' && tab.url != node.url) {
 
 				if (node !== undefined && !htab.isCompleted) { // redirection
@@ -106,7 +104,7 @@ historyMap.controller.browser = function () {
 	function addNode(tab, parentNodeId) {
 
 		const node = new Node(
-			nodeId, 
+			uuidv4(), // nodeId
 			tab.id, 
 			new Date(), 
 			tab.url, 
@@ -116,8 +114,7 @@ historyMap.controller.browser = function () {
 			true
 		);
 
-		nodeId = nodes.addNode(node);
-
+		nodes.addNode(node);
 
 		// Update with visit 'type' (the 'type' information is used in the historyMapView)
 		if (tab.url) {
@@ -182,7 +179,7 @@ historyMap.controller.browser = function () {
 	function createActionObject(tabId, url, text, type, favIconUrl, path, classId, from, pic, hidden) {
 		var time = new Date();
 		var action = {
-			id: nodeId,
+			id: uuidv4(), // id: nodeId,
 			time: time,
 			url: url,
 			text: text,
