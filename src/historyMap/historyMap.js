@@ -3,8 +3,6 @@ const historyMap = function () {
         model: {
             nodes: {},
             tree: {}, // real data
-            user: {},
-            sessions: {},
             tabs: {} // the status of the opened tabs in the browser
         },
         view: {
@@ -15,9 +13,11 @@ const historyMap = function () {
         controller: {
             browser: {}
         },
-        API: {
-            DBSave: {},
-            DBLoad: {}
+        database: { // saving and loading the historyMap sessions
+            user: {},
+            sessions: {},
+            // DBSave: {},
+            // DBLoad: {}
         }
     };
     return historyMap;
@@ -30,6 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Data
     nodes = historyMap.model.nodes.getArray();
 
+    
     // Instantiate vis
     historyMapView = historyMap.view.vis()
         .label(d => d.text)
