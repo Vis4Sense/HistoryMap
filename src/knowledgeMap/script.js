@@ -18,7 +18,6 @@ function convertDataToBeUsedWithRadarChart(tableData){
 }
 //Legend titles
 var LegendOptions = ['Smartphone','Tablet'];
-//Data
 
 var d = [
 		  

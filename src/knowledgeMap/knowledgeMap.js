@@ -61,6 +61,8 @@ document.addEventListener("DOMContentLoaded", function () {
             //add 2 elements
             knowledgeMapNodes.addNode(request.data);
         } else if (request.type === "visualiseData"){
+			
+			console.log(request.data);
             if(request.chart ==="radar"){
                 console.log("visualising radar chart");
                 var radarChartData = convertDataToBeUsedWithRadarChart(request.data);
