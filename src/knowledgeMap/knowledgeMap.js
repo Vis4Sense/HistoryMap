@@ -64,9 +64,14 @@ document.addEventListener("DOMContentLoaded", function () {
             if(request.chart ==="radar"){
                 console.log("visualising radar chart");
                 var radarChartData = convertDataToBeUsedWithRadarChart(request.data);
-                RadarChart.draw("#chart", radarChartData, mycfg);
-            }
-            //knowledgeMap.view.visualise(request.data);
+				var radarChartOptions = radarChartSetup();
+                RadarChart.draw("#chart", radarChartData, radarChartOptions);
+            } else if (request.chart === "radarImproved"){
+                console.log("visualising improved radar chart");
+				var radarChartOptions = improvedRadarChartSetup();
+                var radarChartData = convertDataToBeUsedWithRadarChart(request.data);
+				ImprovedRadarChart("#chart", radarChartData, radarChartOptions);
+			}
         }
     });
 });

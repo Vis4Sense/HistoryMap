@@ -3,12 +3,19 @@ document.getElementById("addAttribute").addEventListener("click", function(){
     console.log("adding another row");
     addEmptyRow();
 });
-document.getElementById("sendToKnowledgeMap").addEventListener("click", function(){
-    console.log("clicked visualisation button ");
+document.getElementById("visualiseRadarChart").addEventListener("click", function(){
+    console.log("visualising radarchart");
     var theTable = document.getElementById('testTable');
     var myJson = createJsonObjectFromTable(theTable);
     var productArray = convertToArray(myJson);
     chrome.runtime.sendMessage({type: "visualiseData", chart: "radar", data: productArray});
+});
+document.getElementById("visualiseImprovedRadarChart").addEventListener("click", function(){
+    console.log("visualising improved radar chart");
+    var theTable = document.getElementById('testTable');
+    var myJson = createJsonObjectFromTable(theTable);
+    var productArray = convertToArray(myJson);
+    chrome.runtime.sendMessage({type: "visualiseData", chart: "radarImproved", data: productArray});
 });
 
 function getNumberOfCellsInARow(){
