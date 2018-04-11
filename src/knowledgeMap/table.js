@@ -18,6 +18,22 @@ document.getElementById("visualiseImprovedRadarChart").addEventListener("click",
     chrome.runtime.sendMessage({type: "visualiseData", chart: "radarImproved", data: productArray});
 });
 
+document.getElementById("sortProduct1Ascending").addEventListener("click", function(){
+	sortTableRows(true, 0);
+});
+
+document.getElementById("sortProduct1Descending").addEventListener("click", function(){
+	sortTableRows(false, 0);
+});
+
+document.getElementById("sortProduct2Ascending").addEventListener("click", function(){
+	sortTableRows(true, 1);
+});
+
+document.getElementById("sortProduct2Descending").addEventListener("click", function(){
+	sortTableRows(false, 1);
+});
+
 function getNumberOfCellsInARow(){
     var theHeaderRow = document.getElementById('tableHeader').getElementsByTagName("th");
     return theHeaderRow.length;
@@ -95,47 +111,12 @@ function getProductAttributes(productColumnIndex){
 		var attributeValue = currentAttribute[productColumnIndex].innerText;
 		//store under respective product
 		tempJson.key = attributeKey;
-		tempJson.value = attributeValue;
+		tempJson.value = parseInt(attributeValue);
 		arrayOfAttributes.push(tempJson);
 	}
 	return arrayOfAttributes;
 }
 
-function ascendingProductAttributes(productAttributes){
-	var temp = {};
-	var swapsMade = true;
-	while (swapsMade){
-		swapsMade = false;
-		for(var i = 0; i < productAttributes.length - 1; i++){
-			if(productAttributes[i].value > productAttributes[i + 1].value){
-				temp = productAttributes[i];
-				productAttributes[i] = productAttributes[i + 1];
-				productAttributes[i + 1] = temp;
-				console.log(productAttributes[i].value +" " + productAttributes[i+1].value);
-				swapsMade = true;
-			}
-		}
-	}
-	return productAttributes;
-}
-
-function descendingProductAttributes(productAttributes){
-	var temp = {};
-	var swapsMade = true;
-	while (swapsMade){
-		swapsMade = false;
-		for(var i = 0; i < productAttributes.length - 1; i++){
-			if(productAttributes[i].value < productAttributes[i + 1].value){
-				temp = productAttributes[i];
-				productAttributes[i] = productAttributes[i + 1];
-				productAttributes[i + 1] = temp;
-				console.log(productAttributes[i].value +" " + productAttributes[i+1].value);
-				swapsMade = true;
-			}
-		}
-	}
-	return productAttributes;
-}
 
 //converts nested products object to an array of products 
 function convertToArray(JsonData){
@@ -153,6 +134,99 @@ function convertToArray(JsonData){
 }
 
 setAllTableCellsToEditable();
+
+function sortTableRows(ascending, productColumnIndex){
+	var temp = {};
+	var swapsMade = true;
+	var attributes = document.getElementById("tableBody").getElementsByTagName("tr");
+	while (swapsMade){
+		swapsMade = false;
+		if (ascending){
+			for(var i = 0; i < attributes.length - 1; i++){
+				var currentRowValue = parseInt(attributes[i].getElementsByTagName("td")[productColumnIndex + 2].innerText);
+				var nextRowValue = parseInt(attributes[i + 1].getElementsByTagName("td")[productColumnIndex + 2].innerText);
+				if(currentRowValue > nextRowValue){
+					console.log("a swap is made ascending");
+					//swapping rows
+					var theTableOfRows = attributes[i].parentNode;
+					attributes[i].parentNode.insertBefore(attributes[i + 1], attributes[i]);
+					swapsMade = true;
+				}
+			}
+		} else {
+			for(var i = 0; i < attributes.length - 1; i++){
+				var currentRowValue = parseInt(attributes[i].getElementsByTagName("td")[productColumnIndex + 2].innerText);
+				var nextRowValue = parseInt(attributes[i + 1].getElementsByTagName("td")[productColumnIndex + 2].innerText);
+				if(currentRowValue < nextRowValue){
+					console.log("a swap is made descending");
+					//swapping rows
+					var theTableOfRows = attributes[i].parentNode;
+					attributes[i].parentNode.insertBefore(attributes[i + 1], attributes[i]);
+					swapsMade = true;
+				}
+			}
+		}
+	}
+}
+
+
+function sortTableRowsBroken(productAttributes, ascending){
+	var temp = {};
+	var swapsMade = true;
+	var attributes = document.getElementById("tableBody").getElementsByTagName("tr");
+	
+	while (swapsMade){
+		swapsMade = false;
+		if (ascending){
+			for(var i = 0; i < productAttributes.length - 1; i++){
+				if(productAttributes[i].value > productAttributes[i + 1].value){
+					console.log("a swap is made ascending");
+					//swapping attributes
+					temp = productAttributes[i];
+					productAttributes[i] = productAttributes[i + 1];
+					productAttributes[i + 1] = temp;
+					//swapping rows				
+					//var row = attributes[i];
+					//var nextRow = attributes[i + 1];
+					console.log("row before");
+					console.log(attributes[i].getElementsByTagName("td")[2].innerText);
+					console.log("nextRow before");
+					console.log(attributes[i + 1].getElementsByTagName("td")[2].innerText);
+					var theTableOfRows = attributes[i].parentNode;
+					attributes[i].parentNode.insertBefore(attributes[i + 1], attributes[i]);
+					swapsMade = true;
+					
+					console.log("row after");
+					console.log(attributes[i].getElementsByTagName("td")[2].innerText);
+					console.log("nextRow after");
+					console.log(attributes[i + 1].getElementsByTagName("td")[2].innerText);
+				}
+			}
+		} else {
+			for(var i = 0; i < productAttributes.length - 1; i++){
+				if(productAttributes[i].value < productAttributes[i + 1].value){
+					console.log("swap made descending");
+					//swapping attributes
+					temp = productAttributes[i];
+					productAttributes[i] = productAttributes[i + 1];
+					productAttributes[i + 1] = temp;
+					//swapping rows				
+					var theTableOfRows = attributes[i].parentNode;
+					//this works in console where attributes is defined as above
+					attributes[i].parentNode.insertBefore(attributes[i], attributes[i + 1]);
+					swapsMade = true;
+				}
+			}
+		}
+	}
+}
+
+var product1 = getProductAttributes(2);
+
+//product1 = ascendingProductAttributes(product1);
+//sortTableRows(product1);
+//sortTableRows(product1, true);
+var product2 = getProductAttributes(3);
 
 // unused
 //adds a row to the table using the data given
@@ -172,6 +246,80 @@ function addRow(elementsToAdd){
 }
 
 ///////////////////////////////// unused////////////////////////////////////////////////////
+
+
+function ascendingProductAttributes(productAttributes){
+	var temp = {};
+	var swapsMade = true;
+	while (swapsMade){
+		swapsMade = false;
+		for(var i = 0; i < productAttributes.length - 1; i++){
+			console.log("comparing " + productAttributes[i].value + " " + productAttributes[i + 1].value);
+			console.log("indexes " + i + " " + (i + 1));
+			console.log(productAttributes[i].value + " > " + productAttributes[i + 1].value + (productAttributes[i].value > productAttributes[i + 1].value));
+			
+			console.log(typeof productAttributes[i].value + " " + typeof productAttributes[i + 1].value); 
+			if(productAttributes[i].value > productAttributes[i + 1].value){
+				console.log(productAttributes[i].value + " > " + productAttributes[i + 1].value);
+				temp = productAttributes[i];
+				productAttributes[i] = productAttributes[i + 1];
+				productAttributes[i + 1] = temp;
+				console.log(productAttributes[i].value +" " + productAttributes[i+1].value);
+				swapsMade = true;
+			}
+		}
+	}
+	return productAttributes;
+}
+
+
+//unused
+function NOTsortTable(keysInOrder){
+	var attributes = document.getElementById("tableBody").getElementsByTagName("tr");
+	//store each row in the json object product (key: attribute name, value: attribute value for that product)
+	for (var attributeIndex = 0; attributeIndex < attributes.length; attributeIndex++){
+		var currentAttribute = attributes[attributeIndex].getElementsByTagName("td");
+		//get key and value for the product
+		var currentAttributeKey = currentAttribute[0].innerText;
+		var currentOrderedKey = keysInOrder[attributeIndex].key;
+		console.log(currentAttributeKey);
+		console.log(currentOrderedKey);
+		if (currentOrderedKey != currentAttributeKey){
+			var indexToMoveAttributeKeyTo = -1;
+			//find index key which matches currentOrderedKey
+			for(var j = 0; j < attributes.length; j++){
+				var currentAttribute = attributes[attributeIndex].getElementsByTagName("td");
+				//get key and value for the product
+				var currentAttributeKey = currentAttribute[0].innerText;
+				if (currentAttributeKey == currentOrderedKey){
+					indexToMoveAttributeKeyTo = j;
+				}
+			}
+			console.log("not the same...where to move");
+			console.log("move table key from index " + indexToMoveAttributeKeyTo + " to " + attributeIndex);
+		}
+	}
+	
+	//var parentNode = rows[RowLocation].parentNode;
+	//parentNode.insertBefore(rows[RowLocation], rows[RowLocation - 1]);
+}
+function descendingProductAttributes(productAttributes){
+	var temp = {};
+	var swapsMade = true;
+	while (swapsMade){
+		swapsMade = false;
+		for(var i = 0; i < productAttributes.length - 1; i++){
+			if(productAttributes[i].value < productAttributes[i + 1].value){
+				temp = productAttributes[i];
+				productAttributes[i] = productAttributes[i + 1];
+				productAttributes[i + 1] = temp;
+				console.log(productAttributes[i].value +" " + productAttributes[i+1].value);
+				swapsMade = true;
+			}
+		}
+	}
+	return productAttributes;
+}
 function addRow(elementsToAdd){
     var numberOfElementsInARow = getNumberOfCellsInARow();
     var newRowIndex = getNumberOfExistingTableRows();
