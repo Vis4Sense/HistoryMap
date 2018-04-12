@@ -85,6 +85,10 @@ historyMap.model.tabs = {
     getTab: function(tabId) {
         return this.tabArray.find(item => item.tabId == tabId);
     },
+	
+	getId: function(tabId){
+		return this.getTab(tabId).node.id;
+	}
 }
 
 historyMap.model.sessions = {

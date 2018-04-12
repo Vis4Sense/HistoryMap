@@ -158,17 +158,18 @@ historyMap.controller.browser = function () {
 		// because two updates can happen in a very short time, thus the second one
 		// happens even before a new action is added in the first update
 		var action;
+		var tabsLatestNodeId = htabs.getId(tab.id);
 		if (type === 'highlight') {
-			action = createActionObject(tab.id, tab.url, text, type, undefined, path, classId, tab2nodeId[tab.id], undefined, false);
+			action = createActionObject(tab.id, tab.url, text, type, undefined, path, classId, tabsLatestNodeId, undefined, false);
 		} else if (type === 'save-image') {
-			action = createActionObject(tab.id, tab.url, undefined, type, undefined, undefined, undefined, tab2nodeId[tab.id], pic, true);
-			onImageSaved(tab2nodeId[tab.id], pic);
+			action = createActionObject(tab.id, tab.url, undefined, type, undefined, undefined, undefined, tabsLatestNodeId, pic, true);
+			onImageSaved(tabsLatestNodeId, pic);
 		} else if (type === 'remove-image') {
-			onImageRemoved(tab2nodeId[tab.id], pic);
+			onImageRemoved(tabsLatestNodeId, pic);
 			//no need to actually create a "remove image" action?
 			//action = createActionObject(tab.id, tab.url, undefined, type, undefined, undefined, undefined, tab2nodeId[tab.id], pic, true);
 		} else if (type === 'note') {
-			action = createActionObject(tab.id, tab.url, text, "note", undefined, path, classId, tab2nodeId[tab.id], undefined, false);
+			action = createActionObject(tab.id, tab.url, text, "note", undefined, path, classId, tabsLatestNodeId, undefined, false);
 		}
 		return action;
 	}
@@ -194,7 +195,7 @@ historyMap.controller.browser = function () {
 
 		if (pic) {
 			action.value = pic;
-			action.id = tab2nodeId[tabId];
+			action.id = from;
 		}
 		if (!isEmbeddedType(type)) {
 			// End time
@@ -207,8 +208,6 @@ historyMap.controller.browser = function () {
 		lastDate = time;
 
 		// Referrer
-		//cant use if(action.from) because action.from = node.id,
-		//which has range of 0 to n  
 		if (typeof from !== "undefined") {
 			action.from = from;
 		} else {
@@ -216,8 +215,9 @@ historyMap.controller.browser = function () {
 				action.from = tab2nodeId[tabId];
 			}
 		}
+
 		historyMap.model.nodes.addNode(action);
-		nodeId++;
+		//nodeId++;
 		return action;
 	}
 
