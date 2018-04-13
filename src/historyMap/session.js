@@ -1,6 +1,3 @@
-// Made by Reday Yahya | @RedayY
-// JavaScript Document for Save and Load Control
-
 let SessionName;
 let SessionProfile;
 let debug_test_result;
@@ -20,7 +17,7 @@ $(function () {
         newHistoryMap();
     });
     $('#btn_load').click(function () {
-        historyMap.API.DBLoad.displaySessions();
+        historyMap.database.sessions.displaySessions();
     });
     $('#btn_logout').click(function () {
         chrome.runtime.sendMessage({
@@ -70,7 +67,7 @@ function btnDisplay() {
         document.getElementById("btn_login").style.display = "none";
         document.getElementById("btn_logout").style.display = "initial";
         document.getElementById('userImage').style.display = "initial";
-        userImage.src = historyMap.model.user.image.url;
+        userImage.src = historyMap.database.user.profile.image.url;
 
         //checks if User has Sessions Saved, displays load if true
 
@@ -125,16 +122,15 @@ function newHistoryMap() {
 
             $(function () {
                 $('#btn_new_sess').click(function () {
-                    historyMap.API.DBSave.newSession();
+                    historyMap.database.sessions.newSession();
                 })
             });
         }
     }
 }
 
-
 //This loads the Sessions in a menu
-historyMap.API.DBLoad.displaySessions = function () {
+historyMap.database.sessions.displaySessions = function () {
 
     document.getElementById("btn_load").setAttribute("disabled", "disabled");
 
@@ -158,18 +154,16 @@ historyMap.API.DBLoad.displaySessions = function () {
 
     // Adding listener to trigger when Select makes a change also reset interface for next load
     document.getElementById("mySelect").addEventListener("change", function (e) {
-        historyMap.API.DBLoad.setSelectedSession();
-        document.getElementById("mySelect").remove();
+        historyMap.database.user.setSelectedSession();
         document.getElementById("btn_load").setAttribute("enabled", "enabled");
     });
 
     // Create event and fire it.
     var changeEvent = document.createEvent("HTMLEvents");
     changeEvent.initEvent("change", true, true);
-
 };
 
-historyMap.API.DBSave.newSession = function () {
+historyMap.database.sessions.newSession = function () {
     SessionName = document.getElementById('sessionName').value;
     document.getElementById("sessionName").remove();
     document.getElementById("btn_new_sess").remove();
@@ -179,7 +173,7 @@ historyMap.API.DBSave.newSession = function () {
     //Looping thorugh SessionProfile
     if (typeof SessionProfile == 'undefined' || SessionProfile == null) {
         console.log("Saving Session: " + SessionName);
-        historyMap.API.DBSave.pushSessToDB();
+        historyMap.database.user.pushSessToDB();
     } else {
         var noDuplicate = true;
 
@@ -195,15 +189,15 @@ historyMap.API.DBSave.newSession = function () {
         if (noDuplicate) {
             //Pushes Session to DB
             console.log("Saving Session: " + SessionName);
-            historyMap.API.DBSave.pushSessToDB();
+            historyMap.database.user.pushSessToDB();
         }
     }
 
 }
 
 //This connects to the API and loads user sessions and stores it in HistoryMapModel
-historyMap.API.DBLoad.loadUserSessions = function () {
-    var url = baseURL + "session/" + up.email + "/" + APIKey;
+historyMap.database.sessions.loadUserSessions = function () {
+    var url = baseURL + "session/" + db.user.profile.email + "/" + historyMap.database.user.APIKey;
     var xhr = new XMLHttpRequest()
     xhr.open('GET', url, true)
     xhr.onload = function () {
@@ -212,56 +206,9 @@ historyMap.API.DBLoad.loadUserSessions = function () {
             //picking out Session Information from User Account
             SessionProfile = users["sessions"];
             historyMap.model.sessions = SessionProfile;
+            db.user.SessionProfile = users["sessions"];
             btnDisplay();
         } else {}
     }
     xhr.send(null);
 }
-
-//Use this function to load Sessions into history map, requires Session Data to be used.
-historyMap.API.DBLoad.setSelectedSession = function () {
-
-    //fetches value from select list
-    select_Val = document.getElementById("mySelect").value;
-    document.getElementById("mySelect").remove();
-    document.getElementById('btn_load').disabled = false;
-
-    for (var i = 0; i => SessionProfile.length; i++) {
-        if (SessionProfile[i]._id == select_Val) {
-            var result = SessionProfile[i];
-            console.log(result);
-            historyMap.API.DBLoad.loadSelectedSession(result);
-            break;
-        }
-    }
-}
-
-//Function for loading
-historyMap.API.DBLoad.loadSelectedSession = function (i) {
-
-    //Clear Previous Values
-    nodes.length = 0;
-    SessionName = "";
-
-    //set new values
-    tempTree = CircularJSON.parse(i.nodes);
-    historyMap.model.tree = tempTree;
-
-    //reload history map
-    historyMapView.width(window.innerWidth).height(window.innerHeight);
-    d3.select('.sm-history-map-container').datum(historyMap.model.tree).call(historyMapView);
-
-    //Set Values to Historymap from Session of Choice for save and load
-    SessionName = i.name;
-    DBSessionPointer = i._id;
-};
-
-//Force logout upon closing
-window.onbeforeunload = function () {
-    chrome.runtime.sendMessage({
-        text: 'logout',
-        function (response) {
-            console.log('response from login.js', response.text);
-        }
-    });
-};

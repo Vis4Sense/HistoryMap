@@ -55,7 +55,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 
 		// Create an instance of the history map
-		// if (ProfileName = localStorage.getItem('ProfileName') !== null) {
 			chrome.windows.create({
 				url: url,
 				type: 'popup',
@@ -72,10 +71,6 @@ document.addEventListener('DOMContentLoaded', function () {
 					focused: true
 				});
 			});
-		// }
-		// else {
-		// 	google_Login();
-		// }
 
 		// Listen to content script
 		chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {

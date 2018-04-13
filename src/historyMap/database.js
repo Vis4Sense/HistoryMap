@@ -1,13 +1,7 @@
 let DBnodes = [];
-let UserProfile;
-let ProfileName;
-let up;
-let UserEmail;
-let APIKey;
-
 let db = historyMap.database;
 
-function User (name, profile, email) {
+function User(name, profile, email) {
     this.name = name;
     this.profile = profile;
     this.email = email;
@@ -16,17 +10,17 @@ function User (name, profile, email) {
 db.user = {
 
     profile: {},
-    
-    addUser: function(user) {
-        
+
+    addUser: function (user) {
+
         this.profile = user;
 
         var newUser = {
             "name": user.name,
             "email": user.email,
-            "info": JSON.stringify(Object.values(user)), // why use object.values()?
+            "info": JSON.stringify(user),
         };
-    
+
         // Adding the User to the DB
         var url = baseURL + "userinsert/";
         var json = JSON.stringify(newUser);
@@ -35,24 +29,55 @@ db.user = {
         xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
         xhr.onload = function () {
             var users = JSON.parse(xhr.responseText);
-            historyMap.API.DBLoad.getUACKey();
+            historyMap.database.user.getUACKey();
         }
         xhr.send(json);
     }
+
 }
 
-//Gets Info direct from login instead of local storage (thank you kai, used your code to make it work)
-//However, with this new logic, it only sends those via authentication. Authentication now runs onload.
-//I think we should make a "Create Session Button". 
-//This will initialize and setup the backend and ask the user to login
+
+//Use this function to load Sessions into history map, requires Session Data to be used.
+historyMap.database.user.setSelectedSession = function () {
+
+    //fetches value from select list
+    select_Val = document.getElementById("mySelect").value;
+    document.getElementById("mySelect").remove();
+    document.getElementById('btn_load').disabled = false;
+
+    for (var i = 0; i => SessionProfile.length; i++) {
+        if (SessionProfile[i]._id == select_Val) {
+            var result = SessionProfile[i];
+            console.log(result);
+            historyMap.database.sessions.loadSelectedSession(result);
+            break;
+        }
+    }
+}
+
+//Function for loading
+historyMap.database.sessions.loadSelectedSession = function (i) {
+
+    //Clear Previous Values
+    nodes.length = 0;
+    SessionName = "";
+
+    //set new values
+    tempTree = CircularJSON.parse(i.nodes);
+    historyMap.model.tree = tempTree;
+
+    //reload history map
+    historyMapView.width(window.innerWidth).height(window.innerHeight);
+    d3.select('.sm-history-map-container').datum(historyMap.model.tree).call(historyMapView);
+
+    //Set Values to Historymap from Session of Choice for save and load
+    SessionName = i.name;
+    DBSessionPointer = i._id;
+};
+
+//Sets Values to HistoryMap.database.user Object
 chrome.runtime.onMessage.addListener(function (request) {
     if (request.text === 'loggedin') {
-        
-        // ProfileName = request.user.name;
-        // up = request.user;
-        // UserEmail = request.user.email;
-
-        // historyMap.API.DBSave.DBaddUser();
         db.user.addUser(request.user);
     }
 });
@@ -62,10 +87,10 @@ var baseURL = "https://sensemap-api.herokuapp.com/";
 let DBSessionPointer;
 
 //gets UACkey from DB // will be moved to historyMap.model
-historyMap.API.DBLoad.getUACKey = function () {
+historyMap.database.user.getUACKey = function () {
 
     //adjusted route
-    var url = baseURL + "userGenerateAccessKey/" + UserEmail + "/";
+    var url = baseURL + "userGenerateAccessKey/" + db.user.profile.email + "/";
     var xhr = new XMLHttpRequest();
     xhr.open("PUT", url, true);
     xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
@@ -73,18 +98,18 @@ historyMap.API.DBLoad.getUACKey = function () {
         var users = JSON.parse(xhr.responseText);
         if (xhr.readyState == 4 && xhr.status == "200") {
             //adjusted field name to accesskey 
-            APIKey = users.accesskey;
-            localStorage.setItem("APIKey", APIKey);
-            localStorage.setItem("UserEmail", UserEmail);
-            historyMap.API.DBLoad.loadUserSessions();
+            historyMap.database.user.APIKey = users.accesskey;
+            localStorage.setItem("APIKey", db.user.APIKey);
+            localStorage.setItem("UserEmail", db.user.profile.email);
+            historyMap.database.sessions.loadUserSessions();
             btnDisplay();
         } else {}
     }
     xhr.send();
 }
 
-historyMap.API.DBSave.pushSessToDB = function () {
-    var url = baseURL + "session/" + UserEmail + "/" + APIKey;
+historyMap.database.user.pushSessToDB = function () {
+    var url = baseURL + "session/" + db.user.profile.email + "/" + historyMap.database.user.APIKey;
     var data = {};
     data.name = SessionName;
     var json = JSON.stringify(data);
@@ -96,18 +121,17 @@ historyMap.API.DBSave.pushSessToDB = function () {
         if (xhr.readyState == 4 && xhr.status == "201") {} else {
             var indexNo = users["sessions"].length - 1;
             DBSessionPointer = users["sessions"][indexNo]._id;
-            UserProfile = users["sessions"];
         }
     }
     xhr.send(json);
 }
 
-historyMap.API.DBSave.DBaddUser = function () {
+historyMap.database.user.DBaddUser = function () {
     //Creating the Object for the DB
     var new_stuff = {
-        "name": up.name,
-        "email": up.email,
-        "info": JSON.stringify(Object.values(up)),
+        "name": db.user.profile.name,
+        "email": db.user.profile.email,
+        "info": JSON.stringify(Object.values(db.user.profile)),
     };
 
     // Adding the User to the DB
@@ -118,16 +142,16 @@ historyMap.API.DBSave.DBaddUser = function () {
     xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
     xhr.onload = function () {
         var users = JSON.parse(xhr.responseText);
-        historyMap.API.DBLoad.getUACKey();
+        historyMap.database.user.getUACKey();
     }
     xhr.send(json);
 }
 
-historyMap.API.DBSave.Node2DB = function () {
+historyMap.database.user.Tree2DB = function () {
 
     //gets HistoryMapTree
     let currentTree = historyMap.model.tree;
-    var url = baseURL + "sessionupdate/" + DBSessionPointer + "/" + APIKey + "/";
+    var url = baseURL + "sessionupdate/" + DBSessionPointer + "/" + historyMap.database.user.APIKey + "/";
     var json = CircularJSON.stringify(currentTree);
     // console.log(json);
     var xhr = new XMLHttpRequest();
@@ -143,3 +167,34 @@ historyMap.API.DBSave.Node2DB = function () {
     }
     xhr.send(json);
 }
+
+historyMap.database.user.Node2DB = function () {
+
+    //gets HistoryMapTree
+    let currentTree = historyMap.model.tree;
+    var url = baseURL + "sessionupdate/" + DBSessionPointer + "/" + historyMap.database.user.APIKey + "/";
+    var json = CircularJSON.stringify(currentTree);
+    // console.log(json);
+    var xhr = new XMLHttpRequest();
+    xhr.open("PUT", url, true);
+    xhr.setRequestHeader('Content-type', 'text/plain; charset=utf-8');
+    xhr.onload = function () {
+        var users = xhr.responseText;
+        if (xhr.readyState == 4 && xhr.status == "200") {
+            console.table(users);
+        } else {
+            console.error(users);
+        }
+    }
+    xhr.send(json);
+}
+
+//Force logout upon closing
+window.onbeforeunload = function () {
+    chrome.runtime.sendMessage({
+        text: 'logout',
+        function (response) {
+            console.log('response from login.js', response.text);
+        }
+    });
+};
