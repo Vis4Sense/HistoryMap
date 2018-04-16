@@ -1,0 +1,21 @@
+table, th, td {
+	border: 1px solid black;
+	border-collapse: collapse;
+}
+
+input {
+	width: 100%;
+}
+
+.largerTableCell {
+	background-color: hsl(120, 100%, 50%);
+}
+
+.smallerTableCell {
+	background-color: hsl(0, 100%, 50%);
+}
+
+.equalTableCell {
+	background-color: hsl(49, 100%, 50%);
+    /*hsl(49, 100%, 27%)*/
+}

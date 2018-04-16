@@ -34,6 +34,19 @@ document.getElementById("sortProduct2Descending").addEventListener("click", func
 	sortTableRows(false, 1);
 });
 
+document.getElementById("groupBetterProduct1").addEventListener("click", function(){
+	groupHighsAndLows(2);
+});
+
+document.getElementById("groupBetterProduct2").addEventListener("click", function(){
+	groupHighsAndLows(3);
+});
+
+document.onkeyup=function (e){
+	removeCellColours();
+	applyStyling();
+}
+
 function getNumberOfCellsInARow(){
     var theHeaderRow = document.getElementById('tableHeader').getElementsByTagName("th");
     return theHeaderRow.length;
@@ -41,7 +54,6 @@ function getNumberOfCellsInARow(){
 
 //adds an empty editable row at the end of the table 
 function addEmptyRow(){
-    console.log("running add e row");
     var numberOfElementsInARow = getNumberOfCellsInARow();
     var newRowIndex = getNumberOfExistingTableRows();
     var theTable = document.getElementById('testTable');
@@ -50,7 +62,6 @@ function addEmptyRow(){
     for(var i = 0; i < numberOfElementsInARow; i++){
         var newCell = newRow.insertCell(i);
         newCell.setAttribute("contenteditable", "true");
-        //contenteditable='true'
     }
 }
 
@@ -117,6 +128,27 @@ function getProductAttributes(productColumnIndex){
 	return arrayOfAttributes;
 }
 
+//checks which attributes are better for the product and bubbles them to the top
+function groupHighsAndLows(productColumnIndex){
+	console.log("running group high and low");
+	var attributes = document.getElementById("tableBody").getElementsByTagName("tr");
+	var swapsMade = true;
+	while(swapsMade == true){
+		for (var attributeIndex = 0; attributeIndex < attributes.length - 1; attributeIndex++){
+			swapsMade = false;
+			var currentAttribute = attributes[attributeIndex].getElementsByTagName("td")[productColumnIndex];
+			var nextAttribute = attributes[attributeIndex + 1].getElementsByTagName("td")[productColumnIndex];
+			var smallerToEqualOrLarge = (currentAttribute.classList.contains("smallerTableCell") && (nextAttribute.classList.contains("largerTableCell") || nextAttribute.classList.contains("equalTableCell")));
+			var equalToLarge = (currentAttribute.classList.contains("equalTableCell") && nextAttribute.classList.contains("largerTableCell"));
+			if(smallerToEqualOrLarge || equalToLarge){
+				//this row has an adjacent cell that is smaller next row
+				swapsMade=true;
+				var theTableOfRows = attributes[attributeIndex].parentNode;
+				attributes[attributeIndex].parentNode.insertBefore(attributes[attributeIndex + 1], attributes[attributeIndex]);
+			}
+		}
+	}
+}
 
 //converts nested products object to an array of products 
 function convertToArray(JsonData){
@@ -134,6 +166,8 @@ function convertToArray(JsonData){
 }
 
 setAllTableCellsToEditable();
+removeCellColours();
+applyStyling();
 
 function sortTableRows(ascending, productColumnIndex){
 	var temp = {};
@@ -169,64 +203,43 @@ function sortTableRows(ascending, productColumnIndex){
 	}
 }
 
+function removeCellColours(){
+	var cells = document.getElementById("tableBody").getElementsByTagName("td");
+	for (var i = 0; i < cells.length;i++){
+		cells[i].classList.remove("smallerTableCell");
+		cells[i].classList.remove("largerTableCell");
+		cells[i].classList.remove("equalTableCell");
+	}
+}
 
-function sortTableRowsBroken(productAttributes, ascending){
-	var temp = {};
-	var swapsMade = true;
+function applyStyling(){
+	//check each row for the higher value
 	var attributes = document.getElementById("tableBody").getElementsByTagName("tr");
-	
-	while (swapsMade){
-		swapsMade = false;
-		if (ascending){
-			for(var i = 0; i < productAttributes.length - 1; i++){
-				if(productAttributes[i].value > productAttributes[i + 1].value){
-					console.log("a swap is made ascending");
-					//swapping attributes
-					temp = productAttributes[i];
-					productAttributes[i] = productAttributes[i + 1];
-					productAttributes[i + 1] = temp;
-					//swapping rows				
-					//var row = attributes[i];
-					//var nextRow = attributes[i + 1];
-					console.log("row before");
-					console.log(attributes[i].getElementsByTagName("td")[2].innerText);
-					console.log("nextRow before");
-					console.log(attributes[i + 1].getElementsByTagName("td")[2].innerText);
-					var theTableOfRows = attributes[i].parentNode;
-					attributes[i].parentNode.insertBefore(attributes[i + 1], attributes[i]);
-					swapsMade = true;
-					
-					console.log("row after");
-					console.log(attributes[i].getElementsByTagName("td")[2].innerText);
-					console.log("nextRow after");
-					console.log(attributes[i + 1].getElementsByTagName("td")[2].innerText);
-				}
-			}
-		} else {
-			for(var i = 0; i < productAttributes.length - 1; i++){
-				if(productAttributes[i].value < productAttributes[i + 1].value){
-					console.log("swap made descending");
-					//swapping attributes
-					temp = productAttributes[i];
-					productAttributes[i] = productAttributes[i + 1];
-					productAttributes[i + 1] = temp;
-					//swapping rows				
-					var theTableOfRows = attributes[i].parentNode;
-					//this works in console where attributes is defined as above
-					attributes[i].parentNode.insertBefore(attributes[i], attributes[i + 1]);
-					swapsMade = true;
-				}
+	var productColumnIndex = 2;
+	var maxNumberOfProducts = attributes[0].getElementsByTagName("td").length;
+	var numberOfProducts = maxNumberOfProducts - productColumnIndex;
+	if (numberOfProducts == 2){
+		//for each row
+		for(var i = 0; i < attributes.length; i++){
+			var firstProductValue = parseInt(attributes[i].getElementsByTagName("td")[productColumnIndex].innerText);
+			var secondProductValue = parseInt(attributes[i].getElementsByTagName("td")[productColumnIndex + 1].innerText);
+			var firstCell = attributes[i].getElementsByTagName("td")[productColumnIndex];
+			var secondCell = attributes[i].getElementsByTagName("td")[productColumnIndex + 1];
+			console.log(firstProductValue + " >? " + secondProductValue);
+			if(firstProductValue > secondProductValue){
+				firstCell.classList.add("largerTableCell");
+				secondCell.classList.add("smallerTableCell");
+			} else if(secondProductValue > firstProductValue) {
+				secondCell.classList.add("largerTableCell");
+				firstCell.classList.add("smallerTableCell");
+			} else {
+				firstCell.classList.add("equalTableCell");
+				secondCell.classList.add("equalTableCell");
 			}
 		}
 	}
 }
 
-var product1 = getProductAttributes(2);
-
-//product1 = ascendingProductAttributes(product1);
-//sortTableRows(product1);
-//sortTableRows(product1, true);
-var product2 = getProductAttributes(3);
 
 // unused
 //adds a row to the table using the data given
