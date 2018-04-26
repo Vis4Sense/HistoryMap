@@ -19,3 +19,34 @@ input {
 	background-color: hsl(49, 100%, 50%);
     /*hsl(49, 100%, 27%)*/
 }
+
+.button {
+    display: inline-block;
+    /*float: right;*/
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    border: 0.5px solid;
+    border-color: #ccc;
+    border-radius: 5px;
+
+    /*
+	color: #333;
+    background-color: #fff;
+	*/
+	color: #333;
+    background-color: #f0f0f0;
+	
+    padding: 5px 10px;
+    font-size: 19px;
+    line-height: 1.5;
+}
+
+button:hover {
+    /*
+	color: #333;
+    background-color: #e6e6e6;
+	*/
+	color: #333;
+    background-color: #d0d0d0;
+}
