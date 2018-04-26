@@ -47,6 +47,43 @@ document.onkeyup=function (e){
 	applyStyling();
 }
 
+
+function registerTableHeaderOnClickListeners(){
+    var headers = document.getElementById("tableHeader").getElementsByTagName("th");
+	var theText = "";
+	var productColumn = 0;
+	for(var i = 2; i < headers.length; i++){
+		productColumn = i - 2;
+		//initially add ascending to the product headers
+		headers[i].innerText += " (Asc )";
+		headers[i].onclick = function (e) {
+		   e = e || window.event;
+		   var th = e.target || e.srcElement;
+		   productColumn = parseInt(th.id);
+		   console.log("ascending : ", isAscending(th.innerText));
+		   console.log("productColumn ", productColumn);
+		   //replace ascending with descending and vice versa on click
+		   if (isAscending(th.innerText)){
+			   th.innerText = th.innerText.replace("Asc ", "Desc");
+			   sortTableRows(true, productColumn);
+		   } else {
+			   th.innerText = th.innerText.replace("Desc", "Asc ");
+			   sortTableRows(false, productColumn);
+		   }
+	   }
+	}
+}
+
+function isAscending(theText){
+	var substring = "Asc";
+	console.log(theText.indexOf(substring));
+	if(theText.indexOf(substring) !== -1){
+		return true;
+	} else {
+		return false;
+	}
+}
+
 function getNumberOfCellsInARow(){
     var theHeaderRow = document.getElementById('tableHeader').getElementsByTagName("th");
     return theHeaderRow.length;
@@ -168,8 +205,10 @@ function convertToArray(JsonData){
 setAllTableCellsToEditable();
 removeCellColours();
 applyStyling();
+registerTableHeaderOnClickListeners();
 
 function sortTableRows(ascending, productColumnIndex){
+	console.log(productColumnIndex);
 	var temp = {};
 	var swapsMade = true;
 	var attributes = document.getElementById("tableBody").getElementsByTagName("tr");
