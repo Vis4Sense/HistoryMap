@@ -18,22 +18,6 @@ document.getElementById("visualiseImprovedRadarChart").addEventListener("click",
     chrome.runtime.sendMessage({type: "visualiseData", chart: "radarImproved", data: productArray});
 });
 
-document.getElementById("sortProduct1Ascending").addEventListener("click", function(){
-	sortTableRows(true, 0);
-});
-
-document.getElementById("sortProduct1Descending").addEventListener("click", function(){
-	sortTableRows(false, 0);
-});
-
-document.getElementById("sortProduct2Ascending").addEventListener("click", function(){
-	sortTableRows(true, 1);
-});
-
-document.getElementById("sortProduct2Descending").addEventListener("click", function(){
-	sortTableRows(false, 1);
-});
-
 document.getElementById("groupBetterProduct1").addEventListener("click", function(){
 	groupHighsAndLows(2);
 });
@@ -208,7 +192,6 @@ applyStyling();
 registerTableHeaderOnClickListeners();
 
 function sortTableRows(ascending, productColumnIndex){
-	console.log(productColumnIndex);
 	var temp = {};
 	var swapsMade = true;
 	var attributes = document.getElementById("tableBody").getElementsByTagName("tr");
@@ -216,8 +199,8 @@ function sortTableRows(ascending, productColumnIndex){
 		swapsMade = false;
 		if (ascending){
 			for(var i = 0; i < attributes.length - 1; i++){
-				var currentRowValue = parseInt(attributes[i].getElementsByTagName("td")[productColumnIndex + 2].innerText);
-				var nextRowValue = parseInt(attributes[i + 1].getElementsByTagName("td")[productColumnIndex + 2].innerText);
+				var currentRowValue = parseInt(attributes[i].getElementsByTagName("td")[productColumnIndex].innerText);
+				var nextRowValue = parseInt(attributes[i + 1].getElementsByTagName("td")[productColumnIndex].innerText);
 				if(currentRowValue > nextRowValue){
 					console.log("a swap is made ascending");
 					//swapping rows
@@ -228,8 +211,8 @@ function sortTableRows(ascending, productColumnIndex){
 			}
 		} else {
 			for(var i = 0; i < attributes.length - 1; i++){
-				var currentRowValue = parseInt(attributes[i].getElementsByTagName("td")[productColumnIndex + 2].innerText);
-				var nextRowValue = parseInt(attributes[i + 1].getElementsByTagName("td")[productColumnIndex + 2].innerText);
+				var currentRowValue = parseInt(attributes[i].getElementsByTagName("td")[productColumnIndex].innerText);
+				var nextRowValue = parseInt(attributes[i + 1].getElementsByTagName("td")[productColumnIndex].innerText);
 				if(currentRowValue < nextRowValue){
 					console.log("a swap is made descending");
 					//swapping rows
