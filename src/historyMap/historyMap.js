@@ -13,7 +13,8 @@ const historyMap = function () {
             redraw: {}
         },
         controller: {
-            browser: {}
+            browser: {},
+			highlightNodes:{}
         },
         API: {
             DBSave: {},
@@ -90,5 +91,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Provenance capture
     const historyMapController = historyMap.controller.browser();
+
+    const highlightNodes = historyMap.controller.highlightNodes();
 
 });
