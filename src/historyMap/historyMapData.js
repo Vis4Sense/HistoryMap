@@ -46,15 +46,15 @@ historyMap.model.nodes = {
         historyMap.view.redraw();
     },
 
+    //locates the original highlight(note), marks it as hidden
     hideNode: function (tabUrl, classId) {
-        //locates the original highlight(note), marks it as hidden
         var foundNode = this.nodeArray.find(a => (a.url === tabUrl) && (a.classId === classId));
         foundNode.hidden = true;
         return foundNode;
     },
 
+    //locates the original highlight(note), updates its text and/or type    
     updateType: function (typeUpdate) {
-        //locates the original highlight(note), updates its text and/or type
         if (typeUpdate.type === 'note') {
             var foundNode = this.nodeArray.find(a => a.classId === typeUpdate.classId)
             foundNode.text = typeUpdate.text;

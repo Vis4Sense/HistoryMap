@@ -73,16 +73,16 @@ historyMap.controller.highlightNodes = function () {
 	
 	//captures messages from background.js and contextMenu.js to update history map nodes with relevant node data
 	chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-		if (request.type === 'highlight') {
+		if (request.type === 'highlightHistoryMap') {
 			createNewAction(request.tab, 'highlight', request.text, request.path, request.classId);
-		} else if (request.type === 'save-image') {
+		} else if (request.type === 'save-image-HistoryMap') {
 			createNewAction(request.tab, 'save-image', request.text, request.path, request.classId, request.picture);
-		} else if (request.type === 'remove-image') {
+		} else if (request.type === 'remove-image-HistoryMap') {
 			createNewAction(request.tab, 'remove-image', request.text, request.path, request.classId, request.picture);
 		} else if (request.type === 'notedHistoryMap') {
 			createNewAction(request.tab, 'note', request.data.text, request.data.path, request.classId, request.picture);
 			historyMap.view.redraw();
-		} else if (request.type === 'removeHighlightSelection') {
+		} else if (request.type === 'removeHighlightSelectionHistoryMap') {
 			historyMap.model.nodes.hideNode(request.tabUrl, request.classId);
 			historyMap.view.redraw();
 		}

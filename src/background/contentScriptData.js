@@ -6,14 +6,14 @@ contentScript.model.urlToHighlight = {
 		return this.urlToHighlight;
 	},
 	
+    //ensures that at the very least an empty array is returned
 	getHighlights: function (url) {
-        //ensures that at the very least an empty array is returned
         this.prepareUrlForHighlights(url);
 		return this.urlToHighlight[url];
-	},
-	
+    },
+    
+	//adds highlighted text image or note
 	addHighlight: function (url, highlight) {
-		//adds highlighted text image or note
         this.prepareUrlForHighlights(url);
         var highlights = this.urlToHighlight[url];
         if (highlight.type === "highlightImage"){
@@ -24,13 +24,13 @@ contentScript.model.urlToHighlight = {
                 highlights.splice(foundNodeIndex, 1);
             }
         }
-		//pushes "highlightImage", "highlightSelection"(text) and "noted"(note)
+		//pushes "highlightImage", "highlightSelection"(text) or "noted"(note)
         highlights.push(highlight);
 		return highlights;
     },
     
+    //removes highlighted text(and note) or image
     removeHighlight: function(url, highlight) {
-		//removes highlighted text(and note) or image
         this.prepareUrlForHighlights(url);
         if (highlight.type === "removeHighlightImage"){
             var highlights = this.urlToHighlight[url];
@@ -39,9 +39,9 @@ contentScript.model.urlToHighlight = {
             if(foundNodeIndex > -1){
                 highlights.splice(foundNodeIndex, 1);
             }
+		//removes highlighted text or a note
         } else if (highlight.type === "highlightRemoved"){
             var highlights = this.urlToHighlight[url];
-			//found node could be highlighted text or a note
             var foundNode = highlights.find(a => a.classId === highlight.classId);
             var foundNodeIndex = highlights.indexOf(foundNode);
             if(foundNodeIndex > -1){
@@ -50,17 +50,17 @@ contentScript.model.urlToHighlight = {
         }
     },
     
+    //locates the original highlighted text, returns its X-path
     getHighlightTextPath: function(typeUpdate) {
-        //locates the original highlighted text, returns its X-path
         if (typeUpdate.type === 'note') {
             var highlights = this.urlToHighlight[typeUpdate.url];
             var foundNode = highlights.find(a => a.classId === typeUpdate.classId)
             return foundNode.path;
         }
     },
-
+    
+    //if url array does not exist, create one
     prepareUrlForHighlights: function (url) {
-        //if url array does not exist, create one
         if(!this.urlToHighlight[url]){
             this.urlToHighlight[url] = [];
         }

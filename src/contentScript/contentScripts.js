@@ -9,13 +9,10 @@ const contentScript = function () {
 }();
 
 loadHighlights  = function (url) {
-		// Get data from the extension
+		// Get data from the extension background.js
 		chrome.runtime.sendMessage({ type: "loadHighlights" }, function(response) {
-			console.log("*** load highlight response is not understood by chrome");
-			console.log(response);
 			if (!response) return;
 			response.forEach(function(d) {
-				console.log(d);
 				if (d.type === "highlightSelection") {
 					$.highlightPath(d.path, d.classId);
 				} else if (d.type === "note") {
@@ -25,7 +22,6 @@ loadHighlights  = function (url) {
 				}
 			});
 		});
-		console.log("loadHighlights listener has been registered");
 }
 
 //loadHighlights called by contentScriptController
