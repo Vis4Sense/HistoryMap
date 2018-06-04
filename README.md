@@ -1,20 +1,26 @@
-SenseMap
-========
+# Overview
 
-Chrome extension to supporting sensemaking through analytic provenance. SENSEMAP stands for SENSEMaking with Analytic Provenance. Have a look of this paper if you want to find out more about 'analytic provenance': https://kaixu.me/2015/03/16/analytic-provenance-for-sensemaking-a-research-agenda-cga-2015/
+HistoryMap is a Chrome extension designed to help mamange (many) opened tabs, or 'supporting sensemaking' in the context of academic research. As the name indicates, it creates a map of pages you visited, making it easier to find a visited page and understand how pages are linked. Also, you can easily find the important information with the highlight and annotation feature. If you are interested in the academic research, there is [more details here](http://vis4sense.github.io/sensemap/).
 
 
-Install
--------
+## Install
 
-There are two ways to install the sensemap in Chrome. It can be installed from the Chrome app shop, and there is a simple user guide here: http://vis4sense.github.io/sensemap/#guide. The second way is to install from the source in github. There are two branches: master and rebuild. 'master' has the same feature set as the chrome store one, whereas the 'rebuild' has a minimal set of functions. The instructions here will allow you to install either: https://developer.chrome.com/extensions/getstarted#unpacked
+Currently, the recommended way is to install from the source in github (please use the default 'rebuild-mvc' branch), becuase it is not fully completed yet. Follow [the steps here](https://blog.hunter.io/how-to-install-a-chrome-extension-without-using-the-chrome-web-store-31902c780034) ('Method 1: from the source code') if you are not familiar with installing Chrome extension from source code. It will be availalbe from the Chrome Web Store once completed.
 
-Testing
--------
+An older version is available in the [Chrome app store](https://chrome.google.com/webstore/detail/sensemap/agljnpanahlilmpipaeflmnjkiiecfjb) (called 'SenseMap'). This version lacks the 'user login' and 'saved sessions' in the new version, and quite a few bug fixes. The source code of this version is the 'master' branch. 
 
-The testing is runing in version 0.1.1 using the Jasmine library (https://jasmine.github.io/). This is a free video tutorial about how to use Jasmine: https://www.udacity.com/course/javascript-testing--ud549
+## Use
 
-We followed this example to make it work with Chrome Extension: https://gist.github.com/stevenqzhang/333fd0b2bca201aabaa40c7b63a74296
+[This video](https://vimeo.com/161322047) shows how HistoryMap works, with an introduction to sense-making. 
 
-To run the test, go the SenseMap ‘Options’ page, and click the ‘jasmine test page’ link. The spec runner page is ‘tests.html’.
+There is a simple user guide here: http://vis4sense.github.io/sensemap/#guide. 
 
+## Contribute
+
+There is more details on the [wikipage](https://github.com/Vis4Sense/HistoryMap/wiki) on how to contribute to the development. We currently need help on:
+- Improve the design, both the interface and user interaction;
+- Implementing [new features](https://github.com/Vis4Sense/HistoryMap/labels/improvement);
+- Testing and fixing [bugs](https://github.com/Vis4Sense/HistoryMap/labels/bug);
+- Machine learning, i.e., to better support the user by understanding what they try to do (e.g., buy a digital camera).
+
+Please use the [Issues](https://github.com/Vis4Sense/HistoryMap/issues) to **report [bugs](https://github.com/Vis4Sense/HistoryMap/labels/bug)** and **request [new features](https://github.com/Vis4Sense/HistoryMap/labels/improvement)**.
