@@ -326,7 +326,7 @@ historyMap.view.vis = function() {
                 var menu = d3.select(this).select('.show-all-highlights').classed('hide', d.children && zoomLevel.numChildren >= d.children.length),
                     menuRect = menu.node().getBoundingClientRect(),
                     nodeRect = this.getBoundingClientRect();
-                menu.style('left', (nodeRect.right > width - menuRect.width ? 1 - menuRect.width : d.width - 1) + 'px');
+                menu.style('left', ((nodeRect.right > width - menuRect.width ? 1 - menuRect.width : d.width - 1) -1) + 'px');
             }).on('mouseout', function() {
                 d3.select(this).select('.show-all-highlights').classed('hide', true);
             });

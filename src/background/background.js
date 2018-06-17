@@ -5,6 +5,7 @@ const contentScript = {
 	}
 }
 
+//updates the urlToHighlight (model) object with request from  
 function updateModel(request){
     var highlightToAdd;
 	var tabUrl = request.tabUrl;
@@ -27,7 +28,6 @@ function updateModel(request){
         highlightToAdd = {type: request.innerType, path:request.path, text: request.text, classId: request.classId};
         contentScript.model.urlToHighlight.addHighlight(tabUrl, highlightToAdd);
 	}
-	contentScript.model.urlToHighlight.displayState();
 	return returnInfo;
 }
 
@@ -72,11 +72,11 @@ document.addEventListener('DOMContentLoaded', function () {
 				});
 			});
 
-		// Listen to content script
-		chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-			 console.log("background got a message " + JSON.stringify(request));    
+		// Messages received from contentScript.js (or contentScript view: highlight.js)
+		chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {    
 			if (request.type === 'backgroundOpened') { // To respond that the background page is currently active
 				sendResponse({backgroundOpened: true, url: sender.tab.url});
+			//received from highlight.js
 			} else if (request.type === "noted") {
 				const typeUpdate = {
 					classId: request.data.classId,
@@ -84,29 +84,28 @@ document.addEventListener('DOMContentLoaded', function () {
 					type: 'note',
 					url: sender.tab.url
 				};
-				var modelInfo = {type: 'updateModel', innerType:'getXPathNoted', tabUrl: sender.tab.url, data: typeUpdate};
 				//extract X-path from the highlighted text node
-				var highlightPath = updateModel(modelInfo);
+				var getXPathRequest = {type: 'updateModel', innerType:'getXPathNoted', tabUrl: sender.tab.url, data: typeUpdate};
+				var highlightPath = updateModel(getXPathRequest);
 				typeUpdate.path = highlightPath;
 				//unique class id for note action
 				typeUpdate.classId = 'sm-' + (+new Date())
 				//add the note to the contentScript model
-				modelInfo = {type: 'updateModel', innerType: 'noted', tabUrl: typeUpdate.url, classId: typeUpdate.classId, path: typeUpdate.path, text: typeUpdate.text, url: typeUpdate.url};
+				var modelInfo = {type: 'updateModel', innerType: 'noted', tabUrl: typeUpdate.url, classId: typeUpdate.classId, path: typeUpdate.path, text: typeUpdate.text, url: typeUpdate.url};
 				updateModel(modelInfo);
 				chrome.runtime.sendMessage({type:'notedHistoryMap', data:typeUpdate, tab: sender.tab}, function (response) {
 				});
+			//received from highlight.js
 			} else if (request.type === "highlightRemoved"){
-				//received remove highlight from contentScript view (highlight.js)
 				var modelInfo = {type: 'updateModel', innerType:request.type, classId: request.classId, tabUrl: sender.tab.url};
 				updateModel(modelInfo);
-				chrome.runtime.sendMessage({type:'removeHighlightSelection', classId:request.classId, tabUrl: sender.tab.url}, function (response) {
+				chrome.runtime.sendMessage({type:'removeHighlightSelectionHistoryMap', classId:request.classId, tabUrl: sender.tab.url}, function (response) {
 				});
+			//returns (to contentScripts.js) all the highlights applied to a unique urls webpage 
 			} else if (request.type === "loadHighlights"){
 				var highlightsToLoad = contentScript.model.urlToHighlight.getHighlights(sender.tab.url);
 				sendResponse(highlightsToLoad);
 			}
-			//potentially used to make reponse asynchronous https://codereview.chromium.org/1874133002/diff/80001/chrome/common/extensions/docs/templates/articles/messaging.html
-			//return true;
 		});
 	});
 

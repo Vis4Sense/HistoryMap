@@ -11,7 +11,8 @@ const historyMap = function () {
             redraw: {}
         },
         controller: {
-            browser: {}
+            browser: {},
+			highlightNodes:{}
         },
         database: { // saving and loading the historyMap sessions
             user: {},
@@ -91,5 +92,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Provenance capture
     const historyMapController = historyMap.controller.browser();
+
+    const highlightNodes = historyMap.controller.highlightNodes();
 
 });
