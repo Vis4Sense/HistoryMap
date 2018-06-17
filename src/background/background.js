@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		// change the extension icon to the coloured one, which should be used when SenseMap is active
 
 		chrome.browserAction.setIcon({
-			path: "/logo/sm-logo-19.png"
+			path: "/logo/no-text-16.png"
 		});
 		const url = chrome.extension.getURL('src/historyMap/historyMap.html');
 		// Only allow a single instance of the history map

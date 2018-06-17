@@ -1,20 +1,22 @@
 {
     "manifest_version": 2,
 
-    "name": "SenseMap - Rebuild",
-    "description": "SenseMaking with Analytic Provenance",
-    "version": "0.1.3",
+    "name": "HistoryMap",
+    "description": "A map of the opened tabs and their links",
+    "version": "0.1",
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
 
     "browser_action": {
         "default_icon": {
-            "19": "logo/sm-logo-19-bw.png"
+            "16": "logo/no-text-bw-16.png"
         },
         "default_title": "Open SenseMap"
     },
 
     "icons": {
-      "128": "logo/sm-logo-128.png"
+      "16": "logo/no-text-16.png",
+      "48": "logo/no-text-48.png",
+      "128": "logo/no-text-128.png"
    },
 
     "background": {
