@@ -8,15 +8,15 @@
 
     "browser_action": {
         "default_icon": {
-            "16": "logo/HistoryMapIcon3-16px-bw.png"
+            "16": "logo/historymap16pxbw.png"
         },
         "default_title": "Open SenseMap"
     },
 
     "icons": {
-      "16": "logo/HistoryMapIcon3-16px.png",
-      "48": "logo/HistoryMapIcon3-48px.png",
-      "128": "logo/HistoryMapIcon3-128px.png"
+      "16": "logo/historymap16px.png",
+      "48": "logo/historymap48px.png",
+      "128": "logo/historymap128px.png"
    },
 
     "background": {
