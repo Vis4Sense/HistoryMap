@@ -147,26 +147,27 @@ historyMap.database.user.DBaddUser = function () {
     xhr.send(json);
 }
 
-historyMap.database.user.Tree2DB = function () {
+// duplication of Node2DB, not used
+// historyMap.database.user.Tree2DB = function () {
 
-    //gets HistoryMapTree
-    let currentTree = historyMap.model.tree;
-    var url = baseURL + "sessionupdate/" + DBSessionPointer + "/" + historyMap.database.user.APIKey + "/";
-    var json = CircularJSON.stringify(currentTree);
-    // console.log(json);
-    var xhr = new XMLHttpRequest();
-    xhr.open("PUT", url, true);
-    xhr.setRequestHeader('Content-type', 'text/plain; charset=utf-8');
-    xhr.onload = function () {
-        var users = xhr.responseText;
-        if (xhr.readyState == 4 && xhr.status == "200") {
-            console.table(users);
-        } else {
-            console.error(users);
-        }
-    }
-    xhr.send(json);
-}
+//     //gets HistoryMapTree
+//     let currentTree = historyMap.model.tree;
+//     var url = baseURL + "sessionupdate/" + DBSessionPointer + "/" + historyMap.database.user.APIKey + "/";
+//     var json = CircularJSON.stringify(currentTree);
+//     // console.log(json);
+//     var xhr = new XMLHttpRequest();
+//     xhr.open("PUT", url, true);
+//     xhr.setRequestHeader('Content-type', 'text/plain; charset=utf-8');
+//     xhr.onload = function () {
+//         var users = xhr.responseText;
+//         if (xhr.readyState == 4 && xhr.status == "200") {
+//             console.table(users);
+//         } else {
+//             console.error(users);
+//         }
+//     }
+//     xhr.send(json);
+// }
 
 historyMap.database.user.Node2DB = function () {
 

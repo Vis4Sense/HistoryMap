@@ -52,6 +52,7 @@
         "tabs",
         "contextMenus",
         "identity",
+        "https://*/",
         "https://accounts.google.com/*",
         "https://www.googleapis.com/*"
     ],

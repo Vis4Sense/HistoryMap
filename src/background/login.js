@@ -46,8 +46,9 @@ hello.on('auth.login', function (r) {
     });
 });
 
-chrome.runtime.onMessage.addListener(function (request) {
-    if (request.text === 'checkLogin') {
-        checkLogin();
-    }
-});
+// seems not used anymore
+// chrome.runtime.onMessage.addListener(function (request) {
+//     if (request.text === 'checkLogin') {
+//         checkLogin();
+//     }
+// });

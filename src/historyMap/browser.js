@@ -94,7 +94,7 @@ historyMap.controller.browser = function () {
 			// - status: 'complete', {do nothing}
 			if (changeInfo.status == 'complete') {
 				htab.isCompleted = true;
-				if (loggedIn = true) {
+				if (loggedIn === true) {
 					historyMap.database.user.Node2DB();
 				}
 			}

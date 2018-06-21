@@ -91,11 +91,14 @@ function btnDisplay() {
 }
 
 function newHistoryMap() {
-    var confirmation = confirm("Do you want to start a new session? All the progress will be lost if you are not logged in.")
+    
+    let confirmed = false;
 
-    // this message box will be updated so depends on whether user is logged in or not, different message and options (such as 'enter session name' or 'login') will be displayed.
+    if (!loggedIn && historyMap.model.nodes.getSize === 0) {
+        confirmed = confirm("Do you want to start a new session? All the progress will be lost if you are not logged in.")
+    }
 
-    if (confirmation) {
+    if (loggedIn || confirmed) {
 
         historyMap.model.nodes.empty();
 
