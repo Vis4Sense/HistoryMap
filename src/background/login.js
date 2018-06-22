@@ -1,6 +1,6 @@
-//Hello.js Initialization spec
+//Hello.js Initialization 
 hello.init({
-    google: '216563153005-rf4vuggusohpth9qm5korfclfo8lah39.apps.googleusercontent.com'
+    google: '1055749121064-fl4rdihe90ceqeihj3uu8b2ito3g9apu.apps.googleusercontent.com '
 }, {
         redirect_uri: 'https://' + chrome.runtime.id + '.chromiumapp.org/src/background/background.html'
     })
@@ -45,6 +45,8 @@ hello.on('auth.login', function (r) {
         chrome.runtime.sendMessage({ text: 'loggedin', user: user });
     });
 });
+
+var redirectURI = 'https://' + chrome.runtime.id + '.chromiumapp.org/src/background/background.html'
 
 // seems not used anymore
 // chrome.runtime.onMessage.addListener(function (request) {
