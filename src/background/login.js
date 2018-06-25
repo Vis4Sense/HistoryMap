@@ -1,6 +1,6 @@
 //Hello.js Initialization 
 hello.init({
-    google: '1055749121064-fl4rdihe90ceqeihj3uu8b2ito3g9apu.apps.googleusercontent.com '
+    google: '1055749121064-fl4rdihe90ceqeihj3uu8b2ito3g9apu.apps.googleusercontent.com'
 }, {
         redirect_uri: 'https://' + chrome.runtime.id + '.chromiumapp.org/src/background/background.html'
     })
