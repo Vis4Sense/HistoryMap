@@ -2,8 +2,8 @@
     "manifest_version": 2,
 
     "name": "HistoryMap",
-    "description": "A map of the opened tabs and their links",
-    "version": "0.1",
+    "description": "A map of the visited tabs and their links",
+    "version": "0.1.1",
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
 
     "browser_action": {
