@@ -50,8 +50,9 @@ document.addEventListener('DOMContentLoaded', function () {
 			// left: Math.floor(screen.width * 0.33), top: 0, width: Math.floor(screen.width * 0.67), height: screen.height
 			left: 0,
 			top: 0,
-			width: Math.floor(screen.width / 2),
-			height: Math.floor(screen.height * 0.7)
+			width: Math.floor(screen.width * 0.5),
+			// height: Math.floor(screen.height * 0.7)
+			height: screen.height
 		});
 
 		// Create an instance of the history map
@@ -62,10 +63,12 @@ document.addEventListener('DOMContentLoaded', function () {
 				// top: 0,
 				// width: Math.floor(screen.width * 0.33),
 				// height: screen.height
-				left: 0,
-				top: Math.floor(screen.height * 0.7 + 25),
+				left: Math.floor(screen.width * 0.5),
+				// top: Math.floor(screen.height * 0.7 + 25),
+				top: 0,
 				width: Math.floor(screen.width / 2),
-				height: Math.floor(screen.height * 0.3 - 25)
+				// height: Math.floor(screen.height * 0.3 - 25)
+				height: screen.height
 			}, function (w) {
 				chrome.windows.update(w.id, {
 					focused: true
