@@ -37,7 +37,8 @@ historyMap.controller.highlightNodes = function () {
 			text: text,
 			type: type,
 			showImage: true,
-			hidden: hidden
+			hidden: hidden,
+			clicked: false
 		};
 
 		if (favIconUrl) action.favIconUrl = favIconUrl;

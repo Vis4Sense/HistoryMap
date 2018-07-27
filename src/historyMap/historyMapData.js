@@ -1,4 +1,4 @@
-function Node(id, tabId, time, url, title, favIconUrl, from, isTabOpen) {
+function Node(id, tabId, time, url, title, favIconUrl, from, isTabOpen, tabStatus) {
     this.id = id;
     this.tabId = tabId;
     this.time = time;
@@ -6,7 +6,9 @@ function Node(id, tabId, time, url, title, favIconUrl, from, isTabOpen) {
     this.text = title;
     this.favIconUrl = favIconUrl;
     this.from = from;
-    this.isTabOpen = isTabOpen; // whether the browser tab showing the node URL is open
+    this.isTabOpen = isTabOpen // whether the browser tab showing the node URL is open
+    this.tabStatus = tabStatus //"opened"(default) or "closed" 
+    this.clicked = false;
 }
 
 historyMap.model.nodes = {
@@ -15,6 +17,12 @@ historyMap.model.nodes = {
 
     getNode: function (index) {
         return this.nodeArray[index];
+    },
+
+    setNodeTabStatus: function (nodeId, newTabStatus){
+		var nodes = this.nodeArray
+		var foundNode = nodes.find(a => a.id === nodeId);
+        foundNode.tabStatus = newTabStatus;
     },
 
     getNodeIndex: function (node) {
@@ -61,6 +69,18 @@ historyMap.model.nodes = {
             foundNode.type = typeUpdate.type;
             return foundNode;
         }
+    },
+
+    //set all the nodes "clicked" attribute to false (before setting the most recently clicked one to "true")
+    setAllNodesClickedFalse: function(){
+        this.nodeArray.forEach(node => {
+            node.clicked = false;
+        });
+        
+        //does same for embedded nodes (combine with above for each)
+        this.nodeArray.filter(n => (n.embedded != undefined)).forEach(node => {
+            node.clicked = false;
+        });
     }
 }
 

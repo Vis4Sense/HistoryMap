@@ -55,6 +55,10 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function onNodeClicked(d, exists) {
+        //set all nodes .clicked value to false
+        historyMap.model.nodes.setAllNodesClickedFalse();
+        //set the most recently clicked node value to true
+        d.clicked = true;
         chrome.tabs.query({}, tabs => {
             var tab = tabs.find(t => t.url === d.url);
             if (tab) {
@@ -71,7 +75,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 chrome.windows.update(tab.windowId, {
                     focused: true
                 });
+                //if the clicked on node is not an embedded (annotation) node
+                if (d.embedded == undefined) {
+                    d.isTabOpen = true;
+                    //tab was found, therefore it is open (redundant?)
+                    d.tabStatus = "opened";
+                }
             } else {
+                //this part doesnt detect a tab for the clicked highlight node so it doesnt create 1
                 // Can't find it, already closed, open new item, request scrolling later on
                 chrome.tabs.create({
                     url: d.url
@@ -80,6 +91,13 @@ document.addEventListener("DOMContentLoaded", function () {
                         focused: true
                     });
                     //pendingTasks[tab.id] = d; no longer defined
+                    //tab has been created, therefore it is now open
+                    
+                    //if the clicked on node is not an embedded (annotation) node
+                    if (d.embedded == undefined) {
+                        d.isTabOpen = true;
+                        d.tabStatus = "opened";
+                    }
                 });
             }
         });
