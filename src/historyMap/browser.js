@@ -37,6 +37,8 @@ historyMap.controller.browser = function () {
 		'google.com/url',
 		'localhost://'
 	];
+	//used for closed tabs withIgnoredUrls (onRemoved)
+	ignoredTabsIdToUrl = {};
 
 	chrome.tabs.onCreated.addListener(function (tab) {
 
@@ -69,6 +71,8 @@ historyMap.controller.browser = function () {
 				let newNode = addNode(tab, findParentNodeId(tab));
 				htabs.addTab(new Tab(tab.id, newNode, false));
 			}
+		} else {
+			ignoredTabsIdToUrl[tab.id] = tab.url;
 		}
 	});
 
@@ -88,14 +92,6 @@ historyMap.controller.browser = function () {
 			if (clickedHighlightNodes.length > 0) {
 				clickedNode = true;
 				let parentNode = clickedHighlightNodes[0].parent
-				/*if (htabs.getTab(parentNode.tabId)) {
-					
-					//Updated, dont add a duplicate Tab to htabs
-					console.log("updated, dont add tabnode");
-					//do not add another tab
-				} else {
-					console.log(" updated, add tabnode(parent)");
-				}*/
 			} else if (clickedNodes.length > 0) {
 				//Tab is closed, node was clicked, do not add Tab
 				// if a tab is opened before historyMap and then refreshed
@@ -114,7 +110,7 @@ historyMap.controller.browser = function () {
 				htab = htabs.getTab(tab.id);
 			}
 			let node = htab.node;
-			
+
 			// 'changeInfo' information:
 			// - status: 'loading': if (tabCompleted) {create a new node} else {update existing node}
 			if (changeInfo.status == 'loading' && tab.url != node.url) {
@@ -147,13 +143,20 @@ historyMap.controller.browser = function () {
 					historyMap.database.user.Node2DB();
 				}
 			}
+		} else {
+			ignoredTabsIdToUrl[tab.id] = tab.url;
 		}
 	});
 
 	chrome.tabs.onRemoved.addListener(function (tabId, removeInfo) {
 		//given tabId find the node, set its "tabOpen" status to closed
-		let closedTabId = htabs.getId(tabId);
-		nodes.setNodeTabStatus(closedTabId, "closed");
+		if (!ignoredTabsIdToUrl[tabId]) {
+			let closedTabId = htabs.getId(tabId);
+			nodes.setNodeTabStatus(closedTabId, "closed");
+		} else {
+			//an ignored tab is being closed
+			delete ignoredTabsIdToUrl[tabId];
+		}
 	});
 
 	function addNode(tab, parentNodeId) {
