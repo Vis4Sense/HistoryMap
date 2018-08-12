@@ -1,4 +1,4 @@
-function Node(id, tabId, time, url, title, favIconUrl, from, isTabOpen, tabStatus) {
+function Node(id, tabId, time, url, title, favIconUrl, from, tabStatus) {
     this.id = id;
     this.tabId = tabId;
     this.time = time;
@@ -6,8 +6,7 @@ function Node(id, tabId, time, url, title, favIconUrl, from, isTabOpen, tabStatu
     this.text = title;
     this.favIconUrl = favIconUrl;
     this.from = from;
-    this.isTabOpen = isTabOpen // whether the browser tab showing the node URL is open
-    this.tabStatus = tabStatus //"opened"(default) or "closed" 
+    this.tabStatus = tabStatus // whether the browser tab showing the node URL is "opened"(default) or "closed" 
     this.clicked = false;
 }
 

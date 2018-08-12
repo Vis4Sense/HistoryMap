@@ -56,7 +56,12 @@ historyMap.model.listToTree = function() {
 
         // Add nodes, excluding child actions
         root.nodes = actions.filter(a => !a.parent && !a.hidden);
-
+        
+        /* issue #101
+        Remove "click-node" to prevent them from appearing in 
+        historyMapVis and historyMap.view.layout.forest().vertices() */
+        root.nodes = root.nodes.filter(a => a.type != "click-node");
+        
         // Then add to the link list
         root.links = [];
         root.nodes.filter(d => d.links).forEach(d => {
@@ -92,7 +97,7 @@ historyMap.model.listToTree = function() {
 
         dispatch.actionAdded(a);
         if (type === 'click-node') {
-            dispatch.nodeClicked(d, doesUrlExist(d.url));
+            dispatch.nodeClicked(d);
         } 
     }
 

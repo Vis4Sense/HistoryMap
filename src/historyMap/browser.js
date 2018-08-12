@@ -43,30 +43,29 @@ historyMap.controller.browser = function () {
 		// this does not catch the event of manually created tab?
 
 		if (!isIgnoredTab(tab)) {
-			console.log('newTab -', 'tabId:' + tab.id, ', parent:' + tab.openerTabId, ', url:' + tab.url, tab); // for testing
-			//web page history map nodes
+			console.log('newTab -', 'tabId:' + tab.id, ', parent:' + tab.openerTabId, ', url:' + tab.url, tab);
 			let historyMapNodes = nodes.getArray().filter(n => (n.url == tab.url));
 			let clickedNodes = historyMapNodes.filter(n => ((n.clicked == true) && (n.tabStatus == "closed")));
 			//annotation (highlight) nodes
 			let highlightNodes = historyMapNodes.filter(n => (n.embedded != undefined));
 			let clickedHighlightNodes = highlightNodes.filter(n => (n.clicked == true));
 
+			//if an annotation(highlight) node was clicked 
 			if (clickedHighlightNodes.length > 0) {
-				let parentNode = clickedHighlightNodes[0].parent
-				//"created, clickedHighlight"
+				let parentNode = clickedHighlightNodes[0].parent;
+				//if the Tab which contains the annotation is open
 				if (htabs.getTab(parentNode.tabId)) {
-					//"created, dont add tabnode"
+					//dont add a duplicate Tab to htabs
 				} else {
-					//"created, add tabnode(parent)""
-					//add another tab using the node representing the webpage (non annotation node)
+					//add a Tab using the node representing the webpage
 					htabs.addTab(new Tab(tab.id, parentNode, false));
 				}
+				//if a normal historyMap node was clicked 
 			} else if (clickedNodes.length > 0) {
-				//"created, clicked and closed is > 0, so add fake node"
-				//adds node element to Tab, for on updated to process it
+				//adds a stub Tab(with preused node), for onUpdated to process it correctly
 				htabs.addTab(new Tab(tab.id, clickedNodes[0], false));
 			} else {
-				//"created, add node bevcause clicked and closed < 1"
+				//no nodes clicked, tab created using other means
 				let newNode = addNode(tab, findParentNodeId(tab));
 				htabs.addTab(new Tab(tab.id, newNode, false));
 			}
@@ -79,14 +78,10 @@ historyMap.controller.browser = function () {
 
 			// console.log('tab update',tabId,changeInfo,tab);
 
-			// if a tab is opened before historyMap and then refreshed
 			let historyMapNodes = nodes.getArray().filter(n => (n.url == tab.url));
-			//at least one node which shares url with recently opened tab
-			let clickedNodes = historyMapNodes.filter(n => (n.clicked == true));
-
-			//embedded (annotation) history map nodes			
+			let clickedNodes = historyMapNodes.filter(n => ((n.clicked == true) && (n.tabStatus == "closed")));
+			//annotation (highlight) nodes
 			let highlightNodes = historyMapNodes.filter(n => (n.embedded != undefined));
-			//clicked embedded nodes
 			let clickedHighlightNodes = highlightNodes.filter(n => (n.clicked == true));
 			let clickedNode = false;
 
@@ -94,15 +89,17 @@ historyMap.controller.browser = function () {
 				clickedNode = true;
 				let parentNode = clickedHighlightNodes[0].parent
 				/*if (htabs.getTab(parentNode.tabId)) {
+					
+					//Updated, dont add a duplicate Tab to htabs
 					console.log("updated, dont add tabnode");
 					//do not add another tab
 				} else {
 					console.log(" updated, add tabnode(parent)");
 				}*/
 			} else if (clickedNodes.length > 0) {
-				//"clicked and closed is > 0, so do not add node"
+				//Tab is closed, node was clicked, do not add Tab
+				// if a tab is opened before historyMap and then refreshed
 			} else if (!htabs.getTab(tab.id)) {
-				// add node
 				let newNode = addNode(tab, findParentNodeId(tab));
 				htabs.addTab(new Tab(tab.id, newNode, false));
 			}
@@ -110,7 +107,7 @@ historyMap.controller.browser = function () {
 			let htab;
 			//if an annotation node was clicked 
 			if (clickedNode) {
-				//use annotation nodes parent node tabId
+				//use annotation parent node tabId
 				let parentNode = clickedHighlightNodes[0].parent;
 				htab = htabs.getTab(parentNode.tabId);
 			} else {
@@ -155,18 +152,8 @@ historyMap.controller.browser = function () {
 
 	chrome.tabs.onRemoved.addListener(function (tabId, removeInfo) {
 		//given tabId find the node, set its "tabOpen" status to closed
-		console.log("closing tab", tabId);
 		let closedTabId = htabs.getId(tabId);
-		console.log("closedTabId ", closedTabId);
 		nodes.setNodeTabStatus(closedTabId, "closed");
-		nodes.getArray().forEach(node => {
-			//mainting a tabStatus for embedded (annotation) nodes is unnecessary 
-			/*if (node.children){
-				node.children.forEach(childNode => {
-					nodes.setNodeTabStatus(childNode.id, "closed");
-				});
-			}*/
-		});
 	});
 
 	function addNode(tab, parentNodeId) {
@@ -179,7 +166,6 @@ historyMap.controller.browser = function () {
 			tab.title || tab.url,
 			tab.favIconUrl,
 			parentNodeId,
-			true,
 			"opened"
 		);
 
