@@ -26,12 +26,13 @@ const historyMap = function () {
 
 var historyMapView;
 
+// MARK: This happens first??
 document.addEventListener("DOMContentLoaded", function () {
 
     // Data
     nodes = historyMap.model.nodes.getArray();
 
-    
+
     // Instantiate vis
     historyMapView = historyMap.view.vis()
         .label(d => d.text)
@@ -89,7 +90,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         focused: true
                     });
                     //pendingTasks[tab.id] = d; no longer defined
-                    
+
                     //if the clicked on node is not an embedded (annotation) node
                     if (d.embedded == undefined) {
                         d.tabStatus = "opened";

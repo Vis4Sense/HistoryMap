@@ -4,7 +4,7 @@
   "name": "HistoryMap - Dev",
   "description": "A map of the visited tabs and their links",
   "version": "0.1.1",
-  "content_security_policy": "script-src 'self' 'unsafe-eval' https://apis.google.com/_/scs/apps-static/_/js/k=oz.gapi.cs.NVF0UDHlAgk.O/m=auth2/rt=j/sv=1/d=1/ed=1/am=wQ/rs=AGLTcCNL7zqdl25OFFUZT2ACtAa1p9TEtw/cb=gapi.loaded_0; object-src 'self'",
+  "content_security_policy": "script-src 'self' 'unsafe-eval' https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js https://cdnjs.cloudflare.com/ajax/libs/aws-sdk/2.409.0/aws-sdk.min.js; object-src 'self'",
 
   "browser_action": {
     "default_icon": {
@@ -56,13 +56,6 @@
     "https://accounts.google.com/*",
     "https://www.googleapis.com/*"
   ],
-
-  "oauth2": {
-    "client_id": "1055749121064-fl4rdihe90ceqeihj3uu8b2ito3g9apu.apps.googleusercontent.com",
-    "scopes": [
-      "https://www.googleapis.com/auth/plus.login"
-    ]
-  },
 
   "web_accessible_resources": [
     "src/css/*.*",

@@ -1,100 +1,110 @@
-let SessionName;
-let SessionProfile;
-let debug_test_result;
-let recording = true; // whether new noded is added to historymap or not
-let loggedIn = false; // whether user is logged in
+let SessionName
+let SessionProfile
+let recording = true // whether new noded is added to historymap or not
+let loggedIn = false // whether user is logged in
+let session = null
 
 $(function () {
-    $('#btn_start').click(function () {
-        recording = true;
-        btnDisplay();
-    });
-    $('#btn_pause').click(function () {
-        recording = false;
-        btnDisplay();
-    });
-    $('#btn_new').click(function () {
-        newHistoryMap();
-    });
-    $('#btn_load').click(function () {
-        historyMap.database.sessions.displaySessions();
-    });
-    $('#btn_logout').click(function () {
-        chrome.runtime.sendMessage({
-            text: 'logout',
-            function (response) {
-                console.log('response from login.js', response.text);
-            }
-        });
-        location.reload();
-        loggedIn = false;
-        btnDisplay();
-    });
-    $('#btn_login').click(function () {
-        // run hello.js google+ login
-        chrome.runtime.sendMessage({
-            text: 'login',
-            function (response) {
-                console.log('response from login.js', response.text);
-            }
-        });
-    });
-});
+  $('#btn_start').click(function () {
+    recording = true
+    redrawMenu()
+  })
 
-window.onload = function () {
-    btnDisplay();
-};
+  $('#btn_pause').click(function () {
+    recording = false
+    redrawMenu()
+  })
 
-chrome.runtime.onMessage.addListener(function (request) {
-    if (request.text === 'loggedin') {
-        loggedIn = true;
-        historyMap.model.user = request.user;
-    }
-});
+  $('#btn_new').click(function () {
+    newHistoryMap()
+  })
 
-function btnDisplay() {
-    // make only the relevant button visible
+  $('#btn_load').click(function () {
+    historyMap.database.sessions.displaySessions()
+  })
 
-    if (recording) {
-        document.getElementById("btn_start").style.display = "none";
-        document.getElementById("btn_pause").style.display = "initial";
-    } else {
-        document.getElementById("btn_start").style.display = "initial";
-        document.getElementById("btn_pause").style.display = "none";
-    }
+  $('#btn_logout').click(function () {
+    Messaging.send('auth', { action: 'logout' })
+      .then(() => {
+        session = null
+        redrawMenu()
+      })
+  })
 
-    if (loggedIn) {
-        document.getElementById("btn_login").style.display = "none";
-        document.getElementById("btn_logout").style.display = "initial";
-        document.getElementById('userImage').style.display = "initial";
-        userImage.src = historyMap.database.user.profile.image.url;
+  $('#btn_login').click(function () {
+    Messaging.send('auth', { action: 'login' })
+      .then((response) => {
+        session = response.session
+        redrawMenu()
+      })
+  })
+})
 
-        //checks if User has Sessions Saved, displays load if true
+/**
+ * Load the user session from the background script.
+ */
+window.addEventListener('load', () => {
+  Messaging.send('auth', { action: 'session' })
+    .then((response) => {
+      session = response.session
+      redrawMenu()
+    })
+})
 
-        if (typeof (SessionProfile) != 'undefined') {
+// chrome.runtime.onMessage.addListener(function (request) {
+//     if (request.text === 'loggedin') {
+//         loggedIn = true;
+//         historyMap.model.user = request.user;
+//     }
+// });
 
-            if (SessionProfile.length == 0) {
-                document.getElementById("btn_load").style.display = 'none';
-            } else {
-                document.getElementById("btn_load").style.display = 'initial';
-            }
-        } else {
-            document.getElementById("btn_load").style.display = 'none';
-        }
+/**
+ * Redraw the menu based on the current application context.
+ */
+const redrawMenu = () => {
 
-    } else {
-        document.getElementById("btn_login").style.display = "initial";
-        document.getElementById("btn_logout").style.display = "none";
-        document.getElementById("btn_load").style.display = "none";
-        document.getElementById('userImage').style.display = "none";
-    }
+  if (recording) {
+    document.getElementById("btn_start").style.display = "none"
+    document.getElementById("btn_pause").style.display = "initial"
+  } else {
+    document.getElementById("btn_start").style.display = "initial"
+    document.getElementById("btn_pause").style.display = "none"
+  }
+
+  if (session !== null) {
+    document.getElementById("btn_login").style.display = "none"
+    document.getElementById("btn_logout").style.display = "initial"
+    document.getElementById('userImage').style.display = "initial"
+    document.getElementById('userImage').src = session.profile.picture
+
+    //checks if User has Sessions Saved, displays load if true
+
+    // if (session !== null) {
+    //   if (SessionProfile.length == 0) {
+    //       document.getElementById("btn_load").style.display = 'none'
+    //   } else {
+    //       document.getElementById("btn_load").style.display = 'initial'
+    //   }
+    // } else {
+    //     document.getElementById("btn_load").style.display = 'none'
+    // }
+
+  } else {
+      document.getElementById("btn_login").style.display = "initial"
+      document.getElementById("btn_logout").style.display = "none"
+      document.getElementById("btn_load").style.display = "none"
+      document.getElementById('userImage').style.display = "none"
+  }
 }
 
 function newHistoryMap() {
-    
+
     let confirmed = false;
 
-    if (!loggedIn && historyMap.model.nodes.getSize === 0) {
+    console.log(CircularJSON.stringify(historyMap.model.tree))
+
+    // MARK: Where data is
+    if (!loggedIn && historyMap.model.nodes.getSize() > 0) {
         confirmed = confirm("Do you want to start a new session? All the progress will be lost if you are not logged in.")
     }
 
@@ -210,8 +220,32 @@ historyMap.database.sessions.loadUserSessions = function () {
             SessionProfile = users["sessions"];
             historyMap.model.sessions = SessionProfile;
             db.user.SessionProfile = users["sessions"];
-            btnDisplay();
+            redrawMenu();
         } else {}
     }
     xhr.send(null);
+}
+
+
+const Messaging = {
+
+  /**
+   * Send a message via a port.
+   *
+   * @param {string} name The port name
+   * @param {any} request The request
+   * @return {Promise<any>} The response
+   */
+  async send (name, request = {}) {
+    return new Promise((resolve, reject) => {
+      const port = chrome.runtime.connect({ name })
+
+      port.onMessage.addListener((response) => {
+        response.ok ? resolve(response) : reject(response)
+      })
+
+      port.postMessage(request)
+    })
+  }
+
 }
