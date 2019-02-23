@@ -1,30 +1,30 @@
 {
-    "manifest_version": 2,
+  "manifest_version": 2,
 
-    "name": "HistoryMap - Dev",
-    "description": "A map of the visited tabs and their links",
-    "version": "0.1.1",
-    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+  "name": "HistoryMap - Dev",
+  "description": "A map of the visited tabs and their links",
+  "version": "0.1.1",
+  "content_security_policy": "script-src 'self' 'unsafe-eval' https://apis.google.com/_/scs/apps-static/_/js/k=oz.gapi.cs.NVF0UDHlAgk.O/m=auth2/rt=j/sv=1/d=1/ed=1/am=wQ/rs=AGLTcCNL7zqdl25OFFUZT2ACtAa1p9TEtw/cb=gapi.loaded_0; object-src 'self'",
 
-    "browser_action": {
-        "default_icon": {
-            "16": "logo/historymap19pxbw.png"
-        },
-        "default_title": "Open SenseMap"
+  "browser_action": {
+    "default_icon": {
+      "16": "logo/historymap19pxbw.png"
     },
+    "default_title": "Open SenseMap"
+  },
 
-    "icons": {
-      "16": "logo/historymap16px.png",
-      "48": "logo/historymap48px.png",
-      "128": "logo/historymap128px.png"
-   },
+  "icons": {
+    "16": "logo/historymap16px.png",
+    "48": "logo/historymap48px.png",
+    "128": "logo/historymap128px.png"
+  },
 
-    "background": {
-        "page": "src/background/background.html",
-        "persistent": false
-    },
+  "background": {
+    "page": "src/background/background.html",
+    "persistent": false
+  },
 
-    "content_scripts": [
+  "content_scripts": [
     {
       "matches": [
         "file:///*",
@@ -32,54 +32,54 @@
         "https://*/*"
       ],
       "js": [
-          "lib/jquery.min.js",
-          "src/contentScript/contentScriptsController.js",
-          "src/contentScript/highlight.js",
-          "src/contentScript/contentScripts.js"
+        "lib/jquery.min.js",
+        "src/contentScript/contentScriptsController.js",
+        "src/contentScript/highlight.js",
+        "src/contentScript/contentScripts.js"
       ],
-	  "css": [
-		  "src/contentScript/content.css"
-	  ],
+      "css": [
+        "src/contentScript/content.css"
+      ],
       "run_at": "document_end"
     }
   ],
 
-    "permissions": [
-        "<all_urls>",
-        "chrome://favicon/",
-        "storage",
-        "history",
-        "tabs",
-        "contextMenus",
-        "identity",
-        "https://*/",
-        "https://accounts.google.com/*",
-        "https://www.googleapis.com/*"
-    ],
+  "permissions": [
+    "<all_urls>",
+    "chrome://favicon/",
+    "storage",
+    "history",
+    "tabs",
+    "contextMenus",
+    "identity",
+    "https://*/",
+    "https://accounts.google.com/*",
+    "https://www.googleapis.com/*"
+  ],
 
-    "oauth2": {
-        "client_id": "1055749121064-fl4rdihe90ceqeihj3uu8b2ito3g9apu.apps.googleusercontent.com",
-        "scopes": [
-        "https://www.googleapis.com/auth/plus.login"
-        ]
-    },
+  "oauth2": {
+    "client_id": "1055749121064-fl4rdihe90ceqeihj3uu8b2ito3g9apu.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/plus.login"
+    ]
+  },
 
-    "web_accessible_resources": [
-        "src/css/*.*", 
-        "tests/tests.html", 
-        "lib/fontello/css/fontello.css", 
-        "lib/fontello/font/fontello.woff", 
-        "lib/fontello/font/fontello.woff2", 
-        "lib/fontello/font/fontello.ttf"
-    ],
+  "web_accessible_resources": [
+    "src/css/*.*",
+    "tests/tests.html",
+    "lib/fontello/css/fontello.css",
+    "lib/fontello/font/fontello.woff",
+    "lib/fontello/font/fontello.woff2",
+    "lib/fontello/font/fontello.ttf"
+  ],
 
-    "options_page":"/src/options.html",
+  "options_page": "/src/options.html",
 
-    "commands": {
-        "_execute_browser_action": {
-            "suggested_key": {
-                "default": "Alt+S"
-            }
-        }
+  "commands": {
+    "_execute_browser_action": {
+      "suggested_key": {
+        "default": "Alt+S"
+      }
     }
+  }
 }

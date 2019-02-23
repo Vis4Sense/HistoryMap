@@ -1,56 +1,49 @@
-//Hello.js Initialization 
-hello.init({
-    google: '1055749121064-fl4rdihe90ceqeihj3uu8b2ito3g9apu.apps.googleusercontent.com'
-}, {
-        redirect_uri: 'https://' + chrome.runtime.id + '.chromiumapp.org/src/background/background.html'
-    })
+// Initialization
 
-//login function
-function googleLogin() {
-    // HelloJS network identifier
-    var google = hello('google');
+gapi.client.init({
+  client_id: '527715214680-6ob4fsq8ir7q6uoe9b2mk8ok7id600p4.apps.googleusercontent.com',
+  scope: 'profile'
+})
 
-    // Forcing E-Mail out of profile Object
-    google.login({
-        scope: 'email',
-        force: true
-        // maybe add here the configuration that do not remember password
-    }).then(function () {
-        return google.api('me');
-    })
-};
+/**
+ * Add listeners for authentication actions.
+ */
+chrome.runtime.onMessage.addListener(async (request, _, sendResponse) => {
+  if (request.text === 'login') {
+    return Auth.login()
+      .then(user => chrome.runtime.sendMessage({ text: 'loggedin', user: user }))
+  }
 
-// handle the 'login' button on historyMap
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-    if (request.text === "login") {
-        googleLogin();
-        sendResponse({text:'using google+ login'})
+  if (request.text === 'logout') {
+    return Auth.logout()
+      .then(() => sendResponse({ text: 'user logged out' }))
+  }
+})
+
+/**
+ * Cognito syntax sugar.
+ */
+const Auth = {
+
+  /**
+   * Log the user in.
+   * TODO: Errors.
+   *
+   * @return {Promise<any>} The user object.
+   */
+  async login () {
+    console.log('login')
+
+    return {
+      name: 'asd'
     }
-});
+  },
 
-// handle the 'logout' button on historyMap
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-    if (request.text === "logout") {
-        hello('google').logout();
-        localStorage.clear();
-        sendResponse({text:'google+ logged out'})
-    }
-});
+  /**
+   * Terminate the session.
+   */
+  async logout () {
+    console.log('logout')
+  }
 
-// Listens to Login requests and executes functions upon verification
-hello.on('auth.login', function (r) {
-
-    // Get Profile
-    hello(r.network).api('/me').then(function (user) {
-        chrome.runtime.sendMessage({ text: 'loggedin', user: user });
-    });
-});
-
-var redirectURI = 'https://' + chrome.runtime.id + '.chromiumapp.org/src/background/background.html'
-
-// seems not used anymore
-// chrome.runtime.onMessage.addListener(function (request) {
-//     if (request.text === 'checkLogin') {
-//         checkLogin();
-//     }
-// });
+}
