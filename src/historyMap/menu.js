@@ -1,7 +1,9 @@
+// Redundant 3
 let SessionName
 let SessionProfile
-let recording = true // whether new noded is added to historymap or not
 let loggedIn = false // whether user is logged in
+
+let recording = true // whether new noded is added to historymap or not
 let session = null
 
 $(function () {
@@ -81,19 +83,6 @@ const redrawMenu = () => {
     document.getElementById('btn_logout').style.display = 'initial'
     document.getElementById('userImage').style.display = 'initial'
     document.getElementById('userImage').src = session.profile.picture
-
-    //checks if User has Sessions Saved, displays load if true
-
-    // if (session !== null) {
-    //   if (SessionProfile.length == 0) {
-    //       document.getElementById('btn_load').style.display = 'none'
-    //   } else {
-    //       document.getElementById('btn_load').style.display = 'initial'
-    //   }
-    // } else {
-    //     document.getElementById('btn_load').style.display = 'none'
-    // }
-
   } else {
       document.getElementById('btn_login').style.display = 'initial'
       document.getElementById('btn_logout').style.display = 'none'
@@ -102,133 +91,57 @@ const redrawMenu = () => {
   }
 }
 
-function newHistoryMap() {
+const newHistoryMap = async () => {
+  // Check if the user is logged in or they agree to losing all data.
+  if (session === null && !confirm('All data will be lost.')) {
+    return
+  }
 
-    let confirmed = false;
+  // Set a new session id.
+  await Messaging.send('persistor', { action: 'set-session', sessionId: uuidv4() })
+    .catch(() => undefined).
 
-    console.log(CircularJSON.stringify(historyMap.model.tree))
-
-    // MARK: Where data is
-    if (!loggedIn && historyMap.model.nodes.getSize() > 0) {
-        confirmed = confirm("Do you want to start a new session? All the progress will be lost if you are not logged in.")
-    }
-
-    if (loggedIn || confirmed) {
-
-        historyMap.model.nodes.empty();
-
-        if (loggedIn) {
-            // so user can't create press the 'new' button more than once.
-            document.getElementById('btn_new').disabled = true;
-
-            // add a text field
-            var input = document.createElement('input');
-            input.type = 'text';
-            var today = new Date();
-            //input.placeholder = today;
-            input.value = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + ' ' + today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
-            input.id = 'sessionName';
-            document.getElementById('settings').appendChild(input);
-            input.focus();
-
-            // add a button
-            var button = document.createElement('button');
-            button.type = 'button';
-            button.innerHTML = 'Create';
-            button.id = 'btn_new_sess';
-            document.getElementById('settings').appendChild(button);
-
-            $(function () {
-                $('#btn_new_sess').click(function () {
-                    historyMap.database.sessions.newSession();
-                })
-            });
-        }
-    }
+  // Clear the history map.
+  historyMap.model.nodes.empty()
 }
 
 //This loads the Sessions in a menu
 const listSessions = async () => {
 
-    document.getElementById('btn_load').setAttribute('disabled', 1)
+  document.getElementById('btn_load').setAttribute('disabled', '')
 
-    // Load session from the backend.
-    const sessions = await Messaging.send('persistor', { action: 'list-sessions' })
-      .then(({ sessions }) => sessions)
-      .catch(() => alert('Listing user sessions failed.'))
+  // Load session from the backend.
+  const sessions = await Messaging.send('persistor', { action: 'list-sessions' })
+    .then(({ sessions }) => sessions)
+    .catch(() => alert('Listing user sessions failed.'))
 
-    // Create a select field.
-    const selectContainer = document.getElementById("Select-Option");
-    const select = document.createElement("select");
-    selectContainer.appendChild(select);
+  // Create a select field.
+  const selectContainer = document.getElementById("Select-Option");
+  const select = document.createElement("select");
+  selectContainer.appendChild(select);
 
-    // Loop through the sessions and show them as options.
-    sessions.forEach((session) => {
-      const option = document.createElement('option')
-      option.setAttribute('value', session)
-      option.innerText = session
-      select.appendChild(option)
-    })
+  // Loop through the sessions and show them as options.
+  sessions.forEach((session) => {
+    const option = document.createElement('option')
+    option.setAttribute('value', session)
+    option.innerText = session
+    select.appendChild(option)
+  })
 
-    select.addEventListener('change', async (e) => {
-      const session = await Messaging.send('persistor', { action: 'load-session', sessionId: select.value })
-        .then(({ session }) => session)
-        .catch(() => alert('Loading session failed.'))
+  select.selectedIndex = -1
 
-      console.log(session)
+  select.addEventListener('change', async (e) => {
+    const nodes = await Messaging.send('persistor', { action: 'load-session', sessionId: select.value })
+      .then(({ session }) => session)
+      .catch(() => alert('Loading session failed.'))
 
-      // Clean up.
-      select.remove()
-      document.getElementById('btn_load').setAttribute('disabled', 0)
-    })
-}
+    // Load data to the history map.
+    historyMap.model.nodes.empty()
+    nodes.forEach(n => historyMap.model.nodes.addNode(n))
+    historyMap.view.redraw()
 
-historyMap.database.sessions.newSession = function () {
-    SessionName = document.getElementById('sessionName').value;
-    document.getElementById("sessionName").remove();
-    document.getElementById("btn_new_sess").remove();
-    document.getElementById('btn_new').disabled = false;
-
-    //Hacky way to prevent users from creating duplicate Sessions.
-    //Looping thorugh SessionProfile
-    if (typeof SessionProfile == 'undefined' || SessionProfile == null) {
-        console.log("Saving Session: " + SessionName);
-        historyMap.database.user.pushSessToDB();
-    } else {
-        var noDuplicate = true;
-
-        for (var i = 0; i < SessionProfile.length; i++) {
-
-            //If SessionName matches a Session Generated alert the user
-            if (SessionName == SessionProfile[i].name) {
-                noDuplicate = false;
-                window.alert("Session Name already exsits, please choose a different Session Name");
-                break;
-            }
-        };
-        if (noDuplicate) {
-            //Pushes Session to DB
-            console.log("Saving Session: " + SessionName);
-            historyMap.database.user.pushSessToDB();
-        }
-    }
-
-}
-
-//This connects to the API and loads user sessions and stores it in HistoryMapModel
-historyMap.database.sessions.loadUserSessions = function () {
-    var url = baseURL + "session/" + db.user.profile.email + "/" + historyMap.database.user.APIKey;
-    var xhr = new XMLHttpRequest()
-    xhr.open('GET', url, true)
-    xhr.onload = function () {
-        var users = JSON.parse(xhr.responseText);
-        if (xhr.readyState == 4 && xhr.status == "200") {
-            //picking out Session Information from User Account
-            SessionProfile = users["sessions"];
-            historyMap.model.sessions = SessionProfile;
-            db.user.SessionProfile = users["sessions"];
-            redrawMenu();
-        } else {}
-    }
-    xhr.send(null);
+    // Clean up.
+    select.remove()
+    document.getElementById('btn_load').removeAttribute('disabled')
+  })
 }
