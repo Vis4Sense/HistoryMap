@@ -4,7 +4,7 @@
   "name": "HistoryMap - Dev",
   "description": "A map of the visited tabs and their links",
   "version": "0.1.1",
-  "content_security_policy": "script-src 'self' 'unsafe-eval' https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js https://cdnjs.cloudflare.com/ajax/libs/aws-sdk/2.409.0/aws-sdk.min.js; object-src 'self'",
+  "content_security_policy": "script-src 'self' 'unsafe-eval' https://cdn.jsdelivr.net/npm/crypto-js@3.1.9-1/crypto-js.js https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js https://cdnjs.cloudflare.com/ajax/libs/aws-sdk/2.409.0/aws-sdk.min.js; object-src 'self'",
 
   "browser_action": {
     "default_icon": {

@@ -40,15 +40,26 @@ $(function () {
   })
 })
 
-/**
- * Load the user session from the background script.
- */
 window.addEventListener('load', () => {
+
+  /**
+   * Load the user session from the background script.
+   */
   Messaging.send('auth', { action: 'session' })
     .then((response) => {
       session = response.session
       redrawMenu()
     })
+    .catch(() => {
+      redrawMenu()
+    })
+
+  /**
+   * Create a new persistence session.
+   */
+  Messaging.send('persistor', { action: 'set-session', sessionId: uuidv4() })
+    .catch(() => undefined)
+
 })
 
 // chrome.runtime.onMessage.addListener(function (request) {
@@ -224,28 +235,4 @@ historyMap.database.sessions.loadUserSessions = function () {
         } else {}
     }
     xhr.send(null);
-}
-
-
-const Messaging = {
-
-  /**
-   * Send a message via a port.
-   *
-   * @param {string} name The port name
-   * @param {any} request The request
-   * @return {Promise<any>} The response
-   */
-  async send (name, request = {}) {
-    return new Promise((resolve, reject) => {
-      const port = chrome.runtime.connect({ name })
-
-      port.onMessage.addListener((response) => {
-        response.ok ? resolve(response) : reject(response)
-      })
-
-      port.postMessage(request)
-    })
-  }
-
 }

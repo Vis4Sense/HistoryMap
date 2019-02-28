@@ -6,6 +6,8 @@ const googleClientId = '527715214680-3eqom1v7vv9s7oeh9frb7ee2ommr2t88.apps.googl
 const googleLoginType = 'accounts.google.com'
 const identityPoolId = 'eu-west-1:cf66235e-c684-4f02-bb4c-e7feadbe2f65'
 const identityPoolRegion = 'eu-west-1'
+const apiGatewayUrl = 'https://n4t2lv3854.execute-api.eu-west-1.amazonaws.com/prod'
+const apiGatewayRegion = 'eu-west-1'
 
 /**
  * Add listeners for authentication actions.
@@ -15,30 +17,31 @@ chrome.runtime.onConnect.addListener((port) => {
     return
   }
 
-  // TODO: Errors.
-  port.onMessage.addListener((request) => {
+  port.onMessage.addListener(async (request) => {
     if (request.action === 'login') {
       return Auth.login()
         .then(session => port.postMessage({ ok: true, session }))
-        .catch(() => port.postMessage({ ok: false }))
+        .catch(error => port.postMessage({ ok: false, error }))
     }
 
     if (request.action === 'logout') {
       return Auth.logout()
         .then(() => port.postMessage({ ok: true }))
-        .catch(() => port.postMessage({ ok: false }))
+        .catch(error => port.postMessage({ ok: false, error }))
     }
 
     if (request.action === 'session') {
       return Auth.session()
         .then(session => port.postMessage({ ok: true, session }))
-        .catch(() => port.postMessage({ ok: false }))
+        .catch(error => port.postMessage({ ok: false, error }))
     }
   })
 })
 
 /**
  * Cognito syntax sugar.
+ *
+ * TODO: Events.
  */
 const Auth = {
 
@@ -54,10 +57,12 @@ const Auth = {
     // Create cognito identity credentials.
     await this.credentials()
 
-    console.log(await this.session())
+    // Fire an event and return the session data.
+    const session = await this.session()
 
-    // Return the session data.
-    return this.session()
+    this.onLogin.dispatch(session)
+
+    return session
   },
 
   /**
@@ -76,7 +81,10 @@ const Auth = {
    */
   async session () {
     return new Promise((resolve, reject) => {
-      chrome.storage.sync.get('session', ({ session }) => session ? resolve(session) : reject())
+      chrome.storage.sync.get('auth.session', item => item['auth.session']
+        ? resolve(item['auth.session'])
+        : reject('No user in session')
+      )
     })
   },
 
@@ -99,6 +107,45 @@ const Auth = {
   },
 
   /**
+   * Make an authenticated request to the API Gateway.
+   *
+   * @param {string} method The request method
+   * @param {string} path The path
+   * @param {any} body The request body
+   * @param {object} queryParams Query parameters
+   * @param {object} headers The request headers
+   * @return {Promise<any>} The response
+   */
+  async request (method, path, body, queryParams = {}, headers = {}) {
+    const credentials = await this.credentials()
+
+    // Sign the request.
+    const request = sigV4Client
+      .newClient({
+        accessKey: credentials.accessKeyId,
+        secretKey: credentials.secretAccessKey,
+        sessionToken: credentials.sessionToken,
+        region: apiGatewayRegion,
+        endpoint: apiGatewayUrl
+      })
+      .signRequest({
+        method: method.toUpperCase(),
+        path,
+        queryParams,
+        body,
+        headers
+      })
+
+    // Send the signed request.
+    return axios.request({
+      url: request.url,
+      method,
+      headers: request.headers,
+      data: body
+    }).then(({ data }) => data)
+  },
+
+  /**
    * Initialize the user session via google apis.
    */
   async _authenticate () {
@@ -117,7 +164,7 @@ const Auth = {
         interactive: true
       }, async (response) => {
         if (chrome.runtime.lastError) {
-          reject()
+          reject('Failed to launch the authentication flow')
         }
 
         // Should reject the promise automatically if anything goes wrong.
@@ -144,7 +191,7 @@ const Auth = {
    */
   async _saveSession (session) {
     return new Promise((resolve) => {
-      chrome.storage.sync.set({ session }, () => resolve())
+      chrome.storage.sync.set({ 'auth.session': session }, () => resolve())
     })
   },
 
@@ -153,8 +200,13 @@ const Auth = {
    */
   async _destroySession () {
     return new Promise((resolve) => {
-      chrome.storage.sync.remove('session', () => resolve())
+      chrome.storage.sync.remove('auth.session', () => resolve())
     })
-  }
+  },
+
+  /**
+   * Events are defined here.
+   */
+  onLogin: new Event(),
 
 }
