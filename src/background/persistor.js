@@ -130,7 +130,7 @@ const Persistor = {
     this._items = {}
 
     // Reassign the session ID.
-    await this.setSessionId(id)
+    await this.setSessionId(sessionId)
 
     return data
   },

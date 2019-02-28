@@ -20,7 +20,7 @@ $(function () {
   })
 
   $('#btn_load').click(function () {
-    historyMap.database.sessions.displaySessions()
+    listSessions()
   })
 
   $('#btn_logout').click(function () {
@@ -37,6 +37,7 @@ $(function () {
         session = response.session
         redrawMenu()
       })
+      .catch(() => alert('Authentication failed.'))
   })
 })
 
@@ -62,49 +63,42 @@ window.addEventListener('load', () => {
 
 })
 
-// chrome.runtime.onMessage.addListener(function (request) {
-//     if (request.text === 'loggedin') {
-//         loggedIn = true;
-//         historyMap.model.user = request.user;
-//     }
-// });
-
 /**
  * Redraw the menu based on the current application context.
  */
 const redrawMenu = () => {
 
   if (recording) {
-    document.getElementById("btn_start").style.display = "none"
-    document.getElementById("btn_pause").style.display = "initial"
+    document.getElementById('btn_start').style.display = 'none'
+    document.getElementById('btn_pause').style.display = 'initial'
   } else {
-    document.getElementById("btn_start").style.display = "initial"
-    document.getElementById("btn_pause").style.display = "none"
+    document.getElementById('btn_start').style.display = 'initial'
+    document.getElementById('btn_pause').style.display = 'none'
   }
 
   if (session !== null) {
-    document.getElementById("btn_login").style.display = "none"
-    document.getElementById("btn_logout").style.display = "initial"
-    document.getElementById('userImage').style.display = "initial"
+    document.getElementById('btn_login').style.display = 'none'
+    document.getElementById('btn_logout').style.display = 'initial'
+    document.getElementById('userImage').style.display = 'initial'
     document.getElementById('userImage').src = session.profile.picture
 
     //checks if User has Sessions Saved, displays load if true
 
     // if (session !== null) {
     //   if (SessionProfile.length == 0) {
-    //       document.getElementById("btn_load").style.display = 'none'
+    //       document.getElementById('btn_load').style.display = 'none'
     //   } else {
-    //       document.getElementById("btn_load").style.display = 'initial'
+    //       document.getElementById('btn_load').style.display = 'initial'
     //   }
     // } else {
-    //     document.getElementById("btn_load").style.display = 'none'
+    //     document.getElementById('btn_load').style.display = 'none'
     // }
 
   } else {
-      document.getElementById("btn_login").style.display = "initial"
-      document.getElementById("btn_logout").style.display = "none"
-      document.getElementById("btn_load").style.display = "none"
-      document.getElementById('userImage').style.display = "none"
+      document.getElementById('btn_login').style.display = 'initial'
+      document.getElementById('btn_logout').style.display = 'none'
+      document.getElementById('btn_load').style.display = 'none'
+      document.getElementById('userImage').style.display = 'none'
   }
 }
 
@@ -154,38 +148,40 @@ function newHistoryMap() {
 }
 
 //This loads the Sessions in a menu
-historyMap.database.sessions.displaySessions = function () {
+const listSessions = async () => {
 
-    document.getElementById("btn_load").setAttribute("disabled", "disabled");
+    document.getElementById('btn_load').setAttribute('disabled', 1)
 
-    // Managing generated HTML Elements
-    var Div = document.getElementById("Select-Option");
-    var selectList = document.createElement("select");
-    selectList.id = "mySelect";
-    Div.appendChild(selectList);
+    // Load session from the backend.
+    const sessions = await Messaging.send('persistor', { action: 'list-sessions' })
+      .then(({ sessions }) => sessions)
+      .catch(() => alert('Listing user sessions failed.'))
 
-    // Looping thorugh SessionProfile and generating selects
-    for (var i = 0; i < SessionProfile.length; i++) {
+    // Create a select field.
+    const selectContainer = document.getElementById("Select-Option");
+    const select = document.createElement("select");
+    selectContainer.appendChild(select);
 
-        // Generating Option for Select List in combination of Data
-        var option = document.createElement("option");
-        option.value = SessionProfile[i]._id;
-        option.text = SessionProfile[i].name;
-        selectList.appendChild(option);
-    };
+    // Loop through the sessions and show them as options.
+    sessions.forEach((session) => {
+      const option = document.createElement('option')
+      option.setAttribute('value', session)
+      option.innerText = session
+      select.appendChild(option)
+    })
 
-    document.getElementById("mySelect").selectedIndex = -1;
+    select.addEventListener('change', async (e) => {
+      const session = await Messaging.send('persistor', { action: 'load-session', sessionId: select.value })
+        .then(({ session }) => session)
+        .catch(() => alert('Loading session failed.'))
 
-    // Adding listener to trigger when Select makes a change also reset interface for next load
-    document.getElementById("mySelect").addEventListener("change", function (e) {
-        historyMap.database.user.setSelectedSession();
-        document.getElementById("btn_load").setAttribute("enabled", "enabled");
-    });
+      console.log(session)
 
-    // Create event and fire it.
-    var changeEvent = document.createEvent("HTMLEvents");
-    changeEvent.initEvent("change", true, true);
-};
+      // Clean up.
+      select.remove()
+      document.getElementById('btn_load').setAttribute('disabled', 0)
+    })
+}
 
 historyMap.database.sessions.newSession = function () {
     SessionName = document.getElementById('sessionName').value;
