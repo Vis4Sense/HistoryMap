@@ -147,6 +147,8 @@ historyMap.controller.browser = function () {
           ...node,
           source: undefined,
           links: undefined,
+          children: undefined,
+          parent: undefined
         }})
 			}
 		} else {

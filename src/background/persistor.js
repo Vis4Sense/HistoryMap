@@ -24,7 +24,7 @@ chrome.runtime.onConnect.addListener((port) => {
     }
 
     if (request.action === 'set-session') {
-      return Persistor.setSessionId(request.sessionId)
+      return Persistor.setSession(request.session)
         .then(() => port.postMessage({ ok: true }))
         .catch(() => port.postMessage({ ok: false }))
     }
@@ -102,18 +102,19 @@ const Persistor = {
 
     return Auth.request('put', '/v1/nodes', {
       nodes: Object.values(this._items),
-      sessionId: await this._getCurrentSessionId()
+      sessionId: (await this._getCurrentSession()).id,
+      sessionName: (await this._getCurrentSession()).name
     }).then(() => this._items = {})
   },
 
   /**
-   * Set the session id.
+   * Set the session.
    *
-   * @param {string} sessionId The session id
+   * @param {any} session The session
    */
-  async setSessionId (sessionId) {
+  async setSession (session) {
     return new Promise((resolve) => {
-      chrome.storage.sync.set({ 'persistor.session': sessionId }, () => resolve())
+      chrome.storage.sync.set({ 'persistor.session': session }, () => resolve())
     })
   },
 
@@ -130,7 +131,7 @@ const Persistor = {
     this._items = {}
 
     // Reassign the session ID.
-    await this.setSessionId(sessionId)
+    await this.setSession({ id: data[0].sessionId, name: data[0].sessionName })
 
     return data
   },
@@ -145,11 +146,11 @@ const Persistor = {
   },
 
   /**
-   * Retrieve the current session id.
+   * Retrieve the current session.
    *
-   * @return {Promise<string>} The session id
+   * @return {Promise<any>} The session
    */
-  async _getCurrentSessionId () {
+  async _getCurrentSession () {
     return new Promise((resolve, reject) => {
       chrome.storage.sync.get('persistor.session', item => item['persistor.session']
         ? resolve(item['persistor.session'])

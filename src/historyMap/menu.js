@@ -60,7 +60,7 @@ window.addEventListener('load', () => {
   /**
    * Create a new persistence session.
    */
-  Messaging.send('persistor', { action: 'set-session', sessionId: uuidv4() })
+  Messaging.send('persistor', { action: 'set-session', session: { id: uuidv4(), name: prompt('Enter session name:') } })
     .catch(() => undefined)
 
 })
@@ -69,7 +69,6 @@ window.addEventListener('load', () => {
  * Redraw the menu based on the current application context.
  */
 const redrawMenu = () => {
-
   if (recording) {
     document.getElementById('btn_start').style.display = 'none'
     document.getElementById('btn_pause').style.display = 'initial'
@@ -97,9 +96,13 @@ const newHistoryMap = async () => {
     return
   }
 
+  // Force commit the queue.
+  await Messaging.send('persistor', { action: 'force-commit' })
+    .catch(() => undefined)
+
   // Set a new session id.
-  await Messaging.send('persistor', { action: 'set-session', sessionId: uuidv4() })
-    .catch(() => undefined).
+  await Messaging.send('persistor', { action: 'set-session', session: { id: uuidv4(), name: prompt('Enter session name:') } })
+    .catch(() => undefined)
 
   // Clear the history map.
   historyMap.model.nodes.empty()
@@ -123,17 +126,26 @@ const listSessions = async () => {
   // Loop through the sessions and show them as options.
   sessions.forEach((session) => {
     const option = document.createElement('option')
-    option.setAttribute('value', session)
-    option.innerText = session
+    option.setAttribute('value', session.id)
+    option.innerText = session.name || session.id
     select.appendChild(option)
   })
 
   select.selectedIndex = -1
 
-  select.addEventListener('change', async (e) => {
-    const nodes = await Messaging.send('persistor', { action: 'load-session', sessionId: select.value })
+  select.addEventListener('change', async () => {
+    let nodes = await Messaging.send('persistor', { action: 'load-session', sessionId: select.value })
       .then(({ session }) => session)
       .catch(() => alert('Loading session failed.'))
+
+    nodes = nodes.map((node) => ({
+      ...node,
+      // source: nodes.find(n => n.id === node.from) || null,
+      links: nodes.filter(n => n.from === node.id),
+      // parent: node.parent ? nodes.find(n => n.id === node.parent) || null : null,
+    }))
+
+    console.log({ ...nodes })
 
     // Load data to the history map.
     historyMap.model.nodes.empty()
