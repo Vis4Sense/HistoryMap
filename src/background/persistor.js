@@ -7,8 +7,6 @@ const minBatchSize = 5
 
 /**
  * Add listeners for persistence actions.
- *
- * TODO: session handling.
  */
 chrome.runtime.onConnect.addListener((port) => {
   if (port.name !== 'persistor') {

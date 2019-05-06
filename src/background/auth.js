@@ -4,10 +4,10 @@
  */
 const googleClientId = '527715214680-3eqom1v7vv9s7oeh9frb7ee2ommr2t88.apps.googleusercontent.com'
 const googleLoginType = 'accounts.google.com'
-const identityPoolId = 'eu-west-1:cf66235e-c684-4f02-bb4c-e7feadbe2f65'
-const identityPoolRegion = 'eu-west-1'
-const apiGatewayUrl = 'https://n4t2lv3854.execute-api.eu-west-1.amazonaws.com/prod'
-const apiGatewayRegion = 'eu-west-1'
+const identityPoolId = 'eu-west-2:515f3296-8235-40d1-99a6-49716ed1328a'
+const identityPoolRegion = 'eu-west-2'
+const apiGatewayUrl = 'https://bw4dok4cae.execute-api.eu-west-2.amazonaws.com/prod'
+const apiGatewayRegion = 'eu-west-2'
 
 /**
  * Add listeners for authentication actions.
@@ -40,8 +40,6 @@ chrome.runtime.onConnect.addListener((port) => {
 
 /**
  * Cognito syntax sugar.
- *
- * TODO: Events.
  */
 const Auth = {
 
@@ -86,6 +84,15 @@ const Auth = {
         : reject('No user in session')
       )
     })
+      .then((session) => new Promise((resolve, reject) => {
+        AWS.config.region = identityPoolRegion
+        AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+          IdentityPoolId: identityPoolId,
+          Logins: { [googleLoginType]: session.idToken },
+        })
+
+        AWS.config.credentials.get(e => e ? reject(e) : resolve(session))
+      }))
   },
 
   /**
