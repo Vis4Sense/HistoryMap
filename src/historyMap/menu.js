@@ -1,217 +1,159 @@
-let SessionName;
-let SessionProfile;
-let debug_test_result;
-let recording = true; // whether new noded is added to historymap or not
-let loggedIn = false; // whether user is logged in
+// Redundant 3
+let SessionName
+let SessionProfile
+let loggedIn = false // whether user is logged in
+
+let recording = true // whether new noded is added to historymap or not
+let session = null
 
 $(function () {
-    $('#btn_start').click(function () {
-        recording = true;
-        btnDisplay();
-    });
-    $('#btn_pause').click(function () {
-        recording = false;
-        btnDisplay();
-    });
-    $('#btn_new').click(function () {
-        newHistoryMap();
-    });
-    $('#btn_load').click(function () {
-        historyMap.database.sessions.displaySessions();
-    });
-    $('#btn_logout').click(function () {
-        chrome.runtime.sendMessage({
-            text: 'logout',
-            function (response) {
-                console.log('response from login.js', response.text);
-            }
-        });
-        location.reload();
-        loggedIn = false;
-        btnDisplay();
-    });
-    $('#btn_login').click(function () {
-        // run hello.js google+ login
-        chrome.runtime.sendMessage({
-            text: 'login',
-            function (response) {
-                console.log('response from login.js', response.text);
-            }
-        });
-    });
-});
+  $('#btn_start').click(function () {
+    recording = true
+    redrawMenu()
+  })
 
-window.onload = function () {
-    btnDisplay();
-};
+  $('#btn_pause').click(function () {
+    recording = false
+    redrawMenu()
+  })
 
-chrome.runtime.onMessage.addListener(function (request) {
-    if (request.text === 'loggedin') {
-        loggedIn = true;
-        historyMap.model.user = request.user;
-    }
-});
+  $('#btn_new').click(function () {
+    newHistoryMap()
+  })
 
-function btnDisplay() {
-    // make only the relevant button visible
+  $('#btn_load').click(function () {
+    listSessions()
+  })
 
-    if (recording) {
-        document.getElementById("btn_start").style.display = "none";
-        document.getElementById("btn_pause").style.display = "initial";
-    } else {
-        document.getElementById("btn_start").style.display = "initial";
-        document.getElementById("btn_pause").style.display = "none";
-    }
+  $('#btn_logout').click(function () {
+    Messaging.send('auth', { action: 'logout' })
+      .then(() => {
+        session = null
+        redrawMenu()
+      })
+  })
 
-    if (loggedIn) {
-        document.getElementById("btn_login").style.display = "none";
-        document.getElementById("btn_logout").style.display = "initial";
-        document.getElementById('userImage').style.display = "initial";
-        userImage.src = historyMap.database.user.profile.image.url;
+  $('#btn_login').click(function () {
+    Messaging.send('auth', { action: 'login' })
+      .then((response) => {
+        session = response.session
+        redrawMenu()
+      })
+      .catch(() => alert('Authentication failed.'))
+  })
+})
 
-        //checks if User has Sessions Saved, displays load if true
+window.addEventListener('load', () => {
 
-        if (typeof (SessionProfile) != 'undefined') {
+  /**
+   * Load the user session from the background script.
+   */
+  Messaging.send('auth', { action: 'session' })
+    .then((response) => {
+      session = response.session
+      redrawMenu()
+    })
+    .catch(() => {
+      redrawMenu()
+    })
 
-            if (SessionProfile.length == 0) {
-                document.getElementById("btn_load").style.display = 'none';
-            } else {
-                document.getElementById("btn_load").style.display = 'initial';
-            }
-        } else {
-            document.getElementById("btn_load").style.display = 'none';
-        }
+  /**
+   * Create a new persistence session.
+   */
+  Messaging.send('persistor', { action: 'set-session', session: { id: uuidv4(), name: prompt('Enter session name:') } })
+    .catch(() => undefined)
 
-    } else {
-        document.getElementById("btn_login").style.display = "initial";
-        document.getElementById("btn_logout").style.display = "none";
-        document.getElementById("btn_load").style.display = "none";
-        document.getElementById('userImage').style.display = "none";
-    }
+})
+
+/**
+ * Redraw the menu based on the current application context.
+ */
+const redrawMenu = () => {
+  if (recording) {
+    document.getElementById('btn_start').style.display = 'none'
+    document.getElementById('btn_pause').style.display = 'initial'
+  } else {
+    document.getElementById('btn_start').style.display = 'initial'
+    document.getElementById('btn_pause').style.display = 'none'
+  }
+
+  if (session !== null) {
+    document.getElementById('btn_login').style.display = 'none'
+    document.getElementById('btn_logout').style.display = 'initial'
+    document.getElementById('userImage').style.display = 'initial'
+    document.getElementById('userImage').src = session.profile.picture
+  } else {
+      document.getElementById('btn_login').style.display = 'initial'
+      document.getElementById('btn_logout').style.display = 'none'
+      document.getElementById('btn_load').style.display = 'none'
+      document.getElementById('userImage').style.display = 'none'
+  }
 }
 
-function newHistoryMap() {
-    
-    let confirmed = false;
+const newHistoryMap = async () => {
+  // Check if the user is logged in or they agree to losing all data.
+  if (session === null && !confirm('All data will be lost.')) {
+    return
+  }
 
-    if (!loggedIn && historyMap.model.nodes.getSize === 0) {
-        confirmed = confirm("Do you want to start a new session? All the progress will be lost if you are not logged in.")
-    }
+  // Force commit the queue.
+  await Messaging.send('persistor', { action: 'force-commit' })
+    .catch(() => undefined)
 
-    if (loggedIn || confirmed) {
+  // Set a new session id.
+  await Messaging.send('persistor', { action: 'set-session', session: { id: uuidv4(), name: prompt('Enter session name:') } })
+    .catch(() => undefined)
 
-        historyMap.model.nodes.empty();
-
-        if (loggedIn) {
-            // so user can't create press the 'new' button more than once.
-            document.getElementById('btn_new').disabled = true;
-
-            // add a text field
-            var input = document.createElement('input');
-            input.type = 'text';
-            var today = new Date();
-            //input.placeholder = today;
-            input.value = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + ' ' + today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
-            input.id = 'sessionName';
-            document.getElementById('settings').appendChild(input);
-            input.focus();
-
-            // add a button
-            var button = document.createElement('button');
-            button.type = 'button';
-            button.innerHTML = 'Create';
-            button.id = 'btn_new_sess';
-            document.getElementById('settings').appendChild(button);
-
-            $(function () {
-                $('#btn_new_sess').click(function () {
-                    historyMap.database.sessions.newSession();
-                })
-            });
-        }
-    }
+  // Clear the history map.
+  historyMap.model.nodes.empty()
 }
 
 //This loads the Sessions in a menu
-historyMap.database.sessions.displaySessions = function () {
+const listSessions = async () => {
 
-    document.getElementById("btn_load").setAttribute("disabled", "disabled");
+  document.getElementById('btn_load').setAttribute('disabled', '')
 
-    // Managing generated HTML Elements
-    var Div = document.getElementById("Select-Option");
-    var selectList = document.createElement("select");
-    selectList.id = "mySelect";
-    Div.appendChild(selectList);
+  // Load session from the backend.
+  const sessions = await Messaging.send('persistor', { action: 'list-sessions' })
+    .then(({ sessions }) => sessions)
+    .catch(() => alert('Listing user sessions failed.'))
 
-    // Looping thorugh SessionProfile and generating selects
-    for (var i = 0; i < SessionProfile.length; i++) {
+  // Create a select field.
+  const selectContainer = document.getElementById("Select-Option");
+  const select = document.createElement("select");
+  selectContainer.appendChild(select);
 
-        // Generating Option for Select List in combination of Data
-        var option = document.createElement("option");
-        option.value = SessionProfile[i]._id;
-        option.text = SessionProfile[i].name;
-        selectList.appendChild(option);
-    };
+  // Loop through the sessions and show them as options.
+  sessions.forEach((session) => {
+    const option = document.createElement('option')
+    option.setAttribute('value', session.id)
+    option.innerText = session.name || session.id
+    select.appendChild(option)
+  })
 
-    document.getElementById("mySelect").selectedIndex = -1;
+  select.selectedIndex = -1
 
-    // Adding listener to trigger when Select makes a change also reset interface for next load
-    document.getElementById("mySelect").addEventListener("change", function (e) {
-        historyMap.database.user.setSelectedSession();
-        document.getElementById("btn_load").setAttribute("enabled", "enabled");
-    });
+  select.addEventListener('change', async () => {
+    let nodes = await Messaging.send('persistor', { action: 'load-session', sessionId: select.value })
+      .then(({ session }) => session)
+      .catch(() => alert('Loading session failed.'))
 
-    // Create event and fire it.
-    var changeEvent = document.createEvent("HTMLEvents");
-    changeEvent.initEvent("change", true, true);
-};
+    nodes = nodes.map((node) => ({
+      ...node,
+      // source: nodes.find(n => n.id === node.from) || null,
+      links: nodes.filter(n => n.from === node.id),
+      // parent: node.parent ? nodes.find(n => n.id === node.parent) || null : null,
+    }))
 
-historyMap.database.sessions.newSession = function () {
-    SessionName = document.getElementById('sessionName').value;
-    document.getElementById("sessionName").remove();
-    document.getElementById("btn_new_sess").remove();
-    document.getElementById('btn_new').disabled = false;
+    console.log({ ...nodes })
 
-    //Hacky way to prevent users from creating duplicate Sessions.
-    //Looping thorugh SessionProfile
-    if (typeof SessionProfile == 'undefined' || SessionProfile == null) {
-        console.log("Saving Session: " + SessionName);
-        historyMap.database.user.pushSessToDB();
-    } else {
-        var noDuplicate = true;
+    // Load data to the history map.
+    historyMap.model.nodes.empty()
+    nodes.forEach(n => historyMap.model.nodes.addNode(n))
+    historyMap.view.redraw()
 
-        for (var i = 0; i < SessionProfile.length; i++) {
-
-            //If SessionName matches a Session Generated alert the user
-            if (SessionName == SessionProfile[i].name) {
-                noDuplicate = false;
-                window.alert("Session Name already exsits, please choose a different Session Name");
-                break;
-            }
-        };
-        if (noDuplicate) {
-            //Pushes Session to DB
-            console.log("Saving Session: " + SessionName);
-            historyMap.database.user.pushSessToDB();
-        }
-    }
-
-}
-
-//This connects to the API and loads user sessions and stores it in HistoryMapModel
-historyMap.database.sessions.loadUserSessions = function () {
-    var url = baseURL + "session/" + db.user.profile.email + "/" + historyMap.database.user.APIKey;
-    var xhr = new XMLHttpRequest()
-    xhr.open('GET', url, true)
-    xhr.onload = function () {
-        var users = JSON.parse(xhr.responseText);
-        if (xhr.readyState == 4 && xhr.status == "200") {
-            //picking out Session Information from User Account
-            SessionProfile = users["sessions"];
-            historyMap.model.sessions = SessionProfile;
-            db.user.SessionProfile = users["sessions"];
-            btnDisplay();
-        } else {}
-    }
-    xhr.send(null);
+    // Clean up.
+    select.remove()
+    document.getElementById('btn_load').removeAttribute('disabled')
+  })
 }

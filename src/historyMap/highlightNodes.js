@@ -1,7 +1,7 @@
 historyMap.controller.highlightNodes = function () {
 	let nodes = historyMap.model.nodes;
 	let htabs = historyMap.model.tabs;
-	
+
 	//to check if the highlight can be embedded in a historyMap node
 	function isEmbeddedType(type) {
 			return ['highlight', 'note', 'filter'].includes(type);
@@ -66,12 +66,22 @@ historyMap.controller.highlightNodes = function () {
 			if (tabId) {
 				action.from = tab2nodeId[tabId];
 			}
-		}
+    }
+
+    console.log({ ...action })
+
+    Messaging.send('persistor', { action: 'queue', node: {
+      ...action,
+      source: undefined,
+      links: undefined,
+      children: undefined,
+      parent: undefined,
+    }}).catch(console.log)
 
 		historyMap.model.nodes.addNode(action);
 		return action;
 	}
-	
+
 	//captures messages from background.js and contextMenu.js to update history map nodes with relevant node data
 	chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 		if (request.type === 'highlightHistoryMap') {
@@ -88,7 +98,7 @@ historyMap.controller.highlightNodes = function () {
 			historyMap.view.redraw();
 		}
 	});
-	
+
 	//saves image in a historyMap node (or replaces an existing one)
 	function onImageSaved(id, imageUrl) {
 		var nodes = historyMap.model.nodes.getArray();
@@ -98,7 +108,7 @@ historyMap.controller.highlightNodes = function () {
 			historyMap.view.redraw();
 		}
 	}
-	
+
 	//deletes the image from the historyMap node
 	function onImageRemoved(id, imageUrl) {
 		var nodes = historyMap.model.nodes.getArray();

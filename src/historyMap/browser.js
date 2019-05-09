@@ -45,14 +45,14 @@ historyMap.controller.browser = function () {
 		// this does not catch the event of manually created tab?
 
 		if (!isIgnoredTab(tab)) {
-			console.log('newTab -', 'tabId:' + tab.id, ', parent:' + tab.openerTabId, ', url:' + tab.url, tab);
+			// console.log('newTab -', 'tabId:' + tab.id, ', parent:' + tab.openerTabId, ', url:' + tab.url, tab);
 			let historyMapNodes = nodes.getArray().filter(n => (n.url == tab.url));
 			let clickedNodes = historyMapNodes.filter(n => ((n.clicked == true) && (n.tabStatus == "closed")));
 			//annotation (highlight) nodes
 			let highlightNodes = historyMapNodes.filter(n => (n.embedded != undefined));
 			let clickedHighlightNodes = highlightNodes.filter(n => (n.clicked == true));
 
-			//if an annotation(highlight) node was clicked 
+			//if an annotation(highlight) node was clicked
 			if (clickedHighlightNodes.length > 0) {
 				let parentNode = clickedHighlightNodes[0].parent;
 				//if the Tab which contains the annotation is open
@@ -62,7 +62,7 @@ historyMap.controller.browser = function () {
 					//add a Tab using the node representing the webpage
 					htabs.addTab(new Tab(tab.id, parentNode, false));
 				}
-				//if a normal historyMap node was clicked 
+				//if a normal historyMap node was clicked
 			} else if (clickedNodes.length > 0) {
 				//adds a stub Tab(with preused node), for onUpdated to process it correctly
 				htabs.addTab(new Tab(tab.id, clickedNodes[0], false));
@@ -101,7 +101,7 @@ historyMap.controller.browser = function () {
 			}
 
 			let htab;
-			//if an annotation node was clicked 
+			//if an annotation node was clicked
 			if (clickedNode) {
 				//use annotation parent node tabId
 				let parentNode = clickedHighlightNodes[0].parent;
@@ -138,10 +138,18 @@ historyMap.controller.browser = function () {
 
 			// - status: 'complete', {do nothing}
 			if (changeInfo.status == 'complete') {
-				htab.isCompleted = true;
-				if (loggedIn === true) {
-					historyMap.database.user.Node2DB();
-				}
+        htab.isCompleted = true;
+
+        // Enqueue a node change, we need to flatten the source and links due to
+        // circular dependencies. This is reconstructed from IDs when loading
+        // the session.
+        Messaging.send('persistor', { action: 'queue', node: {
+          ...node,
+          source: undefined,
+          links: undefined,
+          children: undefined,
+          parent: undefined
+        }})
 			}
 		} else {
 			ignoredTabsIdToUrl[tab.id] = tab.url;
@@ -180,7 +188,7 @@ historyMap.controller.browser = function () {
 				url: tab.url
 			}, results => {
 				// The latest one contains information about the just completely loaded page
-				const type = results && results.length ? _.last(results).transition : undefined; // the 'transition' is a field of the chrome 'VisitItem' object(https://developer.chrome.com/extensions/history#type-VisitItem) and has these possible values (https://developer.chrome.com/extensions/history#type-TransitionType) 
+				const type = results && results.length ? _.last(results).transition : undefined; // the 'transition' is a field of the chrome 'VisitItem' object(https://developer.chrome.com/extensions/history#type-VisitItem) and has these possible values (https://developer.chrome.com/extensions/history#type-TransitionType)
 
 				node.type = type;
 			});

@@ -1,91 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Captures and visualizes browsing sessions.">
-    <meta name="author" content="phongvis - Phong Nguyen">
-    <title>History Map</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Captures and visualizes browsing sessions.">
+  <meta name="author" content="phongvis - Phong Nguyen">
+  <title>History Map</title>
 
-    <link rel="icon" href="/logo/historymap19px.png">
-    <link rel="stylesheet" href="/lib/bootstrap-sm.min.css">
-    <link rel="stylesheet" href="/lib/fontello/css/fontello.css">
-    <link rel="stylesheet" href="core.css">
-    <link rel="stylesheet" href="sensemap.css">
+  <link rel="icon" href="/logo/historymap19px.png">
+  <link rel="stylesheet" href="/lib/bootstrap-sm.min.css">
+  <link rel="stylesheet" href="/lib/fontello/css/fontello.css">
+  <link rel="stylesheet" href="core.css">
+  <link rel="stylesheet" href="sensemap.css">
 
-    <style>
-        body {
-            overflow: hidden;
-            margin-top: 90px;
-        }
+  <style>
+    body {
+      overflow: hidden;
+      margin-top: 90px;
+    }
 
-        .sm-history-map-container {
-            overflow: hidden;
-            position: relative;
-            width: 100%;
-            height: 100%;
-        }
+    .sm-history-map-container {
+      overflow: hidden;
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
 
-        #userImage {
-            margin-left: 10px;
-            border-radius: 50%;
-            width: 3em;
-        }
-    </style>
+    #userImage {
+      margin-left: 10px;
+      border-radius: 50%;
+      width: 3em;
+    }
+  </style>
 </head>
 
 <body>
-    <svg class="sm-history-map-container"></svg>
+  <svg class="sm-history-map-container"></svg>
 
-    <script src="/lib/jquery.min.js"></script>
-    <script src="/lib/jquery-ui.min.js"></script>
-    <script src="/lib/d3.min.js"></script>
-    <script src="/lib/lodash.min.js"></script>
-    <script src="/lib/mxClient.js"></script>
-    <script src="/lib/hello.all.min.js"></script>
-    <!-- for stringify and parse json with circular reference when saving and loading sessions (https://github.com/WebReflection/circular-json) -->
-    <script src="/lib/circular-json.js"></script>
-    <!-- for generating UUID v4 (https://www.npmjs.com/package/uuid) -->
-    <script src="/lib/uuid-v4.js"></script>
+  <!-- APIs -->
+  <script src="../api/Messaging.js"></script>
 
-    <!-- <script src="../core.js"></script> -->
-    <script src="historyMap.js"></script>
-    <script src="../misc/sugar.js"></script>
-    <script src="widgets.js"></script>
-    <script src="browser.js"></script>
-	<script src="highlightNodes.js"></script>
-    <script src="listToTree.js"></script>
-    <script src="forest.js"></script>
-    <script src="historyMapVis.js"></script>
-    <script src="historyMapData.js"></script>
-    <script src="menu.js"></script>
-    <script src="database.js"></script>
+  <script src="/lib/jquery.min.js"></script>
+  <script src="/lib/jquery-ui.min.js"></script>
+  <script src="/lib/d3.min.js"></script>
+  <script src="/lib/lodash.min.js"></script>
+  <script src="/lib/mxClient.js"></script>
+  <!-- for stringify and parse json with circular reference when saving and loading sessions (https://github.com/WebReflection/circular-json) -->
+  <script src="/lib/circular-json.js"></script>
+  <!-- for generating UUID v4 (https://www.npmjs.com/package/uuid) -->
+  <script src="/lib/uuid-v4.js"></script>
+  <!-- <script src="../core.js"></script> -->
+  <script src="historyMap.js"></script>
+  <script src="../misc/sugar.js"></script>
+  <script src="widgets.js"></script>
+  <script src="browser.js"></script>
+  <script src="highlightNodes.js"></script>
+  <script src="listToTree.js"></script>
+  <script src="forest.js"></script>
+  <script src="historyMapVis.js"></script>
+  <script src="historyMapData.js"></script>
+  <script src="menu.js"></script>
+  <script src="database.js"></script>
 
+  <div id="settings">
+    <div class="btn-toolbar">
+      <div class="btn-group">
+        <button id="btn_new" class="btn btn-default"><i class="demo-icon icon-doc"></i> New</button>
+        <button id="btn_load" class="btn btn-default"><i class="demo-icon icon-download"></i> Load</button>
+        <button id="btn_start" class="btn btn-default"><i class="demo-icon icon-play"></i> Resume</button>
+        <button id="btn_pause" class="btn btn-default"><i class="demo-icon icon-pause"></i> Pause</button>
+        <button id="btn_login" class="btn btn-default"><i class="demo-icon icon-login-1"></i> Login</button>
+        <button id="btn_logout" class="btn btn-default"><i class="demo-icon icon-logout-1"></i> Logout</button>
 
+        <div id="Select-Option"></div>
+      </div>
 
-    <div id='settings'>
-        <div class="btn-toolbar">
-            <div class="btn-group">
-                <button id='btn_new' class="btn btn-default">
-                    <i class="demo-icon icon-doc"></i> New</button>
-                <button id='btn_load' class="btn btn-default">
-                    <i class="demo-icon icon-download"></i> Load</button>
-                <button id='btn_start' class="btn btn-default">
-                    <i class="demo-icon icon-play"></i> Resume</button>
-                <button id='btn_pause' class="btn btn-default">
-                    <i class="demo-icon icon-pause"></i> Pause</button>
-                <button id='btn_login' class="btn btn-default">
-                    <i class="demo-icon icon-login-1"></i> Login</button>
-                <button id='btn_logout' class="btn btn-default">
-                    <i class="demo-icon icon-logout-1"></i> Logout</button>
-                <div id="Select-Option">
-                </div>
-            </div>
-            <img id='userImage' alt="user image">
-        </div>
+      <img id="userImage" alt="user image">
     </div>
-
+  </div>
 </body>
-
 </html>
