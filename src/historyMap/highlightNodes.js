@@ -68,8 +68,6 @@ historyMap.controller.highlightNodes = function () {
 			}
     }
 
-    console.log({ ...action })
-
     Messaging.send('persistor', { action: 'queue', node: {
       ...action,
       source: undefined,

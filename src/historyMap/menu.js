@@ -140,17 +140,17 @@ const listSessions = async () => {
 
     nodes = nodes.map((node) => ({
       ...node,
-      // source: nodes.find(n => n.id === node.from) || null,
+      source: nodes.find(n => n.id === node.from) || null,
       links: nodes.filter(n => n.from === node.id),
-      // parent: node.parent ? nodes.find(n => n.id === node.parent) || null : null,
-    }))
-
-    console.log({ ...nodes })
+      parent: node.parent ? nodes.find(n => n.id === node.parent) || null : null,
+    })).reverse()
 
     // Load data to the history map.
     historyMap.model.nodes.empty()
-    nodes.forEach(n => historyMap.model.nodes.addNode(n))
-    historyMap.view.redraw()
+    nodes.forEach((node) => {
+      historyMap.model.nodes.addNode(node)
+      historyMap.view.redraw()
+    })
 
     // Clean up.
     select.remove()
