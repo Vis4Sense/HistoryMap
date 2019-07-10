@@ -2,7 +2,6 @@
 /**
  * Basic auth configuration.
  */
-// const googleClientId = '527715214680-3eqom1v7vv9s7oeh9frb7ee2ommr2t88.apps.googleusercontent.com'
 const googleClientId = '959526320490-n8sju47gtn52m7tidvbs285qb9vv3cmu.apps.googleusercontent.com'
 const googleLoginType = 'accounts.google.com'
 const identityPoolId = 'eu-west-2:515f3296-8235-40d1-99a6-49716ed1328a'
