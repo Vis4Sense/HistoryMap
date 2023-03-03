@@ -24,6 +24,7 @@ There is a simple user guide here: http://vis4sense.github.io/sensemap/#guide.
 ## Contribute
 
 There is more details on the [wikipage](https://github.com/Vis4Sense/HistoryMap/wiki) on how to contribute to the development. We currently need help on:
+- Maybe a better architecture
 - Improve the design, both the interface and user interaction;
 - Implementing [new features](https://github.com/Vis4Sense/HistoryMap/labels/improvement);
 - Testing and fixing [bugs](https://github.com/Vis4Sense/HistoryMap/labels/bug);
