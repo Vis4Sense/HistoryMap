@@ -1,3 +1,7 @@
+# Help needed
+
+Help needed to finish the rebuild of the extension! Please contact me by email (kai.xu@nottingham.ac.uk) if you are interested.
+
 # Overview
 
 HistoryMap is a Chrome extension designed to help mamange (many) opened tabs, or 'supporting sensemaking' in the context of academic research. As the name indicates, it creates a map of pages you visited, making it easier to find a visited page and understand how pages are linked. Also, you can easily find the important information with the highlight and annotation feature. If you are interested in the academic research, there is [more details here](http://vis4sense.github.io/sensemap/).
