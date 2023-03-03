@@ -1,6 +1,6 @@
 # Help needed
 
-Help needed to finish the rebuild of the extension! Please contact me by email (kai.xu@nottingham.ac.uk) if you are interested.
+Help needed to finish the rebuild of the extension! Please contact me by email (kai.xu@nottingham.ac.uk) or post a message here if you are interested.
 
 # Overview
 
@@ -9,11 +9,13 @@ HistoryMap is a Chrome extension designed to help mamange (many) opened tabs, or
 
 ## Install
 
-Currently, the recommended way is to install from the source in github (please use the default 'rebuild-mvc' branch), becuase it is not fully completed yet. Follow [the steps here](https://blog.hunter.io/how-to-install-a-chrome-extension-without-using-the-chrome-web-store-31902c780034) ('Method 1: from the source code') if you are not familiar with installing Chrome extension from source code. It will be availalbe from the Chrome Web Store once completed.
+Currently, the recommended way is to install from the source in github (please use the default 'rebuild-mvc' branch), becuase it is not fully completed yet. Follow [the steps here](https://dev.to/ben/how-to-install-chrome-extensions-manually-from-github-1612) if you are not familiar with installing Chrome extension from source code. It will be availalbe from the Chrome Web Store once completed.
 
-An older version is available in the [Chrome app store](https://chrome.google.com/webstore/detail/sensemap/agljnpanahlilmpipaeflmnjkiiecfjb) (called 'SenseMap'). This version lacks the 'user login' and 'saved sessions' in the new version, and quite a few bug fixes. The source code of this version is the 'master' branch. 
+An older version of the extension is called 'SenseMap'. This version lacks the 'user login' and 'saved sessions' in the new version, and quite a few bug fixes. The source code of this version is the 'master' branch. 
 
 ## Use
+
+(The information below is based on the old 'sensemap' extension, but the main ideas are the same in the historymap. This will be update once the historymap is more or less working.)
 
 [This video](https://vimeo.com/161322047) shows how HistoryMap works, with an introduction to sense-making. 
 
