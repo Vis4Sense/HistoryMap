@@ -2,6 +2,22 @@
 
 Help needed to finish the rebuild of the extension! Please contact me by email (kai.xu@nottingham.ac.uk) or post a message here if you are interested.
 
+# A second rebuild (6 June 2023) ...
+
+It has been a few years since the first HistoryMap rebuild, and the chrome extension development and JavaScript landscape has changed quite a bit: the extension manifest changes from v2 to v3 (breaking changes) and the JavaScript frameworks, such as [React](https://react.dev/), matured a lot, and extension framework, such as [Plasmo](https://www.plasmo.com/), starts to appear. This solves two important issues:
+- The extension development experience becomes better,
+- Using a framework like React/Plasmo can potentially solve the artecture problem that I struggled before.
+
+So, it is time for a second rebuild:
+- Front end: [Plasmo](https://www.plasmo.com/)/[React](https://react.dev/). Plasmo supports other framework as well, such as Vue and Angular, but I was very impressed by the [React documentation](https://react.dev/learn) (comparing to Vue) and its wide adopt, so decided to go for this, even through I need to learn React. 
+  - For those who are familiar with React, Plasmo is kind of the chrome extension development equivalent of [Next.js](https://nextjs.org/).
+  - This might be as performant as the later libraries such [Svelte](https://svelte.dev/) and [Astro](https://astro.build/), but they might not be mature enough and have the level of ecosystem as React.
+- Backe end: [Supabase](https://supabase.com/), which is similar to [firebase](https://firebase.google.com/) but uses open-source sql database [PostegreSQL](https://firebase.google.com/) instead of the proprietary storage firebase uses.
+  - It can generate the backend API access points automatically, which shoudl be handy;
+  - It should make authentication much easier (I heard)
+- Testing: I would like to include some end-to-end testing, but haven't quite decided what to use. I heard that [Playwright](https://playwright.dev/) and [Testing library](https://testing-library.com/) are quite good, better than [Cypress](https://www.cypress.io/). Maybe should include [Storybook](https://storybook.js.org/) as well. 
+  - It will be a balancing act between the efforts needed to learn these and the benefit they bring.
+
 # Overview
 
 HistoryMap is a Chrome extension designed to help mamange (many) opened tabs, or 'supporting sensemaking' in the context of academic research. As the name indicates, it creates a map of pages you visited, making it easier to find a visited page and understand how pages are linked. Also, you can easily find the important information with the highlight and annotation feature. If you are interested in the academic research, there is [more details here](http://vis4sense.github.io/sensemap/).
