@@ -63,12 +63,12 @@ document.addEventListener('DOMContentLoaded', function () {
 				// top: 0,
 				// width: Math.floor(screen.width * 0.33),
 				// height: screen.height
-				left: Math.floor(screen.width * 0.5),
+				// left: 0, // Math.floor(screen.width * 0.5),
 				// top: Math.floor(screen.height * 0.7 + 25),
-				top: 0,
-				width: Math.floor(screen.width / 2),
+				// top: 0,
+				// width: screen.width, // Math.floor(screen.width / 2),
 				// height: Math.floor(screen.height * 0.3 - 25)
-				height: screen.height
+				// height: screen.height
 			}, function (w) {
 				chrome.windows.update(w.id, {
 					focused: true
