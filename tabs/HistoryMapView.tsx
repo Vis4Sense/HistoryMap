@@ -9,3 +9,5 @@ function HistoryMapView() {
  }
   
  export default HistoryMapView
+
+//  access in browser with this url: extension://gmphigidhhldodhjgojihfagbcofcjlh/tabs/HistoryMapView.html
