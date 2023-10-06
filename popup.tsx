@@ -5,11 +5,12 @@ function IndexPopup() {
 
   return (
     <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        padding: 16
-      }}>
+      // style={{
+      //   display: "flex",
+      //   flexDirection: "column",
+      //   padding: 16
+      // }}
+      >
       <h2>
         Welcome to your
         <a href="https://www.plasmo.com" target="_blank">
