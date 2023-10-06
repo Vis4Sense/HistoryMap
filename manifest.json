@@ -1,0 +1,16 @@
+{
+   "manifest_version": 3,
+   "name": "history map mv3",
+   "description": "history map with manifest v3",
+   "version": "0.1",
+   "action": {
+     "default_popup": "popup.html",
+     "default_icon": "assets/icon-stable-diffusion128.png"
+   },
+   "content_scripts": [
+     {
+       "matches": ["<all_urls>"],
+       "js": ["content.js"]
+     }
+   ]
+ }
