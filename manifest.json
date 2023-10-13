@@ -4,7 +4,8 @@
    "description": "history map with manifest v3",
    "version": "0.1",
    "action": {
-     "default_icon": "assets/icon-stable-diffusion128.png"
+     "default_icon": "assets/icon-stable-diffusion128.png",
+     "default_title": "Click to open panel"
    },
    "content_scripts": [
      {
@@ -16,5 +17,5 @@
      "service_worker": "background.js",
      "type": "module"
    },
-   "permissions": ["tabs","storage","scripting"]
+   "permissions": ["tabs","storage","scripting","sidePanel"]
  }

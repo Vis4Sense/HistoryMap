@@ -18,3 +18,7 @@ chrome.action.onClicked.addListener( async (tab) => {
    })
    console.log("Current tab url: ", tab.url)
 })
+
+chrome.sidePanel
+   .setPanelBehavior({openPanelOnActionClick:true})
+   .catch( (error) => console.error(error) )
