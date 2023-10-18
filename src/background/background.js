@@ -26,7 +26,7 @@ chrome.action.onClicked.addListener(async (tab) => {
    // }
    // Create an instance of the history map
    chrome.windows.create({
-      url: "historyMap.html",
+      url: "/src/historymap/historyMap.html",
       type: 'popup',
       // left: 0,
       // top: 0,
