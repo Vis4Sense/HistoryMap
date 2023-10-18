@@ -1,4 +1,4 @@
-import './sw-import.js'
+// import './sw-import.js'
 
 // chrome.runtime.onInstalled.addListener( () => {
 //    chrome.action.setBadgeText({
@@ -49,3 +49,16 @@ chrome.action.onClicked.addListener(async (tab) => {
 chrome.sidePanel
    .setPanelBehavior({ openPanelOnActionClick: true })
    .catch((error) => console.error(error))
+
+
+// listen to events happening in user tab
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+   console.log('tab', tabId + ' updated, title: ' + changeInfo.title + ', url: ' + changeInfo.url)
+
+   const data = {tabID: tabId, changeInfo: changeInfo, tab: tab}
+   // send message to historymap.js
+   chrome.runtime.sendMessage({
+      data: data
+   });
+
+})
