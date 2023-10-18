@@ -45,6 +45,7 @@ chrome.action.onClicked.addListener(async (tab) => {
    });
 })
 
+// not working, maybe need to choose which tab the sidebar will be in: it should be the user tab and not the historymap tab/window
 chrome.sidePanel
    .setPanelBehavior({ openPanelOnActionClick: true })
    .catch((error) => console.error(error))
