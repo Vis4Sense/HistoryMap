@@ -16,7 +16,7 @@ chrome.action.onClicked.addListener(async (tab) => {
    chrome.action.setBadgeText({
       text: nextState
    })
-   console.log("Current tab url: ", tab.url)
+   // console.log("Current tab url: ", tab.url)
 
    // create the history map window
    // const url = chrome.extension.getURL("historyMap.html");
@@ -26,7 +26,7 @@ chrome.action.onClicked.addListener(async (tab) => {
    // }
    // Create an instance of the history map
    chrome.windows.create({
-      url: "/src/historymap/historyMap.html",
+      url: "/src/historymap/hm.html",
       type: 'popup',
       // left: 0,
       // top: 0,
@@ -53,7 +53,7 @@ chrome.sidePanel
 
 // listen to events happening in user tab
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-   console.log('tab', tabId + ' updated, title: ' + changeInfo.title + ', url: ' + changeInfo.url)
+   // console.log('%c tab', 'color: green', tabId, 'updated, url: ', tab.url)
 
    const data = {tabID: tabId, changeInfo: changeInfo, tab: tab}
    // send message to historymap.js
