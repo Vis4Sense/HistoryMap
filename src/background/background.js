@@ -58,6 +58,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
    const data = {tabID: tabId, changeInfo: changeInfo, tab: tab}
    // send message to historymap.js
    chrome.runtime.sendMessage({
+      type: 'tabUpdated',
       data: data
    });
 
