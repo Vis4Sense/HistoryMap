@@ -1,49 +1,44 @@
 // import './sw-import.js'
 
-// chrome.runtime.onInstalled.addListener( () => {
-//    chrome.action.setBadgeText({
-//       text: "Off"
-//    })
+const MAIN_WINDOW_FILENAME = "/src/historymap/hm.html";
 
-//    console.log('HistoryMap: Background service work started.')
-// })
+// Register an action click listener
+chrome.action.onClicked.addListener(activate_main_window)
+  
 
-chrome.action.onClicked.addListener(async (tab) => {
+function activate_main_window(){
+  // Construct the main_window URL
+  const targetURL = chrome.runtime.getURL(MAIN_WINDOW_FILENAME);
+  // Query tabs to find if any match the URL
+  chrome.tabs.query({}, (tabs) => {
+    let found = false;
+    for (const tab of tabs) {
+      if (tab.url === targetURL) {
+        found = true;
+        // Make the tab active within its window
+        chrome.tabs.update(tab.id, { active: true });
 
-   const prevState = await chrome.action.getBadgeText({ tabId: tab.id })
-   const nextState = prevState === 'On' ? 'Off' : 'On'
-
-   chrome.action.setBadgeText({
-      text: nextState
-   })
-   // console.log("Current tab url: ", tab.url)
-
-   // create the history map window
-   // const url = chrome.extension.getURL("historyMap.html");
-   // Only allow a single instance of the history map
-   // if (getView(url)) {
-   //    return;
-   // }
-   // Create an instance of the history map
-   chrome.windows.create({
-      url: "/src/historymap/hm.html",
-      type: 'popup',
-      // left: 0,
-      // top: 0,
-      // width: Math.floor(screen.width * 0.33),
-      // height: screen.height
-      // left: 0, // Math.floor(screen.width * 0.5),
-      // top: Math.floor(screen.height * 0.7 + 25),
-      // top: 0,
-      // width: screen.width, // Math.floor(screen.width / 2),
-      // height: Math.floor(screen.height * 0.3 - 25)
-      // height: screen.height
-   }, function (w) {
-      chrome.windows.update(w.id, {
-         focused: true
+        // Bring the window to the front
+        chrome.windows.update(tab.windowId, {
+          drawAttention: true,
+          focused: true,
+        });
+        break;
+      }
+    }
+    
+    if (!found) {
+      // Create the main_window
+      chrome.windows.create({
+        url: chrome.runtime.getURL(MAIN_WINDOW_FILENAME),
+        //type: "panel", // As of 2023-10-31, panels are not supported and this creates a popup
+        type: "popup", // or panel
       });
-   });
-})
+    }
+  });  
+}
+
+
 
 // not working, maybe need to choose which tab the sidebar will be in: it should be the user tab and not the historymap tab/window
 chrome.sidePanel
@@ -57,9 +52,23 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 
    const data = {tabID: tabId, changeInfo: changeInfo, tab: tab}
    // send message to historymap.js
-   chrome.runtime.sendMessage({
-      type: 'tabUpdated',
-      data: data
-   });
-
+   chrome.runtime
+     .sendMessage({
+       type: "tabUpdated",
+       data: data,
+     })
+     .catch((err) => {
+       if (
+         err.message ===
+         "Could not establish connection. Receiving end does not exist."
+       ) {
+         // Ignore this error.
+         console.log(
+           "sendMessage threw an error: Could not establish connection. Receiving end does not exist. It was ignored because this happens when there are nobody in the forest to hear the tree fall (no other contexts in the extension)."
+         );
+       } else {
+         // Throw the error.
+         throw err;
+       }
+     });
 })

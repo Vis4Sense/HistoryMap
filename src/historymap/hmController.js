@@ -46,3 +46,20 @@ chrome.runtime.onMessage.addListener(
       }
    }
 );
+
+
+// When the window is open, the History Map is open
+window.addEventListener("DOMContentLoaded", function () {
+  toggle_badge("Open");
+});
+
+window.addEventListener("beforeunload", function () {
+  toggle_badge("Off");
+});
+
+
+async function toggle_badge(state) {
+  chrome.action.setBadgeText({
+    text: state,
+  });
+}
