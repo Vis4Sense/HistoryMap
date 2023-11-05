@@ -42,6 +42,8 @@ chrome.runtime.onMessage.addListener(
 
          hmPages.push(newPage)
 
+         list2tree(hmPages)
+
          // console.log('%c newPage added: ', 'color:orange', newPage);
       }
    }
