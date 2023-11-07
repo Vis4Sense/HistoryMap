@@ -70,6 +70,7 @@ function Tree(
     strokeLinecap, // stroke line cap for links
     halo = "#fff", // color of label halo
     haloWidth = 3, // padding around the labels
+    verticalOffset,
     curve = d3.curveBumpX, // curve for the link
   } = {}
 ) {
@@ -91,8 +92,8 @@ function Tree(
   const descendants = root.descendants();
   const L = label == null ? null : descendants.map((d) => label(d.data, d));
 
-  // Compute the layout.
-  const dx = 10;
+  // Compute the layout.NOTE!!!! dx is vertical and dy is horizontal. 
+  const dx = verticalOffset || 20;
   const dy = width / (root.height + padding);
   tree().nodeSize([dx, dy])(root);
 
