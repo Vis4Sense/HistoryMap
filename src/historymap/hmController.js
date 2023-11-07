@@ -13,8 +13,8 @@ chrome.runtime.onMessage.addListener(
         let newPageId = window.crypto.randomUUID();
 
         // check if a page opened in this tab before
-        let parentTab = hmTabs.find((t) => t.tabId === request.data.tabID);
-        let parentTabId;
+        let parentTab = hmTabs.find((t) => t.tabId === request.data.tabID); // NOTE: tabID is not the same case
+        let parentPageId;
 
         // create a hmTab object if this is a new tab
         if (!parentTab) {
@@ -24,11 +24,13 @@ chrome.runtime.onMessage.addListener(
           // if the tab is opened by another tab, the 'openerTabId' property will be set
           let parentTabId = request.data.tab.openerTabId;
           if (parentTabId) {
-            parentTabId = hmTabs.find(
-              (t) => t.tabId === parentTabId
-            ).lastPageId;
+            // Find the parent page
+            const page = hmPages.findLast(
+              (p) => p.tabId == parentTabId
+            )
+            parentPageId = page ? page.pageId : null;
           } else {
-            parentTabId = null;
+            parentPageId = null;
           }
         } else {
           parentPageId = parentTab.lastPageId;
@@ -40,7 +42,7 @@ chrome.runtime.onMessage.addListener(
           request.data.tabID,
           new Date(),
           request.data.tab,
-          parentTabId
+          parentPageId
         );
 
         hmPages.push(newPage);
