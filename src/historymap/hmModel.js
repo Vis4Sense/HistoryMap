@@ -13,6 +13,7 @@ class hmPage {
   }
 }
 
+// --- Kai: why do we need this?
 const pageObj = {
    active: true,
    audible: false,

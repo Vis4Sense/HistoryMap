@@ -24,11 +24,16 @@ chrome.runtime.onMessage.addListener(
           // if the tab is opened by another tab, the 'openerTabId' property will be set
           let parentTabId = request.data.tab.openerTabId;
           if (parentTabId) {
+
             // Find the parent page
+
+            // --- Kai: how is this different from the previous code?
             const page = hmPages.findLast(
               (p) => p.tabId == parentTabId
             )
             parentPageId = page ? page.pageId : null;
+            // ---
+
           } else {
             parentPageId = null;
           }

@@ -14,6 +14,8 @@ function displayTree(dataArray) {
     },
     null
   );
+
+  // Kai: I am not sure what the code does.
   const treeData = [root, ...dataArray]
   const controls = {
     id: (d, n) => d.pageId,
@@ -39,6 +41,8 @@ function displayTree(dataArray) {
   displayElement.innerHTML = "";
   displayElement.appendChild(Tree(treeData, controls));
 }
+
+// Kai: Are we better off with this one, which seems like an updated example? https://observablehq.com/@d3/tree/2
 
 // Copyright 2021-2023 Observable, Inc.
 // Released under the ISC license.
@@ -78,6 +82,9 @@ function Tree(
   // to convert tabular data to a hierarchy; otherwise we assume that the data is
   // specified as an object {children} with nested objects (a.k.a. the “flare.json”
   // format), and use d3.hierarchy.
+
+  // Kai: I think it is better if we move stratify out of the tree drawing function
+
   const root =
     path != null
       ? d3.stratify().path(path)(data)
@@ -94,6 +101,9 @@ function Tree(
 
   // Compute the layout.NOTE!!!! dx is vertical and dy is horizontal. 
   const dx = verticalOffset || 20;
+
+  // Kai: I think it is better if we set dy based on the label length, which we might need to shorten, instead of display width
+
   const dy = width / (root.height + padding);
   tree().nodeSize([dx, dy])(root);
 
