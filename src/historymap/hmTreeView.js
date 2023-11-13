@@ -26,17 +26,17 @@ function displayTree(dataArray) {
       {
         const pId = d.parentPageId
           ? d.parentPageId
-          : d.pageId == rootId
-          ? null
-          : rootId;
-        console.log(d, pId);
+          : d.pageId == rootId // If the page is the root, it has no parent
+          ? null // No parent
+          : rootId; // Default to root 
+        // console.log(d, pId);
         return pId;
       },
     title: (d, n) => d.pageObj.title,
     link: (d, n) => d.pageObj.url,
     width: 1152,
   };
-  console.log("treeData", treeData);
+  // console.log("treeData", treeData);
   const displayElement = document.getElementById("svg-div")
   displayElement.innerHTML = "";
   displayElement.appendChild(Tree(treeData, controls));
