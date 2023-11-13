@@ -1,48 +1,30 @@
 chrome.runtime.onMessage.addListener(
    function (request, sender, sendResponse) {
-      // if ( // Protect against errors in form. 
-      //   request.data &&
-      //   request.data.changeInfo &&
-      //   request.data.changeInfo.url
-      // ) {
-      //   console.log("page updated - URL: ", request.data);
-      // }
-      // There are a few update events when a new page is loaded. changeInfo.status === 'complete' is when the page loading finishes.
+ 
+      // When changeInfo.url
       if (
-        // Protect against errors in form.
-        // request.data &&
-        // request.data.changeInfo &&
-        // request.data.changeInfo.status === "complete"
         request.data &&
         request.data.changeInfo &&
         request.data.changeInfo.url
       ) {
         // debug
-        console.log("page updated Complete: ", request.data);
+        console.log("page updated URL: ", request.data);
 
         let newPageId = window.crypto.randomUUID();
 
-        // check if a page opened in this tab before
-        // let parentTab = hmTabs.find((t) => t.tabId === request.data.tabID); // NOTE: tabID is not the same case
-        // let parentPageId;
-
-        // // create a hmTab object if this is a new tab
-        // if (!parentTab) {
-        //   let newTab = new hmTab(request.data.tabID, newPageId);
-        //   hmTabs.push(newTab);
-
-          // if the tab is opened by another tab, the 'openerTabId' property will be set
-          let parentTabId = request.data.tab.openerTabId;
-          if (parentTabId) {
-            // Find the parent page
-
-            // --- Kai: how is this different from the previous code?
-            const page = hmPages.findLast((p) => p.tabId == parentTabId);
-            parentPageId = page ? page.pageId : null;
-            // ---
-          } else {
-            parentPageId = null;
-          }
+        // if the tab is opened by another tab, the 'openerTabId' property will be set
+        let parentTabId = request.data.tab.openerTabId;
+        if (parentTabId && request.data.tabID != parentTabId) {
+          // Find the parent page
+          const page = hmPages.findLast((p) => p.tabId == parentTabId);
+          parentPageId = page ? page.pageId : null;
+          console.log("parentTabId: ", parentTabId);
+          // The url changed in the same tab
+        } else {
+          const page = hmPages.findLast((p) => p.tabId == request.data.tabID);
+          parentPageId = page ? page.pageId : null;
+          console.log("parentPageId: ", request.data.tabID);
+        }
         // } else {
         //   parentPageId = parentTab.lastPageId;
         // }
@@ -57,7 +39,7 @@ chrome.runtime.onMessage.addListener(
         );
 
         hmPages.push(newPage);
-
+        console.log("hmPages:", hmPages)
         // Map page data to tree data
         displayTree(hmPages);
         // displayTree2(hmPages);
