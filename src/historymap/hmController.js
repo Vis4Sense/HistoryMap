@@ -25,9 +25,6 @@ chrome.runtime.onMessage.addListener(
           parentPageId = page ? page.pageId : null;
           console.log("parentPageId: ", request.data.tabID);
         }
-        // } else {
-        //   parentPageId = parentTab.lastPageId;
-        // }
 
         // Create a new hmPage object
         let newPage = new hmPage(
