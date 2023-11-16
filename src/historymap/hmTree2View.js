@@ -9,27 +9,27 @@ const root = new hmPage(
 );
 console.log("root: ", root);
 
-function displayTree2(pageArray) {
+function displayTree2(pages) {
 
    // Add all page without parent as children of the root
-   const rootedData = pageArray.map((d) => {
+   const rootedPages = pages.map((d) => {
       if (!d.parentPageId) d.parentPageId = rootId;
       return d;
    });
 
    // add the new root to the array
-   rootedData.push(root);
+   rootedPages.push(root);
 
-   console.log("rootedData: ", rootedData);
+   console.log("rootedPages: ", rootedPages);
 
    // create d3 hierarchy with its stratify function
-   const stratifiedData = d3.stratify()
+   const stratifiedPages = d3.stratify()
       .id((d) => d.pageId)
       .parentId((d) => d.parentPageId)
-      (rootedData);
-   console.log("stratifiedData: ", stratifiedData);
+      (rootedPages);
+   console.log("stratifiedPages: ", stratifiedPages);
 
-   createTree2(stratifiedData)
+   createTree2(stratifiedPages)
 };
 
 
