@@ -42,12 +42,12 @@ const pageObj = {
 let hmPages = []
 
 // A opened browser tab (the page opened in a tab can change)
-class hmTab {
-   constructor(tabId, lastPageId) {
-      this.tabId = tabId;
-      this.lastPageId = lastPageId; // the last page opened in this tab
-  }
-}
+// class hmTab {
+//    constructor(tabId, lastPageId) {
+//       this.tabId = tabId;
+//       this.lastPageId = lastPageId; // the last page opened in this tab
+//   }
+// }
 
 // All the browser tabs ever opened
-let hmTabs = []
+// let hmTabs = []
