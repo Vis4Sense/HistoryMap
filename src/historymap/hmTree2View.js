@@ -1,13 +1,13 @@
 // Create a root page for the d3 hierarchy as it does not allow multiple roots
 const rootId = window.crypto.randomUUID();
-const root = new hmPage(
+const rootPage = new hmPage(
    rootId,
    null,
    new Date(),
    { title: "HistoryMap" },
    null
 );
-console.log("root: ", root);
+console.log("rootPage: ", rootPage);
 
 function displayTree2(pages) {
 
@@ -18,7 +18,7 @@ function displayTree2(pages) {
    });
 
    // add the new root to the array
-   rootedPages.push(root);
+   rootedPages.push(rootPage);
 
    console.log("rootedPages: ", rootedPages);
 
@@ -62,7 +62,9 @@ function createTree2(data) {
    // Compute the adjusted height of the tree.
    const height = x1 - x0 + dx * 2;
 
-   const svg = d3.create("svg")
+   document.getElementById("svg-div").innerHTML = "";
+
+   const svg = d3.select("#svg-div").append("svg")
       .attr("width", width)
       .attr("height", height)
       .attr("viewBox", [-dy / 3, x0 - dx, width, height])
