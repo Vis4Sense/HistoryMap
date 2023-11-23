@@ -43,8 +43,8 @@ chrome.runtime.onMessage.addListener(
          hmPages.push(newPage);
          console.log("A new hmPage added:", newPage);
          // Map page data to tree data
-         //   displayTree(hmPages);
-         displayTree2(hmPages);
+         displayTree(hmPages);
+         // displayTree2(hmPages);
       }
    }
 );

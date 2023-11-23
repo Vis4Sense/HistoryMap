@@ -1,3 +1,5 @@
+
+
 // Create a root page for the d3 hierarchy as it does not allow multiple roots
 const rootId = window.crypto.randomUUID();
 const rootPage = new hmPage(
@@ -10,6 +12,13 @@ const rootPage = new hmPage(
 console.log("rootPage: ", rootPage);
 
 function displayTree2(pages) {
+
+   console.log("displayTree2");
+
+   const plot = Plot.rectY({ length: 10000 }, Plot.binX({ y: "count" }, { x: Math.random })).plot();
+   const div = document.querySelector("#myplot");
+   div.innerHTML = "";
+   div.append(plot);
 
    // Add all page without parent as children of the root
    const rootedPages = pages.map((d) => {
@@ -29,7 +38,21 @@ function displayTree2(pages) {
       (rootedPages);
    console.log("stratifiedPages: ", stratifiedPages);
 
-   createTree2(stratifiedPages)
+   // createTree2(stratifiedPages)
+   const plotTree = Plot.plot({
+      axis: null,
+      margin: 10,
+      marginLeft: 40,
+      marginRight: 160,
+      width: 928,
+      height: 500,
+      marks: [
+         Plot.tree(stratifiedPages)
+      ]
+   })
+   const treeDiv = document.querySelector("#svg-div");
+   treeDiv.innerHTML = "";
+   treeDiv.append(plotTree);
 };
 
 
