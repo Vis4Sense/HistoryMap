@@ -63,9 +63,9 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
          "Could not establish connection. Receiving end does not exist."
        ) {
          // Ignore this error.
-         console.log(
-           "sendMessage threw an error: Could not establish connection. Receiving end does not exist. It was ignored because this happens when there are nobody in the forest to hear the tree fall (no other contexts in the extension)."
-         );
+         // console.log(
+         //   "sendMessage threw an error: Could not establish connection. Receiving end does not exist. It was ignored because this happens when there are nobody in the forest to hear the tree fall (no other contexts in the extension)."
+         // );
        } else {
          // Throw the error.
          throw err;
