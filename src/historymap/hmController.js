@@ -1,14 +1,23 @@
+const ignoredUrls = [
+   'chrome-extension://'
+];
+
+function isIgnoredTab(tab) {
+   return ignoredUrls.some(url => tab.url.includes(url));
+}
+
 chrome.runtime.onMessage.addListener(
    function (request, sender, sendResponse) {
 
       // When changeInfo.url
       if (
-         request.data &&
-         request.data.changeInfo &&
-         request.data.changeInfo.url
+         request.data 
+         // && request.data.changeInfo 
+         && request.data.changeInfo.title
+         && !isIgnoredTab(request.data.tab)
       ) {
          // debug
-         console.log("page updated URL: ", request.data);
+         console.log("page updated: ", request.data);
 
          let newPageId = window.crypto.randomUUID();
 
@@ -41,7 +50,7 @@ chrome.runtime.onMessage.addListener(
          );
 
          hmPages.push(newPage);
-         console.log("A new hmPage added:", newPage);
+         // console.log("A new hmPage added:", newPage);
          // Map page data to tree data
          displayTree(hmPages);
          // displayTree2(hmPages);
