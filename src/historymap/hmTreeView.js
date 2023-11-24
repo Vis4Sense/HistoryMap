@@ -16,7 +16,7 @@ function displayTree(dataArray) {
    const treeData = [root, ...dataArray]
    const controls = {
       id: (d, n) => d.pageId,
-      label: (d, n) => (d.pageObj.label ? d.pageObj.label : d.pageObj.title),
+      label: (d, n) => (d.pageObj.label ? d.pageObj.label : d.pageObj.title).slice(0,50),
       // If there is no parent, hang it off the root
       parentId: (d, n) =>
       // If there is a parentID return it, if make the parent the root (except for the root)
