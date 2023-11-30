@@ -12,12 +12,12 @@ chrome.runtime.onMessage.addListener(
       // When changeInfo.url
       if (
          request.data 
-         // && request.data.changeInfo 
+         && request.data.changeInfo 
          && request.data.changeInfo.title
          && !isIgnoredTab(request.data.tab)
       ) {
          // debug
-         console.log("page updated: ", request.data);
+         console.log("page updated: ", request.data.changeInfo, ', tabId:', request.data.tabID, ', openerTabId: ', request.data.tab.openerTabId, ', data: ', request.data);
 
          let newPageId = window.crypto.randomUUID();
 
@@ -30,14 +30,14 @@ chrome.runtime.onMessage.addListener(
                p.tabId === request.data.tab.openerTabId
             );
             if (parentPage) parentPageId = parentPage.pageId
-            console.log("Opened by a page in a different tab: ", parentPageId);
+            // console.log("Opened by a page in a different tab: ", parentPageId);
             // The url changed in the same tab
          } else {
             const parentPage = hmPages.findLast((p) => 
                p.tabId === request.data.tabID
             );
             if (parentPage) parentPageId = parentPage.pageId
-            console.log("Opened by a page in the same tab: ", parentPageId);
+            // console.log("Opened by a page in the same tab: ", parentPageId);
          }
 
          // Create a new hmPage object
