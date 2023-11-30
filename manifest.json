@@ -17,5 +17,5 @@
      "service_worker": "src/background/background.js",
      "type": "module"
    },
-   "permissions": ["tabs","storage","scripting","sidePanel"]
+   "permissions": ["tabs","storage","scripting","sidePanel","history"]
  }
