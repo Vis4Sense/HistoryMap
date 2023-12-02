@@ -1,5 +1,6 @@
 const ignoredUrls = [
-   'chrome-extension://'
+   'chrome-extension://',
+   'edge://extensions/'
 ];
 
 function isIgnoredTab(tab) {
@@ -17,60 +18,60 @@ chrome.runtime.onMessage.addListener(
          && !isIgnoredTab(request.data.tab)
       ) {
          // debug
-         console.log("page updated: ", request.data.changeInfo, ', tabId:', request.data.tabID, ', openerTabId: ', request.data.tab.openerTabId, ', data: ', request.data);
+         console.log("tab updated: ", request.data.changeInfo, ', url: ', request.data.tab.url, ', tabId:', request.data.tabID, ', openerTabId: ', request.data.tab.openerTabId, ', data: ', request.data);
 
-         // testing chrome history api
-         chrome.history.search(
-         {
-            'text': '',                // Return every history item....
-            // 'startTime': oneWeekAgo,   // that was accessed less than one week ago.
-            'maxResults': 5            // Optionally state a limit
-         },
-         function (historyItems) {
-            // For each history item, get details on all visits.
-            // for (var i = 0; i < historyItems.length; ++i) {
-            //    var url = historyItems[i].url;
-            //    // do whatever you want with this visited url
-               // console.log(`history item: ${i}, ${historyItems[i]}, transition type: ${historyItems[i].TransitionType}`);
-            // }
-            console.log('history items: ', historyItems);
-         })
+         // check if the url is typed manually using chrome history api's getVisits function
+         let isTyped = false;
+         chrome.history.getVisits(
+            { url: request.data.tab.url },
+            function (visitItems) {
+               console.log('history entry: ', visitItems[0]);
+               if (visitItems[0].transition === 'typed') {
+                  isTyped = true;
+               }
 
-         let newPageId = window.crypto.randomUUID();
+               let newPageId = window.crypto.randomUUID();
 
-         let parentPageId = null;
+               let parentPageId = null;
 
-         // if the tab is opened by another tab, the 'openerTabId' property will be set
-         if (request.data.tab.openerTabId) {
-            // Find the parent page
-            const parentPage = hmPages.findLast((p) =>
-               p.tabId === request.data.tab.openerTabId
-            );
-            if (parentPage) parentPageId = parentPage.pageId
-            // console.log("Opened by a page in a different tab: ", parentPageId);
-            // The url changed in the same tab
-         } else {
-            const parentPage = hmPages.findLast((p) =>
-               p.tabId === request.data.tabID
-            );
-            if (parentPage) parentPageId = parentPage.pageId
-            // console.log("Opened by a page in the same tab: ", parentPageId);
-         }
+               if (!isTyped) { // find the parent page if the url is not typed manually
 
-         // Create a new hmPage object
-         let newPage = new hmPage(
-            newPageId,
-            request.data.tabID,
-            new Date(),
-            request.data.tab,
-            parentPageId
+                  // if the tab is opened by another tab, the 'openerTabId' property will be set
+                  if (request.data.tab.openerTabId) {
+                     // Find the parent page
+                     const parentPage = hmPages.findLast((p) =>
+                        p.tabId === request.data.tab.openerTabId
+                     );
+                     if (parentPage) parentPageId = parentPage.pageId
+                     // console.log("Opened by a page in a different tab: ", parentPageId);
+
+                  } else { // the tab is opened by the previous page in the same tab
+                     const parentPage = hmPages.findLast((p) =>
+                        p.tabId === request.data.tabID
+                     );
+                     if (parentPage) parentPageId = parentPage.pageId
+                     // console.log("Opened by a page in the same tab: ", parentPageId);
+                  }
+               }
+
+               // Create a new hmPage object
+               let newPage = new hmPage(
+                  newPageId,
+                  request.data.tabID,
+                  new Date(),
+                  request.data.tab,
+                  parentPageId
+               );
+
+               hmPages.push(newPage);
+               console.log("A new hmPage added:", newPage);
+               // Map page data to tree data
+               displayTree(hmPages);
+               // displayTree2(hmPages);
+            }
          );
 
-         hmPages.push(newPage);
-         // console.log("A new hmPage added:", newPage);
-         // Map page data to tree data
-         displayTree(hmPages);
-         // displayTree2(hmPages);
+
       }
    }
 );
