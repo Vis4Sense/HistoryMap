@@ -72,3 +72,28 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
        }
      });
 })
+
+// list to webNavigation events
+chrome.webNavigation.onCommitted.addListener(function (details) {
+   // console.log('%c webNavigation', 'color: green', details)
+   // send message to historymap.js
+   chrome.runtime
+     .sendMessage({
+       type: "webNavigation",
+       data: details,
+     })
+     .catch((err) => {
+       if (
+         err.message ===
+         "Could not establish connection. Receiving end does not exist."
+       ) {
+         // Ignore this error.
+         // console.log(
+         //   "sendMessage threw an error: Could not establish connection. Receiving end does not exist. It was ignored because this happens when there are nobody in the forest to hear the tree fall (no other contexts in the extension)."
+         // );
+       } else {
+         // Throw the error.
+         throw err;
+       }
+     });
+})
