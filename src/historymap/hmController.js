@@ -26,7 +26,7 @@ chrome.runtime.onMessage.addListener(
             { url: request.data.tab.url },
             function (visitItems) {
                console.log('history entry: ', visitItems[0]);
-               if (visitItems[0].transition === 'typed') {
+               if (visitItems.pop().transition === 'typed') {
                   isTyped = true;
                }
 
@@ -36,21 +36,22 @@ chrome.runtime.onMessage.addListener(
 
                if (!isTyped) { // find the parent page if the url is not typed manually
 
-                  // if the tab is opened by another tab, the 'openerTabId' property will be set
-                  if (request.data.tab.openerTabId) {
-                     // Find the parent page
-                     const parentPage = hmPages.findLast((p) =>
+                  // Find the parent page
+                  // check if the tab is opened by a previous page in the same tab
+                  const parentPage = hmPages.findLast((p) =>
+                     p.tabId === request.data.tabID
+                  );
+                  if (parentPage) { // if there was a page in the same tab
+                     parentPageId = parentPage.pageId
+                     // console.log("Opened by a page in the same tab: ", parentPageId);
+                  }
+                  else {
+                     parentPage = hmPages.findLast((p) =>
                         p.tabId === request.data.tab.openerTabId
                      );
-                     if (parentPage) parentPageId = parentPage.pageId
+                     parentPageId = parentPage.pageId
                      // console.log("Opened by a page in a different tab: ", parentPageId);
-
-                  } else { // the tab is opened by the previous page in the same tab
-                     const parentPage = hmPages.findLast((p) =>
-                        p.tabId === request.data.tabID
-                     );
-                     if (parentPage) parentPageId = parentPage.pageId
-                     // console.log("Opened by a page in the same tab: ", parentPageId);
+                     // !! we will be in trouble if we can't find the tab with the 'openerTabId'.
                   }
                }
 
@@ -64,7 +65,7 @@ chrome.runtime.onMessage.addListener(
                );
 
                hmPages.push(newPage);
-               console.log("A new hmPage added:", newPage);
+               // console.log("A new hmPage added:", newPage);
                // Map page data to tree data
                displayTree(hmPages);
                // displayTree2(hmPages);
