@@ -22,11 +22,13 @@ chrome.runtime.onMessage.addListener(
 
          // check if the url is typed manually using chrome history api's getVisits function
          let isTyped = false;
+         let isNewPage = true;
          chrome.history.getVisits(
             { url: request.data.tab.url },
             function (visitItems) {
-               console.log('history entry: ', visitItems[0]);
-               if (visitItems.pop().transition === 'typed') {
+               let lastHistoryEntry = visitItems[visitItems.length - 1];
+               // console.log('history entry: ', lastHistoryEntry);
+               if (lastHistoryEntry.transition && lastHistoryEntry.transition === 'typed') {
                   isTyped = true;
                }
 
@@ -38,11 +40,17 @@ chrome.runtime.onMessage.addListener(
 
                   // Find the parent page
                   // check if the tab is opened by a previous page in the same tab
-                  const parentPage = hmPages.findLast((p) =>
+                  let parentPage = hmPages.findLast((p) =>
                      p.tabId === request.data.tabID
                   );
                   if (parentPage) { // if there was a page in the same tab
-                     parentPageId = parentPage.pageId
+                     if (parentPage.pageObj.url === request.data.tab.url) { // if the url is the same, this is not a new page so just update the title
+                        parentPage.pageObj.title = request.data.tab.title;
+                        isNewPage = false;
+                     }
+                     else {
+                        parentPageId = parentPage.pageId
+                     }
                      // console.log("Opened by a page in the same tab: ", parentPageId);
                   }
                   else {
@@ -55,17 +63,20 @@ chrome.runtime.onMessage.addListener(
                   }
                }
 
-               // Create a new hmPage object
-               let newPage = new hmPage(
-                  newPageId,
-                  request.data.tabID,
-                  new Date(),
-                  request.data.tab,
-                  parentPageId
-               );
+               if (isNewPage) {
+                  // Create a new hmPage object
+                  let newPage = new hmPage(
+                     newPageId,
+                     request.data.tabID,
+                     new Date(),
+                     request.data.tab,
+                     parentPageId
+                  );
 
-               hmPages.push(newPage);
-               // console.log("A new hmPage added:", newPage);
+                  hmPages.push(newPage);
+                  console.log("A new hmPage added:", newPage.pageObj.title, ', ', newPage.pageObj.url);
+               }
+
                // Map page data to tree data
                displayTree(hmPages);
                // displayTree2(hmPages);
