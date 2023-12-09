@@ -7,8 +7,34 @@ function isIgnoredTab(tab) {
    return ignoredUrls.some(url => tab.url.includes(url));
 }
 
+async function getOpenedTabs() {
+   return await chrome.tabs.query({});
+}
+
 chrome.runtime.onMessage.addListener(
    function (request, sender, sendResponse) {
+
+      // add all the tabs opened before running historymap to hmPages
+      if (hmPages.length === 0) {
+         chrome.tabs.query({}, function (openedTabs) {
+            console.log("Tabs opened before historymap: ", openedTabs);
+            for (let i = 0; i < openedTabs.length; i++) {
+               if (!isIgnoredTab(openedTabs[i])) {
+                  let newPageId = window.crypto.randomUUID();
+                  let newPage = new hmPage(
+                     newPageId,
+                     openedTabs[i].id,
+                     new Date(),
+                     openedTabs[i],
+                     null
+                  );
+                  hmPages.push(newPage);
+                  console.log("A new hmPage opened before historymap is added:", newPage.pageObj.title, ', ', newPage.pageObj.url);
+                  displayTree(hmPages);
+               }
+            }
+         });
+      }
 
       // When changeInfo.url
       if (
@@ -82,17 +108,14 @@ chrome.runtime.onMessage.addListener(
                // displayTree2(hmPages);
             }
          );
-
-
       }
-   }
-);
+   })
 
 
 // When the window is open, the History Map is open
 window.addEventListener("DOMContentLoaded", function () {
-   toggle_badge("Open");
-});
+      toggle_badge("Open");
+   });
 
 window.addEventListener("beforeunload", function () {
    toggle_badge("Off");
