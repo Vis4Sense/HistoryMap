@@ -15,13 +15,17 @@ function addPage(tabURL, tabID, pageObj, parentPageId) {
       );
       hmPages.push(newPage);
       console.log("A new hmPage added:", newPage.pageObj.title, ', ', newPage.pageObj.url);
-      displayTree(hmPages);
+      // displayTree(hmPages);
    }
 }
 
 
 chrome.runtime.onMessage.addListener(
    function (request, sender, sendResponse) {
+
+      if (request.type === 'tabUpdated') {
+         console.log("A new page update event: ", request.data);
+      }
 
       // add all the tabs opened before running historymap to hmPages
       if (hmPages.length === 0) {
@@ -30,6 +34,7 @@ chrome.runtime.onMessage.addListener(
             for (let i = 0; i < openedTabs.length; i++) {
                addPage(openedTabs[i].url, openedTabs[i].id, openedTabs[i], null);
             }
+            displayTree(hmPages);
          });
       }
 
@@ -37,7 +42,7 @@ chrome.runtime.onMessage.addListener(
       if (
          request.data
          && request.data.changeInfo
-         && request.data.changeInfo.title
+         // && request.data.changeInfo.title
       ) {
          // debug
          console.log("tab updated: ", request.data.changeInfo, ', url: ', request.data.tab.url, ', tabId:', request.data.tabID, ', openerTabId: ', request.data.tab.openerTabId, ', data: ', request.data);
@@ -52,9 +57,10 @@ chrome.runtime.onMessage.addListener(
                // console.log('history entry: ', lastHistoryEntry);
                if (lastHistoryEntry.transition && lastHistoryEntry.transition === 'typed') {
                   isTyped = true;
+                  console.log('Typed url: ', request.data.tab.url);
                }
 
-               let newPageId = window.crypto.randomUUID();
+               // let newPageId = window.crypto.randomUUID();
 
                let parentPageId = null;
 
@@ -66,8 +72,8 @@ chrome.runtime.onMessage.addListener(
                      p.tabId === request.data.tabID
                   );
                   if (parentPage) { // if there was a page in the same tab
-                     if (parentPage.pageObj.url === request.data.tab.url) { // if the url is the same, this is not a new page so just update the title
-                        parentPage.pageObj.title = request.data.tab.title;
+                     if (parentPage.pageObj.url === request.data.tab.url) { // if the url is the same, this is not a new page so just update pageObj
+                        parentPage.pageObj = request.data.tab;
                         isNewPage = false;
                      }
                      else {
@@ -75,11 +81,13 @@ chrome.runtime.onMessage.addListener(
                      }
                      // console.log("Opened by a page in the same tab: ", parentPageId);
                   }
-                  else {
+                  else { // not typed and not page in the same tab ==> opened by another tab
                      parentPage = hmPages.findLast((p) =>
                         p.tabId === request.data.tab.openerTabId
                      );
-                     parentPageId = parentPage.pageId
+                     if (parentPage) {
+                        parentPageId = parentPage.pageId
+                     }
                      // console.log("Opened by a page in a different tab: ", parentPageId);
                      // !! we will be in trouble if we can't find the tab with the 'openerTabId'.
                   }
@@ -89,11 +97,10 @@ chrome.runtime.onMessage.addListener(
                   // Create a new hmPage object
                   addPage(request.data.tab.url, request.data.tabID, request.data.tab, parentPageId);
                }
-               else {
-                  // Map page data to tree data
-                  displayTree(hmPages);
-                  // displayTree2(hmPages);
-               }
+
+               // Map page data to tree data
+               displayTree(hmPages);
+               // displayTree2(hmPages);
             }
          );
       }
