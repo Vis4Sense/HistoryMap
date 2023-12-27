@@ -28,9 +28,10 @@ chrome.runtime.onMessage.addListener(
       }
 
       // add all the tabs opened before running historymap to hmPages
-      if (hmPages.length === 0) {
+      if (hmPages && hmPages.length === 0) {
          chrome.tabs.query({}, function (openedTabs) {
             console.log("Tabs opened before historymap: ", openedTabs);
+            hmPages = []
             for (let i = 0; i < openedTabs.length; i++) {
                addPage(openedTabs[i].url, openedTabs[i].id, openedTabs[i], null);
             }
@@ -44,6 +45,8 @@ chrome.runtime.onMessage.addListener(
          && request.data.changeInfo
          // && request.data.changeInfo.title
       ) {
+         // Ignore messages from ignored URLs
+         if (request.data && request.data.tab && request.data.tab.url && ignoredUrls.some(url => request.data.tab.url.includes(url))) return
          // debug
          console.log("tab updated: ", request.data.changeInfo, ', url: ', request.data.tab.url, ', tabId:', request.data.tabID, ', openerTabId: ', request.data.tab.openerTabId, ', data: ', request.data);
 

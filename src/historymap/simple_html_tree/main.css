@@ -1,0 +1,349 @@
+:root {
+  --connector-line-width: 1px;
+}
+
+
+body {
+  margin: 0;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 10px;
+}
+
+#root-container {
+  height: 100vh;
+}
+
+.item-contents {
+  position: relative;
+}
+
+.item-contents-display {
+  padding: 2px;
+  background-color: white;
+  max-width: 10em;
+}
+
+
+.item-header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+.item-title {
+  font-weight: bold;
+  font-size: 8px;
+  cursor: default;
+  width: 100%;
+}
+
+.item-title-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 95%;
+  min-width: 30px;
+  cursor: default;
+}
+
+.items-container {
+  margin-left: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.item,
+.items-container {
+  flex-grow: 0;
+}
+
+.invisible {
+  display: none;
+}
+
+.centered .item {
+  position:relative;
+  display: flex;
+  margin-top: 0;
+  flex-direction: column;
+  align-items: center;
+}
+
+.centered .item-contents {
+  margin-bottom: 2em;
+}
+
+.centered .items-container {
+  margin: 0px;
+  display: flex;
+  align-items: flex-start; /* Align items to the top */
+  flex-direction: row;
+  justify-content: center; /* This will center the items horizontally */
+  overflow: visible; /* This ensures the line is not clipped */
+}
+
+/* Additional styles to ensure proper spacing between items */
+.centered .items-container > .item {
+  margin: 0 10px; /* Adjust the spacing as needed */
+}
+
+/* Vertical line from parent to the horizontal line */
+.centered.css-connector .item-contents::after {
+  content: '';
+  position: absolute;
+  top: calc(100%);
+  left: calc(50%);
+  /* Adjust so that it connects with the vertical line */
+  height: 1em;
+  /* This is the length of the line */
+  border-left: calc(var(--connector-line-width)) solid #000;
+  /* The horizontal line */
+}
+
+.centered.css-connector .item.no-items .item-contents::after {
+  display: none;
+  /* Hide lines for an only child */
+}
+
+/* Vertical line from parent to the horizontal line */
+.centered.css-connector .item::after {
+  content: '';
+  position: absolute;
+  top: -1em;
+  left: calc(50%);
+  /* Adjust so that it connects with the vertical line */
+  height: 1em;
+  /* This is the length of the line */
+  border-left: calc(var(--connector-line-width)) solid #000;
+  /* The horizontal line */
+  overflow: visible; /* This ensures the line is not clipped */
+  z-index: 1; /* This ensures the line is above other elements */
+}
+
+
+/* Horizontal line to the right */
+.centered.css-connector .item.first-child::before {
+  content: '';
+  position: absolute;
+  top: -1em;
+  left: 50%;
+  /* Adjust so that it connects with the vertical line */
+  width: calc(50% + 1em);
+  /* This is the length of the line */
+  border-top: calc(var(--connector-line-width)) solid #000;
+  /* The horizontal line */
+  overflow: visible; /* This ensures the line is not clipped */
+  z-index: 1; /* This ensures the line is above other elements */
+}
+
+/* Horizontal line to the left */
+.centered.css-connector .item.last-child::before {
+  content: '';
+  position: absolute;
+  top: -1em;
+  left: -1em;
+  /* Adjust so that it connects with the vertical line */
+  width: calc(50% + 1em);
+  /* This is the length of the line */
+  border-top: calc(var(--connector-line-width)) solid #000;
+  /* The horizontal line */
+  overflow: visible; /* This ensures the line is not clipped */
+  z-index: 1; /* This ensures the line is above other elements */
+}
+
+/* Horizontal line to the left and right */
+.centered.css-connector .item.middle-child::before {
+  content: '';
+  position: absolute;
+  top: -1em;
+  left: -1em;
+  /* Adjust so that it connects with the vertical line */
+  width: calc(100% + 2em);
+  /* This is the length of the line */
+  border-top: calc(var(--connector-line-width)) solid #000;
+  /* The horizontal line */
+  overflow: visible; /* This ensures the line is not clipped */
+  z-index: 1; /* This ensures the line is above other elements */
+}
+
+
+.centered.css-connector .item.only-child::before {
+  display: none;
+}
+
+.centered.css-connector .item.orphan::after {
+  display: none;
+}
+
+.horizontal .item {
+  position: relative;
+  /* Needed for absolute positioning of pseudo-elements */
+  display: flex;
+  align-items: center;
+  vertical-align: middle;
+}
+
+/* Vertical line from the child up and down */
+.horizontal.css-connector .item>.items-container::before {
+  content: '';
+  position: absolute;
+  top: 0%;
+  /* Align with the middle of the parent */
+  left: -12px;
+  height: calc(100% + 4px);
+  /* Make sure the line is long enough to reach the last child */
+  border-left: calc(var(--connector-line-width)) solid #000;
+  /* The vertical line */
+}
+
+/* Vertical line from the child up */
+.horizontal.css-connector .item.last-child>.items-container::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  /* Align with the middle of the parent */
+  left: -12px;
+  height: calc(50% + 1px);
+  /* Make sure the line is long enough to reach the last child */
+  border-left: calc(var(--connector-line-width)) solid #000;
+  /* The vertical line */
+}
+
+/* Vertical line from the child down */
+.horizontal.css-connector .item.first-child>.items-container::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  /* Align with the middle of the parent */
+  left: -12px;
+  height: calc(50% + 4px);
+  /* Make sure the line is long enough to reach the last child */
+  border-left: calc(var(--connector-line-width)) solid #000;
+  /* The vertical line */
+}
+
+/* Horizontal line from child to the vertical line */
+.horizontal.css-connector .item-contents::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -12px;
+  /* Adjust so that it connects with the vertical line */
+  width: 12px;
+  /* This is the length of the line */
+  border-top: calc(var(--connector-line-width)) solid #000;
+  /* The horizontal line */
+}
+
+/* Horizontal line from parent to the vertical line */
+.horizontal.css-connector .item-contents::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: calc(100%);
+  /* Adjust so that it connects with the vertical line */
+  width: 9px;
+  /* This is the length of the line */
+  border-top: calc(var(--connector-line-width)) solid #000;
+  /* The horizontal line */
+}
+
+.horizontal.css-connector .item.only-child::after,
+.horizontal.css-connector .item.only-child>.items-container::before {
+  display: none;
+  /* Hide lines for an only child */
+}
+
+.horizontal.css-connector .item.no-items .item-contents::after {
+  display: none;
+  /* Hide lines for an only child */
+}
+
+.horizontal.css-connector .item.orphan>.item-contents::before {
+  display: none;
+}
+
+.horizontal.css-connector .item.orphan>.items-container::before {
+  display: none;
+}
+
+
+.vertical .item {
+  position: relative;
+  /* Needed for absolute positioning of pseudo-elements */
+  margin: 2px;
+}
+
+
+/* Horizontal line from parent to the vertical line */
+.vertical.css-connector .item-contents::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -1em;
+  /* Adjust so that it connects with the vertical line */
+  width: 1em;
+  /* This is the length of the line */
+  border-top: calc(var(--connector-line-width)) solid #000;
+  /* The horizontal line */
+}
+
+.vertical.css-connector .item.first-child:after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  /* Align with the center of the last child */
+  left: -1em;
+  /* Position to the left of the content */
+  height: calc(100% + 4px);
+  /* The height of the line should be to the top of the items container from the middle of the last child */
+  border-left: calc(var(--connector-line-width)) solid #000;
+  /* The vertical line */
+  /* Shadow for the line */
+}
+
+.vertical.css-connector .item.only-child .item-contents:after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  /* Align with the center of the last child */
+  left: -1em;
+  /* Position to the left of the content */
+  height: calc(50% + 2px);
+  /* The height of the line should be to the top of the items container from the middle of the last child */
+  border-left: calc(var(--connector-line-width)) solid #000;
+  /* The vertical line */
+  /* Shadow for the line */
+}
+
+.vertical.css-connector .item.last-child .item-contents:after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  /* Align with the center of the last child */
+  left: -1em;
+  /* Position to the left of the content */
+  height: calc(50% + 2px);
+  /* The height of the line should be to the top of the items container from the middle of the last child */
+  border-left: calc(var(--connector-line-width)) solid #000;
+  /* The vertical line */
+  /* Shadow for the line */
+}
+
+.vertical.css-connector .item.middle-child:after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  /* Align with the center of the last child */
+  left: -1em;
+  /* Position to the left of the content */
+  height: calc(100% + 4px);
+  /* The height of the line should be to the top of the items container from the middle of the last child */
+  border-left: calc(var(--connector-line-width)) solid #000;
+  /* The vertical line */
+  /* Shadow for the line */
+}
+
+/* The root does not need a line out toward a parent */
+.vertical.css-connector .item.orphan>.item-contents::before {
+  display: none;
+}

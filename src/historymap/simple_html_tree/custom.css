@@ -1,0 +1,64 @@
+
+.favicon {
+  width: 8px;
+  /* Adjust as needed */
+  height: 8px;
+  /* Adjust as needed */
+  margin-left: 0px;
+  margin-right: 2px;
+  margin-top: -1px;
+}
+
+
+.screenshot {
+  max-width: 100%;
+  /* Ensures image does not exceed the width of its container */
+  height: auto;
+  /* Maintains aspect ratio */
+}
+
+.notes {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  cursor: default;
+  display: none;
+}
+
+.note {
+  margin-left: 1em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-contents-display.boxed-item {
+  border: 1px solid lightgray;
+  padding: 5px;
+  margin-bottom: 2px;
+  background-color: white;
+  /* Sets the background color to white */
+  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
+  /* Adds a shadow */
+  width: 100px;
+}
+
+.css-connector  .item::after {
+  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
+}
+
+.css-connector  .item-contents::before {
+  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
+}
+
+.css-connector  .item-contents::after {
+  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
+}
+
+.css-connector .children-container::before {
+  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
+}
+
+/** 
+Connector Controls 
+**/
