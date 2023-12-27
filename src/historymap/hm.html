@@ -5,6 +5,9 @@
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>HistoryMap</title>
+   <!-- Styles -->
+   <link rel="stylesheet" href="debug.css">
+   <!-- Scripts -->
    <script src="../../lib/d3.v7.js"></script>
    <script src="../../lib/plot.js"></script>
    <script src="hmController.js"></script>
@@ -19,7 +22,20 @@
    <div id="myplot"></div> -->
 
    <h1>History Map</h1>
+   <!-- Buttons for saving and loading session -->
+   <div id="session-buttons">
+      <button id="session-button-save" class="button">Save</button>
+      <input type="file" id="session-file-input" accept=".json">
+      <button id="session-button-load" class="button">Load</button>
+   </div>
+   <!-- Debugging div -->
+   <div id="svg-debug" class="hm-debug-historymap"></div>
+   <!-- Main HistoryMap -->
    <div id="svg-div"></div>
+
+   <!-- Scripts for saving and loading sessoin -->
+   <script src="hmSessionSave.js"></script>
+   <script src="hmSessionLoad.js"></script>
 </body>
 
 </html>

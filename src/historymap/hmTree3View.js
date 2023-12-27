@@ -1,5 +1,8 @@
 // copied from displayTree2
-function displayTree3(dataArray) {
+function displayTree3(
+   dataArray,
+   displayElementId = "svg-div"
+) {
    // Create a root object for the tree
    const rootId = window.crypto.randomUUID();
    const root = new hmPage(
@@ -41,7 +44,8 @@ function displayTree3(dataArray) {
       nodePaddingY: 5,
    };
    // console.log("treeData", treeData);
-   const displayElement = document.getElementById("svg-div")
+   // const displayElement = document.getElementById("svg-div")
+   const displayElement = document.getElementById(displayElementId)
    displayElement.innerHTML = "";
    displayElement.appendChild(Tree3(treeData, controls));
 }
@@ -137,23 +141,25 @@ function Tree3(
    // Test only. Generate the rendered size of the node. Use a fixed size
    // for node width and randomly generate node height. See `pageObjWithSize`
    // for data format
-   // const data_ = data.map((d) => {
-   data = data.map((d) => {
+   const data_ = data.map((d) => {
       return {
          ...d,
          nodeSize: d.nodeSize || {
             width: nodeWidth + nodePaddingX * 2,
-            height: Math.random() * 20 + 60 + nodePaddingY * 2
+            // height: Math.random() * 20 + 60 + nodePaddingY * 2
+
+            // Yuhan: change it to a stable mapping
+            height: ((d.pageObj.id || 0) % 10 + 1) * 2 + 60 + nodePaddingY * 2
          }
       }
    });
 
    const root =
       path != null
-         ? d3.stratify().path(path)(data)
+         ? d3.stratify().path(path)(data_)
          : id != null || parentId != null
-            ? d3.stratify().id(id).parentId(parentId)(data)
-            : d3.hierarchy(data, children);
+            ? d3.stratify().id(id).parentId(parentId)(data_)
+            : d3.hierarchy(data_, children);
 
    // Sort the nodes.
    if (sort != null) root.sort(sort);
