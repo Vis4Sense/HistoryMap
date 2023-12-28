@@ -94,3 +94,18 @@ function customContent(itemInfo) {
     </div>
   `
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+
+  // Handle the Selection to Change the Orientation
+  var selectElement = document.getElementById('options-select');
+
+  selectElement.addEventListener('change', (event) => {
+    const element = document.getElementById("root")
+    const orientation = event.target.value
+    const orientations = ["horizontal", "vertical", "centered"]
+    if (!orientations.includes(orientation)) orientation = "horizontal"
+    orientations.forEach(o => element.classList.remove(o));
+    element.classList.add(orientation);
+  });
+})

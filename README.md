@@ -13,6 +13,6 @@ Simple HTML Hierarchy was created with HistoryMap in mind after exploring multip
 
 ### Features
 
-- Simple hierachical data structure
+- Simple hierarchical data structure
 - Horizontal, Vertical, and Centered Orientations
 - Customizable with simple, template-based item rendering
