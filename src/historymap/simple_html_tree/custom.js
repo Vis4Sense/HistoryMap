@@ -1,4 +1,5 @@
 
+let _orientation = "horizontal"
   /* displayTree
     Given an array of hmPage objects
     1. Create a root object
@@ -47,7 +48,7 @@ function displayTree(dataArray) {
   console.log("items:", items)
   let instructions = {
     rootElement: undefined, // will default to "root", 
-    orientation: undefined, // horizontal, vertical, or centered
+    orientation: _orientation, // : undefined, // horizontal, vertical, or centered
     customContent: customContent, // If provided, all items will render using the same customContent, unless an item has been assigned customerContent
     items 
   }
@@ -102,10 +103,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
   selectElement.addEventListener('change', (event) => {
     const element = document.getElementById("root")
-    const orientation = event.target.value
+    _orientation = event.target.value
     const orientations = ["horizontal", "vertical", "centered"]
-    if (!orientations.includes(orientation)) orientation = "horizontal"
+    if (!orientations.includes(_orientation)) _orientation = "horizontal"
     orientations.forEach(o => element.classList.remove(o));
-    element.classList.add(orientation);
+    element.classList.add(_orientation);
   });
 })
