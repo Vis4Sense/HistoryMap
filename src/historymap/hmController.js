@@ -102,8 +102,9 @@ chrome.runtime.onMessage.addListener(
                }
 
                // Map page data to tree data
-               displayTree(hmPages);
+               // displayTree(hmPages);
                // displayTree2(hmPages);
+               displayTree3(hmPages);
             }
          );
       }
