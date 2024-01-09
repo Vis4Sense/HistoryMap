@@ -1,5 +1,5 @@
 // copied from displayTree2
-function displayTree3(
+function displayTree(
    dataArray,
    displayElementId = "svg-div"
 ) {
