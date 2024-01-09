@@ -1,0 +1,18 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 10px;
+}
+#openButton {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  margin: 10px 0;
+  border: none;
+  cursor: pointer;
+}
+#openButton:hover {
+  background-color: #45a049;
+}
+.container {
+  text-align: center;
+}
