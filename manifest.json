@@ -18,5 +18,8 @@
      "service_worker": "src/background/background.js",
      "type": "module"
    },
-   "permissions": ["tabs","storage","scripting","sidePanel","history","webNavigation", "contextMenus"]
+   "permissions": ["tabs","storage","scripting","sidePanel","history","webNavigation", "contextMenus"],
+   "icons": {
+      "128": "assets/icon-stable-diffusion128.png"
+   }
  }
