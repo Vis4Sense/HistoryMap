@@ -1,4 +1,5 @@
 // import './sw-import.js'
+import "./contextMenu.js";
 
 const MAIN_WINDOW_FILENAME = "/src/historymap/simple_html_tree/simple_tree.html" // "/src/historymap/hm.html";
 
@@ -71,6 +72,14 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
          throw err;
        }
      });
+
+   // Messages received from contentScript.js
+   chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+      // To respond that the background page is currently active
+      if (request.type === 'backgroundOpened') {
+         sendResponse({backgroundOpened: true, url: sender.tab.url});
+      }
+   })
 })
 
 // list to webNavigation events
