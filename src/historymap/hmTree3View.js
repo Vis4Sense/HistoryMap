@@ -133,23 +133,51 @@ function Tree3(
       nodePaddingY = 5, // vertical spacing between nodes
    } = {}
 ) {
-   // Yuhan: the node width (`nodeWidth`) is fixed for now
+   // Transform hmPage to itemInfo, which is the input of customContent
+   // Yuhan: would it be better if the customContent can take the shared
+   // schema (hmPage) as input?
+   const hmPage2ItemInfo = (hmPage) => ({
+      id: hmPage.pageId,
+      data: hmPage,
+      parentPageId: hmPage.parentPageId,
+      title: hmPage.pageObj.title,
+      faviconUrl: hmPage.pageObj.favIconUrl,
+   })
+
+   // Reuse customContent to create shadow nodes
+   const shadowHost = d3.select("#shadow-host").node();
+
+   // Yuhan: not using actural shadow DOM because it cannot access the css stylesheets
+
+   // if (!shadowHost.shadowRoot) {
+   //    shadowHost.attachShadow({mode: "open"});
+   // }
+   // const shadowRoot = shadowHost.shadowRoot;
+
+   // Create shadow nodes to get the rendered size of the node
+   const shadowNodeRects = data.map((d) => {
+      const node = d3.create("div")
+         .html(customContent(hmPage2ItemInfo(d))).node();
+      shadowHost.appendChild(node);
+      const bbox = node.getBoundingClientRect();
+      const { width, height } = bbox;
+      return { width, height };
+   });
+
+   // Remove shadow nodes
+   d3.select("#shadow-host").selectAll("*").remove();
+
+   // Yuhan: assume that all nodes have the same width
+   nodeWidth = shadowNodeRects[0].width || nodeWidth;
 
    // Yuhan: to enbale spaces between nodes, padding is added to the node size,
-   // it will be removed when drawing the node
-
-   // Test only. Generate the rendered size of the node. Use a fixed size
-   // for node width and randomly generate node height. See `pageObjWithSize`
-   // for data format
-   const data_ = data.map((d) => {
+   // it will be removed when drawing the nodes
+   const data_ = data.map((d, i) => {
       return {
          ...d,
-         nodeSize: d.nodeSize || {
-            width: nodeWidth + nodePaddingX * 2,
-            // height: Math.random() * 20 + 60 + nodePaddingY * 2
-
-            // Yuhan: change it to a stable mapping
-            height: ((d.pageObj.id || 0) % 10 + 1) * 2 + 60 + nodePaddingY * 2
+         nodeSize: {
+            width: shadowNodeRects[i].width + nodePaddingX * 2,
+            height: shadowNodeRects[i].height + nodePaddingY * 2
          }
       }
    });
@@ -180,7 +208,7 @@ function Tree3(
    // Drawing the tree
 
    // Yuhan: the size of the canvas fits the tree for now, and it is customized
-   // to a vertical tree
+   // to a horizontal tree
 
    // Calculate canvas size
    const canvasWidth = (root.height + 1) * (nodeWidth + nodePaddingX * 2);
@@ -191,8 +219,6 @@ function Tree3(
       .create("svg")
       .attr("width", canvasWidth)
       .attr("height", canvasHeight);
-
-   // console.log(root.links())
 
    // Draw links
    const links = root.links().map((d) => {
@@ -207,6 +233,7 @@ function Tree3(
          target: {...target, x: tx, y: ty}
       }
    });
+
    svg
       .append("g")
       .attr("fill", "none")
@@ -227,7 +254,7 @@ function Tree3(
       );
 
    // Draw nodes
-   const node = svg
+   svg
       .append("g")
       .selectAll("g")
       .data(root.descendants())
@@ -240,26 +267,9 @@ function Tree3(
       .attr("xlink:href", link == null ? null : (d) => link(d.data, d))
       .attr("target", link == null ? null : linkTarget)
       .append("foreignObject")
-      .attr("width", (d) => d.data.nodeSize.width - nodePaddingX * 2)
-      .attr("height", (d) => d.data.nodeSize.height - nodePaddingY * 2);
-   // node
-   //    .append("rect")
-   //    .attr("width", (d) => d.data.nodeSize.width - nodePaddingX * 2)
-   //    .attr("height", (d) => d.data.nodeSize.height - nodePaddingY * 2)
-   //    .attr("fill", "none")
-   //    .attr("stroke", fill);
-   
-   // Yuhan: a temporal style setting for testing
-   node
-      .append("xhtml:div")
-      .style("width", (d) => d.data.nodeSize.width - nodePaddingX * 2 + "px")
-      .style("height", (d) => d.data.nodeSize.height - nodePaddingY * 2 + "px")
-      .style("padding", "10px")
-      .style("border", "1px dashed #999")
-      .style("border-radius", "2px")
-      .style("box-sizing", "border-box")
-      .append("xhtml:div")
-      .text((_, i) => L[i]);
+      .attr("width", (d) => d.data.nodeSize.width)
+      .attr("height", (d) => d.data.nodeSize.height)
+      .html((d) => customContent(hmPage2ItemInfo(d.data)))
 
    return svg.node();
 }

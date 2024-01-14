@@ -12,8 +12,15 @@
    <script src="../../lib/plot.js"></script>
    <script src="hmController.js"></script>
    <script src="hmModel.js"></script>
-   <script src="hmTreeView.js"></script>
+   <!-- <script src="hmTreeView.js"></script> -->
    <script src="hmTree2View.js"></script>
+   <!-- Reuse html nodes in simple_html_tree -->
+   <link rel="stylesheet" href="simple_html_tree/custom.css">
+   <link rel="stylesheet" href="simple_html_tree/main.css">
+   <script src="simple_html_tree/main.js"></script>
+   <script src="simple_html_tree/custom.js"></script>
+   <!-- Vector tree
+      Yuhan: note that there currently the `displayTree` function in `simple_html_tree/custom.js` and `hmTree3View.js` share the same name. The system will use the later introduced one (`hmTree3View.js` here). -->
    <script src="hmTree3View.js"></script>
 </head>
 
@@ -32,6 +39,9 @@
    <div id="svg-debug" class="hm-debug-historymap"></div>
    <!-- Main HistoryMap -->
    <div id="svg-div"></div>
+
+   <!-- Shadow host -->
+   <div id="shadow-host" style="position:absolute;left:-9999px;top:-9999px"></div>
 
    <!-- Scripts for saving and loading sessoin -->
    <script src="hmSessionSave.js"></script>

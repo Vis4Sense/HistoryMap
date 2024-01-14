@@ -51,7 +51,7 @@ function playSession(duration=1000) {
     savedHmPages.forEach((page, idx) => {
         setTimeout(() => {
             curHmPages.push(page);
-            displayTree3(curHmPages, debugDivId)
+            displayTree(curHmPages, debugDivId)
         }, duration * idx);
     });
 }
