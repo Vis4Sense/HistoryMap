@@ -10,6 +10,7 @@ class hmPage {
       this.parentPageId = parentPageId;
       // this.isOpened = isOpened;
       // this.clicked = false;
+      this.highlights = [];
   }
 }
 
