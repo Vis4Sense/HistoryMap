@@ -1,0 +1,17 @@
+{
+  "name": "historymap",
+  "version": "1.0.0",
+  "description": "## Chrome Manifest Version 3",
+  "main": "popup.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.41.0",
+    "@types/node": "^20.11.5"
+  }
+}
