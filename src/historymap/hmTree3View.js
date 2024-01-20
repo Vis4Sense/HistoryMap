@@ -1,4 +1,27 @@
-// copied from displayTree2
+// Define tree component
+class TreeComponent extends HTMLElement {
+   constructor() {
+      super();
+      this.attachShadow({ mode: "open" });
+      this.shadowRoot.innerHTML = `
+         <style>
+         ${Tree3CSS}
+         </style>
+         <div id="svg-debug" class="hm-debug-historymap"></div>
+         <div id="svg-div"></div>
+         <div id="hidden-div" class="hidden"></div>
+      `;
+   }
+
+   // Shadow element cannot be selected from outside
+   getElementById(id) {
+      return this.shadowRoot.getElementById(id);
+   }
+}
+
+customElements.define('tree-component', TreeComponent);
+
+// Display tree
 function displayTree(
    dataArray,
    displayElementId = "svg-div"
@@ -43,28 +66,41 @@ function displayTree(
       nodePaddingX: 20,
       nodePaddingY: 5,
    };
-   // console.log("treeData", treeData);
-   // const displayElement = document.getElementById("svg-div")
-   const displayElement = document.getElementById(displayElementId)
-   displayElement.innerHTML = "";
-   displayElement.appendChild(Tree3(treeData, controls));
+
+   const treeComponent = document.querySelector("tree-component");
+   const svgDiv = treeComponent.getElementById(displayElementId);
+   svgDiv.innerHTML = "";
+   svgDiv.appendChild(Tree3(treeData, controls));
 }
 
-// Yuhan: I'm not sure which attribute name to use for the rendered size
-// of the node, so just use nodeSize for now
+function playSession(duration=1000) {
+   // Starting from empty hmPages
+   const curHmPages = [];
 
-// for reference only, not used
-class hmPageWithSize extends hmPage {
-   constructor(pageId, tabId, time, pageObj, parentPageId) {
-      super(pageId, tabId, time, pageObj, parentPageId);
-      this.nodeSize = {
-         width: 40,
-         height: 40
-      }
+   // Debug div id
+   const debugDivId = "svg-debug";
+
+   // Progressively add pages
+   savedHmPages.forEach((page, idx) => {
+       setTimeout(() => {
+           curHmPages.push(page);
+           displayTree(curHmPages, debugDivId)
+       }, duration * idx);
+   });
+}
+
+// Transform hmPage to itemInfo, which is the input of customContent
+function hmPage2ItemInfo (hmPage) { 
+   return {
+      id: hmPage.pageId,
+      data: hmPage,
+      parentPageId: hmPage.parentPageId,
+      title: hmPage.pageObj.title,
+      faviconUrl: hmPage.pageObj.favIconUrl,
    }
-};
+}
 
-// Yuhan: The layout calculation is temporarily customized to vertical tree
+// Yuhan: The layout calculation is temporarily customized to horizontal tree
 // i.e., the root width is set by node height
 
 // Recursively calculate the height of the tree
@@ -133,39 +169,21 @@ function Tree3(
       nodePaddingY = 5, // vertical spacing between nodes
    } = {}
 ) {
-   // Transform hmPage to itemInfo, which is the input of customContent
-   // Yuhan: would it be better if the customContent can take the shared
-   // schema (hmPage) as input?
-   const hmPage2ItemInfo = (hmPage) => ({
-      id: hmPage.pageId,
-      data: hmPage,
-      parentPageId: hmPage.parentPageId,
-      title: hmPage.pageObj.title,
-      faviconUrl: hmPage.pageObj.favIconUrl,
-   })
-
-   // Reuse customContent to create shadow nodes
-   const shadowHost = d3.select("#shadow-host").node();
-
-   // Yuhan: not using actural shadow DOM because it cannot access the css stylesheets
-
-   // if (!shadowHost.shadowRoot) {
-   //    shadowHost.attachShadow({mode: "open"});
-   // }
-   // const shadowRoot = shadowHost.shadowRoot;
+   const treeComponent = document.querySelector("tree-component");
+   const hiddenDiv = treeComponent.getElementById("hidden-div");
 
    // Create shadow nodes to get the rendered size of the node
    const shadowNodeRects = data.map((d) => {
-      const node = d3.create("div")
+      const parentNode = d3.create("div")
          .html(customContent(hmPage2ItemInfo(d))).node();
-      shadowHost.appendChild(node);
+      const node = parentNode.firstChild
+      hiddenDiv.appendChild(node);
       const bbox = node.getBoundingClientRect();
       const { width, height } = bbox;
       return { width, height };
    });
 
-   // Remove shadow nodes
-   d3.select("#shadow-host").selectAll("*").remove();
+   d3.select(hiddenDiv).selectAll("*").remove();
 
    // Yuhan: assume that all nodes have the same width
    nodeWidth = shadowNodeRects[0].width || nodeWidth;
@@ -273,3 +291,127 @@ function Tree3(
 
    return svg.node();
 }
+
+function customContent(itemInfo) {
+   /* children
+   Given the pagInfo, returns the img HTML with the screenshot
+   */
+   function screenShot(itemInfo){
+     return itemInfo && itemInfo.screenshotSrc
+       ? `<img class='screeshot' src='${itemInfo.screenshotSrc}'/>`
+       : ``;
+   }
+ 
+   /* notes
+   given an array of notes
+   return divs of the notes
+   */
+   function notes(notes){
+     let notesHTML = ""
+     if (notes && notes.length > 0){
+       notes.map(n => {
+         notesHTML += `<div title="${n}" class="note" >${n}</div>`;
+       })
+     }
+     return notesHTML;
+   }
+ 
+   return `<div class='item-contents-display boxed-item'>
+      <div class="item-header">
+         <div class='favicon'>
+            <img class='favicon' src='${ itemInfo.faviconUrl || "./simple_html_tree/unknown-18-16.png" }'/>
+         </div>
+         <div class='item-title'>
+            <div class='item-title-text' title='${ itemInfo.title || "Title"}'>
+               ${itemInfo.title || "Title"}
+            </div>
+         </div>
+      </div>
+      ${screenShot(itemInfo)}
+      <div class='notes'>
+      ${notes(itemInfo.notes)}
+      </div>
+      </div>
+   `
+}
+
+const Tree3CSS = `
+.hidden {
+   visibility: hidden;
+}
+
+.hm-debug-historymap {
+   background-color: azure;
+}
+
+.item-contents-display {
+   padding: 2px;
+   background-color: white;
+   max-width: 10rem;
+}
+
+.item-header {
+   display: flex;
+   align-items: center;
+   width: 100%;
+}
+
+.item-title {
+   font-size: 0.8rem;
+   cursor: default;
+   width: 100%;
+}
+
+.item-title-text {
+   white-space: nowrap;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   max-width: 95%;
+   max-width: 90%;
+   min-width: 30px;
+   cursor: default;
+}
+
+.favicon {
+   width: 1rem;
+   /* Adjust as needed */
+   height: 1rem;
+   /* Adjust as needed */
+   margin-left: 0px;
+   margin-right: 2px;
+   margin-top: -1px;
+} 
+ 
+.screenshot {
+   max-width: 100%;
+   /* Ensures image does not exceed the width of its container */
+   height: auto;
+   /* Maintains aspect ratio */
+}
+ 
+.notes {
+   list-style: none;
+   padding: 0;
+   margin: 0;
+   cursor: default;
+   display: none;
+}
+ 
+.note {
+   margin-left: 1em;
+   white-space: nowrap;
+   overflow: hidden;
+   text-overflow: ellipsis;
+}
+ 
+.item-contents-display.boxed-item {
+   border: 1px solid lightgray;
+   padding: 5px;
+   margin-bottom: 2px;
+   background-color: white;
+   /* Sets the background color to white */
+   /* box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3); */
+   /* Adds a shadow */
+   width: 10rem;
+}
+`;
