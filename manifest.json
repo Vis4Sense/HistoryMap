@@ -16,6 +16,9 @@
          "src/content-script/contentScriptsController.js",
          "src/content-script/highlight.js",
          "src/content-script/content.js"
+        ],
+        "css": [
+          "src/content-script/content.css"
         ]
      }
    ],
