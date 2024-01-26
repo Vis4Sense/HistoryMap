@@ -1,6 +1,6 @@
 {
    "manifest_version": 3,
-   "name": "history map mv3",
+   "name": "historymap",
    "description": "history map with manifest v3",
    "version": "0.1",
    "action": {
@@ -12,19 +12,18 @@
      {
        "matches": ["<all_urls>"],
        "js": [
-         "lib/jquery.min.js",
-         "src/content-script/contentScriptsController.js",
-         "src/content-script/highlight.js",
-         "src/content-script/content.js"
+         "./src/content-script/contentScriptsController.js",
+         "./src/content-script/highlight.js",
+         "./src/content-script/content.js"
         ]
      }
    ],
    "background": {
-     "service_worker": "src/background/background.js",
+     "service_worker": "./src/background/background.js",
      "type": "module"
    },
    "permissions": ["tabs","storage","scripting","sidePanel","history","webNavigation", "contextMenus"],
    "icons": {
-      "128": "assets/icon-stable-diffusion128.png"
+      "128": "./assets/icon-stable-diffusion128.png"
    }
  }
