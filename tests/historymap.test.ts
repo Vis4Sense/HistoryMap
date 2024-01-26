@@ -9,3 +9,8 @@ test('popup page', async ({ page, extensionId }) => {
   await page.goto(`chrome-extension://${extensionId}/popup.html`);
   await expect(page.locator('h1')).toHaveText('History Map');
 });
+
+test('HistoryMap page', async ({ page, extensionId }) => {
+   await page.goto(`chrome-extension://${extensionId}/src/historymap/hm.html`);
+   await expect(page.locator('h1')).toHaveText('History Map');
+ });
