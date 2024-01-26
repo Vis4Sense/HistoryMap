@@ -12,6 +12,7 @@
      {
        "matches": ["<all_urls>"],
        "js": [
+         "./lib/jquery.min.js",
          "./src/content-script/contentScriptsController.js",
          "./src/content-script/highlight.js",
          "./src/content-script/content.js"
