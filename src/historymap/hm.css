@@ -1,0 +1,17 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Full height of the viewport */
+}
+
+.control-panel {
+  /* Assuming a fixed height for the control panel */
+  height: 50px; /* Adjust as needed */
+  /* Other styling for the control panel */
+}
+
+.responsive-iframe {
+  flex-grow: 1; /* This makes the iframe take up the remaining space */
+  width: 100%; /* Full width */
+  border: none; /* Optional: removes the border */
+}

@@ -73,6 +73,8 @@ function displayTree(
    svgDiv.appendChild(Tree3(treeData, controls));
 }
 
+window.displayTree = displayTree
+
 function playSession(duration=1000) {
    // Starting from empty hmPages
    const curHmPages = [];

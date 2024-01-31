@@ -3,6 +3,8 @@ const ignoredUrls = [
    'edge://extensions/'
 ];
 
+let displayTree = ()=>{};
+
 function addPage(tabURL, tabID, pageObj, parentPageId) {
    if (!ignoredUrls.some(url => tabURL.includes(url))) {
       let newPageId = window.crypto.randomUUID();
@@ -114,6 +116,13 @@ chrome.runtime.onMessage.addListener(
 // When the window is open, the History Map is open
 window.addEventListener("DOMContentLoaded", function () {
    toggle_badge("Open");
+   var iframe = document.getElementById('tree_view');
+   var iframeWindow = iframe.contentWindow;
+   iframe.onload = function () {
+      // Access global variables
+      displayTree = iframeWindow.displayTree;
+      displayTree(hmPages)
+   }
 });
 
 window.addEventListener("beforeunload", function () {

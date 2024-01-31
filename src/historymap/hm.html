@@ -6,35 +6,39 @@
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>HistoryMap</title>
    <!-- Styles -->
+   <link href="hm.css" rel="stylesheet" />
    <!-- <link rel="stylesheet" href="debug.css"> -->
    <!-- Scripts -->
-   <script src="../../lib/d3.v7.js"></script>
-   <script src="../../lib/plot.js"></script>
    <script src="hmController.js"></script>
    <script src="hmControllerHighlight.js"></script>
    <script src="hmModel.js"></script>
+   <script src="hmControlPanel.js"></script>
    <!-- <script src="hmTreeView.js"></script> -->
    <!-- <script src="hmTree2View.js"></script> -->
 
-   <!-- Vector tree
-      Yuhan: note that there currently the `displayTree` function in `simple_html_tree/custom.js` and `hmTree3View.js` share the same name. The system will use the later introduced one (`hmTree3View.js` here). -->
-   <script src="hmTree3View.js"></script>
 </head>
 
-<body>
+<body class="container">
    <!-- <h1>Observable Plot Library Example</h1>
    <div id="myplot"></div> -->
-
+   
    <h1>History Map</h1>
-   <!-- Buttons for saving and loading session -->
-   <div id="session-buttons">
-      <button id="session-button-save" class="button">Save</button>
-      <input type="file" id="session-file-input" accept=".json">
-      <button id="session-button-load" class="button">Load</button>
+   <div id="control-panel" class="control-panel">
+      <label>Select Experience</label>
+      <select id="optionSelect">
+          <option value="vector">Vector</option>
+          <option value="html">HTML</option>
+      </select>
+      <br>
+      <!-- Buttons for saving and loading session -->
+      <div id="session-buttons">
+         <button id="session-button-save" class="button">Save</button>
+         <input type="file" id="session-file-input" accept=".json">
+         <button id="session-button-load" class="button">Load</button>
+      </div>
    </div>
 
-   <!-- HistoryMap tree component, see definition in hmTree3View.js -->
-   <tree-component></tree-component>
+   <iframe id="tree_view" class="responsive-iframe" src="./hmTree3View/hmTree3View.html" ></iframe>
 
    <!-- Scripts for saving and loading sessoin -->
    <script src="hmSessionSave.js"></script>

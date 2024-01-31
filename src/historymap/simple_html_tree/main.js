@@ -100,7 +100,10 @@
   function itemsIndex(){
     return _itemsIndex
   }
-  if (window) window.Simple_Tree = { renderTree, clearCustomContent, itemsIndex }
+  if (window) {
+    window.Simple_Tree = { renderTree, clearCustomContent, itemsIndex }
+    window.renderTree = renderTree
+  }
   
 })();
 
