@@ -271,6 +271,16 @@ body {
   position: relative;
   /* Needed for absolute positioning of pseudo-elements */
   margin: 2px;
+  font-size: 12px;
+}
+
+.vertical .items-container {
+  font-size: 0;
+  display: block;
+}
+
+.vertical .items-container > *:first-child {
+  margin-top: -10px; /* Shifts the first element up by 10px */
 }
 
 
@@ -287,48 +297,6 @@ body {
   /* The horizontal line */
 }
 
-.vertical.css-connector .item.first-child:after {
-  content: '';
-  position: absolute;
-  top: -2px;
-  /* Align with the center of the last child */
-  left: -1em;
-  /* Position to the left of the content */
-  height: calc(100% + 4px);
-  /* The height of the line should be to the top of the items container from the middle of the last child */
-  border-left: calc(var(--connector-line-width)) solid #000;
-  /* The vertical line */
-  /* Shadow for the line */
-}
-
-.vertical.css-connector .item.only-child .item-contents:after {
-  content: '';
-  position: absolute;
-  top: -2px;
-  /* Align with the center of the last child */
-  left: -1em;
-  /* Position to the left of the content */
-  height: calc(50% + 2px);
-  /* The height of the line should be to the top of the items container from the middle of the last child */
-  border-left: calc(var(--connector-line-width)) solid #000;
-  /* The vertical line */
-  /* Shadow for the line */
-}
-
-.vertical.css-connector .item.last-child .item-contents:after {
-  content: "";
-  position: absolute;
-  top: -2px;
-  /* Align with the center of the last child */
-  left: -1em;
-  /* Position to the left of the content */
-  height: calc(50% + 2px);
-  /* The height of the line should be to the top of the items container from the middle of the last child */
-  border-left: calc(var(--connector-line-width)) solid #000;
-  /* The vertical line */
-  /* Shadow for the line */
-}
-
 .vertical.css-connector .item.middle-child:after {
   content: '';
   position: absolute;
@@ -342,6 +310,51 @@ body {
   /* The vertical line */
   /* Shadow for the line */
 }
+
+
+.vertical.css-connector .item.only-child .item-contents::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  /* Align with the center of the last child */
+  left: -1em;
+  /* Position to the left of the content */
+  height: calc(50% - 8px);
+  /* The height of the line should be to the top of the items container from the middle of the last child */
+  border-left: calc(var(--connector-line-width)) solid #000;
+  /* The vertical line */
+  /* Shadow for the line */
+}
+
+
+.vertical.css-connector .item.last-child .item-contents::after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  /* Align with the center of the last child */
+  left: -1em;
+  /* Position to the left of the content */
+  height: calc(50% + 2px);
+  /* The height of the line should be to the top of the items container from the middle of the last child */
+  border-left: calc(var(--connector-line-width)) solid #000;
+  /* The vertical line */
+  /* Shadow for the line */
+}
+
+.vertical.css-connector .item.first-child::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  /* Align with the center of the last child */
+  left: -1em;
+  /* Position to the left of the content */
+  height: calc(100% - 8px);
+  /* The height of the line should be to the top of the items container from the middle of the last child */
+  border-left: calc(var(--connector-line-width)) solid #000;
+  /* The vertical line */
+  /* Shadow for the line */
+}
+
 
 /* The root does not need a line out toward a parent */
 .vertical.css-connector .item.orphan>.item-contents::before {
