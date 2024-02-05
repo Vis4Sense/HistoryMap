@@ -21,6 +21,10 @@ class TreeComponent extends HTMLElement {
 
 customElements.define('tree-component', TreeComponent);
 
+// Functions from parent page
+const parentWindow = window.parent;
+const handleOpenPage = parentWindow.handleOpenPage;
+
 // Display tree
 function displayTree(
    dataArray,
@@ -95,6 +99,7 @@ function playSession(duration=1000) {
 function hmPage2ItemInfo (hmPage) { 
    return {
       id: hmPage.pageId,
+      isOpened: hmPage.isOpened,
       data: hmPage,
       parentPageId: hmPage.parentPageId,
       title: hmPage.pageObj.title,
@@ -289,9 +294,11 @@ function Tree3(
          ${(d.depth) * (nodeWidth + nodePaddingX * 2) + nodePaddingX},
          ${d.offset + d.cover / 2 - d.data.nodeSize.height / 2 + nodePaddingY}
       )`)
-      .append("a")
-      .attr("xlink:href", link == null ? null : (d) => link(d.data, d))
-      .attr("target", link == null ? null : linkTarget)
+      // .append("a")
+      // .attr("xlink:href", link == null ? null : (d) => link(d.data, d))
+      // .attr("target", link == null ? null : linkTarget)
+      .style("cursor", "pointer")
+      .on("click", (_, d) => handleOpenPage(d.data))
       .append("foreignObject")
       .attr("width", (d) => d.data.nodeSize.width)
       .attr("height", (d) => d.data.nodeSize.height)
@@ -375,10 +382,10 @@ function customContent(itemInfo) {
       return highlightsHTML;
    }
 
-   return `<div class='item-contents-display boxed-item'>
+   return `<div class='item-contents-display boxed-item ${itemInfo.isOpened ? "opened" : "closed"}'>
       <div class="item-header">
          <div class='favicon'>
-            <img class='favicon' src='${ itemInfo.faviconUrl || "./simple_html_tree/unknown-18-16.png" }'/>
+            <img class='favicon' src='${ itemInfo.faviconUrl || "./unknown-18-16.png" }'/>
          </div>
          <div class='item-title'>
             <div class='item-title-text' title='${ itemInfo.title || "Title"}'>
@@ -542,6 +549,11 @@ const Tree3CSS = `
    /* box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3); */
    /* Adds a shadow */
    width: 10rem;
+}
+
+.item-contents-display.boxed-item.closed {
+   border: 1px dashed gray;
+   opacity: 0.5;
 }
 `;
 

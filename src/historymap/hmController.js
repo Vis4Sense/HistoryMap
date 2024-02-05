@@ -5,7 +5,7 @@ const ignoredUrls = [
 
 let displayTree = ()=>{};
 
-function addPage(tabURL, tabID, pageObj, parentPageId) {
+function addPage(tabURL, tabID, pageObj, parentPageId, isOpened=true) {
    if (!ignoredUrls.some(url => tabURL.includes(url))) {
       let newPageId = window.crypto.randomUUID();
       let newPage = new hmPage(
@@ -13,7 +13,8 @@ function addPage(tabURL, tabID, pageObj, parentPageId) {
          tabID,
          new Date(),
          pageObj,
-         parentPageId
+         parentPageId,
+         isOpened
       );
       hmPages.push(newPage);
       console.log("A new hmPage added:", newPage.pageObj.title, ', ', newPage.pageObj.url);
@@ -21,6 +22,25 @@ function addPage(tabURL, tabID, pageObj, parentPageId) {
    }
 }
 
+function updatePage(pageId, type, data=null) {
+   let page = hmPages.find(p => p.pageId === pageId);
+   
+   if (!page) {
+      console.error('Page not found: ', pageId);
+      return;
+   }
+
+   if (type === 'reopen') { // if page reopened (from hm tree)
+      page.tabId = data.tabId;
+      page.time = new Date();
+      page.pageObj = data.tab;
+      page.isOpened = true;
+      console.log("Page reopened: ", page.pageObj.title, ', ', page.pageObj.url);
+   } else if (type === 'close') { // if page closed
+      page.isOpened = false;
+      console.log("Page closed: ", page.pageObj.title, ', ', page.pageObj.url);
+   }
+}
 
 chrome.runtime.onMessage.addListener(
    function (request, sender, sendResponse) {
@@ -82,7 +102,8 @@ chrome.runtime.onMessage.addListener(
                         isNewPage = false;
                      }
                      else {
-                        parentPageId = parentPage.pageId
+                        parentPageId = parentPage.pageId;
+                        isSameTab = true;
                      }
                      // console.log("Opened by a page in the same tab: ", parentPageId);
                   }
@@ -98,7 +119,30 @@ chrome.runtime.onMessage.addListener(
                   }
                }
 
+               // Not add the page if it is opened from hm tree
                if (isNewPage) {
+                  // Check if the page is already in hmPages
+                  let oldPage = hmPages.find(p => 
+                     p.tabId === request.data.tabID
+                     && (
+                        p.pageObj.url === request.data.tab.url
+                        || p.pageObj.pendingUrl === request.data.tab.url
+                     )
+                     && p.isOpened
+                  );
+
+                  if (oldPage) {
+                     oldPage.pageObj = request.data.tab;
+                     isNewPage = false;
+                  }
+               }
+
+               if (isNewPage) {
+                  // Set other pages in the same tab to be closed
+                  let oldPages = hmPages.filter(p => p.tabId === request.data.tabID);
+                  oldPages.forEach(p => {
+                     updatePage(p.pageId, 'close');
+                  });
                   // Create a new hmPage object
                   addPage(request.data.tab.url, request.data.tabID, request.data.tab, parentPageId);
                }
@@ -111,6 +155,20 @@ chrome.runtime.onMessage.addListener(
          );
       }
    })
+
+// listen to tab close event
+chrome.tabs.onRemoved.addListener(function (tabId, removeInfo) {
+   let page = hmPages.find(p => 
+      p.tabId === tabId
+      && p.isOpened
+   );
+   if (page) {
+      updatePage(page.pageId, 'close');
+      displayTree(hmPages);
+   } else {
+      console.error('Page not found: ', tabId);
+   }
+});
 
 
 // When the window is open, the History Map is open

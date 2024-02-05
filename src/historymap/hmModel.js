@@ -2,13 +2,13 @@
 
 // A opened webpage
 class hmPage {
-   constructor(pageId, tabId, time, pageObj, parentPageId) {
+   constructor(pageId, tabId, time, pageObj, parentPageId, isOpened) {
       this.pageId = pageId;
       this.tabId = tabId;
       this.time = time;
       this.pageObj = pageObj;
       this.parentPageId = parentPageId;
-      // this.isOpened = isOpened;
+      this.isOpened = isOpened;
       // this.clicked = false;
       this.highlights = [];
   }
