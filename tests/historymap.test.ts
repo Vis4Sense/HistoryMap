@@ -1,4 +1,4 @@
-import { test, expect } from './fixtures';
+import { test, expect} from './fixtures';
 
 // test('example test', async ({ page }) => {
 //   await page.goto('https://example.com');
@@ -10,8 +10,9 @@ test('popup page', async ({ page, extensionId }) => {
   await expect(page.locator('h1')).toHaveText('History Map');
 });
 
-test('HistoryMap page', async ({ page, extensionId }) => {
+test('HistoryMap page', async ({ page, extensionId, context }) => {
    await page.goto('https://www.bbc.co.uk');
-   await page.goto(`chrome-extension://${extensionId}/src/historymap/hm.html`);
-   await expect(page.locator('h1')).toHaveText('History Map');
+   const hmPage = await context.newPage();
+   await hmPage.goto(`chrome-extension://${extensionId}/src/historymap/hm.html`);
+   await expect(hmPage.locator('h1')).toHaveText('History Map');
  });
