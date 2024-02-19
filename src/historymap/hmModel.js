@@ -10,6 +10,10 @@ class hmPage {
       this.parentPageId = parentPageId;
       this.isOpened = isOpened;
       // this.clicked = false;
+      this.forwardBack = {
+         forward: 0, // the number of times the parent page goes forward to this page
+         back: 0 // the number of times this page goes back to the parent page
+      };
       this.highlights = [];
   }
 }

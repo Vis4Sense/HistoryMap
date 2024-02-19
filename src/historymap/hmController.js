@@ -39,6 +39,20 @@ function updatePage(pageId, type, data=null) {
    } else if (type === 'close') { // if page closed
       page.isOpened = false;
       console.log("Page closed: ", page.pageObj.title, ', ', page.pageObj.url);
+   } else if (type === 'back') {
+      page.forwardBack.back++;
+      page.isOpened = false;
+      let parentPage = hmPages.find(p => p.pageId === page.parentPageId);
+      parentPage.isOpened = true;
+      parentPage.time = new Date();
+      console.log("Page goes back: ", page.pageObj.title, ', ', page.pageObj.url);
+   } else if (type === 'forward') {
+      page.forwardBack.forward++;
+      page.isOpened = true;
+      page.time = new Date();
+      let parentPage = hmPages.find(p => p.pageId === page.parentPageId);
+      parentPage.isOpened = false;
+      console.log("Page goes forward: ", page.pageObj.title, ', ', page.pageObj.url);
    }
 }
 
@@ -88,27 +102,27 @@ chrome.runtime.onMessage.addListener(
                // let newPageId = window.crypto.randomUUID();
 
                let parentPageId = null;
+               let parentPage = null;
 
                if (!isTyped) { // find the parent page if the url is not typed manually
 
+                  sortedHmPages = [...hmPages].sort((a, b) => a.time - b.time); // sort by time
+
                   // Find the parent page
                   // check if the tab is opened by a previous page in the same tab
-                  let parentPage = hmPages.findLast((p) =>
+                  parentPage = sortedHmPages.findLast((p) =>
                      p.tabId === request.data.tabID
                   );
                   if (parentPage) { // if there was a page in the same tab
+                     parentPageId = parentPage.pageId;
                      if (parentPage.pageObj.url === request.data.tab.url) { // if the url is the same, this is not a new page so just update pageObj
                         parentPage.pageObj = request.data.tab;
                         isNewPage = false;
                      }
-                     else {
-                        parentPageId = parentPage.pageId;
-                        isSameTab = true;
-                     }
                      // console.log("Opened by a page in the same tab: ", parentPageId);
                   }
                   else { // not typed and not page in the same tab ==> opened by another tab
-                     parentPage = hmPages.findLast((p) =>
+                     parentPage = sortedHmPages.findLast((p) =>
                         p.tabId === request.data.tab.openerTabId
                      );
                      if (parentPage) {
@@ -116,6 +130,39 @@ chrome.runtime.onMessage.addListener(
                      }
                      // console.log("Opened by a page in a different tab: ", parentPageId);
                      // !! we will be in trouble if we can't find the tab with the 'openerTabId'.
+                  }
+               }
+
+               // Not add the page if it is opened by going back
+               if (isNewPage && parentPage && parentPage.tabId === request.data.tabID) {
+                  // If the page is the same as the parent of its parent: go back
+                  let parentPage = hmPages.find(p => p.pageId === parentPageId);
+                  if (parentPage && parentPage.parentPageId) {
+                     let grandParentPage = hmPages.find(p => p.pageId === parentPage.parentPageId);
+                     if (
+                        grandParentPage
+                        && grandParentPage.tabId === request.data.tabID
+                        && grandParentPage.pageObj.url === request.data.tab.url
+                     ) {
+                        updatePage(parentPageId, 'back');
+                        isNewPage = false;
+                     }
+                  }
+               }
+               
+               // Not add the page if it is opened by going forward
+               if (isNewPage && parentPage && parentPage.tabId === request.data.tabID) {
+                  // if the page is the same as its siblings: go forward
+                  let siblings = hmPages.filter(p => p.parentPageId === parentPageId);
+                  if (siblings) {
+                     let sameSibling = siblings.find(p => 
+                        p.tabId === request.data.tabID
+                        && p.pageObj.url === request.data.tab.url
+                     );
+                     if (sameSibling) {
+                        updatePage(sameSibling.pageId, 'forward');
+                        isNewPage = false;
+                     }
                   }
                }
 

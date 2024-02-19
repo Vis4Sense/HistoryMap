@@ -285,7 +285,7 @@ function Tree3(
       );
 
    // Draw nodes
-   svg
+   const node = svg
       .append("g")
       .selectAll("g")
       .data(root.descendants())
@@ -294,17 +294,52 @@ function Tree3(
          ${(d.depth) * (nodeWidth + nodePaddingX * 2) + nodePaddingX},
          ${d.offset + d.cover / 2 - d.data.nodeSize.height / 2 + nodePaddingY}
       )`)
-      // .append("a")
-      // .attr("xlink:href", link == null ? null : (d) => link(d.data, d))
-      // .attr("target", link == null ? null : linkTarget)
       .style("cursor", "pointer")
-      .on("click", (_, d) => handleOpenPage(d.data))
-      .append("foreignObject")
+      .on("click", (_, d) => handleOpenPage(d.data));
+
+   // Node content
+   node.append("foreignObject")
       .attr("width", (d) => d.data.nodeSize.width)
       .attr("height", (d) => d.data.nodeSize.height)
-      .html((d) => customContent(hmPage2ItemInfo(d.data)))
+      .html((d) => customContent(hmPage2ItemInfo(d.data)));
+
+   // Forward back icon
+   const forwardBack = node
+      .filter((d) => d.data.forwardBack.back > 0)
+      .append("g")
+      .attr("transform", (d) => `translate(-8, ${d.data.nodeSize.height / 2 - nodePaddingY})`);
+   forwardBack // forward
+      .filter((d) => d.data.forwardBack.forward > 0)
+      .append("path")
+      .attr("d", trianglePath(8, "right"))
+      .attr("fill", "black")
+      .attr("transform", "translate(7, 0)");
+   forwardBack.append("path") // back
+      .attr("d", trianglePath(8, "left"))
+      .attr("fill", "black")
+      .attr("transform", "translate(-7, 0)");
+   forwardBack.append("circle")
+      .attr("r", 6)
+      .attr("fill", "white")
+      .attr("stroke", "black")
+   forwardBack.append("text")
+      .attr("y", 3)
+      .attr("font-size", 10)
+      .style("text-anchor", "middle")
+      .text((d) => `${d.data.forwardBack.back}`);
+   forwardBack
+      .attr("opacity", d => d.data.isOpened || d.parent.data.isOpened ? 1 : 0.2)
 
    return svg.node();
+}
+
+function trianglePath(length=10, direction="right") {
+   const height = length * 1.2 / 2;
+   if (direction === "left") {
+      return `M 0 ${-length / 2} L ${-height} 0 L 0 ${length / 2} Z`;
+   } else if (direction === "right") {
+      return `M 0 ${-length / 2} L ${height} 0 L 0 ${length / 2} Z`;
+   }
 }
 
 function customContent(itemInfo) {
