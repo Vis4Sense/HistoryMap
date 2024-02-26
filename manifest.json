@@ -27,6 +27,6 @@
    },
    "permissions": ["tabs","storage","scripting","sidePanel","history","webNavigation", "contextMenus"],
    "icons": {
-      "128": "./assets/icon-stable-diffusion128.png"
+      "128": "./assets/icon-history-map2-128px.png"
    }
  }
