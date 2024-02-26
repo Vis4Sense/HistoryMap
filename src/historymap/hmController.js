@@ -94,7 +94,7 @@ chrome.runtime.onMessage.addListener(
             function (visitItems) {
                let lastHistoryEntry = visitItems[visitItems.length - 1];
                // console.log('history entry: ', lastHistoryEntry);
-               if (lastHistoryEntry.transition && lastHistoryEntry.transition === 'typed') {
+               if (lastHistoryEntry && lastHistoryEntry.transition && lastHistoryEntry.transition === 'typed') {
                   isTyped = true;
                   console.log('Typed url: ', request.data.tab.url);
                }
