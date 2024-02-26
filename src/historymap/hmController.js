@@ -218,9 +218,9 @@ chrome.tabs.onRemoved.addListener(function (tabId, removeInfo) {
 });
 
 
-// When the window is open, the History Map is open
+// When the window is open, the History Map is on
 window.addEventListener("DOMContentLoaded", function () {
-   toggle_badge("Open");
+   toggle_badge("On");
    var iframe = document.getElementById('tree_view');
    var iframeWindow = iframe.contentWindow;
    iframe.onload = function () {

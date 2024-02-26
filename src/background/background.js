@@ -1,7 +1,7 @@
 // import './sw-import.js'
 import "./contextMenu.js";
 
-const MAIN_WINDOW_FILENAME = "/src/historymap/simple_html_tree/simple_tree.html" // "/src/historymap/hm.html";
+const MAIN_WINDOW_FILENAME = "/src/historymap/hm.html";
 
 // Register an action click listener
 chrome.action.onClicked.addListener(activate_main_window)
