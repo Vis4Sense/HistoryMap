@@ -25,9 +25,9 @@ function handleOpenPage(page) { // Yuhan: use a formal event as the parameter?
         if (targetTabs.length > 0) { // if tab found, go back to it
             activateTab(targetTabs[0]);
         } else { // if tab not found, create a new tab
-            chrome.tabs.create({ url }, function(tab) {
+            createTab(url, function(tab) {
                 // update the page with the new tab
-                updatePage(page.pageId, 'reopen', { tabId: tab.id, tab });
+                updatePage(page.pageId, 'beforeReopen', { tabId: tab.id, tab });
             });
         }
     });
@@ -39,5 +39,12 @@ function activateTab(tab) {
 
     chrome.windows.update(windowId, {focused: true}, function() {
         chrome.tabs.update(tabId, {active: true});
+    });
+}
+
+function createTab(url, callback) {
+    chrome.tabs.create({ url }, function(tab) {
+        callback(tab);
+        chrome.windows.update(tab.windowId, {focused: true});
     });
 }
