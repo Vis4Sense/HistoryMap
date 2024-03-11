@@ -99,8 +99,6 @@ function handleNavigationCommitted(details) {
    // console.log('Navigation committed: ', details);
 
    // Not respond to subframe events
-   // !! we may need to handle subframe events
-   // e.g., navigation events in https://developer.chrome.com/
    if (details.frameId !== 0) return;
 
    getTabInfo(details.tabId)
