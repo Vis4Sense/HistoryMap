@@ -173,6 +173,9 @@ function handleNavigationCommitted(details) {
          case !isNewTab && !isForwardBack && transitionType === 'link':
             event = 'tabUpdate-clickLink';
             break;
+         case !isNewTab && !isForwardBack && transitionType === 'form_submit':
+            event = 'tabUpdate-formSubmit';
+            break;
          case !isNewTab && !isForwardBack && transitionType === 'auto_bookmark' && isFromEmpty:
             event = 'tabUpdate-bookmarkEmpty';
             break;
@@ -371,6 +374,7 @@ function pageEventToHmPagesUpdate(event, navInfo, tabInfo) {
          pageId = addPage(tabInfo.url, navInfo.documentId, tabInfo.id, tabInfo, parentPage.pageId);
          break;
       case 'tabUpdate-clickLink':
+      case 'tabUpdate-formSubmit':
          // link to the last opened page in the tab
          parentPage = openerPage = lastPageInTab(tabInfo.id);
          pageId = addPage(tabInfo.url, navInfo.documentId, tabInfo.id, tabInfo, parentPage.pageId);
