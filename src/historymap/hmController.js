@@ -20,7 +20,9 @@ function addPage(tabURL, docId, tabID, pageObj, parentPageId, isOpened=true) {
       hmPages.push(newPage);
       console.log("A new hmPage added:", newPage.pageObj.title, ', ', newPage.pageObj.url);
       // displayTree(hmPages);
+      return newPageId;
    }
+   return null;
 }
 
 function updatePage(pageId, type, data=null) {
@@ -108,6 +110,7 @@ function handleNavigationCommitted(details) {
    // Main handler
    function mainHandler(navInfo, tabInfo) {
       let pageEvent = navigationToPageEvent(navInfo, tabInfo);
+      closePagesInTab(tabInfo.id);
       pageEventToHmPagesUpdate(pageEvent, navInfo, tabInfo);
       displayTree(hmPages);
    }
@@ -131,6 +134,7 @@ function handleNavigationCommitted(details) {
       const isFromEmpty = isFromEmptyPage(tabInfo);
 
       switch (true) {
+         // create a new tab
          case isNewTab && transitionType === 'auto_bookmark':
             event = 'tabCreate-bookmark';
             break;
@@ -158,6 +162,8 @@ function handleNavigationCommitted(details) {
          case isNewTab && transitionType === 'link' && !isReopened && hasOpener && !isFromHistory:
             event = 'tabCreate-clickLink';
             break;
+
+         // existing tab url changes
          case !isNewTab && isForwardBack:
             event = 'tabUpdate-forwardBack';
             break;
@@ -195,79 +201,6 @@ function handleNavigationCommitted(details) {
       return event;
    }
 
-   // Map page event to hmPages update
-   function pageEventToHmPagesUpdate(event, navInfo, tabInfo) {
-      let openerPage = null;
-      let parentPage = null;
-      let page = null;
-
-      switch (event) {
-         // add a new node, not link to existing node
-         case 'tabCreate-bookmark':
-         case 'tabCreate-startPage':
-         case 'tabCreate-newtab':
-         case 'tabCreate-historyRecent':
-         case 'tabUpdate-bookmark':
-         case 'tabUpdate-typed':
-         case 'tabUpdate-search':
-            addPage(tabInfo.url, navInfo.documentId, tabInfo.id, tabInfo, null);
-            break;
-
-         // add a new node, link to an existing node
-         case 'tabCreate-duplicate':
-            // sibling of the opener page
-            openerPage = lastPageInTab(tabInfo.openerTabId);
-            parentPage = getParentPage(openerPage);
-            addPage(tabInfo.url, navInfo.documentId, tabInfo.id, tabInfo, parentPage ? parentPage.pageId : null);
-            break;
-         case 'tabCreate-webPopup':
-            // link to the opener page
-            // !! we don't know which page opens this, temporarily using the last opened page
-            parentPage = openerPage = lastOpenedPage();
-            addPage(tabInfo.url, navInfo.documentId, tabInfo.id, tabInfo, parentPage.pageId);
-            break;
-         case 'tabCreate-historyPage':
-         case 'tabCreate-clickLink':
-            // link to the last page in the opener tab
-            parentPage = openerPage = lastPageInTab(tabInfo.openerTabId);
-            addPage(tabInfo.url, navInfo.documentId, tabInfo.id, tabInfo, parentPage.pageId);
-            break;
-         case 'tabUpdate-clickLink':
-            // link to the last opened page in the tab
-            parentPage = openerPage = lastPageInTab(tabInfo.id);
-            addPage(tabInfo.url, navInfo.documentId, tabInfo.id, tabInfo, parentPage.pageId);
-            break;
-
-         // update page, not adding a new node
-         case 'tabCreate-hmReopen':
-            page = hmPages.find(p => p.incomingTabId === tabInfo.id);
-            updatePage(page.pageId, 'reopen', { tab: tabInfo, docId: navInfo.documentId });
-            break;
-         case 'tabUpdate-forwardBack':
-            let backPage = backTarget(tabInfo);
-            let forwardPage = forwardTarget(tabInfo);
-            if (backPage) {
-               updatePage(backPage.pageId, 'back', { docId: navInfo.documentId });
-            } else if (forwardPage) {
-               updatePage(forwardPage.pageId, 'forward', { docId: navInfo.documentId });
-            } else {
-               // !! this happens when the back/forward page is not in hmPages
-               console.error('Unrecognized forwardBack event: ', navInfo);
-            }
-            break;
-         case 'tabUpdate-reload':
-         case 'tabUpdate-bookmarkEmpty':
-         case 'tabUpdate-typedEmpty':
-         case 'tabUpdate-searchEmpty':
-            page = lastPageInTab(tabInfo.id);
-            updatePage(page.pageId, 'reload', { tab: tabInfo, docId: navInfo.documentId });
-            break;
-
-         default:
-            console.error('unhandled event: ', event);
-      }
-   }
-
    function isTabFirstOpened(tabInfo) {
       let page = hmPages.find(p => p.tabId === tabInfo.id);
       if (!page) return true;
@@ -299,6 +232,186 @@ function handleNavigationCommitted(details) {
       if (page.pageObj.url === 'chrome://newtab/' || page.pageObj.url === 'edge://newtab/') return true;
       return false;
    }
+}
+
+// Use history state update event to capture navigation from navigation bar
+function handleHistoryStateUpdated(details) {
+   // Not respond to subframe events
+   if (details.frameId !== 0) return;
+
+   // Only respond to active lifecycle
+   if (details.documentLifecycle != 'active') return;
+   
+   // Deduplicate navigation commit events
+   if (isPageCaptured(details)) return;
+
+   console.log('History state updated: ', details);
+
+   getTabInfo(details.tabId)
+      .then(tab => mainHandler(details, tab))
+
+   function mainHandler(navInfo, tabInfo) {
+      // Map history state update to page event
+      let event = '';
+
+      switch (true) {
+         case navInfo.transitionQualifiers.includes('forward_back'):
+            event = 'tabUpdate-forwardBack';
+            break;
+         case navInfo.transitionQualifiers.includes('client_redirect'):
+            event = 'tabUpdate-clientRedirect';
+            break;
+         default:
+            event = 'tabUpdate-clickLink';
+      }
+
+      console.log('Event: ', event);
+
+      // Set previous pages in tab as closed
+      closePagesInTab(tabInfo.id);
+
+      // Map event to hmPages update
+      let pageId = pageEventToHmPagesUpdate(event, navInfo, tabInfo);
+      displayTree(hmPages);
+
+      // When history state updated, the tab content (e.g., the title) is not loaded
+      // Manually capture this by polling the tab info
+      captureTabUpdate(pageId);
+   }
+   
+   function captureTabUpdate(pageId, duration=60000, interval=1000) {
+      let page = hmPages.find(p => p.pageId === pageId);
+
+      // Polling tab info
+      let timer = setInterval(() => {
+         getTabInfo(page.tabId)
+            .then(tab => handleGetTabInfo(tab))
+            .catch(() => clearInterval(timer));
+      }, interval);
+
+      // Remove timer if timeout
+      setTimeout(() => {
+         clearInterval(timer);
+      }, duration);
+
+      function handleGetTabInfo(tab) {
+         if (
+            // tab.url === page.pageObj.url
+            isSameUrl(tab.url, page.pageObj.url) // Ignore query parameter changes
+            && tab.title !== page.pageObj.title
+         ) {
+            updatePage(pageId, 'complete', { tab: tab});
+            displayTree(hmPages);
+            clearInterval(timer);
+         }
+      }
+   }
+
+   // To deduplicate events that are already captured by onCommitted api
+   function isPageCaptured(navInfo) {
+      let page = hmPages.find(p =>
+         p.tabId === navInfo.tabId
+         && p.isOpened
+         // && p.pageObj.url === navInfo.url
+         && isSameUrl(p.pageObj.url, navInfo.url) // Ignore query parameter changes
+      );
+      if (page) return true;
+      return false;
+   }
+
+   // Compare pathname of two urls, ignore query parameters
+   // !! This is a simplified version and does not work for all web apps
+   // e.g.,
+   //   'github.com/username/?tab=repositories'
+   // will be treated as the same as
+   //   'github.com/username/?tab=projects'
+   function isSameUrl(url1, url2) {
+      const parsedUrl1 = new URL(url1);
+      const parsedUrl2 = new URL(url2);
+      return parsedUrl1.pathname === parsedUrl2.pathname;
+   }
+}
+
+// Map page event to hmPages update
+function pageEventToHmPagesUpdate(event, navInfo, tabInfo) {
+   let openerPage = null;
+   let parentPage = null;
+   let page = null;
+   let pageId = null;
+
+   switch (event) {
+      // add a new node, not link to existing node
+      case 'tabCreate-bookmark':
+      case 'tabCreate-startPage':
+      case 'tabCreate-newtab':
+      case 'tabCreate-historyRecent':
+      case 'tabUpdate-bookmark':
+      case 'tabUpdate-typed':
+      case 'tabUpdate-search':
+         pageId = addPage(tabInfo.url, navInfo.documentId, tabInfo.id, tabInfo, null);
+         break;
+
+      // add a new node, link to an existing node
+      case 'tabCreate-duplicate':
+         // sibling of the opener page
+         openerPage = lastPageInTab(tabInfo.openerTabId);
+         parentPage = getParentPage(openerPage);
+         pageId = addPage(tabInfo.url, navInfo.documentId, tabInfo.id, tabInfo, parentPage ? parentPage.pageId : null);
+         break;
+      case 'tabCreate-webPopup':
+         // link to the opener page
+         // !! we don't know which page opens this, temporarily using the last opened page
+         parentPage = openerPage = lastOpenedPage();
+         pageId = addPage(tabInfo.url, navInfo.documentId, tabInfo.id, tabInfo, parentPage.pageId);
+         break;
+      case 'tabCreate-historyPage':
+      case 'tabCreate-clickLink':
+         // link to the last page in the opener tab
+         parentPage = openerPage = lastPageInTab(tabInfo.openerTabId);
+         pageId = addPage(tabInfo.url, navInfo.documentId, tabInfo.id, tabInfo, parentPage.pageId);
+         break;
+      case 'tabUpdate-clickLink':
+         // link to the last opened page in the tab
+         parentPage = openerPage = lastPageInTab(tabInfo.id);
+         pageId = addPage(tabInfo.url, navInfo.documentId, tabInfo.id, tabInfo, parentPage.pageId);
+         break;
+
+      // update page, not adding a new node
+      case 'tabCreate-hmReopen':
+         page = hmPages.find(p => p.incomingTabId === tabInfo.id);
+         pageId = page.pageId;
+         updatePage(pageId, 'reopen', { tab: tabInfo, docId: navInfo.documentId });
+         break;
+      case 'tabUpdate-forwardBack':
+         let backPage = backTarget(tabInfo);
+         let forwardPage = forwardTarget(tabInfo);
+         if (backPage) {
+            pageId = backPage.pageId;
+            updatePage(pageId, 'back', { docId: navInfo.documentId });
+         } else if (forwardPage) {
+            pageId = forwardPage.pageId;
+            updatePage(pageId, 'forward', { docId: navInfo.documentId });
+         } else {
+            // !! this happens when the back/forward page is not in hmPages
+            console.error('Unrecognized forwardBack event: ', navInfo);
+         }
+         break;
+      case 'tabUpdate-reload':
+      case 'tabUpdate-bookmarkEmpty':
+      case 'tabUpdate-typedEmpty':
+      case 'tabUpdate-searchEmpty':
+         page = lastPageInTab(tabInfo.id);
+         pageId = page.pageId;
+         updatePage(pageId, 'reload', { tab: tabInfo, docId: navInfo.documentId });
+         break;
+
+      // do nothing
+      case 'tabUpdate-clientRedirect':
+         break;
+
+      default:
+         console.error('unhandled event: ', event);
+   }
 
    function backTarget(tabInfo) {
       // if the grandparent page is the same as the parent page
@@ -323,15 +436,13 @@ function handleNavigationCommitted(details) {
       );
       return sameSibling || null;
    }
+
+   return pageId;
 }
 
 function handleNavigationCompleted(details) {
-   // console.log('Navigation completed: ', details);
-
    // Not respond to subframe events
    if (details.frameId !== 0) return;
-
-   console.log('Navigation completed: ', details);
 
    getTabInfo(details.tabId)
       .then(tab => mainHandler(tab))
@@ -345,37 +456,13 @@ function handleNavigationCompleted(details) {
    }
 }
 
-function handleBeforeNavigate(details) {
-   // console.log('OnBeforeNavigate: ', details);
-
-   // Not respond to subframe events
-   if (details.frameId !== 0) return;
-
-   // find the opened page in the tab
-   let page = hmPages.find(p => p.tabId === details.tabId && p.isOpened);
-
-   // close the page
-   if (page) {
-      updatePage(page.pageId, 'close');
-      displayTree(hmPages);
-   }
-}
-
 function handleTabRemoved(tabId) {
-   // find the opened page in the tab
-   let page = hmPages.find(p => p.tabId === tabId && p.isOpened);
-
-   // close the page
-   if (page) {
-      updatePage(page.pageId, 'close');
-      displayTree(hmPages);
-   } else {
-      console.error('Page not found: ', tabId);
-   }
+   closePagesInTab(tabId);
+   displayTree(hmPages);
 }
 
 // register listeners
-chrome.webNavigation.onBeforeNavigate.addListener(handleBeforeNavigate);
+chrome.webNavigation.onHistoryStateUpdated.addListener(handleHistoryStateUpdated);
 chrome.webNavigation.onCommitted.addListener(handleNavigationCommitted);
 chrome.webNavigation.onCompleted.addListener(handleNavigationCompleted);
 chrome.tabs.onRemoved.addListener(handleTabRemoved);
@@ -396,6 +483,11 @@ function lastPageInTab(tabId) {
 function getParentPage(page) {
    let parentPage = hmPages.find(p => p.pageId === page.parentPageId);
    return parentPage || null;
+}
+
+function closePagesInTab(tabId) {
+   let pages = hmPages.filter(p => p.tabId === tabId && p.isOpened);
+   pages.forEach(p => updatePage(p.pageId, 'close'));
 }
 
 function getTabInfo(tabId) {
