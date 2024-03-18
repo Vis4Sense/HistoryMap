@@ -392,8 +392,10 @@ function pageEventToHmPagesUpdate(event, navInfo, tabInfo) {
             pageId = forwardPage.pageId;
             updatePage(pageId, 'forward', { docId: navInfo.documentId });
          } else {
-            // !! this happens when the back/forward page is not in hmPages
-            console.error('Unrecognized forwardBack event: ', navInfo);
+            // when the back/forward page is not in hmPages, i.e., opened before historymap
+            // just add a new node, and link to the last opened page in the tab
+            parentPage = openerPage = lastPageInTab(tabInfo.id);
+            pageId = addPage(tabInfo.url, navInfo.documentId, tabInfo.id, tabInfo, parentPage.pageId);
          }
          break;
       case 'tabUpdate-reload':
