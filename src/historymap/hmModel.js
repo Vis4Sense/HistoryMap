@@ -20,6 +20,16 @@ class hmPage {
       // optional
       this.incomingTabId = null; // the tabId of the incoming page, needed for locating the page that is reopened from hm tree
    }
+
+   update(data) {
+      for (let attr in data) {
+         this[attr] = data[attr];
+      }
+   }
+
+   increaseForwardBack(type) {
+      this.forwardBack[type]++;
+   }
 }
 
 // for reference only, not used
