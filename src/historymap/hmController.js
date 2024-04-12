@@ -142,7 +142,9 @@ function handleHistoryStateUpdated(details) {
 
       // When history state updated, the tab content (e.g., the title) is not loaded
       // Manually capture this by polling the tab info
-      captureTabUpdate(pageId);
+      if (pageId) {
+         captureTabUpdate(pageId);
+      }
    }
 
    function captureTabUpdate(pageId, duration=60000, interval=1000) {
@@ -229,7 +231,7 @@ chrome.tabs.onRemoved.addListener(handleTabRemoved);
 window.addEventListener("DOMContentLoaded", function () {
    toggle_badge("On");
    // Initialize hmPages
-   initializeHmPages();
+   // initializeHmPages();
    var iframe = document.getElementById('tree_view');
    var iframeWindow = iframe.contentWindow;
    iframe.onload = function () {

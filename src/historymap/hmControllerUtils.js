@@ -128,25 +128,25 @@ function pageEventToHmPagesUpdate(event, navInfo, tabInfo) {
          // sibling of the opener page
          openerPage = lastPageInTab(tabInfo.openerTabId);
          parentPage = getParentPage(openerPage);
-         pageId = addPage(tabInfo.url, navInfo.documentId, tabInfo.id, tabInfo, parentPage ? parentPage.pageId : null);
+         pageId = addPage(tabInfo.url, navInfo.documentId, tabInfo.id, tabInfo, parentPage?.pageId);
          break;
       case 'tabCreate-webPopup':
          // link to the opener page
          // !! we don't know which page opens this, temporarily using the last opened page
          parentPage = openerPage = lastOpenedPage();
-         pageId = addPage(tabInfo.url, navInfo.documentId, tabInfo.id, tabInfo, parentPage.pageId);
+         pageId = addPage(tabInfo.url, navInfo.documentId, tabInfo.id, tabInfo, parentPage?.pageId);
          break;
       case 'tabCreate-historyPage':
       case 'tabCreate-clickLink':
          // link to the last page in the opener tab
          parentPage = openerPage = lastPageInTab(tabInfo.openerTabId);
-         pageId = addPage(tabInfo.url, navInfo.documentId, tabInfo.id, tabInfo, parentPage.pageId);
+         pageId = addPage(tabInfo.url, navInfo.documentId, tabInfo.id, tabInfo, parentPage?.pageId);
          break;
       case 'tabUpdate-clickLink':
       case 'tabUpdate-formSubmit':
          // link to the last opened page in the tab
          parentPage = openerPage = lastPageInTab(tabInfo.id);
-         pageId = addPage(tabInfo.url, navInfo.documentId, tabInfo.id, tabInfo, parentPage.pageId);
+         pageId = addPage(tabInfo.url, navInfo.documentId, tabInfo.id, tabInfo, parentPage?.pageId);
          break;
 
       // update page, not adding a new node
@@ -168,21 +168,24 @@ function pageEventToHmPagesUpdate(event, navInfo, tabInfo) {
             // when the back/forward page is not in hmPages, i.e., opened before historymap
             // just add a new node, and link to the last opened page in the tab
             parentPage = openerPage = lastPageInTab(tabInfo.id);
-            pageId = addPage(tabInfo.url, navInfo.documentId, tabInfo.id, tabInfo, parentPage.pageId);
+            pageId = addPage(tabInfo.url, navInfo.documentId, tabInfo.id, tabInfo, parentPage?.pageId);
          }
          break;
       case 'tabUpdate-reload':
       case 'tabUpdate-bookmarkEmpty':
       case 'tabUpdate-typedEmpty':
       case 'tabUpdate-searchEmpty':
+      case 'tabUpdate-clientRedirect':
          page = lastPageInTab(tabInfo.id);
-         pageId = page.pageId;
-         updatePage(pageId, 'reload', { tab: tabInfo, docId: navInfo.documentId });
+         pageId = page?.pageId;
+         if (pageId) {
+            updatePage(pageId, 'reload', { tab: tabInfo, docId: navInfo.documentId });
+         }
          break;
 
-      // do nothing
-      case 'tabUpdate-clientRedirect':
-         break;
+      // // do nothing
+      // case 'tabUpdate-clientRedirect':
+      //    break;
 
       default:
          console.error('unhandled event: ', event);
