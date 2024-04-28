@@ -7,31 +7,24 @@
    <title>HistoryMap</title>
    <!-- Styles -->
    <link href="hm.css" rel="stylesheet" />
-   <!-- <link rel="stylesheet" href="debug.css"> -->
-   <!-- Scripts -->
-   <script src="hmController.js"></script>
-   <script src="hmControllerUtils.js"></script>
-   <script src="hmControllerTree.js"></script>
-   <script src="hmControllerHighlight.js"></script>
-   <script src="hmModel.js"></script>
-   <script src="hmControlPanel.js"></script>
-   <!-- <script src="hmTreeView.js"></script> -->
-   <!-- <script src="hmTree2View.js"></script> -->
-
+   <link href="hmTree.css" rel="stylesheet" />
+   <!-- Libraries -->
+   <script src="../../lib/d3.v7.min.js"></script>
+   <script src="../../lib/mxClient.js"></script>
 </head>
 
 <body class="container">
-   <!-- <h1>Observable Plot Library Example</h1>
-   <div id="myplot"></div> -->
-   
    <h1>History Map</h1>
+
+   <!-- Control panel -->
    <div id="control-panel" class="control-panel">
-      <label>Select Experience</label>
+      <!-- <label>Select Experience</label>
       <select id="optionSelect">
           <option value="vector">Vector</option>
           <option value="html">HTML</option>
       </select>
-      <br>
+      <br> -->
+
       <!-- Buttons for saving and loading session -->
       <div id="session-buttons">
          <button id="session-button-save" class="button">Save</button>
@@ -40,7 +33,19 @@
       </div>
    </div>
 
-   <iframe id="tree_view" class="responsive-iframe" src="./hmTree3View/hmTree3View.html" ></iframe>
+   <!-- HistoryMap View container -->
+   <div id="hm-tree-view"></div>
+
+   <!-- Scripts -->
+   <script src="hmTreeUtils.js"></script>
+   <script src="hmTreeLayout.js"></script>
+   <script src="hmTreeView.js"></script>
+   <script src="hmController.js"></script>
+   <script src="hmControllerUtils.js"></script>
+   <script src="hmControllerTree.js"></script>
+   <script src="hmControllerHighlight.js"></script>
+   <script src="hmModel.js"></script>
+   <!-- <script src="hmControlPanel.js"></script> -->
 
    <!-- Scripts for saving and loading sessoin -->
    <script src="hmSessionSave.js"></script>

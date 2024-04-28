@@ -1,177 +1,221 @@
-function displayTree(dataArray) {
-   // Create a root object for the tree
-   const rootId = window.crypto.randomUUID();
-   const root = new hmPage(
-      rootId,
-      null,
-      new Date(),
-      {
-         title: "Tabs opened since opening History Map",
-         label: "History Map",
-      },
-      null
-   );
+/**
+ * @fileoverview Draw HistoryMap tree view
+ */
 
-   // Kai: I am not sure what the code does.
-   const treeData = [root, ...dataArray]
-   const controls = {
-      id: (d, n) => d.pageId,
-      label: (d, n) => (d.pageObj.label ? d.pageObj.label : d.pageObj.title).slice(0,50),
-      // If there is no parent, hang it off the root
-      parentId: (d, n) =>
-      // If there is a parentID return it, if make the parent the root (except for the root)
-      {
-         const pId = d.parentPageId
-            ? d.parentPageId
-            : d.pageId == rootId // If the page is the root, it has no parent
-               ? null // No parent
-               : rootId; // Default to root 
-         // console.log(d, pId);
-         return pId;
-      },
-      title: (d, n) => d.pageObj.title,
-      link: (d, n) => d.pageObj.url,
-      width: 1152,
-   };
-   // console.log("treeData", treeData);
-   const displayElement = document.getElementById("svg-div")
-   displayElement.innerHTML = "";
-   displayElement.appendChild(Tree(treeData, controls));
+function hmTreeView() {
+    var module,
+        hmPageArray,
+        container,
+        dummyContainer;
+
+    function initialize() {
+        container = document.getElementById('hm-tree-view');
+    }
+
+    function calculateNodeSizes(nodes) {
+        dummyContainer = utils.dummyContainer();
+
+        nodes.forEach(d => {
+            const node = hmTreeNode(d).node();
+            dummyContainer.appendChild(node);
+            const bbox = node.getBoundingClientRect();
+            d.width = bbox.width;
+            d.height = bbox.height;
+        })
+
+        dummyContainer.remove();
+    }
+
+    function trianglePath(length=10, direction="right") {
+        const height = length * 1.2 / 2;
+        if (direction === "left") {
+           return `M 0 ${-length / 2} L ${-height} 0 L 0 ${length / 2} Z`;
+        } else if (direction === "right") {
+           return `M 0 ${-length / 2} L ${height} 0 L 0 ${length / 2} Z`;
+        }
+    }
+
+    // TODO: refactor this function
+    function displayTree({
+        data,
+        links,
+        canvasWidth = 640,
+        canvasHeight = 480,
+        stroke = "#555", // stroke for links
+        strokeWidth = 1.5, // stroke width for links
+        strokeOpacity = 0.4, // stroke opacity for links
+        strokeLinejoin, // stroke line join for links
+        strokeLinecap, // stroke line cap for links
+        curve = d3.curveBumpX, // curve for the link
+    } = {}) {
+        // Create svg
+        const svg = d3
+            .create("svg")
+            .attr("width", canvasWidth)
+            .attr("height", canvasHeight);
+
+        // Draw links
+        svg
+            .append("g")
+            .attr("fill", "none")
+            .attr("stroke", stroke)
+            .attr("stroke-opacity", strokeOpacity)
+            .attr("stroke-linecap", strokeLinecap)
+            .attr("stroke-linejoin", strokeLinejoin)
+            .attr("stroke-width", strokeWidth)
+            .selectAll("path")
+            .data(links)
+            .join("path")
+            .attr(
+                "d",
+                d3
+                    .link(curve)
+                    .x((d) => d.x)
+                    .y((d) => d.y)
+            );
+
+        // Draw nodes
+        const node = svg
+            .append("g")
+            .selectAll("g")
+            .data(data)
+            .join("g")
+            .attr("transform", (d) => `translate(${d.x}, ${d.y})`)
+            .style("cursor", "pointer")
+            .on("click", (_, d) => handleOpenPage(d));
+
+        // Node content
+        node.append("foreignObject")
+            .attr("width", (d) => d.width)
+            .attr("height", (d) => d.height)
+            .html((d) => hmTreeNode(d).node().outerHTML);
+
+        // Forward back icon
+        const forwardBack = node
+            .filter((d) => d.forwardBack.back > 0)
+            .append("g")
+            .attr("transform", (d) => `translate(-8, ${d.height / 2})`);
+        forwardBack // forward
+            .filter((d) => d.forwardBack.forward > 0)
+            .append("path")
+            .attr("d", trianglePath(8, "right"))
+            .attr("fill", "black")
+            .attr("transform", "translate(7, 0)");
+        forwardBack.append("path") // back
+            .attr("d", trianglePath(8, "left"))
+            .attr("fill", "black")
+            .attr("transform", "translate(-7, 0)");
+        forwardBack.append("circle")
+            .attr("r", 6)
+            .attr("fill", "white")
+            .attr("stroke", "black")
+        forwardBack.append("text")
+            .attr("y", 3)
+            .attr("font-size", 10)
+            .style("text-anchor", "middle")
+            .text((d) => `${d.forwardBack.back}`);
+        forwardBack
+            .attr("opacity", d => d.isOpened ? 1 : 0.2)
+
+        return svg.node();
+    }
+
+    initialize();
+
+    return module = {
+        hmPageArray: function (_) {
+            return arguments.length ? (hmPageArray = _, module) : hmPageArray;
+        },
+
+        display: function () {
+            var data = [...hmPageArray],
+                links,
+                width,
+                height,
+                layout;
+
+            // run compact tree layout
+            layout = compactTreeLayout();
+            calculateNodeSizes(data);
+            layout.nodes(data).run();
+            layout.close();
+
+            // get links, canvas width, and canvas height
+            links = layout.links();
+            width = layout.width();
+            height = layout.height();
+
+            // display tree
+            container.innerHTML = '';
+            container.appendChild(displayTree({
+                data,
+                links,
+                canvasWidth: width,
+                canvasHeight: height,
+            }));
+
+            return module;
+        }
+    }
 }
 
-// Kai: Are we better off with this one, which seems like an updated example? https://observablehq.com/@d3/tree/2
+function hmTreeNode(hmPage) {
+    var module,
+        node,
+        nodeData;
 
-// Copyright 2021-2023 Observable, Inc.
-// Released under the ISC license.
-// https://observablehq.com/@d3/tree
-function Tree(
-   data,
-   {
-      // data is either tabular (array of objects) or hierarchy (nested objects)
-      path, // as an alternative to id and parentId, returns an array identifier, imputing internal nodes
-      id = Array.isArray(data) ? (d) => d.id : null, // if tabular data, given a d in data, returns a unique identifier (string)
-      parentId = Array.isArray(data) ? (d) => d.parentId : null, // if tabular data, given a node d, returns its parent’s identifier
-      children, // if hierarchical data, given a d in data, returns its children
-      tree = d3.tree, // layout algorithm (typically d3.tree or d3.cluster)
-      sort, // how to sort nodes prior to layout (e.g., (a, b) => d3.descending(a.height, b.height))
-      label, // given a node d, returns the display name
-      title, // given a node d, returns its hover text
-      link, // given a node d, its link (if any)
-      linkTarget = "_blank", // the target attribute for links (if any)
-      width = 640, // outer width, in pixels
-      height, // outer height, in pixels
-      r = 3, // radius of nodes
-      padding = 1, // horizontal padding for first and last column
-      fill = "#999", // fill for nodes
-      fillOpacity, // fill opacity for nodes
-      stroke = "#555", // stroke for links
-      strokeWidth = 1.5, // stroke width for links
-      strokeOpacity = 0.4, // stroke opacity for links
-      strokeLinejoin, // stroke line join for links
-      strokeLinecap, // stroke line cap for links
-      halo = "#fff", // color of label halo
-      haloWidth = 3, // padding around the labels
-      verticalOffset,
-      curve = d3.curveBumpX, // curve for the link
-   } = {}
-) {
-   // If id and parentId options are specified, or the path option, use d3.stratify
-   // to convert tabular data to a hierarchy; otherwise we assume that the data is
-   // specified as an object {children} with nested objects (a.k.a. the “flare.json”
-   // format), and use d3.hierarchy.
+    function hmPage2nodeData() {
+        nodeData = {
+            id: hmPage.pageId,
+            isOpened: hmPage.isOpened,
+            data: hmPage,
+            parentPageId: hmPage.parentPageId,
+            title: hmPage.pageObj.title,
+            favIconUrl: hmPage.pageObj.favIconUrl,
+            highlights: hmPage.highlights
+        }
+    }
 
-   // Kai: I think it is better if we move stratify out of the tree drawing function
+    function initialize() {
+        hmPage2nodeData();
 
-   const root =
-      path != null
-         ? d3.stratify().path(path)(data)
-         : id != null || parentId != null
-            ? d3.stratify().id(id).parentId(parentId)(data)
-            : d3.hierarchy(data, children);
+        node = d3.create('div');
+        node.datum(nodeData);
+        node.attr('class', 'item-contents-display boxed-item');
+        node.classed('closed', !nodeData.isOpened);
 
-   // Sort the nodes.
-   if (sort != null) root.sort(sort);
+        appendHeader();
+    }
 
-   // Compute labels and titles.
-   const descendants = root.descendants();
-   const L = label == null ? null : descendants.map((d) => label(d.data, d));
+    /**
+     * Append header to the node
+     * 
+     * <div class="item-header">
+     *   <img src="faviconUrl">
+     *   <span>title</span>
+     * </div>
+     */
+    function appendHeader() {
+        const header = node
+            .append('div')
+            .attr('class', 'item-header');
 
-   // Compute the layout.NOTE!!!! dx is vertical and dy is horizontal. 
-   const dx = verticalOffset || 20;
+        header
+            .append('img')
+            .attr('src', d => d.favIconUrl || utils.iconUrl('question-circle'));
 
-   // Kai: I think it is better if we set dy based on the label length, which we might need to shorten, instead of display width
+        header
+            .append('span')
+            .text(d => d.title);
+    }
 
-   const dy = width / (root.height + padding);
-   tree().nodeSize([dx, dy])(root);
+    // TODO: append highlights
 
-   // Center the tree.
-   let x0 = Infinity;
-   let x1 = -x0;
-   root.each((d) => {
-      if (d.x > x1) x1 = d.x;
-      if (d.x < x0) x0 = d.x;
-   });
+    initialize();
 
-   // Compute the default height.
-   if (height === undefined) height = x1 - x0 + dx * 2;
-
-   // Use the required curve
-   if (typeof curve !== "function") throw new Error(`Unsupported curve`);
-
-   const svg = d3
-      .create("svg")
-      .attr("viewBox", [(-dy * padding) / 2, x0 - dx, width, height])
-      .attr("width", width)
-      .attr("height", height)
-      .attr("style", "max-width: 100%; height: auto; height: intrinsic;")
-      .attr("font-family", "sans-serif")
-      .attr("font-size", 10);
-
-   svg
-      .append("g")
-      .attr("fill", "none")
-      .attr("stroke", stroke)
-      .attr("stroke-opacity", strokeOpacity)
-      .attr("stroke-linecap", strokeLinecap)
-      .attr("stroke-linejoin", strokeLinejoin)
-      .attr("stroke-width", strokeWidth)
-      .selectAll("path")
-      .data(root.links())
-      .join("path")
-      .attr(
-         "d",
-         d3
-            .link(curve)
-            .x((d) => d.y)
-            .y((d) => d.x)
-      );
-
-   const node = svg
-      .append("g")
-      .selectAll("a")
-      .data(root.descendants())
-      .join("a")
-      .attr("xlink:href", link == null ? null : (d) => link(d.data, d))
-      .attr("target", link == null ? null : linkTarget)
-      .attr("transform", (d) => `translate(${d.y},${d.x})`);
-
-   node
-      .append("circle")
-      .attr("fill", (d) => (d.children ? stroke : fill))
-      .attr("r", r);
-
-   if (title != null) node.append("title").text((d) => title(d.data, d));
-
-   if (L)
-      node
-         .append("text")
-         .attr("dy", "0.32em")
-         .attr("x", (d) => (d.children ? -6 : 6))
-         .attr("text-anchor", (d) => (d.children ? "end" : "start"))
-         .attr("paint-order", "stroke")
-         .attr("stroke", halo)
-         .attr("stroke-width", haloWidth)
-         .text((d, i) => L[i]);
-
-   return svg.node();
+    return module = {
+        node: function () {
+            return node.node();
+        }
+    }
 }

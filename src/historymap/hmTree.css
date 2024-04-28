@@ -1,0 +1,152 @@
+.hidden {
+    visibility: hidden;
+}
+
+.ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.hm-debug-historymap {
+    background-color: azure;
+}
+
+.item-contents-display {
+    padding: 2px;
+    background-color: white;
+    max-width: 10rem;
+    font-size: 0.8rem;
+}
+
+.item-contents-display > div:not(:last-child) {
+    margin-bottom: 0.3rem;
+}
+
+.item-contents-display .item-highlights > div:not(:last-child) {
+    margin-bottom: 2px;
+}
+
+.item-header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.item-header span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 90%;
+    min-width: 30px;
+    cursor: default;
+}
+
+.item-header img {
+    width: 1rem;
+    /* Adjust as needed */
+    height: 1rem;
+    /* Adjust as needed */
+    margin-left: 0px;
+    margin-right: 0.2rem;
+}
+
+.item-title {
+    cursor: default;
+    width: 100%;
+}
+
+.item-highlight {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.item-highlight .icon-brush {
+    flex-shrink: 0;
+    width: 1rem;
+    height: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: red;
+    border-radius: 2px;
+    margin-right: 0.2rem;
+}
+
+.item-highlight .icon {
+    width: 0.7rem;
+    height: 0.7rem;
+}
+
+.item-highlight .item-highlight-text {
+    max-width: 90%;
+    min-width: 30px;
+}
+
+.item-highlight img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+}
+
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(2rem, 1fr));
+    gap: 1px;
+}
+
+.gallery-item {
+    width: 100%;
+    height: 2rem;
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.screenshot {
+    max-width: 100%;
+    /* Ensures image does not exceed the width of its container */
+    height: auto;
+    /* Maintains aspect ratio */
+}
+
+.notes {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    cursor: default;
+    display: none;
+}
+
+.note {
+    margin-left: 1em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.item-contents-display.boxed-item {
+    border: 1px solid gray;
+    border-radius: 4px;
+    padding: 5px;
+    margin-bottom: 2px;
+    background-color: white;
+    box-sizing: border-box;
+    /* Sets the background color to white */
+    /* box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3); */
+    /* Adds a shadow */
+    width: 10rem;
+}
+
+.item-contents-display.boxed-item.closed {
+    border: 1px dashed gray;
+    opacity: 0.5;
+}

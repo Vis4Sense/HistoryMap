@@ -1,3 +1,92 @@
+// TODO: Refactor this file
+
+const ignoredUrls = [
+   'chrome-extension://',
+   'edge://extensions/'
+];
+
+function addPage(tabURL, docId, tabID, pageObj, parentPageId, isOpened=true) {
+   if (!ignoredUrls.some(url => tabURL.includes(url))) {
+      let newPageId = window.crypto.randomUUID();
+      let newPage = new hmPage(
+         newPageId,
+         tabID,
+         new Date(),
+         pageObj,
+         parentPageId,
+         docId,
+         isOpened
+      );
+      hmPages.push(newPage);
+      console.log("A new hmPage added:", newPage.pageObj.title, ', ', newPage.pageObj.url);
+      return newPageId;
+   }
+   return null;
+}
+
+function updatePage(pageId, type, data=null) {
+   let page = hmPages.find(p => p.pageId === pageId);
+   let parentPage = null;
+
+   if (!page) {
+      console.error('Page not found: ', pageId);
+      return;
+   }
+
+   switch (type) {
+      case 'complete': // update page object after navigation completed
+         page.update({ pageObj: data.tab });
+         break;
+      case 'close': // page closed
+         page.update({ isOpened: false });
+         break;
+      case 'beforeReopen': // before page reopened (from hm tree)
+         page.update({ incomingTabId: data.tabId });
+         break;
+      case 'reopen': // page reopened (from hm tree)
+         page.update({
+            tabId: data.tab.id,
+            docId: data.docId,
+            time: new Date(),
+            pageObj: data.tab,
+            isOpened: true,
+            incomingTabId: null
+         });
+         break;
+      case 'reload': // rewrite page info, after reload or url change in empty page
+         page.update({
+            tabId: data.tab.id,
+            docId: data.docId,
+            time: new Date(),
+            pageObj: data.tab,
+            isOpened: true
+         });
+         break;
+      case 'back': // go back
+         page.update({ isOpened: false });
+         page.increaseForwardBack('back');
+         parentPage = getParentPage(page);
+         parentPage.update({
+            isOpened: true,
+            docId: data.docId,
+            time: new Date()
+         });
+         break;
+      case 'forward': // go forward
+         page.update({
+            isOpened: true,
+            docId: data.docId,
+            time: new Date()
+         });
+         page.increaseForwardBack('forward');
+         parentPage = getParentPage(page);
+         parentPage.update({ isOpened: false });
+         break;
+      default:
+         console.error('Unhandled type: ', type);
+   }
+}
+
 // Map navigation info to page event
 function navigationToPageEvent(navInfo, tabInfo) {
    let event = '';

@@ -1,91 +1,8 @@
-const ignoredUrls = [
-   'chrome-extension://',
-   'edge://extensions/'
-];
+let treeView = hmTreeView();
 
-let displayTree = ()=>{};
-
-function addPage(tabURL, docId, tabID, pageObj, parentPageId, isOpened=true) {
-   if (!ignoredUrls.some(url => tabURL.includes(url))) {
-      let newPageId = window.crypto.randomUUID();
-      let newPage = new hmPage(
-         newPageId,
-         tabID,
-         new Date(),
-         pageObj,
-         parentPageId,
-         docId,
-         isOpened
-      );
-      hmPages.push(newPage);
-      console.log("A new hmPage added:", newPage.pageObj.title, ', ', newPage.pageObj.url);
-      return newPageId;
-   }
-   return null;
-}
-
-function updatePage(pageId, type, data=null) {
-   let page = hmPages.find(p => p.pageId === pageId);
-   let parentPage = null;
-
-   if (!page) {
-      console.error('Page not found: ', pageId);
-      return;
-   }
-
-   switch (type) {
-      case 'complete': // update page object after navigation completed
-         page.update({ pageObj: data.tab });
-         break;
-      case 'close': // page closed
-         page.update({ isOpened: false });
-         break;
-      case 'beforeReopen': // before page reopened (from hm tree)
-         page.update({ incomingTabId: data.tabId });
-         break;
-      case 'reopen': // page reopened (from hm tree)
-         page.update({
-            tabId: data.tab.id,
-            docId: data.docId,
-            time: new Date(),
-            pageObj: data.tab,
-            isOpened: true,
-            incomingTabId: null
-         });
-         break;
-      case 'reload': // rewrite page info, after reload or url change in empty page
-         page.update({
-            tabId: data.tab.id,
-            docId: data.docId,
-            time: new Date(),
-            pageObj: data.tab,
-            isOpened: true
-         });
-         break;
-      case 'back': // go back
-         page.update({ isOpened: false });
-         page.increaseForwardBack('back');
-         parentPage = getParentPage(page);
-         parentPage.update({
-            isOpened: true,
-            docId: data.docId,
-            time: new Date()
-         });
-         break;
-      case 'forward': // go forward
-         page.update({
-            isOpened: true,
-            docId: data.docId,
-            time: new Date()
-         });
-         page.increaseForwardBack('forward');
-         parentPage = getParentPage(page);
-         parentPage.update({ isOpened: false });
-         break;
-      default:
-         console.error('Unhandled type: ', type);
-   }
-}
+let displayTree = (data) => {
+   treeView.hmPageArray(data).display();
+};
 
 function initializeHmPages() {
    // add all the tabs opened before running historymap to hmPages
@@ -232,13 +149,14 @@ window.addEventListener("DOMContentLoaded", function () {
    toggle_badge("On");
    // Initialize hmPages
    // initializeHmPages();
-   var iframe = document.getElementById('tree_view');
-   var iframeWindow = iframe.contentWindow;
-   iframe.onload = function () {
-      // Access global variables
-      displayTree = iframeWindow.displayTree;
-      displayTree(hmPages);
-   }
+   // var iframe = document.getElementById('tree_view');
+   // var iframeWindow = iframe.contentWindow;
+   // iframe.onload = function () {
+   //    // Access global variables
+   //    displayTree = iframeWindow.displayTree;
+   //    displayTree(hmPages);
+   // }
+   displayTree(hmPages);
 });
 
 window.addEventListener("beforeunload", function () {
