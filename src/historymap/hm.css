@@ -5,9 +5,7 @@
 }
 
 .control-panel {
-  /* Assuming a fixed height for the control panel */
-  height: 50px; /* Adjust as needed */
-  /* Other styling for the control panel */
+  margin-bottom: 10px;
 }
 
 .responsive-iframe {

@@ -2,11 +2,15 @@
  * @fileoverview Draw HistoryMap tree view
  */
 
-function hmTreeView() {
+function hmTreeView({
+    defaultLayoutMethod = 'indentedTree',
+} = {}) {
     var module,
         hmPageArray,
         container,
         dummyContainer;
+
+    var layoutMethod = defaultLayoutMethod;
 
     function initialize() {
         container = document.getElementById('hm-tree-view');
@@ -35,6 +39,29 @@ function hmTreeView() {
         }
     }
 
+    function linkPath(link) {
+        if (layoutMethod === 'compactTree') {
+            link.attr(
+                "d",
+                d3
+                    .link(d3.curveBumpX)
+                    .x((d) => d.x)
+                    .y((d) => d.y)
+            )
+        } else if (layoutMethod === 'indentedTree') {
+            link.attr(
+                "d",
+                d => `
+                    M ${d.source.x} ${d.source.y}
+                    L ${d.source.x} ${d.target.y}
+                    L ${d.target.x} ${d.target.y}
+                `
+            )
+        } else {
+            console.error(`Unknown layout method: ${layoutMethod}`);
+        }
+    }
+
     // TODO: refactor this function
     function displayTree({
         data,
@@ -43,10 +70,9 @@ function hmTreeView() {
         canvasHeight = 480,
         stroke = "#555", // stroke for links
         strokeWidth = 1.5, // stroke width for links
-        strokeOpacity = 0.4, // stroke opacity for links
+        strokeOpacity = 1, // stroke opacity for links
         strokeLinejoin, // stroke line join for links
         strokeLinecap, // stroke line cap for links
-        curve = d3.curveBumpX, // curve for the link
     } = {}) {
         // Create svg
         const svg = d3
@@ -66,13 +92,7 @@ function hmTreeView() {
             .selectAll("path")
             .data(links)
             .join("path")
-            .attr(
-                "d",
-                d3
-                    .link(curve)
-                    .x((d) => d.x)
-                    .y((d) => d.y)
-            );
+            .call(linkPath);
 
         // Draw nodes
         const node = svg
@@ -135,7 +155,8 @@ function hmTreeView() {
                 layout;
 
             // run compact tree layout
-            layout = compactTreeLayout();
+            layoutFunc = hmTreeLayouts[layoutMethod];
+            layout = layoutFunc();
             calculateNodeSizes(data);
             layout.nodes(data).run();
             layout.close();
@@ -155,6 +176,10 @@ function hmTreeView() {
             }));
 
             return module;
+        },
+
+        layoutMethod: function (_) {
+            return arguments.length ? (layoutMethod = _, module) : layoutMethod;
         }
     }
 }

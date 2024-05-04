@@ -26,8 +26,6 @@ function compactTreeLayout({
 
     function initialize() {
         dummyContainer = utils.dummyContainer();
-        // dummyContainer = document.createElement('div');
-        // document.body.appendChild(dummyContainer);
 
         graph = new mxGraph(dummyContainer.get());
         parentNode = graph.getDefaultParent();
