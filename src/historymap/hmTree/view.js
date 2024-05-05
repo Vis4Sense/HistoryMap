@@ -30,11 +30,11 @@ function hmTreeView({
         dummyContainer.remove();
     }
 
-    function trianglePath(length=10, direction="right") {
+    function trianglePath(length=10, direction='right') {
         const height = length * 1.2 / 2;
-        if (direction === "left") {
+        if (direction === 'left') {
            return `M 0 ${-length / 2} L ${-height} 0 L 0 ${length / 2} Z`;
-        } else if (direction === "right") {
+        } else if (direction === 'right') {
            return `M 0 ${-length / 2} L ${height} 0 L 0 ${length / 2} Z`;
         }
     }
@@ -42,7 +42,7 @@ function hmTreeView({
     function linkPath(link) {
         if (layoutMethod === 'compactTree') {
             link.attr(
-                "d",
+                'd',
                 d3
                     .link(d3.curveBumpX)
                     .x((d) => d.x)
@@ -50,7 +50,7 @@ function hmTreeView({
             )
         } else if (layoutMethod === 'indentedTree') {
             link.attr(
-                "d",
+                'd',
                 d => `
                     M ${d.source.x} ${d.source.y}
                     L ${d.source.x} ${d.target.y}
@@ -68,7 +68,9 @@ function hmTreeView({
         links,
         canvasWidth = 640,
         canvasHeight = 480,
-        stroke = "#555", // stroke for links
+        paddingRight = 200,
+        paddingBottom = 20,
+        stroke = '#555', // stroke for links
         strokeWidth = 1.5, // stroke width for links
         strokeOpacity = 1, // stroke opacity for links
         strokeLinejoin, // stroke line join for links
@@ -76,66 +78,83 @@ function hmTreeView({
     } = {}) {
         // Create svg
         const svg = d3
-            .create("svg")
-            .attr("width", canvasWidth)
-            .attr("height", canvasHeight);
+            .create('svg')
+            .attr('width', canvasWidth + paddingRight)
+            .attr('height', canvasHeight + paddingBottom);
 
         // Draw links
         svg
-            .append("g")
-            .attr("fill", "none")
-            .attr("stroke", stroke)
-            .attr("stroke-opacity", strokeOpacity)
-            .attr("stroke-linecap", strokeLinecap)
-            .attr("stroke-linejoin", strokeLinejoin)
-            .attr("stroke-width", strokeWidth)
-            .selectAll("path")
+            .append('g')
+            .attr('fill', 'none')
+            .attr('stroke', stroke)
+            .attr('stroke-opacity', strokeOpacity)
+            .attr('stroke-linecap', strokeLinecap)
+            .attr('stroke-linejoin', strokeLinejoin)
+            .attr('stroke-width', strokeWidth)
+            .selectAll('path')
             .data(links)
-            .join("path")
+            .join('path')
             .call(linkPath);
 
         // Draw nodes
         const node = svg
-            .append("g")
-            .selectAll("g")
+            .append('g')
+            .selectAll('g')
             .data(data)
-            .join("g")
-            .attr("transform", (d) => `translate(${d.x}, ${d.y})`)
-            .style("cursor", "pointer")
-            .on("click", (_, d) => handleOpenPage(d));
+            .join('g')
+            .attr('transform', (d) => `translate(${d.x}, ${d.y})`);
 
         // Node content
-        node.append("foreignObject")
-            .attr("width", (d) => d.width)
-            .attr("height", (d) => d.height)
+        node.append('foreignObject')
+            .attr('width', (d) => d.width)
+            .attr('height', (d) => d.height)
             .html((d) => hmTreeNode(d).node().outerHTML);
+        
+        // Node Menu
+        const menu = hmNodeMenu();
+
+        // Interaction
+        node
+            .style('cursor', 'pointer')
+            .on('click', (_, d) => handleOpenPage(d))
+            .on('mouseenter', function () {
+                // Append menu
+                d3.select(this)
+                    .append('g')
+                    .attr('transform', d => `translate(${d.width}, 0)`)
+                    .attr('class', 'menu')
+                    .call(menu);
+            })
+            .on('mouseleave', function () {
+                d3.select(this).select('.menu').remove();
+            });
 
         // Forward back icon
         const forwardBack = node
             .filter((d) => d.forwardBack.back > 0)
-            .append("g")
-            .attr("transform", (d) => `translate(-8, ${d.height / 2})`);
+            .append('g')
+            .attr('transform', (d) => `translate(-8, ${d.height / 2})`);
         forwardBack // forward
             .filter((d) => d.forwardBack.forward > 0)
-            .append("path")
-            .attr("d", trianglePath(8, "right"))
-            .attr("fill", "black")
-            .attr("transform", "translate(7, 0)");
-        forwardBack.append("path") // back
-            .attr("d", trianglePath(8, "left"))
-            .attr("fill", "black")
-            .attr("transform", "translate(-7, 0)");
-        forwardBack.append("circle")
-            .attr("r", 6)
-            .attr("fill", "white")
-            .attr("stroke", "black")
-        forwardBack.append("text")
-            .attr("y", 3)
-            .attr("font-size", 10)
-            .style("text-anchor", "middle")
+            .append('path')
+            .attr('d', trianglePath(8, 'right'))
+            .attr('fill', 'black')
+            .attr('transform', 'translate(7, 0)');
+        forwardBack.append('path') // back
+            .attr('d', trianglePath(8, 'left'))
+            .attr('fill', 'black')
+            .attr('transform', 'translate(-7, 0)');
+        forwardBack.append('circle')
+            .attr('r', 6)
+            .attr('fill', 'white')
+            .attr('stroke', 'black')
+        forwardBack.append('text')
+            .attr('y', 3)
+            .attr('font-size', 10)
+            .style('text-anchor', 'middle')
             .text((d) => `${d.forwardBack.back}`);
         forwardBack
-            .attr("opacity", d => d.isOpened ? 1 : 0.2)
+            .attr('opacity', d => d.isOpened ? 1 : 0.2)
 
         return svg.node();
     }

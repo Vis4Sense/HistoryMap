@@ -150,3 +150,44 @@
     border: 1px dashed gray;
     opacity: 0.5;
 }
+
+.btn-group {
+    display: flex;
+    flex-direction: row;
+}
+
+.btn-group button {
+    padding: 0.2rem 0.2rem;
+    background-color: white;
+    border: 1.5px solid #ccc;
+    cursor: pointer; /* Pointer/hand icon */
+    display: flex;
+    align-items: center;
+}
+
+.btn-group button:not(:last-child) {
+    border-right: none; /* Prevent double borders */
+}
+
+.btn-group button:first-child {
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+
+.btn-group button:last-child {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+.btn-group button img {
+    height: 1.1rem;
+}
+
+/* Add a background color on hover */
+.btn-group button:hover {
+    background-color: #eee;
+}
+
+foreignObject {
+    overflow: visible;
+}

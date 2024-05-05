@@ -16,7 +16,7 @@ const utils = {
         initialize();
 
         return module = {
-            get: function () {
+            node: function () {
                 return container;
             },
 
@@ -26,6 +26,14 @@ const utils = {
 
             appendChild: function (child) {
                 container.appendChild(child);
+            },
+
+            call: function (fn) {
+                fn(d3.select(container));
+            },
+
+            select: function (selector) {
+                return d3.select(container).select(selector);
             }
         }
     },

@@ -4,6 +4,7 @@
 
 function indentedTreeLayout({
     indent = 10,
+    marginTop = 10,
     spacingY = 5,
     linkDx = 5,
 } = {}) {
@@ -30,11 +31,12 @@ function indentedTreeLayout({
     function initialize() {
         dummyContainer = utils.dummyContainer();
 
-        graph = new mxGraph(dummyContainer.get());
+        graph = new mxGraph(dummyContainer.node());
         parentNode = graph.getDefaultParent();
 
         layout = new mxStackLayout(graph, false);
         layout.spacing = spacingY;
+        layout.marginTop = marginTop;
 
         nodeDict = {};
         linkDict = {};
