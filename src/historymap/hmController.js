@@ -5,15 +5,18 @@ let displayTree = (data) => {
 };
 
 function initializeHmPages() {
+   if (window.self == window.top) {
+      hmPages = dataExample.hmPages;
+   }
    // add all the tabs opened before running historymap to hmPages
-   chrome.tabs.query({}, function (openedTabs) {
-      console.log("Tabs opened before historymap: ", openedTabs);
-      hmPages = []
-      for (let i = 0; i < openedTabs.length; i++) {
-         addPage(openedTabs[i].url, null, openedTabs[i].id, openedTabs[i], null);
-      }
-      displayTree(hmPages);
-   });
+   // chrome.tabs.query({}, function (openedTabs) {
+   //    console.log("Tabs opened before historymap: ", openedTabs);
+   //    hmPages = []
+   //    for (let i = 0; i < openedTabs.length; i++) {
+   //       addPage(openedTabs[i].url, null, openedTabs[i].id, openedTabs[i], null);
+   //    }
+   //    // displayTree(hmPages);
+   // });
 }
 
 function handleNavigationCommitted(details) {
@@ -148,7 +151,7 @@ chrome.tabs.onRemoved.addListener(handleTabRemoved);
 window.addEventListener("DOMContentLoaded", function () {
    toggle_badge("On");
    // Initialize hmPages
-   // initializeHmPages();
+   initializeHmPages();
    // var iframe = document.getElementById('tree_view');
    // var iframeWindow = iframe.contentWindow;
    // iframe.onload = function () {
