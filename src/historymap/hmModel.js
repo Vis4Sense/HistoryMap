@@ -2,7 +2,7 @@
 
 // A opened webpage
 class hmPage {
-   constructor(pageId, tabId, time, pageObj, parentPageId, docId=null, isOpened=true) {
+   constructor({ pageId, tabId, time, pageObj, parentPageId, docId=null, isOpened=true, forwardBack={forward: 0, back: 0}, highlights=[], incomingTabId=null }) {
       this.pageId = pageId;
       this.docId = docId; // a UUID of the document loaded, get from webNavigation API, needed for locating the page to update pageObj after navigation completed
       this.tabId = tabId;
@@ -11,14 +11,11 @@ class hmPage {
       this.parentPageId = parentPageId;
       this.isOpened = isOpened;
       // this.clicked = false;
-      this.forwardBack = {
-         forward: 0, // the number of times the parent page goes forward to this page
-         back: 0 // the number of times this page goes back to the parent page
-      };
-      this.highlights = [];
+      this.forwardBack = forwardBack;
+      this.highlights = highlights;
 
       // optional
-      this.incomingTabId = null; // the tabId of the incoming page, needed for locating the page that is reopened from hm tree
+      this.incomingTabId = incomingTabId; // the tabId of the incoming page, needed for locating the page that is reopened from hm tree
    }
 
    update(data) {

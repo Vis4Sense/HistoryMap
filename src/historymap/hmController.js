@@ -6,7 +6,7 @@ let displayTree = (data) => {
 
 function initializeHmPages() {
    if (window.self == window.top) {
-      hmPages = dataExample.hmPages;
+      hmPages = dataExample.hmPages.map(p => new hmPage(p));
    }
    // add all the tabs opened before running historymap to hmPages
    // chrome.tabs.query({}, function (openedTabs) {

@@ -8,15 +8,15 @@ const ignoredUrls = [
 function addPage(tabURL, docId, tabID, pageObj, parentPageId, isOpened=true) {
    if (!ignoredUrls.some(url => tabURL.includes(url))) {
       let newPageId = window.crypto.randomUUID();
-      let newPage = new hmPage(
-         newPageId,
-         tabID,
-         new Date(),
+      let newPage = new hmPage({
+         pageId: newPageId,
+         tabId: tabID,
+         time: new Date(),
          pageObj,
          parentPageId,
          docId,
          isOpened
-      );
+      });
       hmPages.push(newPage);
       console.log("A new hmPage added:", newPage.pageObj.title, ', ', newPage.pageObj.url);
       return newPageId;
