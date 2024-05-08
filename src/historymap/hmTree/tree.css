@@ -146,9 +146,21 @@
     width: 10rem;
 }
 
-.item-contents-display.boxed-item.closed {
-    border: 1px dashed gray;
+.hm-tree-node.closed {
+    border: 1px dashed rgba(128, 128, 128, 0.5);
+    color: rgba(0, 0, 0, 0.5);
+}
+
+.hm-tree-node.closed img {
     opacity: 0.5;
+}
+
+.hm-tree-node.semi-closed {
+    border-left: 2px solid gray;
+}
+
+.hm-tree-node.semi-closed .icon-collapse {
+    opacity: 1;
 }
 
 .btn-group {

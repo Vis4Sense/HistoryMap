@@ -12,6 +12,8 @@ function hmTreeView({
 
     var layoutMethod = defaultLayoutMethod;
 
+    var parent = d => hmPageArray.find(p => p.pageId === d.parentPageId);
+
     function initialize() {
         container = document.getElementById('hm-tree-view');
     }
@@ -28,6 +30,35 @@ function hmTreeView({
         })
 
         dummyContainer.remove();
+    }
+
+    function processData(nodes) {
+        function isAncestorCollapsed(d) {
+            let ancestor = parent(d);
+            while (ancestor) {
+                if (ancestor.isCollapsed) return true;
+                ancestor = parent(ancestor);
+            }
+            return false;
+        }
+
+        function hasOpenedDescendants(d) {
+            if (d.isOpened) return true;
+            else if (d.isLeaf) return false;
+            let children = nodes.filter(n => n.parentPageId === d.pageId);
+            return children.find(n => hasOpenedDescendants(n)) !== undefined;
+        }
+
+        nodes.forEach((d) => {
+            d.isLeaf = nodes.find((n) => n.parentPageId === d.pageId) === undefined;
+            d.display = isAncestorCollapsed(d) ? false : true;
+            d.isDescendantOpened = hasOpenedDescendants(d);
+        });
+
+        // Filter out collapsed nodes
+        nodes = nodes.filter(d => d.display);
+
+        return nodes;
     }
 
     function trianglePath(length=10, direction='right') {
@@ -128,6 +159,13 @@ function hmTreeView({
             .on('mouseleave', function () {
                 d3.select(this).select('.menu').remove();
             });
+        
+        // Collapse node
+        node.select('.icon-collapse')
+            .on('click', function (e, d) {
+                e.stopPropagation();
+                handleToggleCollapse(d.pageId);
+            });
 
         // Forward back icon
         const forwardBack = node
@@ -167,7 +205,7 @@ function hmTreeView({
         },
 
         display: function () {
-            var data = [...hmPageArray],
+            var data = processData([...hmPageArray]),
                 links,
                 width,
                 height,
@@ -216,7 +254,10 @@ function hmTreeNode(hmPage) {
             parentPageId: hmPage.parentPageId,
             title: hmPage.pageObj.title,
             favIconUrl: hmPage.pageObj.favIconUrl,
-            highlights: hmPage.highlights
+            highlights: hmPage.highlights,
+            isLeaf: hmPage.isLeaf,
+            isCollapsed: hmPage.isCollapsed,
+            isDescendantOpened: hmPage.isDescendantOpened,
         }
     }
 
@@ -225,8 +266,13 @@ function hmTreeNode(hmPage) {
 
         node = d3.create('div');
         node.datum(nodeData);
-        node.attr('class', 'item-contents-display boxed-item');
+        node.attr('class', 'item-contents-display boxed-item hm-tree-node');
         node.classed('closed', !nodeData.isOpened);
+        node.classed('semi-closed', d =>
+            d.isCollapsed
+            && !d.isOpened
+            && d.isDescendantOpened
+        );
 
         appendHeader();
     }
@@ -243,6 +289,15 @@ function hmTreeNode(hmPage) {
         const header = node
             .append('div')
             .attr('class', 'item-header');
+
+        header
+            .filter(d => !d.isLeaf)
+            .append('img')
+            .attr('class', 'icon-collapse')
+            .attr('src', d => d.isCollapsed
+                ? utils.iconUrl('arrow-right')
+                : utils.iconUrl('arrow-down')
+            );
 
         header
             .append('img')

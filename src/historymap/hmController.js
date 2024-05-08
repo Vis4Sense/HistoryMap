@@ -147,6 +147,11 @@ chrome.webNavigation.onCommitted.addListener(handleNavigationCommitted);
 chrome.webNavigation.onCompleted.addListener(handleNavigationCompleted);
 chrome.tabs.onRemoved.addListener(handleTabRemoved);
 
+function handleToggleCollapse(pageId) {
+   updatePage(pageId, 'toggleCollapse');
+   displayTree(hmPages);
+}
+
 // When the window is open, the History Map is on
 window.addEventListener("DOMContentLoaded", function () {
    toggle_badge("On");

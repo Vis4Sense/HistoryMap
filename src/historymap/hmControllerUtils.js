@@ -40,6 +40,9 @@ function updatePage(pageId, type, data=null) {
       case 'close': // page closed
          page.update({ isOpened: false });
          break;
+      case 'toggleCollapse': // update page attributes
+         page.update({ isCollapsed: !page.isCollapsed });
+         break;
       case 'beforeReopen': // before page reopened (from hm tree)
          page.update({ incomingTabId: data.tabId });
          break;
