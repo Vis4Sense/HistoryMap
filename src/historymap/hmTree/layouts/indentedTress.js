@@ -3,7 +3,7 @@
  */
 
 function indentedTreeLayout({
-    indent = 10,
+    indent = 15,
     marginTop = 10,
     spacingY = 5,
     linkDx = 5,
