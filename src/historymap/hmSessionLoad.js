@@ -55,3 +55,12 @@ function playSession(duration=1000) {
         }, duration * idx);
     });
 }
+
+function loadAllFromLocalStorage(callback=null) {
+    chrome.storage.local.get(["hmPages"], function(result) {
+        hmPages = result.hmPages.map(p => new hmPage(p));
+        if (callback) {
+            callback();
+        }
+    });
+}

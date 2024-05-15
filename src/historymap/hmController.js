@@ -5,9 +5,9 @@ let displayTree = (data) => {
 };
 
 function initializeHmPages() {
-   if (window.self == window.top) {
-      hmPages = dataExample.hmPages.map(p => new hmPage(p));
-   }
+   // if (window.self == window.top) {
+   //    hmPages = dataExample.hmPages.map(p => new hmPage(p));
+   // }
    // add all the tabs opened before running historymap to hmPages
    // chrome.tabs.query({}, function (openedTabs) {
    //    console.log("Tabs opened before historymap: ", openedTabs);
@@ -17,6 +17,9 @@ function initializeHmPages() {
    //    }
    //    // displayTree(hmPages);
    // });
+   loadAllFromLocalStorage(() => {
+      displayTree(hmPages);
+   });
 }
 
 function handleNavigationCommitted(details) {
@@ -164,7 +167,7 @@ window.addEventListener("DOMContentLoaded", function () {
    //    displayTree = iframeWindow.displayTree;
    //    displayTree(hmPages);
    // }
-   displayTree(hmPages);
+   // displayTree(hmPages);
 });
 
 window.addEventListener("beforeunload", function () {

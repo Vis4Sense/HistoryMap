@@ -27,3 +27,7 @@ function saveSession() {
     // Clean up the URL object to release resources
     window.URL.revokeObjectURL(url);
 }
+
+function saveAllToLocalStorage() {
+    chrome.storage.local.set({ "hmPages": hmPages });
+}
