@@ -1,14 +1,14 @@
 // Saved hmPages
 var savedHmPages = [];
 
-// Button element
-const sessionButtonLoad = document.getElementById("session-button-load");
+// // Button element
+// const sessionButtonLoad = document.getElementById("session-button-load");
 
-// Listen clicking button
-sessionButtonLoad.addEventListener("click", () => {
-    console.log("loading session");
-    loadSession();
-})
+// // Listen clicking button
+// sessionButtonLoad.addEventListener("click", () => {
+//     console.log("loading session");
+//     loadSession();
+// })
 
 // Load session from local storage
 function loadSession() {

@@ -1,11 +1,11 @@
-// Button element
-const sessionButtonSave = document.getElementById("session-button-save");
+// // Button element
+// const sessionButtonSave = document.getElementById("session-button-save");
 
-// Listen clicking button
-sessionButtonSave.addEventListener("click", () => {
-    console.log("saving session");
-    saveSession();
-});
+// // Listen clicking button
+// sessionButtonSave.addEventListener("click", () => {
+//     console.log("saving session");
+//     saveSession();
+// });
 
 // Save session
 function saveSession() {

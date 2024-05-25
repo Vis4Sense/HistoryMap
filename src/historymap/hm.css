@@ -4,6 +4,18 @@
   height: 100vh; /* Full height of the viewport */
 }
 
+.flex {
+  display: flex;
+}
+
+.flex-row {
+  flex-direction: row;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
 .control-panel {
   margin-bottom: 10px;
 }
@@ -12,4 +24,19 @@
   flex-grow: 1; /* This makes the iframe take up the remaining space */
   width: 100%; /* Full width */
   border: none; /* Optional: removes the border */
+}
+
+.loader {
+  border: 2px solid #d9d9d9; /* Light grey */
+  border-top: 2px solid #686868; /* Blue */
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  animation: spin 1s linear infinite;
+  display: none;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

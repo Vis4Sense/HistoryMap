@@ -1,8 +1,29 @@
 let treeView = hmTreeView();
 
+const cntInitVisibleNodes = 5;
+let visibleIndex = 0;
+let isLoading = false;
+
 let displayTree = (data) => {
-   treeView.hmPageArray(data).display();
+   treeView.hmPageArray(data.slice(visibleIndex)).display();
 };
+
+function loadMore() {
+   document.getElementById('loading-icon').style.display = 'block';
+   setTimeout(() => {
+      visibleIndex = Math.max(0, visibleIndex - 10);
+      displayTree(hmPages);
+      document.getElementById('loading-icon').style.display = 'none';
+      isLoading = false;
+   }, 1000);
+}
+
+window.addEventListener('wheel', function(e) {
+   if (e.deltaY < 0 && !isLoading && window.scrollY == 0) {
+      isLoading = true;
+      loadMore();
+   }
+});
 
 function initializeHmPages() {
    // if (window.self == window.top) {
@@ -18,6 +39,7 @@ function initializeHmPages() {
    //    // displayTree(hmPages);
    // });
    loadAllFromLocalStorage(() => {
+      visibleIndex = Math.max(0, hmPages.length - cntInitVisibleNodes);
       displayTree(hmPages);
    });
 }
