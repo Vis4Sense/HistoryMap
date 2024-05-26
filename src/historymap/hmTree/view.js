@@ -140,9 +140,6 @@ function hmTreeView({
             .attr('width', (d) => d.width)
             .attr('height', (d) => d.height)
             .html((d) => hmTreeNode(d).node().outerHTML);
-        
-        // Node Menu
-        const menu = hmNodeMenu();
 
         // Interaction
         node
@@ -150,6 +147,8 @@ function hmTreeView({
             .on('click', (_, d) => handleOpenPage(d))
             .on('mouseenter', function () {
                 // Append menu
+                const nodeContent = d3.select(this).select('.hm-tree-node');
+                const menu = hmNodeMenu(nodeContent);
                 d3.select(this)
                     .append('g')
                     .attr('transform', d => `translate(${d.width}, 0)`)
@@ -159,7 +158,7 @@ function hmTreeView({
             .on('mouseleave', function () {
                 d3.select(this).select('.menu').remove();
             });
-        
+
         // Collapse node
         node.select('.icon-collapse')
             .on('click', function (e, d) {
@@ -255,6 +254,7 @@ function hmTreeNode(hmPage) {
             title: hmPage.pageObj.title,
             favIconUrl: hmPage.pageObj.favIconUrl,
             highlights: hmPage.highlights,
+            tags: hmPage.tags,
             isLeaf: hmPage.isLeaf,
             isCollapsed: hmPage.isCollapsed,
             isDescendantOpened: hmPage.isDescendantOpened,
@@ -273,6 +273,7 @@ function hmTreeNode(hmPage) {
             && !d.isOpened
             && d.isDescendantOpened
         );
+        node.classed('favorite', d => d.tags.includes('favorite'));
 
         appendHeader();
     }

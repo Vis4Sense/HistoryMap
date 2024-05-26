@@ -44,6 +44,16 @@ function updatePage(pageId, type, data=null) {
       case 'toggleCollapse': // update page attributes
          page.update({ isCollapsed: !page.isCollapsed });
          break;
+      case 'toggleTag':
+         let tags = page.tags;
+         const tag = data.tag;
+         if (tags.includes(tag)) {
+            tags = tags.filter(d => d !== tag);
+         } else {
+            tags.push(tag);
+         }
+         page.update({ tags });
+         break;
       case 'beforeReopen': // before page reopened (from hm tree)
          page.update({ incomingTabId: data.tabId });
          break;

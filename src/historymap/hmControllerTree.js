@@ -48,3 +48,7 @@ function createTab(url, callback) {
         chrome.windows.update(tab.windowId, {focused: true});
     });
 }
+
+function handleFavoriteNode(page) {
+    updatePage(page.pageId, 'toggleTag', { tag: 'favorite' });
+}

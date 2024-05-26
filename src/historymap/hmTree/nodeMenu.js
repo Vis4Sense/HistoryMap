@@ -2,7 +2,7 @@
  * @fileoverview Draw menu when hovering on a hmTree node
  */
 
-function hmNodeMenu() {
+function hmNodeMenu(node) {
     var menu,
         container;
     
@@ -34,8 +34,12 @@ function hmNodeMenu() {
             .on('click', (e, d) => {
                 // prevent event bubbling
                 e.stopPropagation();
-
-                console.log(d.title);
+                let nodeData = selection.data()[0];
+                if (d.title === 'favorite') {
+                    const isFav = !nodeData.tags.includes('favorite');
+                    handleFavoriteNode(nodeData);
+                    node.classed('favorite', isFav);
+                }
             });
 
         item.append('xhtml:img')

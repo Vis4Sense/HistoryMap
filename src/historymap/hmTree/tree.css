@@ -163,6 +163,10 @@
     opacity: 1;
 }
 
+.hm-tree-node.favorite {
+    background-color: #fde047;
+}
+
 .btn-group {
     display: flex;
     flex-direction: row;
