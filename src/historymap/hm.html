@@ -13,11 +13,11 @@
    <script src="../../lib/mxClient.js"></script>
 </head>
 
-<body class="container">
+<body class="container flex flex-col">
    <h1>History Map</h1>
 
    <!-- Control panel -->
-   <div id="control-panel" class="control-panel">
+   <div id="control-panel" class="control-panel flex-shrink-0">
       <p>
          <label>Select Tree Layout</label>
          <select id="optionSelect">
@@ -31,15 +31,17 @@
          <p><button id="session-button-save" class="button">Save</button></p>
          <button id="session-button-load" class="button">Load</button>
          <input type="file" id="session-file-input" accept=".json">
-      </div> -->
-
-      <div class="flex flex-row justify-center">
-         <div class="loader" id="loading-icon"></div>
-      </div>
+      </div> -->      
    </div>
 
    <!-- HistoryMap View container -->
-   <div id="hm-tree-view"></div>
+   <div id="hm-view-container" class="flex-auto overflow-y-scroll">
+      <div class="flex flex-row justify-center">
+         <div class="loader" id="loading-icon"></div>
+         <div id="loading-tip">Scroll up to view earlier pages</div>
+      </div>
+      <div id="hm-tree-view" ></div>
+   </div>
 
    <!-- Example data for debugging -->
    <script src="./dataExample.js"></script>

@@ -9,21 +9,29 @@ let displayTree = (data) => {
 };
 
 function loadMore() {
+   if (visibleIndex === 0) return;
+   document.getElementById('loading-tip').style.display = 'none';
    document.getElementById('loading-icon').style.display = 'block';
    setTimeout(() => {
       visibleIndex = Math.max(0, visibleIndex - 10);
       displayTree(hmPages);
+      if (visibleIndex > 0) {
+         document.getElementById('loading-tip').style.display = 'block';
+      }
       document.getElementById('loading-icon').style.display = 'none';
       isLoading = false;
    }, 1000);
 }
 
-window.addEventListener('wheel', function(e) {
-   if (e.deltaY < 0 && !isLoading && window.scrollY == 0) {
-      isLoading = true;
-      loadMore();
-   }
-});
+function registerScrollTopListener() {
+   const container = document.getElementById('hm-view-container');
+   container.addEventListener('wheel', function(e) {
+      if (e.deltaY < 0 && container.scrollTop === 0 && !isLoading) {
+         isLoading = true;
+         loadMore();
+      }
+   });
+}
 
 function initializeHmPages() {
    // if (window.self == window.top) {
@@ -40,6 +48,9 @@ function initializeHmPages() {
    // });
    loadAllFromLocalStorage(() => {
       visibleIndex = Math.max(0, hmPages.length - cntInitVisibleNodes);
+      if (visibleIndex === 0) {
+         document.getElementById('loading-tip').style.display = 'none';
+      }
       displayTree(hmPages);
    });
 }
@@ -180,6 +191,7 @@ function handleToggleCollapse(pageId) {
 // When the window is open, the History Map is on
 window.addEventListener("DOMContentLoaded", function () {
    toggle_badge("On");
+   registerScrollTopListener();
    // Initialize hmPages
    initializeHmPages();
    // var iframe = document.getElementById('tree_view');

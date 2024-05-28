@@ -8,8 +8,26 @@
   display: flex;
 }
 
+.flex-col {
+  flex-direction: column;
+}
+
 .flex-row {
   flex-direction: row;
+}
+
+.flex-shrink-0 {
+  flex-shrink: 0;
+}
+
+.flex-auto {
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: auto;
+}
+
+.overflow-y-scroll {
+  overflow-y: scroll;
 }
 
 .justify-center {
@@ -34,6 +52,11 @@
   height: 10px;
   animation: spin 1s linear infinite;
   display: none;
+}
+
+#loading-tip {
+  font-size: 0.6rem;
+  color: #bdbdbd;
 }
 
 @keyframes spin {
