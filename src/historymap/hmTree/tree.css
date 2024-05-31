@@ -76,8 +76,9 @@
 }
 
 .item-highlight .icon {
-    width: 0.7rem;
-    height: 0.7rem;
+    width: 0.8rem;
+    height: 0.8rem;
+    position: relative;
 }
 
 .item-highlight .item-highlight-text {
@@ -151,8 +152,12 @@
     color: rgba(0, 0, 0, 0.5);
 }
 
-.hm-tree-node.closed img {
+.hm-tree-node.closed img:not(.icon) {
     opacity: 0.5;
+}
+
+.hm-tree-node.closed .icon-brush {
+    background-color: rgba(255, 0, 0, 0.5);
 }
 
 .hm-tree-node.semi-closed {

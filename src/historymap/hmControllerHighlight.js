@@ -45,7 +45,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             }
 
             // add the highlight to the hmPage highlights array
-            hmPage.highlights.push(highlight);
+            updatePage(hmPage.pageId, 'addHighlight', { highlight })
 
             // Yuhan: this will redraw the history map, not sure if a more efficient way is needed
             displayTree(hmPages);

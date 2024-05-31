@@ -45,7 +45,7 @@ function updatePage(pageId, type, data=null) {
          page.update({ isCollapsed: !page.isCollapsed });
          break;
       case 'toggleTag':
-         let tags = page.tags;
+         let tags = [...page.tags];
          const tag = data.tag;
          if (tags.includes(tag)) {
             tags = tags.filter(d => d !== tag);
@@ -54,6 +54,9 @@ function updatePage(pageId, type, data=null) {
          }
          page.update({ tags });
          break;
+      case 'addHighlight':
+         const highlights = [...page.highlights, data.highlight];
+         page.update({ highlights });
       case 'beforeReopen': // before page reopened (from hm tree)
          page.update({ incomingTabId: data.tabId });
          break;

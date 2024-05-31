@@ -27,7 +27,6 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
          chrome.contextMenus.create(menuItem);
       });
 
-      
 		// Register listener for context menu click
 		chrome.contextMenus.onClicked.addListener((info, tab) => {
          // Yuhan: I don't know why click a the context menu will trigger this listener twice, and even more after clicking several times?

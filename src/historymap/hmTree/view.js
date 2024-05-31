@@ -276,6 +276,7 @@ function hmTreeNode(hmPage) {
         node.classed('favorite', d => d.tags.includes('favorite'));
 
         appendHeader();
+        appendHighlights();
     }
 
     /**
@@ -310,6 +311,40 @@ function hmTreeNode(hmPage) {
     }
 
     // TODO: append highlights
+
+    /**
+     * Append highlights to the node
+     * 
+     * <div class="item-highlights">
+     *   <div class="item-highlight">
+     *     <div class="icon-brush"></div>
+     *     <div class="item-highlight-text ellipsis">highlighted text</div>
+     *   </div>
+     * </div>
+     */
+    function appendHighlights() {
+        const highlights = node
+            .append('div')
+            .attr('class', 'item-highlights');
+
+        highlights
+            .selectAll('.item-highlight')
+            .data(d => d.highlights)
+            .join('div')
+            .attr('class', 'item-highlight')
+            .call(appendHighlight);
+
+        function appendHighlight(selection) {
+            selection.append('div')
+                .attr('class', 'icon-brush')
+                .append('img')
+                .attr('class', 'icon')
+                .attr('src', utils.iconUrl('brush-fill'));
+            selection.append('div')
+                .attr('class', 'item-highlight-text ellipsis')
+                .text(d => d.text);
+        }
+    }
 
     initialize();
 
