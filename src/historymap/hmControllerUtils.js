@@ -57,6 +57,10 @@ function updatePage(pageId, type, data=null) {
       case 'addHighlight':
          const highlights = [...page.highlights, data.highlight];
          page.update({ highlights });
+         break;
+      case 'addNote':
+         page.update({ note: data.note });
+         break;
       case 'beforeReopen': // before page reopened (from hm tree)
          page.update({ incomingTabId: data.tabId });
          break;

@@ -5,6 +5,8 @@ console.log("history map content.js loading");
 const contentScript = function () {
     const contentScript = {
         view: {
+            highlight: () => {},
+            annotate: () => {},
         },
         controller: {
         }
@@ -17,3 +19,5 @@ contentScriptController();
 
 contentScript.view.highlight = highlight;
 highlight();
+
+contentScript.view.annotate = annotate();

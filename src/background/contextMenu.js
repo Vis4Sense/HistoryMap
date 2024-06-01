@@ -20,6 +20,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
       const menuItems = [
          { id: "hm-highlight-text", title: "Highlight Text", contexts: ["selection"] }, // to highlight text
          { id: "hm-save-image", title: "Save Image", contexts: ["image"] }, // to save image
+         { id: "hm-add-page-note", title: "Add Note", contexts: ["page"] }, // to add note
       ];
 
       // create context menus
@@ -34,7 +35,9 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 			if (info.menuItemId === "hm-highlight-text") { // highlight selected text
             handleHighlightSelection(tab);
 			} else if (info.menuItemId === "hm-save-image") { // highlight image
-            handleHighlightImage(info, tab)
+            handleHighlightImage(info, tab);
+         } else if (info.menuItemId === "hm-add-page-note") { // add note
+            handleAddPageNote(tab);
          }
 		});
 	}
@@ -80,5 +83,14 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
             });
          }
       )
+   }
+
+   // handle add note
+   function handleAddPageNote(tab) {
+      // message sent to content script
+      chrome.tabs.sendMessage(
+         tab.id,
+         { type: "addPageNote", tab: tab }
+      );
    }
 });

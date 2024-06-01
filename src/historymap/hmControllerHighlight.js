@@ -28,6 +28,12 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                 imageHeight: request.imageHeight,
             }
         );
+    } else if (request.type === "hmAddPageNote") {
+        addPageNote(
+            hmPages,
+            request.tab,
+            request.text
+        );
     }
 
     // find the corresponding hmPage and add the highlight
@@ -52,5 +58,21 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         } else {
             console.error("hmPage not found");
         }
+    }
+
+    function addPageNote(array, tab, note) {
+        const hmPage = array.find((hmPage) => hmPage.tabId === tab.id && hmPage.pageObj.url === tab.url);
+        if (!hmPage) {
+            console.error("unimplemented (hm page note): Page not found");
+
+            // TODO: if page is not found, should:
+            //   search for the page with the same url but different tabId
+            //   if not found, add a new node?
+
+            return;
+        }
+
+        updatePage(hmPage.pageId, 'addNote', { note });
+        displayTree(hmPages);
     }
 });

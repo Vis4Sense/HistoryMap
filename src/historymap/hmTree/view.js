@@ -255,6 +255,7 @@ function hmTreeNode(hmPage) {
             favIconUrl: hmPage.pageObj.favIconUrl,
             highlights: hmPage.highlights,
             tags: hmPage.tags,
+            note: hmPage.note,
             isLeaf: hmPage.isLeaf,
             isCollapsed: hmPage.isCollapsed,
             isDescendantOpened: hmPage.isDescendantOpened,
@@ -276,6 +277,7 @@ function hmTreeNode(hmPage) {
         node.classed('favorite', d => d.tags.includes('favorite'));
 
         appendHeader();
+        appendNote();
         appendHighlights();
     }
 
@@ -310,7 +312,15 @@ function hmTreeNode(hmPage) {
             .text(d => d.title);
     }
 
-    // TODO: append highlights
+    /**
+     * Append notes to the node
+     */
+    function appendNote() {
+        const note = node
+            .append('div')
+            .attr('class', 'item-note')
+            .text(d => d.note);
+    }
 
     /**
      * Append highlights to the node

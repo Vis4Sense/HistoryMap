@@ -12,14 +12,22 @@
        "matches": ["<all_urls>"],
        "js": [
          "./lib/jquery.min.js",
+         "./lib/umbrella.js",
          "./src/content-script/contentScriptsController.js",
          "./src/content-script/highlight.js",
+         "./src/content-script/annotate.js",
          "./src/content-script/content.js"
         ],
         "css": [
           "src/content-script/content.css"
         ]
      }
+   ],
+   "web_accessible_resources": [
+    {
+      "resources": ["assets/icons/chat-square-text.svg"],
+      "matches": ["<all_urls>"]
+    }
    ],
    "background": {
      "service_worker": "./src/background/background.js",

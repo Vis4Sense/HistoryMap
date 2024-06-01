@@ -36,8 +36,10 @@ function respondExtension() {
             highlightSelection(sendResponse);
         } else if (request.type === 'highlightImage') {
             changeHighlightImage(request.srcUrl, request.pageUrl, true, sendResponse);
+        } else if (request.type === 'addPageNote') {
+            contentScript.view.annotate.tab(request.tab).showNoteBox();
         }
-        
+
         // else if (request.type === 'highlightImage') {
         //     changeHighlightImage(request.srcUrl, request.pageUrl, true, sendResponse);
         // } else if (request.type === 'removeHighlightImage') {
