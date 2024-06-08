@@ -172,6 +172,10 @@
     background-color: #fde047;
 }
 
+.hm-tree-node.visible {
+    background-color: #cffafe;
+}
+
 .btn-group {
     display: flex;
     flex-direction: row;

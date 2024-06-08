@@ -103,6 +103,9 @@ function updatePage(pageId, type, data=null) {
          parentPage = getParentPage(page);
          parentPage.update({ isOpened: false });
          break;
+      case 'update':
+         page.update(data);
+         break;
       default:
          console.error('Unhandled type: ', type);
    }

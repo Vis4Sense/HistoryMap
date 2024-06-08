@@ -138,6 +138,7 @@ function hmTreeView({
 
         // Node content
         node.append('foreignObject')
+            .attr('id', (d) => `hmtree-node-${d.pageId}`)
             .attr('width', (d) => d.width)
             .attr('height', (d) => d.height)
             .each(function(d) {
@@ -252,6 +253,7 @@ function hmTreeNode(hmPage) {
         nodeData = {
             id: hmPage.pageId,
             isOpened: hmPage.isOpened,
+            isVisible: hmPage.isVisible,
             data: hmPage,
             parentPageId: hmPage.parentPageId,
             title: hmPage.pageObj.title,
@@ -376,6 +378,7 @@ function hmTreeNode(hmPage) {
                 && d.isDescendantOpened
             );
             node.classed('favorite', d => d.tags.includes('favorite'));
+            node.classed('visible', d => d.isVisible);
 
             appendHeader();
             appendNote();

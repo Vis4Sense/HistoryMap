@@ -3,9 +3,14 @@ let treeView = hmTreeView();
 const cntInitVisibleNodes = 5;
 let visibleIndex = 0;
 let isLoading = false;
+let virtualPage = null;
 
 let displayTree = (data) => {
-   treeView.hmPageArray(data.slice(visibleIndex)).display();
+   let data_ = data.slice(visibleIndex);
+   if (virtualPage) {
+      data_.push(virtualPage);
+   }
+   treeView.hmPageArray(data_).display();
 };
 
 function loadMore() {
@@ -177,11 +182,64 @@ function handleTabRemoved(tabId) {
    displayTree(hmPages);
 }
 
+function handleTabActivated(details) {
+   getTabInfo(details.tabId)
+      .then(tab => mainHandler(tab))
+      .catch(err => console.error(err));
+
+   function mainHandler(tabInfo) {
+      let page = lastPageInTab(tabInfo.id);
+
+      // set the old visible page as invisible
+      hmPages
+         .filter(p => p.isVisible)
+         .forEach(p => updatePage(p.pageId, 'update', { isVisible: false }));
+      // remove virtual page
+      virtualPage = null;
+
+      // if page is saved in hmPages, set it as visible and scroll to it
+      if (page && tabInfo.url === page.pageObj.url) {
+         updatePage(page.pageId, 'update', { isVisible: true });
+
+         // if the node is not visible, update visibleIndex
+         const pageIndex = hmPages.findIndex(p => p.pageId === page.pageId);
+         if (pageIndex < visibleIndex) {
+            visibleIndex = Math.max(0, pageIndex - cntInitVisibleNodes + 1);
+         }
+         
+         displayTree(hmPages);
+      }
+      // if the page is not yet saved, ask user whether to save it
+      else {
+         // set the page as a virtual page
+         virtualPage = new hmPage({
+            pageId: window.crypto.randomUUID(),
+            tabId: tabInfo.id,
+            time: new Date().getTime(), // ! this might not be the actual open time
+            pageObj: tabInfo,
+            parentPageId: null,
+            isVisible: true,
+         });
+         page = virtualPage;
+
+         displayTree(hmPages);
+
+         // TODO: style of the virtual page
+         // TODO: a button besides the virtual page to save it
+      }
+
+      // scroll to the element
+      let element = document.getElementById(`hmtree-node-${page.pageId}`);
+      element.scrollIntoView({behavior: 'smooth'});
+   }
+}
+
 // register listeners
 chrome.webNavigation.onHistoryStateUpdated.addListener(handleHistoryStateUpdated);
 chrome.webNavigation.onCommitted.addListener(handleNavigationCommitted);
 chrome.webNavigation.onCompleted.addListener(handleNavigationCompleted);
 chrome.tabs.onRemoved.addListener(handleTabRemoved);
+chrome.tabs.onActivated.addListener(handleTabActivated);
 
 function handleToggleCollapse(pageId) {
    updatePage(pageId, 'toggleCollapse');
