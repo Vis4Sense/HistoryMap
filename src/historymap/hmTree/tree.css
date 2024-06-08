@@ -173,7 +173,16 @@
 }
 
 .hm-tree-node.visible {
-    background-color: #cffafe;
+    border-color: #ef4444;
+    border-width: 2px;
+}
+
+.hm-tree-node {
+    transition: border-color 0.5s ease;
+}
+
+.hm-tree-node:hover {
+    border-color: #dc2626;
 }
 
 .btn-group {
