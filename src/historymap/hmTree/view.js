@@ -22,7 +22,7 @@ function hmTreeView({
         dummyContainer = utils.dummyContainer();
 
         nodes.forEach(d => {
-            const node = hmTreeNode(d).node();
+            const node = d3.create('div').call(hmTreeNode(d).init).node();
             dummyContainer.appendChild(node);
             const bbox = node.getBoundingClientRect();
             d.width = bbox.width;
@@ -53,6 +53,7 @@ function hmTreeView({
             d.isLeaf = nodes.find((n) => n.parentPageId === d.pageId) === undefined;
             d.display = isAncestorCollapsed(d) ? false : true;
             d.isDescendantOpened = hasOpenedDescendants(d);
+            d.node = hmTreeNode(d);
         });
 
         // Filter out collapsed nodes
@@ -139,16 +140,18 @@ function hmTreeView({
         node.append('foreignObject')
             .attr('width', (d) => d.width)
             .attr('height', (d) => d.height)
-            .html((d) => hmTreeNode(d).node().outerHTML);
+            .each(function(d) {
+                d.node.init(d3.select(this).append('xhtml:div'));
+            });
 
         // Interaction
-        node
+        node.select('.item-header')
             .style('cursor', 'pointer')
             .on('click', (_, d) => handleOpenPage(d))
-            .on('mouseenter', function () {
+        node
+            .on('mouseenter', function (_, d) {
                 // Append menu
-                const nodeContent = d3.select(this).select('.hm-tree-node');
-                const menu = hmNodeMenu(nodeContent);
+                const menu = hmNodeMenu(d.node);
                 d3.select(this)
                     .append('g')
                     .attr('transform', d => `translate(${d.width}, 0)`)
@@ -264,21 +267,6 @@ function hmTreeNode(hmPage) {
 
     function initialize() {
         hmPage2nodeData();
-
-        node = d3.create('div');
-        node.datum(nodeData);
-        node.attr('class', 'item-contents-display boxed-item hm-tree-node');
-        node.classed('closed', !nodeData.isOpened);
-        node.classed('semi-closed', d =>
-            d.isCollapsed
-            && !d.isOpened
-            && d.isDescendantOpened
-        );
-        node.classed('favorite', d => d.tags.includes('favorite'));
-
-        appendHeader();
-        appendNote();
-        appendHighlights();
     }
 
     /**
@@ -291,12 +279,12 @@ function hmTreeNode(hmPage) {
      */
     function appendHeader() {
         const header = node
-            .append('div')
+            .append('xhtml:div')
             .attr('class', 'item-header');
 
         header
             .filter(d => !d.isLeaf)
-            .append('img')
+            .append('xhtml:img')
             .attr('class', 'icon-collapse')
             .attr('src', d => d.isCollapsed
                 ? utils.iconUrl('arrow-right')
@@ -304,22 +292,35 @@ function hmTreeNode(hmPage) {
             );
 
         header
-            .append('img')
+            .append('xhtml:img')
             .attr('src', d => d.favIconUrl || utils.iconUrl('question-circle'));
 
         header
-            .append('span')
+            .append('xhtml:span')
             .text(d => d.title);
     }
 
     /**
      * Append notes to the node
      */
-    function appendNote() {
+    function appendNote(force = false) {
         const note = node
-            .append('div')
+            .filter(d => d.note !== null || force)
+            .append('xhtml:div')
             .attr('class', 'item-note')
-            .text(d => d.note);
+            .attr('contenteditable', 'true')
+            .text(d => d.note || 'Add note...')
+            .classed('placeholder', d => !d.note)
+            .on('focus', function (e, d) {
+                if (!d.note) {
+                    e.target.innerText = '';
+                    e.target.classList.remove('placeholder');
+                }
+            })
+            .on('blur', function (e, d) {
+                const newNote = e.target.innerText || null;
+                handleNoteChange(d.id, newNote);
+            })
     }
 
     /**
@@ -334,23 +335,24 @@ function hmTreeNode(hmPage) {
      */
     function appendHighlights() {
         const highlights = node
-            .append('div')
+            .filter(d => d.highlights.length > 0)
+            .append('xhtml:div')
             .attr('class', 'item-highlights');
 
         highlights
             .selectAll('.item-highlight')
             .data(d => d.highlights)
-            .join('div')
+            .join('xhtml:div')
             .attr('class', 'item-highlight')
             .call(appendHighlight);
 
         function appendHighlight(selection) {
-            selection.append('div')
+            selection.append('xhtml:div')
                 .attr('class', 'icon-brush')
-                .append('img')
+                .append('xhtml:img')
                 .attr('class', 'icon')
                 .attr('src', utils.iconUrl('brush-fill'));
-            selection.append('div')
+            selection.append('xhtml:div')
                 .attr('class', 'item-highlight-text ellipsis')
                 .text(d => d.text);
         }
@@ -361,6 +363,36 @@ function hmTreeNode(hmPage) {
     return module = {
         node: function () {
             return node.node();
+        },
+
+        init: function (node_) {
+            node = node_;
+            node.datum(nodeData);
+            node.attr('class', 'item-contents-display boxed-item hm-tree-node');
+            node.classed('closed', !nodeData.isOpened);
+            node.classed('semi-closed', d =>
+                d.isCollapsed
+                && !d.isOpened
+                && d.isDescendantOpened
+            );
+            node.classed('favorite', d => d.tags.includes('favorite'));
+
+            appendHeader();
+            appendNote();
+            appendHighlights();
+        },
+
+        toggleFav: function (isFav) {
+            node.classed('favorite', isFav);
+        },
+
+        openNote: function () {
+            // if note is not displayed, display it
+            if (!node.select('.item-note').node()) {
+                appendNote(force=true);
+                handleNoteChange(nodeData.id, '');
+            }
+            node.select('.item-note').node().focus();
         }
     }
 }

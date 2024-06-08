@@ -212,3 +212,7 @@
 foreignObject {
     overflow: visible;
 }
+
+.placeholder {
+    color: #a2a2a2;
+}

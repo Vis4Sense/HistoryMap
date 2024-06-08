@@ -52,3 +52,8 @@ function createTab(url, callback) {
 function handleFavoriteNode(page) {
     updatePage(page.pageId, 'toggleTag', { tag: 'favorite' });
 }
+
+function handleNoteChange(pageId, note) {
+    updatePage(pageId, 'addNote', { note });
+    displayTree(hmPages);
+}
