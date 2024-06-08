@@ -134,11 +134,11 @@ function hmTreeView({
             .selectAll('g')
             .data(data)
             .join('g')
-            .attr('transform', (d) => `translate(${d.x}, ${d.y})`);
+            .attr('transform', (d) => `translate(${d.x}, ${d.y})`)
+            .attr('id', (d) => `hmtree-node-${d.pageId}`);
 
         // Node content
         node.append('foreignObject')
-            .attr('id', (d) => `hmtree-node-${d.pageId}`)
             .attr('width', (d) => d.width)
             .attr('height', (d) => d.height)
             .each(function(d) {
@@ -314,14 +314,25 @@ function hmTreeNode(hmPage) {
             .text(d => d.note || 'Add note...')
             .classed('placeholder', d => !d.note)
             .on('focus', function (e, d) {
+                if (!d.isRaising) {
+                    d.isRaising = true;
+                    d3.select(`#hmtree-node-${d.id}`).raise();
+                }
                 if (!d.note) {
                     e.target.innerText = '';
                     e.target.classList.remove('placeholder');
                 }
             })
             .on('blur', function (e, d) {
-                const newNote = e.target.innerText || null;
-                handleNoteChange(d.id, newNote);
+                if (d.isRaising) {
+                    setTimeout(() => {
+                        e.target.focus();
+                        d.isRaising = false;
+                    }, 0);
+                } else {
+                    const newNote = e.target.innerText || null;
+                    handleNoteChange(d.id, newNote);
+                }
             })
     }
 
