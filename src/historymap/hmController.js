@@ -201,17 +201,25 @@ function handleTabActivated(details) {
             visibleIndex = Math.max(0, pageIndex - cntInitVisibleNodes + 1);
          }
       }
-      // if the page is not yet saved, save it as a new node
-      else {
+      // if the page is opened before but not yet saved
+      // TODO: is it possible that the tab id is the same with the tab in previous sessions?
+      else if (page) {
          const event = 'tabCreate-activate';
          pageId = pageEventToHmPagesUpdate(event, null, tabInfo);
       }
+      // if the the tab is newly created, it is captured by navigation api,
+      // so no need to add it to the array
+      else { }
 
-      updatePage(pageId, 'update', { isVisible: true });
+      if (pageId) updatePage(pageId, 'update', { isVisible: true });
       displayTree(hmPages);
 
-      // scroll to the element
-      let element = document.getElementById(`hmtree-node-${page.pageId}`);
+      let element;
+      if (pageId) { // scroll to the node
+         element = document.getElementById(`hmtree-node-${pageId}`);
+      } else { // scroll to bottom
+         element = document.getElementById('hm-view-container');
+      }
       element.scrollIntoView({behavior: 'smooth'});
    }
 }

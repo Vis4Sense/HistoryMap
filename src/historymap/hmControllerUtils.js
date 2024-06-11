@@ -71,7 +71,8 @@ function updatePage(pageId, type, data=null) {
             time: new Date(),
             pageObj: data.tab,
             isOpened: true,
-            incomingTabId: null
+            incomingTabId: null,
+            isVisible: true
          });
          break;
       case 'reload': // rewrite page info, after reload or url change in empty page
@@ -239,6 +240,7 @@ function pageEventToHmPagesUpdate(event, navInfo, tabInfo) {
          break;
       case 'tabCreate-activate':
          pageId = addPage(tabInfo.url, null, tabInfo.id, tabInfo, null);
+         updatePage(pageId, 'update', { isVisible: true });
          break;
 
       // add a new node, link to an existing node
