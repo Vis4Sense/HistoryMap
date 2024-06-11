@@ -234,19 +234,15 @@ function pageEventToHmPagesUpdate(event, navInfo, tabInfo) {
       // add a new node, not link to existing node
       case 'tabCreate-bookmark':
       case 'tabCreate-startPage':
-      case 'tabCreate-newtab':
       case 'tabCreate-historyRecent':
-         pageId = addPage(tabInfo.url, navInfo.documentId, tabInfo.id, tabInfo, null);
-         break;
+      case 'tabCreate-newtab':
       case 'tabUpdate-bookmark':
       case 'tabUpdate-typed':
       case 'tabUpdate-search':
          pageId = addPage(tabInfo.url, navInfo.documentId, tabInfo.id, tabInfo, null);
-         updatePage(pageId, 'activate');
          break;
       case 'tabCreate-activate':
          pageId = addPage(tabInfo.url, null, tabInfo.id, tabInfo, null);
-         updatePage(pageId, 'activate');
          break;
 
       // add a new node, link to an existing node
@@ -273,7 +269,6 @@ function pageEventToHmPagesUpdate(event, navInfo, tabInfo) {
          // link to the last opened page in the tab
          parentPage = openerPage = lastPageInTab(tabInfo.id);
          pageId = addPage(tabInfo.url, navInfo.documentId, tabInfo.id, tabInfo, parentPage?.pageId);
-         updatePage(pageId, 'activate');
          break;
 
       // update page, not adding a new node
@@ -281,7 +276,6 @@ function pageEventToHmPagesUpdate(event, navInfo, tabInfo) {
          page = hmPages.find(p => p.incomingTabId === tabInfo.id);
          pageId = page.pageId;
          updatePage(pageId, 'reopen', { tab: tabInfo, docId: navInfo.documentId });
-         updatePage(pageId, 'activate');
          break;
       case 'tabUpdate-forwardBack':
          let backPage = backTarget(tabInfo);
@@ -298,7 +292,6 @@ function pageEventToHmPagesUpdate(event, navInfo, tabInfo) {
             parentPage = openerPage = lastPageInTab(tabInfo.id);
             pageId = addPage(tabInfo.url, navInfo.documentId, tabInfo.id, tabInfo, parentPage?.pageId);
          }
-         updatePage(pageId, 'activate');
          break;
       case 'tabUpdate-reload':
       case 'tabUpdate-bookmarkEmpty':
@@ -315,6 +308,12 @@ function pageEventToHmPagesUpdate(event, navInfo, tabInfo) {
       default:
          console.error('unhandled event: ', event);
    }
+
+   chrome.tabs.query({ active: true }, (tabs) => {
+      if (tabs.map(t => t.id).includes(tabInfo.id)) {
+         updatePage(pageId, 'activate');
+      }
+   });
 
    function backTarget(tabInfo) {
       // if the grandparent page is the same as the parent page
