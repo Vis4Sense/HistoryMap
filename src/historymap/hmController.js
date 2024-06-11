@@ -3,13 +3,9 @@ let treeView = hmTreeView();
 const cntInitVisibleNodes = 5;
 let visibleIndex = 0;
 let isLoading = false;
-let virtualPage = null;
 
 let displayTree = (data) => {
    let data_ = data.slice(visibleIndex);
-   if (virtualPage) {
-      data_.push(virtualPage);
-   }
    treeView.hmPageArray(data_).display();
 };
 
@@ -188,45 +184,31 @@ function handleTabActivated(details) {
       .catch(err => console.error(err));
 
    function mainHandler(tabInfo) {
-      let page = lastPageInTab(tabInfo.id);
+      let page = lastPageInTab(tabInfo.id), pageId;
 
       // set the old visible page as invisible
       hmPages
          .filter(p => p.isVisible)
          .forEach(p => updatePage(p.pageId, 'update', { isVisible: false }));
-      // remove virtual page
-      virtualPage = null;
 
       // if page is saved in hmPages, set it as visible and scroll to it
       if (page && tabInfo.url === page.pageObj.url) {
-         updatePage(page.pageId, 'update', { isVisible: true });
+         pageId = page.pageId;
 
          // if the node is not visible, update visibleIndex
          const pageIndex = hmPages.findIndex(p => p.pageId === page.pageId);
          if (pageIndex < visibleIndex) {
             visibleIndex = Math.max(0, pageIndex - cntInitVisibleNodes + 1);
          }
-         
-         displayTree(hmPages);
       }
-      // if the page is not yet saved, ask user whether to save it
+      // if the page is not yet saved, save it as a new node
       else {
-         // set the page as a virtual page
-         virtualPage = new hmPage({
-            pageId: window.crypto.randomUUID(),
-            tabId: tabInfo.id,
-            time: new Date().getTime(), // ! this might not be the actual open time
-            pageObj: tabInfo,
-            parentPageId: null,
-            isVisible: true,
-         });
-         page = virtualPage;
-
-         displayTree(hmPages);
-
-         // TODO: style of the virtual page
-         // TODO: a button besides the virtual page to save it
+         const event = 'tabCreate-activate';
+         pageId = pageEventToHmPagesUpdate(event, null, tabInfo);
       }
+
+      updatePage(pageId, 'update', { isVisible: true });
+      displayTree(hmPages);
 
       // scroll to the element
       let element = document.getElementById(`hmtree-node-${page.pageId}`);

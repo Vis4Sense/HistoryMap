@@ -237,6 +237,9 @@ function pageEventToHmPagesUpdate(event, navInfo, tabInfo) {
       case 'tabUpdate-search':
          pageId = addPage(tabInfo.url, navInfo.documentId, tabInfo.id, tabInfo, null);
          break;
+      case 'tabCreate-activate':
+         pageId = addPage(tabInfo.url, null, tabInfo.id, tabInfo, null);
+         break;
 
       // add a new node, link to an existing node
       case 'tabCreate-duplicate':
