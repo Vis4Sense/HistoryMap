@@ -186,11 +186,6 @@ function handleTabActivated(details) {
    function mainHandler(tabInfo) {
       let page = lastPageInTab(tabInfo.id), pageId;
 
-      // set the old visible page as invisible
-      hmPages
-         .filter(p => p.isVisible)
-         .forEach(p => updatePage(p.pageId, 'update', { isVisible: false }));
-
       // if page is saved in hmPages, set it as visible and scroll to it
       if (page && tabInfo.url === page.pageObj.url) {
          pageId = page.pageId;
@@ -201,9 +196,8 @@ function handleTabActivated(details) {
             visibleIndex = Math.max(0, pageIndex - cntInitVisibleNodes + 1);
          }
       }
-      // if the page is opened before but not yet saved
-      // TODO: is it possible that the tab id is the same with the tab in previous sessions?
-      else if (page) {
+      // if the page is opened before (the status is complete) but not yet saved
+      else if (tabInfo.status === 'complete') {
          const event = 'tabCreate-activate';
          pageId = pageEventToHmPagesUpdate(event, null, tabInfo);
       }
@@ -211,7 +205,7 @@ function handleTabActivated(details) {
       // so no need to add it to the array
       else { }
 
-      if (pageId) updatePage(pageId, 'update', { isVisible: true });
+      if (pageId) updatePage(pageId, 'activate');
       displayTree(hmPages);
 
       let element;

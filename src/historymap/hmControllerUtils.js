@@ -72,7 +72,6 @@ function updatePage(pageId, type, data=null) {
             pageObj: data.tab,
             isOpened: true,
             incomingTabId: null,
-            isVisible: true
          });
          break;
       case 'reload': // rewrite page info, after reload or url change in empty page
@@ -103,6 +102,10 @@ function updatePage(pageId, type, data=null) {
          page.increaseForwardBack('forward');
          parentPage = getParentPage(page);
          parentPage.update({ isOpened: false });
+         break;
+      case 'activate': // set a page as visible
+         hmPages.filter(p => p.isVisible).forEach(p => p.update({ isVisible: false }));
+         page.update({ isVisible: true });
          break;
       case 'update':
          page.update(data);
@@ -233,14 +236,17 @@ function pageEventToHmPagesUpdate(event, navInfo, tabInfo) {
       case 'tabCreate-startPage':
       case 'tabCreate-newtab':
       case 'tabCreate-historyRecent':
+         pageId = addPage(tabInfo.url, navInfo.documentId, tabInfo.id, tabInfo, null);
+         break;
       case 'tabUpdate-bookmark':
       case 'tabUpdate-typed':
       case 'tabUpdate-search':
          pageId = addPage(tabInfo.url, navInfo.documentId, tabInfo.id, tabInfo, null);
+         updatePage(pageId, 'activate');
          break;
       case 'tabCreate-activate':
          pageId = addPage(tabInfo.url, null, tabInfo.id, tabInfo, null);
-         updatePage(pageId, 'update', { isVisible: true });
+         updatePage(pageId, 'activate');
          break;
 
       // add a new node, link to an existing node
@@ -267,6 +273,7 @@ function pageEventToHmPagesUpdate(event, navInfo, tabInfo) {
          // link to the last opened page in the tab
          parentPage = openerPage = lastPageInTab(tabInfo.id);
          pageId = addPage(tabInfo.url, navInfo.documentId, tabInfo.id, tabInfo, parentPage?.pageId);
+         updatePage(pageId, 'activate');
          break;
 
       // update page, not adding a new node
@@ -274,6 +281,7 @@ function pageEventToHmPagesUpdate(event, navInfo, tabInfo) {
          page = hmPages.find(p => p.incomingTabId === tabInfo.id);
          pageId = page.pageId;
          updatePage(pageId, 'reopen', { tab: tabInfo, docId: navInfo.documentId });
+         updatePage(pageId, 'activate');
          break;
       case 'tabUpdate-forwardBack':
          let backPage = backTarget(tabInfo);
@@ -290,6 +298,7 @@ function pageEventToHmPagesUpdate(event, navInfo, tabInfo) {
             parentPage = openerPage = lastPageInTab(tabInfo.id);
             pageId = addPage(tabInfo.url, navInfo.documentId, tabInfo.id, tabInfo, parentPage?.pageId);
          }
+         updatePage(pageId, 'activate');
          break;
       case 'tabUpdate-reload':
       case 'tabUpdate-bookmarkEmpty':
@@ -302,10 +311,6 @@ function pageEventToHmPagesUpdate(event, navInfo, tabInfo) {
             updatePage(pageId, 'reload', { tab: tabInfo, docId: navInfo.documentId });
          }
          break;
-
-      // // do nothing
-      // case 'tabUpdate-clientRedirect':
-      //    break;
 
       default:
          console.error('unhandled event: ', event);
