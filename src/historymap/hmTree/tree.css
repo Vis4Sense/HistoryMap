@@ -95,6 +95,15 @@
     object-fit: cover;
 }
 
+.hm-tree-node .tagify {
+    width: 100%;
+    background-color: white;
+}
+
+.hm-tree-node .tagify .tagify__input {
+    min-width: 1rem;
+}
+
 .gallery {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(2rem, 1fr));

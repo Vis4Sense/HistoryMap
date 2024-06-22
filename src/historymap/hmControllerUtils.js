@@ -410,3 +410,9 @@ function getTabInfo(tabId) {
       });
    });
 }
+
+function getAllTags() {
+   let tags = new Set();
+   hmPages.forEach(p => p.tags.forEach(t => tags.add(t)));
+   return [...tags];
+}

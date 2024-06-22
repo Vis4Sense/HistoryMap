@@ -9,7 +9,8 @@ function hmNodeMenu(node) {
     var menuItems = [
         { title: 'favorite', icon: 'star-fill' },
         { title: 'minimize', icon: 'minus' },
-        { title: 'annotate', icon: 'sticky' },
+        // { title: 'annotate', icon: 'sticky' },
+        { title: 'tag', icon: 'tags' }
     ];
 
     /**
@@ -43,7 +44,9 @@ function hmNodeMenu(node) {
                 } else if (d.title === 'minimize') {
                     // TODO: handle minimise node
                 } else if (d.title === 'annotate') {
-                    node.openNote();
+                    // node.openNote();
+                } else if (d.title === 'tag') {
+                    node.openTagInput();
                 }
             });
 
