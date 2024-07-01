@@ -61,4 +61,5 @@ function handleNoteChange(pageId, note) {
 function handleTagChange(pageId, tags) {
     updatePage(pageId, 'update', {tags} );
     displayTree(hmPages);
+    displayTagList();
 }

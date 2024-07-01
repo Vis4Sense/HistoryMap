@@ -7,45 +7,63 @@
    <title>HistoryMap</title>
    <!-- Styles -->
    <link href="hm.css" rel="stylesheet" />
+   <link href="tagList.css" rel="stylesheet" />
    <link href="./hmTree/tree.css" rel="stylesheet" />
    <!-- Libraries -->
    <script src="../../lib/d3.v7.min.js"></script>
    <script src="../../lib/mxClient.js"></script>
    <script src="../../lib/lodash.core.js"></script>
+   <script src="../../lib/umbrella.js"></script>
    <script src="../../lib/tagify/tagify.js"></script>
    <script src="../../lib/tagify//tagify.polyfills.min.js"></script>
    <link href="../../lib/tagify//tagify.css" rel="stylesheet" type="text/css" />
 </head>
 
-<body class="container flex flex-col">
-   <h1>History Map</h1>
+<body>
+   <nav>
+      <div class="flex flex-row justify-between items-center px-2">
+         <span class="text-lg">History Map</span>
 
-   <!-- Control panel -->
-   <div id="control-panel" class="control-panel flex-shrink-0">
-      <p>
-         <label>Select Tree Layout</label>
-         <select id="optionSelect">
-            <option value="indented">Indented</option>
-            <option value="horizontal">Horizontal</option>
-         </select>
-      </p>
-
-      <!-- Buttons for saving and loading session -->
-      <!-- <div id="session-buttons">
-         <p><button id="session-button-save" class="button">Save</button></p>
-         <button id="session-button-load" class="button">Load</button>
-         <input type="file" id="session-file-input" accept=".json">
-      </div> -->      
-   </div>
-
-   <!-- HistoryMap View container -->
-   <div id="hm-view-container" class="flex-auto overflow-y-scroll">
-      <div class="flex flex-row justify-center">
-         <div class="loader" id="loading-icon"></div>
-         <div id="loading-tip">Scroll up to view earlier pages</div>
+         <div class="flex items-center">
+            <div id="nav-button-tags" class="cursor-pointer">
+               <img src="../../assets/icons/tags.svg" alt="tags" title="Tags">
+            </div>
+         </div>
       </div>
-      <div id="hm-tree-view" ></div>
-   </div>
+   </nav>
+
+   <main class="container flex flex-row">
+      <div id="main-panel" class="flex-auto px-2 flex flex-col overflow-x-scroll">
+         <!-- Control panel -->
+         <div id="control-panel" class="control-panel flex-shrink-0">
+            <p>
+               <label>Select Tree Layout</label>
+               <select id="optionSelect">
+                  <option value="indented">Indented</option>
+                  <option value="horizontal">Horizontal</option>
+               </select>
+            </p>
+
+            <!-- Buttons for saving and loading session -->
+            <!-- <div id="session-buttons">
+               <p><button id="session-button-save" class="button">Save</button></p>
+               <button id="session-button-load" class="button">Load</button>
+               <input type="file" id="session-file-input" accept=".json">
+            </div> -->      
+         </div>
+
+         <!-- HistoryMap View container -->
+         <div id="hm-view-container" class="flex-auto">
+            <div class="flex flex-row justify-center">
+               <div class="loader" id="loading-icon"></div>
+               <div id="loading-tip">Scroll up to view earlier pages</div>
+            </div>
+            <div id="hm-tree-view" class="overflow-x-scroll"></div>
+         </div>
+      </div>
+
+      <div id="side-panel" class="flex-shrink-0 hidden"></div>
+   </main>
 
    <!-- Example data for debugging -->
    <script src="./dataExample.js"></script>
@@ -64,6 +82,8 @@
    <script src="hmControllerHighlight.js"></script>
    <script src="hmModel.js"></script>
    <script src="hmControlPanel.js"></script>
+   <script src="tagList.js"></script>
+   <script src="navBar.js"></script>
 
    <!-- Scripts for saving and loading sessoin -->
    <script src="hmSessionSave.js"></script>
