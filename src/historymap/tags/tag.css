@@ -1,0 +1,14 @@
+.tag-bar .tag {
+    padding: 0.2rem 0.5rem;
+    background-color: #F5F5F5;
+    border-radius: 0.5rem;
+    color: #777;
+}
+
+.tag-bar .tag .number {
+    color: #999;
+}
+
+.tag-bar .tag.selected {
+    font-weight: bold;
+}

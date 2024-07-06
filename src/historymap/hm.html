@@ -7,7 +7,7 @@
    <title>HistoryMap</title>
    <!-- Styles -->
    <link href="hm.css" rel="stylesheet" />
-   <link href="tagList.css" rel="stylesheet" />
+   <link href="./tags/tag.css" rel="stylesheet" />
    <link href="./hmTree/tree.css" rel="stylesheet" />
    <!-- Libraries -->
    <script src="../../lib/d3.v7.min.js"></script>
@@ -20,22 +20,37 @@
 </head>
 
 <body>
-   <nav>
-      <div class="flex flex-row justify-between items-center px-2">
-         <span class="text-lg">History Map</span>
-
-         <div class="flex items-center">
-            <div id="nav-button-tags" class="cursor-pointer">
-               <img src="../../assets/icons/tags.svg" alt="tags" title="Tags">
+   <main class="h-screen w-sreen flex flex-col">
+      <div class="flex-auto flex flex-col overflow-auto p-5 gap-5">
+         <!-- Navigation bar -->
+         <div class="flex-shrink-0 flex flex-col gap-2">
+            <!-- Search bar -->
+            <div class="search-bar flex flex-row">
+               <img src="../../assets/icons/search.svg" alt="search" title="Search">
+               <input type="text" id="search-box" class="flex-auto" placeholder="Search">
+            </div>
+            <!-- Tag bar -->
+            <div class="flex flex-row gap-2">
+               <div id="tag-bar" class="flex-auto tag-bar flex flex-row flex-nowrap gap-1 overflow-x-scroll"></div>
+               <div class="flex-shrink-0 flex items-center">
+                  <img src="../../assets/icons/caret-down-fill.svg">
+               </div>
             </div>
          </div>
-      </div>
-   </nav>
 
-   <main class="container flex flex-row">
-      <div id="main-panel" class="flex-auto px-2 flex flex-col overflow-x-scroll">
+         <!-- HistoryMap view container -->
+         <div class="flex-auto flex flex-col overflow-x-scroll">
+            <div id="hm-view-container" class="flex-auto">
+               <div class="flex flex-row justify-center">
+                  <div class="loader" id="loading-icon"></div>
+                  <div id="loading-tip">Scroll up to view earlier pages</div>
+               </div>
+               <div id="hm-tree-view" class="overflow-x-scroll"></div>
+            </div>
+         </div>
+
          <!-- Control panel -->
-         <div id="control-panel" class="control-panel flex-shrink-0">
+         <div id="control-panel" class="flex-shrink-0">
             <p>
                <label>Select Tree Layout</label>
                <select id="optionSelect">
@@ -51,18 +66,7 @@
                <input type="file" id="session-file-input" accept=".json">
             </div> -->      
          </div>
-
-         <!-- HistoryMap View container -->
-         <div id="hm-view-container" class="flex-auto">
-            <div class="flex flex-row justify-center">
-               <div class="loader" id="loading-icon"></div>
-               <div id="loading-tip">Scroll up to view earlier pages</div>
-            </div>
-            <div id="hm-tree-view" class="overflow-x-scroll"></div>
-         </div>
       </div>
-
-      <div id="side-panel" class="flex-shrink-0 hidden"></div>
    </main>
 
    <!-- Example data for debugging -->
@@ -82,8 +86,8 @@
    <script src="hmControllerHighlight.js"></script>
    <script src="hmModel.js"></script>
    <script src="hmControlPanel.js"></script>
-   <script src="tagList.js"></script>
-   <script src="navBar.js"></script>
+   <script src="./tags/tagBar.js"></script>
+   <script src="./tags/tagList.js"></script>
 
    <!-- Scripts for saving and loading sessoin -->
    <script src="hmSessionSave.js"></script>

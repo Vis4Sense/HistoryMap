@@ -53,6 +53,7 @@ function initializeHmPages() {
          document.getElementById('loading-tip').style.display = 'none';
       }
       displayTree(hmPages);
+      displayTagBar();
    });
 }
 
