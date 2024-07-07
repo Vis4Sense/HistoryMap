@@ -150,7 +150,13 @@ function hmTreeView({
             .style('cursor', 'pointer')
             .on('click', (_, d) => handleOpenPage(d))
         node
+            .on('click', (_, d) => {
+                if (d.tags.includes('/minimize')) {
+                    handleMinimizeNode(d);
+                }
+            })
             .on('mouseenter', function (_, d) {
+                if (d.tags.includes('/minimize')) return;
                 // Append menu
                 const menu = hmNodeMenu(d.node);
                 d3.select(this)

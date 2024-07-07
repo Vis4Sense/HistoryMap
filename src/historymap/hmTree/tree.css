@@ -177,6 +177,15 @@
     opacity: 1;
 }
 
+.hm-tree-node.minimized {
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    background-color: #ccc;
+    border: 1px solid #999;
+    cursor: pointer;
+}
+
 .hm-tree-node.favorite {
     background-color: #fde047;
 }

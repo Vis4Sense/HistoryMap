@@ -38,11 +38,11 @@ function hmNodeMenu(node) {
                 e.stopPropagation();
                 let nodeData = selection.data()[0];
                 if (d.title === 'favorite') {
-                    const isFav = !nodeData.tags.includes('favorite');
+                    const isFav = !nodeData.tags.includes('/favorite');
                     handleFavoriteNode(nodeData);
                     node.toggleFav(isFav);
                 } else if (d.title === 'minimize') {
-                    // TODO: handle minimise node
+                    handleMinimizeNode(nodeData);
                 } else if (d.title === 'annotate') {
                     // node.openNote();
                 } else if (d.title === 'tag') {

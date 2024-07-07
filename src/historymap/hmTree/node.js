@@ -96,12 +96,12 @@ function hmTreeNode(hmPage) {
      */
     function appendTagInput(force = false) {
         const data = node.datum();
-        const userTags = data.tags.filter(d => d !== 'favorite')
+        const userTags = data.tags.filter(d => d[0] !== '/')
         if (userTags.length === 0 && !force) return;
         const tagInput = node.append('xhtml:input');
         const tagify = new Tagify(tagInput.node(), {
             // show suggestions
-            whitelist : getAllTags().filter(d => d !== 'favorite'),
+            whitelist : getAllTags().filter(d => d[0] !== '/'),
             dropdown : {
                 classname     : "color-blue",
                 enabled       : 1,
@@ -111,7 +111,7 @@ function hmTreeNode(hmPage) {
                 highlightFirst: true
             }
         });
-        tagify.addTags(data.tags);
+        tagify.addTags(userTags);
         const input = tagify.DOM.input;
         d3.select(input)
             .datum(data)
@@ -191,20 +191,28 @@ function hmTreeNode(hmPage) {
         init: function (node_) {
             node = node_;
             node.datum(nodeData);
-            node.attr('class', 'item-contents-display boxed-item hm-tree-node');
+
+            node.classed('hm-tree-node', true);
             node.classed('closed', !nodeData.isOpened);
             node.classed('semi-closed', d =>
                 d.isCollapsed
                 && !d.isOpened
                 && d.isDescendantOpened
             );
-            node.classed('favorite', d => d.tags.includes('favorite'));
+            node.classed('favorite', d => d.tags.includes('/favorite'));
             node.classed('visible', d => d.isVisible);
 
-            appendHeader();
-            // appendNote();
-            appendTagInput();
-            appendHighlights();
+            if (nodeData.tags.includes('/minimize')) {
+                node.classed('minimized', true);
+            } else {
+                node.classed('item-contents-display', true);
+                node.classed('boxed-item', true);
+
+                appendHeader();
+                // appendNote();
+                appendTagInput();
+                appendHighlights();
+            }
         },
 
         toggleFav: function (isFav) {

@@ -54,6 +54,10 @@ function updatePage(pageId, type, data=null) {
          }
          page.update({ tags });
          break;
+      case 'nonSlashTags':
+         const slashTags = page.tags.filter(t => t[0] === '/');
+         page.update({ tags: [...slashTags, ...data.tags] });
+         break;
       case 'addHighlight':
          const highlights = [...page.highlights, data.highlight];
          page.update({ highlights });

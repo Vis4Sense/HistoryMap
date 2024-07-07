@@ -50,7 +50,12 @@ function createTab(url, callback) {
 }
 
 function handleFavoriteNode(page) {
-    updatePage(page.pageId, 'toggleTag', { tag: 'favorite' });
+    updatePage(page.pageId, 'toggleTag', { tag: '/favorite' });
+}
+
+function handleMinimizeNode(page) {
+    updatePage(page.pageId, 'toggleTag', { tag: '/minimize' });
+    displayTree(hmPages);
 }
 
 function handleNoteChange(pageId, note) {
@@ -59,7 +64,7 @@ function handleNoteChange(pageId, note) {
 }
 
 function handleTagChange(pageId, tags) {
-    updatePage(pageId, 'update', {tags} );
+    updatePage(pageId, 'nonSlashTags', {tags} );
     displayTree(hmPages);
-    displayTagList();
+    displayTagBar();
 }
