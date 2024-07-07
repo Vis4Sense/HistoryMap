@@ -19,6 +19,7 @@ function addPage(tabURL, docId, tabID, pageObj, parentPageId, isOpened=true) {
       });
       hmPages.push(newPage);
       console.log("A new hmPage added:", newPage.pageObj.title, ', ', newPage.pageObj.url);
+      addPageToSearchIndex(newPage);
       saveAllToLocalStorage();
       return newPageId;
    }
@@ -118,6 +119,7 @@ function updatePage(pageId, type, data=null) {
          console.error('Unhandled type: ', type);
    }
 
+   updateSearchIndex(page);
    saveAllToLocalStorage();
 }
 

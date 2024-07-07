@@ -54,6 +54,7 @@ function initializeHmPages() {
       }
       displayTree(hmPages);
       displayTagBar();
+      initializeSearchIndex(hmPages);
    });
 }
 
