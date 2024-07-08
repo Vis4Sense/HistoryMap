@@ -16,3 +16,15 @@ Simple HTML Hierarchy was created with HistoryMap in mind after exploring multip
 - Simple hierarchical data structure
 - Horizontal, Vertical, and Centered Orientations
 - Customizable with simple, template-based item rendering
+
+## GitHub project convension
+### Priority: 
+- p0 - high priority
+- p1 - medium priority
+- p2 - low priority
+### Size
+- XS: a couple of hours
+- S: half a day
+- M: 1 day
+- L: a few days
+- XL: a week
