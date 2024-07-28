@@ -1,0 +1,63 @@
+.sm-highlight-image {
+	border: 5px solid yellow;
+}
+
+.hm-annotation.container {
+	position: fixed;
+	z-index: 10000;
+	top: 2rem;
+	right: 2rem;
+	width: 16rem;
+}
+
+.hm-annotation .note-box {
+	background-color: rgba(255, 255, 255, 0.9);
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	padding: 0.5rem;
+	height: 8rem;
+}
+
+.hm-annotation .buttons {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 0.25rem;
+}
+
+.hm-annotation button {
+	background-color: #ccc;
+	border: 1px solid #aaa;
+	border-radius: 2px;
+	color: white;
+	cursor: pointer;
+	padding: 0.1rem 1rem;
+}
+
+.hm-annotation button:hover {
+	background-color: #aaa;
+}
+
+.hm-annotation button:not(:last-child) {
+	margin-right: 0.5rem;
+}
+
+.hm-annotation .mini-icon.container {
+	cursor: pointer;
+	border: #aaa 1px solid;
+	width: 36px;
+	height: 36px;
+	border-radius: 50%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-color: rgba(255, 255, 255, 0.9);
+	box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 1px, rgba(6, 24, 44, 0.65) 0px 2px 3px -0.5px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+}
+
+.hm-annotation .mini-icon.container:hover {
+	background-color: #f6f6f6;
+}
+
+.float-right {
+	float: right;
+}

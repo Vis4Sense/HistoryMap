@@ -52,9 +52,9 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
             chrome.runtime.sendMessage({
                tab: tab,
                type: "hmHighlightText",
+               uuid: response.uuid,
                text: response.text,
-               path: response.path,
-               classId: response.classId,
+               serialized: response.serialized,
                picture: null,
             });
          }

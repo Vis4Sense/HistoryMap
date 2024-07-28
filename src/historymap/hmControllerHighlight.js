@@ -11,9 +11,9 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             request,
             {
                 type: "highlightText",
+                uuid: request.uuid,
                 text: request.text,
-                path: request.path,
-                classId: request.classId,
+                serialized: request.serialized,
             }
         );
     } else if (request.type === "hmHighlightImage") {

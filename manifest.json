@@ -11,12 +11,14 @@
      {
        "matches": ["<all_urls>"],
        "js": [
-         "./lib/jquery.min.js",
-         "./lib/umbrella.js",
-         "./src/content-script/contentScriptsController.js",
-         "./src/content-script/highlight.js",
-         "./src/content-script/annotate.js",
-         "./src/content-script/content.js"
+          "./lib/rangy/rangy-core.js",
+          "./lib/rangy/rangy-classapplier.js",
+          "./lib/rangy/rangy-highlighter.js",
+          "./lib/rangy/rangy-serializer.js",
+          "./lib/rangy/rangy-selectionsaverestore.js",
+          "./src/content-script/highlight.js",
+          "./src/content-script/content-script-controller.js",
+          "./src/content-script/content-script.js"
         ],
         "css": [
           "src/content-script/content.css"

@@ -22,7 +22,7 @@ function indentedTreeLayout({
     // key functions to bind data
     var nodeKey = d => d.pageId,
         linkKey = d => d.source.id + "-" + d.target.id;
-    
+
     var key2node = d => nodes.find(n => n.pageId === d);
 
     // function to find parent node
