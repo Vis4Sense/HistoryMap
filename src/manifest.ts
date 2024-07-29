@@ -10,14 +10,10 @@ export default defineManifest({
   version: packageData.version,
   manifest_version: 3,
   icons: {
-    16: 'img/logo-16.png',
-    32: 'img/logo-34.png',
-    48: 'img/logo-48.png',
-    128: 'img/logo-128.png',
+    128: 'img/icon-history-map2-128px.png',
   },
   action: {
     default_popup: 'popup.html',
-    default_icon: 'img/logo-48.png',
   },
   options_page: 'options.html',
   devtools_page: 'devtools.html',
@@ -36,12 +32,12 @@ export default defineManifest({
   },
   web_accessible_resources: [
     {
-      resources: ['img/logo-16.png', 'img/logo-34.png', 'img/logo-48.png', 'img/logo-128.png'],
+      resources: ['img/icon-history-map2-128px.png'],
       matches: [],
     },
   ],
-  permissions: ['sidePanel', 'storage'],
-  chrome_url_overrides: {
-    newtab: 'newtab.html',
-  },
+  permissions: ['sidePanel', 'storage', 'contextMenus'],
+  // chrome_url_overrides: {
+  //   newtab: 'newtab.html',
+  // },
 })
