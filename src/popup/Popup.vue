@@ -9,11 +9,11 @@ const minus = () => {
 }
 const add = () => count.value++
 
-onMounted(() => {
-  chrome.storage.sync.get(['count'], (result) => {
-    count.value = result.count ?? 0
-  })
-})
+// onMounted(() => {
+//   chrome.storage.sync.get(['count'], (result) => {
+//     count.value = result.count ?? 0
+//   })
+// })
 
 watch(count, (newCount) => {
   chrome.storage.sync.set({ count: newCount })

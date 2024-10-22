@@ -25,6 +25,7 @@ export default defineManifest({
     {
       matches: ['http://*/*', 'https://*/*'],
       js: ['src/contentScript/index.ts'],
+      // run_at: 'document_start',
     },
   ],
   side_panel: {

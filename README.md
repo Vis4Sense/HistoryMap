@@ -2,6 +2,14 @@
 
 > a chrome extension tools built with Vite + Vue, and Manifest v3
 
+## Libraries Used
+
+- CSS
+  - ~~[UnoCSS](https://unocss.dev/)~~
+    - We are not using UnoCSS as it will generate a '__uno.css.js' file, which is forbidden in chrom extension.
+    - But we can use it if there is a way to configure the name of the output file.
+  - [Tailwind CSS](https://tailwindcss.com/)
+
 ## Installing
 
 1. Check if your `Node.js` version is >= **14**.
