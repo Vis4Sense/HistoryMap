@@ -1,44 +1,91 @@
-import { defineManifest } from '@crxjs/vite-plugin'
-import packageData from '../package.json'
+import fs from 'fs-extra'
+import type { Manifest } from 'webextension-polyfill'
+import type PkgType from '../package.json'
+import { isDev, isFirefox, port, r } from '../scripts/utils'
 
-//@ts-ignore
-const isDev = process.env.NODE_ENV == 'development'
+export async function getManifest() {
+  const pkg = await fs.readJSON(r('package.json')) as typeof PkgType
 
-export default defineManifest({
-  name: `${packageData.displayName || packageData.name}${isDev ? ` ➡️ Dev` : ''}`,
-  description: packageData.description,
-  version: packageData.version,
-  manifest_version: 3,
-  icons: {
-    128: 'img/icon-history-map2-128px.png',
-  },
-  action: {
-    default_popup: 'popup.html',
-  },
-  options_page: 'options.html',
-  devtools_page: 'devtools.html',
-  background: {
-    service_worker: 'src/background/index.ts',
-    type: 'module',
-  },
-  content_scripts: [
-    {
-      matches: ['http://*/*', 'https://*/*'],
-      js: ['src/contentScript/index.ts'],
-      // run_at: 'document_start',
+  // update this file to update this manifest.json
+  // can also be conditional based on your need
+  const manifest: Manifest.WebExtensionManifest = {
+    manifest_version: 3,
+    name: pkg.displayName || pkg.name,
+    version: pkg.version,
+    description: pkg.description,
+    action: {
+      default_icon: './assets/icon-128.png',
+      default_popup: './dist/popup/index.html',
     },
-  ],
-  side_panel: {
-    default_path: 'sidepanel.html',
-  },
-  web_accessible_resources: [
-    {
-      resources: ['img/icon-history-map2-128px.png'],
-      matches: [],
+    options_ui: {
+      page: './dist/options/index.html',
+      open_in_tab: true,
     },
-  ],
-  permissions: ['sidePanel', 'storage', 'contextMenus'],
-  // chrome_url_overrides: {
-  //   newtab: 'newtab.html',
-  // },
-})
+    background: isFirefox
+      ? {
+          scripts: ['dist/background/index.mjs'],
+          type: 'module',
+        }
+      : {
+          service_worker: './dist/background/index.mjs',
+        },
+    icons: {
+      16: './assets/icon-128.png',
+      48: './assets/icon-128.png',
+      128: './assets/icon-128.png',
+    },
+    permissions: [
+      'tabs',
+      'storage',
+      'activeTab',
+      'sidePanel',
+    ],
+    host_permissions: ['*://*/*'],
+    content_scripts: [
+      {
+        matches: [
+          '<all_urls>',
+        ],
+        js: [
+          'dist/contentScripts/index.global.js',
+        ],
+      },
+    ],
+    web_accessible_resources: [
+      {
+        resources: ['dist/contentScripts/style.css'],
+        matches: ['<all_urls>'],
+      },
+    ],
+    content_security_policy: {
+      extension_pages: isDev
+        // this is required on dev for Vite script to load
+        ? `script-src \'self\' http://localhost:${port}; object-src \'self\'`
+        : 'script-src \'self\'; object-src \'self\'',
+    },
+  }
+
+  // add sidepanel
+  if (isFirefox) {
+    manifest.sidebar_action = {
+      default_panel: 'dist/sidepanel/index.html',
+    }
+  }
+  else {
+    // the sidebar_action does not work for chromium based
+    (manifest as any).side_panel = {
+      default_path: 'dist/sidepanel/index.html',
+    }
+  }
+
+  // FIXME: not work in MV3
+  if (isDev && false) {
+    // for content script, as browsers will cache them for each reload,
+    // we use a background script to always inject the latest version
+    // see src/background/contentScriptHMR.ts
+    delete manifest.content_scripts
+    manifest.permissions?.push('webNavigation')
+  }
+
+  return manifest
+}

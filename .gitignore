@@ -1,23 +1,17 @@
-# See https://help.github.com/ignore-files/ for more about ignoring files.
-
-# dependencies
-/node_modules
-
-# testing
-/coverage
-
-# production
-/build
-/package
-
-# misc
 .DS_Store
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-.history
+.idea/
+.vite-ssg-dist
+.vite-ssg-temp
+*.crx
+*.local
 *.log
-
-# secrets
-secrets.*.js
+*.pem
+*.xpi
+*.zip
+dist
+dist-ssr
+extension/manifest.json
+node_modules
+src/auto-imports.d.ts
+src/components.d.ts
+.eslintcache
