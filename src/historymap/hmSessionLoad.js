@@ -12,55 +12,57 @@ var savedHmPages = [];
 
 // Load session from local storage
 function loadSession() {
-    // File input
-    const fileInput = document.getElementById("session-file-input");
+  // File input
+  const fileInput = document.getElementById("session-file-input");
 
-    // Check if file selected
-    if (fileInput.files.length == 0) {
-        console.log("no file selected");
-        window.alert("No file selected");
-        return;
-    }
+  // Check if file selected
+  if (fileInput.files.length == 0) {
+    console.log("no file selected");
+    window.alert("No file selected");
+    return;
+  }
 
-    // Read file
-    const file = fileInput.files[0];
-    const reader = new FileReader();
-    reader.onload = (event) => {
-        const content = event.target.result;
-        const jsonData = JSON.parse(content);
-        console.log("sucessfully loaded session data");
-        console.log(jsonData);
+  // Read file
+  const file = fileInput.files[0];
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    const content = event.target.result;
+    const jsonData = JSON.parse(content);
+    console.log("sucessfully loaded session data");
+    console.log(jsonData);
 
-        // Yuhan: check if the data is valid?
+    // Yuhan: check if the data is valid?
 
-        savedHmPages = jsonData;
-        playSession();
-    }
-    reader.readAsText(file);
+    savedHmPages = jsonData;
+    playSession();
+  };
+  reader.readAsText(file);
 }
 
 // Play the loaded session
-function playSession(duration=1000) {
-    // Starting from empty hmPages
-    const curHmPages = [];
+function playSession(duration = 1000) {
+  // Starting from empty hmPages
+  const curHmPages = [];
 
-    // Debug div id
-    const debugDivId = "svg-debug";
+  // Debug div id
+  const debugDivId = "svg-debug";
 
-    // Progressively add pages
-    savedHmPages.forEach((page, idx) => {
-        setTimeout(() => {
-            curHmPages.push(page);
-            displayTree(curHmPages, debugDivId)
-        }, duration * idx);
-    });
+  // Progressively add pages
+  savedHmPages.forEach((page, idx) => {
+    setTimeout(() => {
+      curHmPages.push(page);
+      displayTree(curHmPages, debugDivId);
+    }, duration * idx);
+  });
 }
 
-function loadAllFromLocalStorage(callback=null) {
-    chrome.storage.local.get(["hmPages"], function(result) {
-        hmPages = result.hmPages.map(p => new hmPage(p));
-        if (callback) {
-            callback();
-        }
-    });
+function loadAllFromLocalStorage(callback = null) {
+  chrome.storage.local.get(["hmPages"], function (result) {
+    if ("hmPages" in result) {
+      hmPages = result.hmPages.map((p) => new hmPage(p));
+    }
+    if (callback) {
+      callback();
+    }
+  });
 }
