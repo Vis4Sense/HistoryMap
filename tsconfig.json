@@ -1,24 +1,43 @@
 {
   "compilerOptions": {
-    "incremental": false,
-    "target": "es2016",
+    "forceConsistentCasingInFileNames": true,
+    "incremental": true,
+    "target": "ES6",
     "jsx": "preserve",
-    "lib": ["DOM", "ESNext"],
-    "baseUrl": ".",
+    "lib": ["ES6", "DOM"],
+    "useDefineForClassFields": true,
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "Bundler",
     "paths": {
-      "~/*": ["src/*"]
+      "@/*": ["./src/*"],
+      "~/*": ["./src/*"],
+      "src/*": ["./src/*"],
+      "@assets/*": ["./src/assets/*"]
     },
     "resolveJsonModule": true,
     "types": [
-      "vite/client"
+      "unplugin-icons/types/vue",
+      "chrome-types",
+      "@intlify/unplugin-vue-i18n/messages"
     ],
     "strict": true,
-    "noUnusedLocals": true,
+    "noEmit": true,
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
     "skipLibCheck": true
   },
-  "exclude": ["dist", "node_modules"]
+  "include": [
+    "package.json",
+    "vite.config.ts",
+    // "manifest.config.ts",
+    "src/**/*.ts",
+    "src/**/*.d.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue"
+  ]
+  // "references": [
+  //   {
+  //     "path": "./tsconfig.node.json"
+  //   }
+  // ]
 }

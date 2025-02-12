@@ -1,12 +1,13 @@
 {
-  "cSpell.words": ["Vitesse"],
-  "typescript.tsdk": "node_modules/typescript/lib",
-  "vite.autoStart": false,
-  "eslint.experimental.useFlatConfig": true,
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
-  },
-  "files.associations": {
-    "*.css": "postcss"
-  }
+  "json.schemas": [
+    {
+      "fileMatch": ["manifest.json"],
+      "url": "https://json.schemastore.org/chrome-manifest.json"
+    }
+  ],
+  "typescript.preferences.autoImportFileExcludePatterns": ["vue-router"],
+  "i18n-ally.localesPaths": [
+    "src/locales"
+  ],
+  "i18n-ally.keystyle": "nested"
 }

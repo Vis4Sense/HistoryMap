@@ -1,0 +1,6 @@
+// required for vue-devtools
+@use '/node_modules/vite-plugin-vue-devtools/src/overlay/devtools-overlay.css';
+
+body {
+  font-size: 1rem;
+}
