@@ -1,26 +1,49 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import type { Node, Edge } from '@vue-flow/core'  
-import { VueFlow } from '@vue-flow/core'
+import { Position, VueFlow } from '@vue-flow/core'
 import { useHistoryMap } from '@/composables/useHistoryMap'
+import { HmPage } from '@/types/historymap'
+import { compactTreeLayout } from './layout/compact-tree'
 
 const { session } = useHistoryMap()
 
-const nodes = computed((): Node[] => {
+const nodes = computed((): Node<HmPage>[] => {
   if (!session.value) return []
   const nodes = session.value.pages.map((page): Node => ({
     id: page.pageId,
     // type
-    position: { x: Math.random() * 100, y: Math.random() * 100 },
-    data: {
-      label: page.pageObj.title,
-      ...page
+    width: 160,
+    height: 32,
+    position: {
+      x: 0,
+      y: 0
     },
+    data: page,
+    sourcePosition: Position.Right,
+    targetPosition: Position.Left,
   }))
+
+  const layout = compactTreeLayout()
+  layout.nodes(nodes).links(edges.value).run()
+  layout.close()
+
   return nodes
 })
 
-const edges = ref([])
+const edges = computed((): Edge[] => {
+  if (!session.value) return []
+
+  const edges: Edge[] = session.value.pages
+    .filter((page) => page.parentPageId)
+    .map((page) => ({
+        id: `${page.pageId}_${page.parentPageId}`,
+        source: page.parentPageId!,
+        target: page.pageId,
+      })
+    )
+
+  return edges
+})
 </script>
 
 <template>

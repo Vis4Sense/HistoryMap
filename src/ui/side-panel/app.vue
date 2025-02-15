@@ -27,7 +27,6 @@ import HistoryMap from '@/components/HistoryMap/HistoryMap.vue'
         p-4
         flex-auto
       >
-        <div class="text-lg font-bold">History Map</div>
         <HistoryMap
           w-full
           h-full
