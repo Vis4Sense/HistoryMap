@@ -10,6 +10,7 @@ declare module 'vue' {
     AppFooter: typeof import('./../components/AppFooter.vue')['default']
     AppHeader: typeof import('./../components/AppHeader.vue')['default']
     DisplayError: typeof import('./../components/state/DisplayError.vue')['default']
+    HistoryMapHistoryMap: typeof import('./../components/HistoryMap/HistoryMap.vue')['default']
     IPhArrowLeft: typeof import('~icons/ph/arrow-left')['default']
     IPhDotsThreeVertical: typeof import('~icons/ph/dots-three-vertical')['default']
     IPhGear: typeof import('~icons/ph/gear')['default']

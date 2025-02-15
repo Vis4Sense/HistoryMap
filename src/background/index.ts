@@ -1,3 +1,5 @@
+import { initialiseController } from "./controller"
+
 /** open side panel on clicking in toolbar */
 chrome.sidePanel
   .setPanelBehavior({ openPanelOnActionClick: true })
@@ -12,5 +14,8 @@ self.onerror = function (message, source, lineno, colno, error) {
 }
 
 console.info("hello world from background")
+
+/** initialise controller */
+initialiseController()
 
 export {}
