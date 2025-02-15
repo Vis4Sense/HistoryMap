@@ -37,8 +37,8 @@ export function initialiseController() {
   console.log('session', session.value)
 
   // only for debugging
-  const clearLocalStorage = true
-  if (clearLocalStorage) {
-    chrome.storage.local.clear()
-  }
+  // const clearLocalStorage = true
+  // if (clearLocalStorage) {
+  //   chrome.storage.local.clear()
+  // }
 }
