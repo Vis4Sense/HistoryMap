@@ -37,11 +37,6 @@ export function useHistoryMap() {
   }
 
   function newPage(tab: chrome.tabs.Tab, parentPageId: string | null = null): HmPage | null {
-    // if new page is in the active tab, set other pages to inactive
-    if (tab.active) {
-      session.value?.pages.forEach(page => page.isActive = false)
-    }
-
     return {
       sessionId: sessionId.value,
       pageId: uuidv4(),
@@ -52,6 +47,12 @@ export function useHistoryMap() {
       parentPageId,
       isActive: tab.active,
     }
+  }
+
+  function deactivateAllPages() {
+    console.log('deactivating all pages')
+    hmPages.value.filter(d => d.sessionId === sessionId.value)
+      .forEach(page => page.isActive = false)
   }
 
   /** actions */
@@ -69,14 +70,20 @@ export function useHistoryMap() {
     }
 
     const page = newPage(tab, parentPageId)
-    if (page) hmPages.value = [...hmPages.value, page]
+    if (page) {
+      if (page.isActive) deactivateAllPages()
+      hmPages.value = [...hmPages.value, page]
+    }
 
     // console.log('added page', page)
   }
 
   function updatePage(pageId: string, data: Partial<HmPage>) {
     const page = hmPages.value.find(d => d.pageId === pageId)
-    if (page) Object.assign(page, data)
+    if (page) {
+      if (data.isActive) deactivateAllPages()
+      Object.assign(page, data)
+    }
   }
 
   return {

@@ -12,6 +12,9 @@ const props = defineProps<Node<HmPage>>()
     border
     border-rounded
     p="x-2 y-1"
+    :class="{
+      'border-red': props.data!.isActive
+    }"
   >
     <div
       flex

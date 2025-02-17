@@ -8,9 +8,15 @@ const { session, addSession, addPage, updatePage } = useHistoryMap()
 
 chrome.tabs.onCreated.addListener(tabCreationHandler)
 chrome.tabs.onUpdated.addListener(tabUpdateHandler)
+chrome.tabs.onActivated.addListener(tabActivateHandler)
 
+/**
+ * handle chrome.tabs.onCreated
+ * 
+ * add a new page to historymap
+ */
 function tabCreationHandler(tab: chrome.tabs.Tab) {
-  console.log('tab created', tab)
+  // console.log('tab created', tab)
 
   if (!session.value) addSession()
 
@@ -25,8 +31,17 @@ function tabCreationHandler(tab: chrome.tabs.Tab) {
   addPage(tab, parent?.pageId || null)
 }
 
+/**
+ * handle chrome.tabs.onUpdated
+ * 
+ * possible behaviour:
+ *   - page information updated during loading: update the page object
+ *   - url update due to navigation (within the same tab)
+ *      - capture as go back if the url is previously visited
+ *      - create a new page if the url is new
+*/
 function tabUpdateHandler(tabId: number, changeInfo: Partial<chrome.tabs.Tab>, tab: chrome.tabs.Tab) {
-  console.log('tab updated', tabId, changeInfo, tab)
+  // console.log('tab updated', tabId, changeInfo, tab)
   
   // the page to update
   let page: HmPage | undefined
@@ -42,7 +57,7 @@ function tabUpdateHandler(tabId: number, changeInfo: Partial<chrome.tabs.Tab>, t
     if (page) {
       page.pageObj.url = changeInfo.url
       page.pageObj.status = 'loading'
-      updatePage(page.pageId, page)
+      updatePage(page.pageId, { pageObj: page.pageObj })
     }
     // go back or create a new page
     else {
@@ -52,8 +67,10 @@ function tabUpdateHandler(tabId: number, changeInfo: Partial<chrome.tabs.Tab>, t
       )
       if (prior) {
         prior.pageObj.status = 'loading'
-        prior.timeLastActivated = Date.now()
-        updatePage(prior.pageId, prior)
+        updatePage(prior.pageId, { 
+          pageObj: prior.pageObj,
+          timeLastActivated: Date.now()
+        })
       }
       else {
         if (!session.value) addSession()
@@ -75,7 +92,7 @@ function tabUpdateHandler(tabId: number, changeInfo: Partial<chrome.tabs.Tab>, t
     if (page) {
       page.pageObj.title = tab.title
       page.pageObj.favIconUrl = tab.favIconUrl
-      updatePage(page.pageId, page)
+      updatePage(page.pageId, { pageObj: page.pageObj })
     }
   }
 
@@ -87,8 +104,23 @@ function tabUpdateHandler(tabId: number, changeInfo: Partial<chrome.tabs.Tab>, t
     )
     if (page) {
       page.pageObj.status = 'complete'
-      updatePage(page.pageId, page)
+      updatePage(page.pageId, { pageObj: page.pageObj })
     }
+  }
+}
+
+/**
+ * handle chrome.tabs.onActivated
+ * 
+ * set the activated page as active
+ */
+function tabActivateHandler(activeInfo: { tabId: number }) {
+  const page = session.value?.pages.find(page => page.tabId === activeInfo.tabId)
+  if (page) {
+    updatePage(page.pageId, {
+      timeLastActivated: Date.now(),
+      isActive: true
+    })
   }
 }
 

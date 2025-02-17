@@ -26,6 +26,8 @@ const nodes = computed((): Node<HmPage>[] => {
   layout.nodes(nodes).links(edges.value).run()
   layout.close()
 
+  console.log(nodes.filter((node) => node.data!.isActive))
+
   return nodes
 })
 
