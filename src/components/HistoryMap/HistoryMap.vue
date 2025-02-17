@@ -20,8 +20,6 @@ const nodes = computed((): Node<HmPage>[] => {
       y: 0
     },
     data: page,
-    sourcePosition: Position.Right,
-    targetPosition: Position.Left,
   }))
 
   const layout = compactTreeLayout()

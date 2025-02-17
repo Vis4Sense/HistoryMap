@@ -74,9 +74,15 @@ export function useHistoryMap() {
     // console.log('added page', page)
   }
 
+  function updatePage(pageId: string, data: Partial<HmPage>) {
+    const page = hmPages.value.find(d => d.pageId === pageId)
+    if (page) Object.assign(page, data)
+  }
+
   return {
     ...state,
     addSession,
     addPage,
+    updatePage,
   }
 }

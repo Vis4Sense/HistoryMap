@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { HmPage } from '@/types/historymap';
-import type { Node } from '@vue-flow/core'
+import { Handle, Position, type Node } from '@vue-flow/core'
 
 const props = defineProps<Node<HmPage>>()
 </script>
@@ -22,6 +22,7 @@ const props = defineProps<Node<HmPage>>()
       <!-- favicon -->
       <img
         v-if="props.data!.pageObj.favIconUrl"
+        h-5
         :src="props.data!.pageObj.favIconUrl"
       />
       <div
@@ -31,9 +32,18 @@ const props = defineProps<Node<HmPage>>()
       ></div>
 
       <!-- title -->
-      <span>
+      <span truncate>
         {{ props.data!.pageObj.title }}
       </span>
     </div>
+
+    <Handle
+      type="source"
+      :position="Position.Right"
+    />
+    <Handle
+      type="target"
+      :position="Position.Left"
+    />
   </div>
 </template>
