@@ -7,30 +7,13 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    AppFooter: typeof import('./../components/AppFooter.vue')['default']
-    AppHeader: typeof import('./../components/AppHeader.vue')['default']
-    DisplayError: typeof import('./../components/state/DisplayError.vue')['default']
     HistoryMapHistoryMap: typeof import('./../components/HistoryMap/HistoryMap.vue')['default']
     HistoryMapNodesNodeHmPage: typeof import('./../components/HistoryMap/nodes/NodeHmPage.vue')['default']
-    IPhArrowLeft: typeof import('~icons/ph/arrow-left')['default']
-    IPhDotsThreeVertical: typeof import('~icons/ph/dots-three-vertical')['default']
-    IPhGear: typeof import('~icons/ph/gear')['default']
-    IPhGlobe: typeof import('~icons/ph/globe')['default']
     IPhListHeart: typeof import('~icons/ph/list-heart')['default']
-    IPhMinus: typeof import('~icons/ph/minus')['default']
-    IPhMoon: typeof import('~icons/ph/moon')['default']
-    IPhPlus: typeof import('~icons/ph/plus')['default']
     IPhPresentationChart: typeof import('~icons/ph/presentation-chart')['default']
-    IPhQuestion: typeof import('~icons/ph/question')['default']
     IPhRocketLaunch: typeof import('~icons/ph/rocket-launch')['default']
-    IPhSun: typeof import('~icons/ph/sun')['default']
-    LoadingSpinner: typeof import('./../components/state/LoadingSpinner.vue')['default']
-    LocaleSwitch: typeof import('./../components/LocaleSwitch.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
-    RouterLinkUp: typeof import('./../components/RouterLinkUp.vue')['default']
     RouterView: typeof import('vue-router')['RouterView']
-    TailwindEmptyState: typeof import('./../components/state/tailwind-empty-state.vue')['default']
-    TestComponent: typeof import('./../components/TestComponent.vue')['default']
-    ThemeSwitch: typeof import('./../components/ThemeSwitch.vue')['default']
+    SessionList: typeof import('./../components/SessionList.vue')['default']
   }
 }

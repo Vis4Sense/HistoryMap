@@ -2,29 +2,30 @@
  * @fileoverview Layout tree nodes using mxGraph
  */
 
-import type { Node, Edge } from '@vue-flow/core'
-import { Graph, CompactTreeLayout, Cell } from '@maxgraph/core'
+import type { HmPage } from '@/types/historymap'
+import type { Cell } from '@maxgraph/core'
+import type { Edge, Node } from '@vue-flow/core'
+import { CompactTreeLayout, Graph } from '@maxgraph/core'
 import { DummyContainer } from './utils'
-import { HmPage } from '@/types/historymap'
 
 export function compactTreeLayout({
   levelDistance = 30,
   nodeDistance = 5,
 } = {}) {
   let module: {
-      run: () => typeof module,
-      close: () => typeof module,
-      nodes: (nodes: Node<HmPage>[]) => typeof module,
+      run: () => typeof module
+      close: () => typeof module
+      nodes: (nodes: Node<HmPage>[]) => typeof module
       links: (links: Edge[]) => typeof module
     },
-      nodes: Node<HmPage>[],
-      links: Edge[],
-      roots: Node<HmPage>[],
-      nodeDict: Record<string, Cell>,
-      dummyContainer: ReturnType<typeof DummyContainer>,
-      graph: Graph,
-      parentNode: Cell,
-      layout: CompactTreeLayout;
+    nodes: Node<HmPage>[],
+    links: Edge[],
+    roots: Node<HmPage>[],
+    nodeDict: Record<string, Cell>,
+    dummyContainer: ReturnType<typeof DummyContainer>,
+    graph: Graph,
+    parentNode: Cell,
+    layout: CompactTreeLayout
 
   // key functions to bind data
   const nodeKey = (d: Node<HmPage>) => d.data!.pageId
@@ -33,74 +34,76 @@ export function compactTreeLayout({
   const parent = (d: Node<HmPage>) => nodes.find(n => n.data!.pageId === d.data!.parentPageId)
 
   function initialize() {
-      dummyContainer = DummyContainer();
+    dummyContainer = DummyContainer()
 
-      graph = new Graph(dummyContainer.node());
-      parentNode = graph.getDefaultParent();
-      layout = new CompactTreeLayout(graph, true);
+    graph = new Graph(dummyContainer.node())
+    parentNode = graph.getDefaultParent()
+    layout = new CompactTreeLayout(graph, true)
 
-      layout.useBoundingBox = false;
-      layout.edgeRouting = false;
-      layout.levelDistance = levelDistance;
-      layout.nodeDistance = nodeDistance;
+    layout.useBoundingBox = false
+    layout.edgeRouting = false
+    layout.levelDistance = levelDistance
+    layout.nodeDistance = nodeDistance
 
-      nodeDict = {};
+    nodeDict = {}
 
-      initializeNodes();
+    initializeNodes()
   }
 
   function initializeNodes() {
-      if (!nodes) return;
+    if (!nodes)
+      return
 
-      roots = nodes.filter(d => !parent(d));
+    roots = nodes.filter(d => !parent(d))
 
-      nodes.forEach(d => {
-          nodeDict[nodeKey(d)] = graph.insertVertex(parentNode, null, '', 0, 0, d.width as number, d.height as number);
-      });
+    nodes.forEach((d) => {
+      nodeDict[nodeKey(d)] = graph.insertVertex(parentNode, null, '', 0, 0, d.width as number, d.height as number)
+    })
 
-      // virtual root and edges
-      const virtualRoot = graph.insertVertex(parentNode, null, '', 0, 0, -layout.levelDistance - 10, -layout.levelDistance - 10);
-      roots.forEach(r => {
-        graph.insertEdge(parentNode, null, '', virtualRoot, nodeDict[nodeKey(r)]);
-    });
+    // virtual root and edges
+    const virtualRoot = graph.insertVertex(parentNode, null, '', 0, 0, -layout.levelDistance - 10, -layout.levelDistance - 10)
+    roots.forEach((r) => {
+      graph.insertEdge(parentNode, null, '', virtualRoot, nodeDict[nodeKey(r)])
+    })
   }
 
   function initializeEdges() {
-      if (!links) return;
+    if (!links)
+      return
 
-      links.forEach(d => {
-          graph.insertEdge(parentNode, null, '', nodeDict[d.source], nodeDict[d.target]);
-      });
+    links.forEach((d) => {
+      graph.insertEdge(parentNode, null, '', nodeDict[d.source], nodeDict[d.target])
+    })
   }
 
   function setNodeCoordinate() {
-      nodes.forEach(d => {
-          const m = nodeDict[nodeKey(d)].geometry;
-          d.position.x = m?.x ?? 0;
-          d.position.y = m?.y ?? 0;
-      });
+    nodes.forEach((d) => {
+      const m = nodeDict[nodeKey(d)].geometry
+      d.position.x = m?.x ?? 0
+      d.position.y = m?.y ?? 0
+    })
   }
 
-  initialize();
+  initialize()
 
   return module = {
-      run: function() {
-          layout.execute(parentNode);
-          setNodeCoordinate();
-          return module;
-      },
+    run() {
+      layout.execute(parentNode)
+      setNodeCoordinate()
+      return module
+    },
 
-      close: function() {
-          dummyContainer.remove();
-          return module;
-      },
+    close() {
+      dummyContainer.remove()
+      return module
+    },
 
-      nodes: function(_: Node<HmPage>[]) {
-          return (nodes = _, initializeNodes(), module)
-      },
+    nodes(_: Node<HmPage>[]) {
+      return (nodes = _, initializeNodes(), module)
+    },
 
-      links: function(_: Edge[]) {
-          return (links = _, initializeEdges(), module)
-      }
+    links(_: Edge[]) {
+      return (links = _, initializeEdges(), module)
+    },
   }
 }

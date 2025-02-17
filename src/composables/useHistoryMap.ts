@@ -1,16 +1,17 @@
-import { v4 as uuidv4 } from 'uuid'
-import { useBrowserLocalStorage } from "./useBrowserStorage"
 import type { HmPage, HmSession, HmSessionMetadata } from '~/types/historymap'
+import { v4 as uuidv4 } from 'uuid'
+import { useBrowserLocalStorage } from './useBrowserStorage'
 
 interface HistoryMapState {
   sessionId: Ref<number>
   session: ComputedRef<HmSession | null>
+  sessions: Ref<HmSessionMetadata[]>
 }
 
 function getSessionData(
-  sessionId: number, 
-  sessions: HmSessionMetadata[], 
-  hmPages: HmPage[]
+  sessionId: number,
+  sessions: HmSessionMetadata[],
+  hmPages: HmPage[],
 ): HmSession | null {
   const metadata = (sessions ?? []).find(d => d.sessionId === sessionId)
   const pages = (hmPages ?? []).filter(d => d.sessionId === sessionId)
@@ -27,13 +28,20 @@ export function useHistoryMap() {
   const state: HistoryMapState = {
     sessionId,
     session,
+    sessions,
   }
 
   /** utilities */
 
-  function newSession(): HmSessionMetadata {
+  function newSession(title: string = ''): HmSessionMetadata {
     const id = sessions.value.length
-    return { sessionId: id, time: Date.now(), title: 'New session' }
+    return {
+      sessionId: id,
+      time: Date.now(),
+      title,
+      timeCreated: Date.now(),
+      timeUpdated: Date.now(),
+    }
   }
 
   function newPage(tab: chrome.tabs.Tab, parentPageId: string | null = null): HmPage | null {
@@ -50,17 +58,25 @@ export function useHistoryMap() {
   }
 
   function deactivateAllPages() {
-    console.log('deactivating all pages')
     hmPages.value.filter(d => d.sessionId === sessionId.value)
       .forEach(page => page.isActive = false)
   }
 
   /** actions */
-  function addSession() {
-    const session_ = newSession()
+  function addSession(title: string = '') {
+    const session_ = newSession(title)
     sessions.value = [...sessions.value, session_]
     sessionId.value = session_.sessionId
-    // console.log('added session', session_, sessionId.value)
+  }
+
+  function updateSession(id: number, data: Partial<HmSessionMetadata>) {
+    const session_ = sessions.value.find(d => d.sessionId === id)
+    if (session_)
+      Object.assign(session_, data)
+  }
+
+  function switchSession(id: number) {
+    sessionId.value = id
   }
 
   function addPage(tab: chrome.tabs.Tab, parentPageId: string | null = null) {
@@ -71,7 +87,11 @@ export function useHistoryMap() {
 
     const page = newPage(tab, parentPageId)
     if (page) {
-      if (page.isActive) deactivateAllPages()
+      if (page.isActive)
+        deactivateAllPages()
+      if (!session.value?.title && page.pageObj.title) {
+        updateSession(sessionId.value, { title: page.pageObj.title })
+      }
       hmPages.value = [...hmPages.value, page]
     }
 
@@ -81,14 +101,27 @@ export function useHistoryMap() {
   function updatePage(pageId: string, data: Partial<HmPage>) {
     const page = hmPages.value.find(d => d.pageId === pageId)
     if (page) {
-      if (data.isActive) deactivateAllPages()
+      if (data.isActive)
+        deactivateAllPages()
       Object.assign(page, data)
     }
   }
 
+  /** initialise */
+  function initialise() {
+    // the first session is the background session that captures
+    // page history when no specific session is active
+    if (!sessions.value.length)
+      addSession('Default')
+  }
+
+  initialise()
+
   return {
     ...state,
     addSession,
+    updateSession,
+    switchSession,
     addPage,
     updatePage,
   }
