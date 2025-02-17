@@ -4,11 +4,7 @@ import type { HmPage } from '@/types/historymap'
  */
 import { useHistoryMap } from '@/composables/useHistoryMap'
 
-const { session, addSession, addPage, updatePage } = useHistoryMap()
-
-chrome.tabs.onCreated.addListener(tabCreationHandler)
-chrome.tabs.onUpdated.addListener(tabUpdateHandler)
-chrome.tabs.onActivated.addListener(tabActivateHandler)
+const { session, addSession, switchToDefaultSession, switchToLatestSession, addPage, updatePage } = useHistoryMap()
 
 /**
  * handle chrome.tabs.onCreated
@@ -128,8 +124,19 @@ function tabActivateHandler(activeInfo: { tabId: number }) {
 }
 
 export function initialiseController() {
-  console.info('start initialising controller')
-  console.log('session', session.value)
+  chrome.tabs.onCreated.addListener(tabCreationHandler)
+  chrome.tabs.onUpdated.addListener(tabUpdateHandler)
+  chrome.tabs.onActivated.addListener(tabActivateHandler)
+
+  /** switch to default session when historymap is not opened */
+  chrome.runtime.onConnect.addListener((port) => {
+    if (port.name === 'historymap') {
+      switchToLatestSession()
+      port.onDisconnect.addListener(() => {
+        switchToDefaultSession()
+      })
+    }
+  })
 
   // only for debugging
   // const clearLocalStorage = true

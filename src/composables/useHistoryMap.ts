@@ -79,6 +79,21 @@ export function useHistoryMap() {
     sessionId.value = id
   }
 
+  function switchToDefaultSession() {
+    switchSession(0)
+  }
+
+  function switchToLatestSession() {
+    let latestestId = 0
+    if (sessions.value.length > 1) {
+      const latest = sessions.value
+        .filter(d => d.sessionId !== 0)
+        .sort((a, b) => b.timeUpdated - a.timeUpdated)[0]
+      latestestId = latest.sessionId
+    }
+    switchSession(latestestId)
+  }
+
   function addPage(tab: chrome.tabs.Tab, parentPageId: string | null = null) {
     if (!tab.id) {
       console.error('invalid tab id', tab)
@@ -122,6 +137,8 @@ export function useHistoryMap() {
     addSession,
     updateSession,
     switchSession,
+    switchToDefaultSession,
+    switchToLatestSession,
     addPage,
     updatePage,
   }
