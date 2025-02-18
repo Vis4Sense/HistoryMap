@@ -109,8 +109,11 @@ function tabUpdateHandler(tabId: number, changeInfo: Partial<chrome.tabs.Tab>, t
  * set the activated page as active
  */
 function tabActivateHandler(activeInfo: { tabId: number }) {
-  const page = session.value?.pages.find(page => page.tabId === activeInfo.tabId)
-  if (page) {
+  const pagesIntab = session.value?.pages
+    .filter(page => page.tabId === activeInfo.tabId)
+    .sort((a, b) => b.timeLastActivated - a.timeLastActivated)
+  if (pagesIntab && pagesIntab.length) {
+    const page = pagesIntab[0]
     updatePage(page.pageId, {
       timeLastActivated: Date.now(),
       isActive: true,
