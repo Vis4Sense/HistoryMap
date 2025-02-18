@@ -22,8 +22,10 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SchemaEditor: typeof import('./../components/SchemaEditor/Index.vue')['default']
+    SchemaEditorViewBox: typeof import('./../components/SchemaEditor/ViewBox.vue')['default']
     SchemaEditorViewGraph: typeof import('./../components/SchemaEditor/ViewGraph/Index.vue')['default']
     SchemaEditorViewGraphCanvas: typeof import('./../components/SchemaEditor/ViewGraph/Canvas.vue')['default']
+    SchemaEditorViewNested: typeof import('./../components/SchemaEditor/ViewNested/Index.vue')['default']
     SessionList: typeof import('./../components/SessionList.vue')['default']
   }
 }

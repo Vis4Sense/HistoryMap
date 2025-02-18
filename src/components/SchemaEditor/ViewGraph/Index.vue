@@ -30,16 +30,16 @@ function handleExtract() {
 </script>
 
 <template>
-  <div w-full h-full border rounded flex flex-col overflow-auto>
-    <div shrink-0 bg-gray-1 p-1 flex justify-between items-center>
-      <div>Graph view</div>
+  <SchemaEditorViewBox>
+    <template #header>
+      <div>Graph View</div>
       <el-button @click="handleExtract">
         <div i-material-symbols-light:graph-3 text-lg></div>
       </el-button>
-    </div>
+    </template>
 
     <SchemaEditorViewGraphCanvas />
-  </div>
+  </SchemaEditorViewBox>
 </template>
 
 <style scoped>
