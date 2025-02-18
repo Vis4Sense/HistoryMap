@@ -122,6 +122,27 @@ export function useHistoryMap() {
     }
   }
 
+  function removePage(pageId: string, removeChildren = false) {
+    const page = hmPages.value.find(d => d.pageId === pageId)
+    if (page) {
+      if (removeChildren) {
+        // remove its children
+        hmPages.value
+          .filter(d => d.parentPageId === pageId)
+          .forEach(d => removePage(d.pageId, true))
+      } else {
+        // connect its children to its parent
+        hmPages.value
+          .filter(d => d.parentPageId === pageId)
+          .forEach(d => d.parentPageId = page.parentPageId)
+      }
+      
+      // remove the page
+      const index = hmPages.value.indexOf(page)
+      hmPages.value.splice(index, 1)
+    }
+  }
+
   /** initialise */
   function initialise() {
     // the first session is the background session that captures
@@ -141,5 +162,6 @@ export function useHistoryMap() {
     switchToLatestSession,
     addPage,
     updatePage,
+    removePage,
   }
 }

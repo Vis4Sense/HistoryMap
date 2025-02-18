@@ -6,11 +6,10 @@ import ElementPlus from 'element-plus'
 import { createApp } from 'vue'
 import App from './app.vue'
 
-import 'element-plus/dist/index.css'
 import './index.scss'
 import '@unocss/reset/tailwind.css'
-
 import 'uno.css'
+import 'element-plus/dist/index.css'
 
 appRouter.addRoute({
   path: '/',

@@ -23,6 +23,9 @@ importers:
       '@vue-flow/core':
         specifier: ^1.42.1
         version: 1.42.1(vue@3.5.13(typescript@5.7.3))
+      '@vue-flow/node-toolbar':
+        specifier: ^1.1.0
+        version: 1.1.0(@vue-flow/core@1.42.1(vue@3.5.13(typescript@5.7.3)))
       d3:
         specifier: ^7.9.0
         version: 7.9.0
@@ -1998,6 +2001,11 @@ packages:
     resolution: {integrity: sha512-QzzTxMAXfOeETKc+N3XMp5XpiPxKBHK5kq98avgTsE6MXyeU2E8EkANwwgSB/hvJ/k36RjU0Y7BOwCHiqiI1tw==}
     peerDependencies:
       vue: ^3.3.0
+
+  '@vue-flow/node-toolbar@1.1.0':
+    resolution: {integrity: sha512-6RVDHgY+x8m1cXPaEkqPa/RMR90AC1hPHYBK/QVh8k6lJnFPgwJ9PSiYoC4amsUiDK0mF0Py+PlztLJY1ty+4A==}
+    peerDependencies:
+      '@vue-flow/core': ^1.12.2
 
   '@vue-macros/common@1.15.1':
     resolution: {integrity: sha512-O0ZXaladWXwHplQnSjxLbB/G1KpdWCUNJPNYVHIxHonGex1BGpoB4fBZZLgddHgAiy18VZG/Iu5L0kwG+SV7JQ==}
@@ -7915,6 +7923,10 @@ snapshots:
       vue: 3.5.13(typescript@5.7.3)
     transitivePeerDependencies:
       - '@vue/composition-api'
+
+  '@vue-flow/node-toolbar@1.1.0(@vue-flow/core@1.42.1(vue@3.5.13(typescript@5.7.3)))':
+    dependencies:
+      '@vue-flow/core': 1.42.1(vue@3.5.13(typescript@5.7.3))
 
   '@vue-macros/common@1.15.1(rollup@4.29.1)(vue@3.5.13(typescript@5.7.3))':
     dependencies:
