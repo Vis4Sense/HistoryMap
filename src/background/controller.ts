@@ -1,10 +1,11 @@
-import type { HmPage } from '@/types/historymap'
 /**
  * @fileoverview Controller of history map data, i.e., sessions and pages.
  */
+
+import type { HmPage } from '@/types/historymap'
 import { useHistoryMap } from '@/composables/useHistoryMap'
 
-const { session, addSession, switchToDefaultSession, switchToLatestSession, addPage, updatePage } = useHistoryMap()
+const { session, switchToDefaultSession, switchToLatestSession, addPage, updatePage } = useHistoryMap()
 
 /**
  * handle chrome.tabs.onCreated
@@ -13,10 +14,6 @@ const { session, addSession, switchToDefaultSession, switchToLatestSession, addP
  */
 function tabCreationHandler(tab: chrome.tabs.Tab) {
   // console.log('tab created', tab)
-
-  if (!session.value)
-    addSession()
-
   let parent: HmPage | null = null
   if (tab.openerTabId) {
     parent = session.value?.pages
@@ -71,8 +68,6 @@ function tabUpdateHandler(tabId: number, changeInfo: Partial<chrome.tabs.Tab>, t
         })
       }
       else {
-        if (!session.value)
-          addSession()
         const parent = session.value?.pages
           .sort((a, b) => b.timeLastActivated - a.timeLastActivated)
           .find(page => page.tabId === tabId)
@@ -119,6 +114,14 @@ function tabActivateHandler(activeInfo: { tabId: number }) {
     updatePage(page.pageId, {
       timeLastActivated: Date.now(),
       isActive: true,
+    })
+  }
+  // if page not found, create a new node
+  else {
+    chrome.tabs.get(activeInfo.tabId, (tab) => {
+      if (tab) {
+        addPage(tab, null)
+      }
     })
   }
 }
