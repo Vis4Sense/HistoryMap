@@ -7,6 +7,8 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    ExtractionToolbarExtractionToolbar: typeof import('./../components/ExtractionToolbar/ExtractionToolbar.vue')['default']
+    ExtractionToolbarToolIcon: typeof import('./../components/ExtractionToolbar/ToolIcon.vue')['default']
     Header: typeof import('./../components/Header.vue')['default']
     HistoryMapHistoryMap: typeof import('./../components/HistoryMap/HistoryMap.vue')['default']
     HistoryMapNodesNodeHmPage: typeof import('./../components/HistoryMap/nodes/NodeHmPage.vue')['default']

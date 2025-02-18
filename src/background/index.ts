@@ -1,4 +1,5 @@
 import { initialiseController } from './controller'
+import { initialiseExtractor } from './extractor'
 
 /** open side panel on clicking in toolbar */
 chrome.sidePanel
@@ -17,5 +18,6 @@ console.info('hello world from background')
 
 /** initialise controller */
 initialiseController()
+initialiseExtractor()
 
 export {}

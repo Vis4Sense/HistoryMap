@@ -1,23 +1,25 @@
 // This file is used to style the iframe that is injected into the page
-.crx-iframe {
+.historymap-crx-iframe {
   border: none;
-  border-radius: 8px;
-  box-shadow:
-    0 2px 4px rgba(0, 0, 0, 0.2),
-    0 -1px 0px rgba(0, 0, 0, 0.02);
-  background-color: #fff;
-  margin: 2em;
+  // border-radius: 2px;
+  // box-shadow:
+  //   0 2px 4px rgba(0, 0, 0, 0.2),
+  //   0 -1px 0px rgba(0, 0, 0, 0.02);
+  // background-color: #fff;
+  margin: 0.5rem;
   position: fixed;
-  bottom: 0;
+  top: 50%;
   right: 0;
-  width: 420px;
-  min-height: 340px;
+  // width: min-content;
+  // height: min-content;
+  // min-height: 40px;
+  transform: translateY(-50%);
 }
 
-[data-scraper-hovered="true"] {
-  outline: 2px dashed #D18700;
-}
+// [data-scraper-hovered="true"] {
+//   outline: 2px dashed #D18700;
+// }
 
-[data-scraper-selected="true"] {
-  background-color: rgba($color: #FFB900, $alpha: 0.1);
-}
+// [data-scraper-selected="true"] {
+//   background-color: rgba($color: #FFB900, $alpha: 0.1);
+// }

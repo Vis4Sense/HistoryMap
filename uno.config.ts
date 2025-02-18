@@ -13,6 +13,9 @@ export default defineConfig({
     presetIcons({
       scale: 1.2,
       warn: true,
+      collections: {
+        'material-symbols-light': () => import('@iconify-json/material-symbols-light/icons.json').then(i => i.default),
+      }
     }),
     presetWebFonts({
       fonts: {

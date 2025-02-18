@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@antfu/eslint-config": "^4.2.1",
+    "@iconify-json/material-symbols-light": "^1.2.14",
     "@maxgraph/core": "^0.15.1",
     "@mozilla/readability": "^0.5.0",
     "@vue-flow/core": "^1.42.1",
@@ -34,6 +35,7 @@
     "marked": "^15.0.6",
     "notivue": "^2.4.5",
     "pinia": "^2.3.0",
+    "postmate": "^1.5.2",
     "uuid": "^11.0.5",
     "vue": "^3.5.13",
     "vue-i18n": "^11.0.1",
@@ -56,6 +58,7 @@
     "@types/eslint": "^9.6.1",
     "@types/eslint__js": "~8.42.3",
     "@types/node": "^22.10.5",
+    "@types/postmate": "^1.5.4",
     "@types/webextension-polyfill": "^0.12.1",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vue/compiler-sfc": "^3.5.13",

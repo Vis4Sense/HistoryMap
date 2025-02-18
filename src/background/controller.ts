@@ -137,9 +137,11 @@ export function initialiseController() {
   /** switch to default session when historymap is not opened */
   chrome.runtime.onConnect.addListener((port) => {
     if (port.name === 'historymap') {
+      // console.info('connected to historymap')
       switchToLatestSession()
       port.onDisconnect.addListener(() => {
         switchToDefaultSession()
+        // console.info('switched to default session')
       })
     }
   })
