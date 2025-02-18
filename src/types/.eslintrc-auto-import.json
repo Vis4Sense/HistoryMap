@@ -329,6 +329,7 @@
     "watchWithFilter": true,
     "whenever": true,
     "useHistoryMap": true,
-    "useExtraction": true
+    "useExtractor": true,
+    "useSchemaEditor": true
   }
 }

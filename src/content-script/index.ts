@@ -29,6 +29,21 @@ import './index.scss'
 //   sendMessage('extract', data_, 'background')
 // }
 
+// add listener when document is ready
+// document.addEventListener('DOMContentLoaded', () => {
+//   console.info('document ready')
+//   sendMessage('content-script-ready', null, 'background')
+// })
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  // console.info('message', message)
+  if (message.type === 'fetch-content') {
+    const sourceText = document.body.textContent || ''
+    sendResponse({ sourceText })
+  }
+  return true
+})
+
 self.onerror = function (message, source, lineno, colno, error) {
   console.info(`Error: ${message}`)
   console.info(`Source: ${source}`)

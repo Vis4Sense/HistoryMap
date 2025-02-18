@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import HistoryMap from '@/components/HistoryMap/HistoryMap.vue'
+import { useSchemaEditor } from '@/composables/useSchemaEditor'
+
+const { modal: schemaEditorModal } = useSchemaEditor()
 
 onMounted(() => {
   /** connect to background so we know when it is closed */
@@ -15,6 +17,27 @@ onMounted(() => {
       <div p-4 flex-auto>
         <HistoryMap w-full h-full />
       </div>
+
+      <el-dialog v-model="schemaEditorModal"
+        title="Schema Editor"
+        width="96%" h="90%" top="5%"
+        class="body-h-full"
+        overflow-auto
+      >
+        <SchemaEditor />
+      </el-dialog>
     </div>
   </main>
 </template>
+
+<style>
+.el-dialog.body-h-full {
+  display: flex;
+  flex-direction: column;
+}
+
+.body-h-full .el-dialog__body {
+  flex: 1;
+  overflow: auto;
+}
+</style>
