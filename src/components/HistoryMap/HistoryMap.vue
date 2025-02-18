@@ -4,7 +4,7 @@ import type { Edge, Node } from '@vue-flow/core'
 import { useHistoryMap } from '@/composables/useHistoryMap'
 import { VueFlow } from '@vue-flow/core'
 import { compactTreeLayout } from './layout/compact-tree'
-import NodeHmPage from './nodes/NodeHmPage.vue'
+import NodeHmPage from './nodes/HmPageNode.vue'
 
 const { session } = useHistoryMap()
 
@@ -45,6 +45,7 @@ const nodes = computed((): Node<HmPage>[] => {
 
   return nodes
 })
+
 </script>
 
 <template>

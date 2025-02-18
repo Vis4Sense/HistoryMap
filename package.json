@@ -28,6 +28,7 @@
     "@maxgraph/core": "^0.15.1",
     "@mozilla/readability": "^0.5.0",
     "@vue-flow/core": "^1.42.1",
+    "@vue-flow/node-toolbar": "^1.1.0",
     "d3": "^7.9.0",
     "element-plus": "^2.9.3",
     "lint-staged": "^15.4.3",
