@@ -1,5 +1,10 @@
 <script setup lang="ts">
 import HistoryMap from '@/components/HistoryMap/HistoryMap.vue'
+
+onMounted(() => {
+  /** connect to background so we know when it is closed */
+  chrome.runtime.connect(undefined, { name: 'historymap' })
+})
 </script>
 
 <template>
