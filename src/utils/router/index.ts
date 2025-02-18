@@ -1,10 +1,10 @@
-import { createRouter, createWebHashHistory } from "vue-router"
-import { handleHotUpdate, routes } from "vue-router/auto-routes"
+import { createRouter, createWebHashHistory } from 'vue-router'
+import { handleHotUpdate, routes } from 'vue-router/auto-routes'
 
-routes.push({
-  path: "/:catchAll(.*)*",
-  redirect: "/",
-})
+// routes.push({
+//   path: "/:catchAll(.*)*",
+//   redirect: "/",
+// })
 
 export const appRouter = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),

@@ -13,10 +13,10 @@ import '@unocss/reset/tailwind.css'
 import 'uno.css'
 
 // FIXME: using app router causes stack overflow
-// appRouter.addRoute({
-//   path: "/",
-//   redirect: "/side-panel",
-// })
+appRouter.addRoute({
+  path: '/',
+  redirect: '/side-panel',
+})
 
 const app = createApp(App)
   .use(i18n)

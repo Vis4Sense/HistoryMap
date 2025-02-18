@@ -7,6 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    Header: typeof import('./../components/Header.vue')['default']
     HistoryMapHistoryMap: typeof import('./../components/HistoryMap/HistoryMap.vue')['default']
     HistoryMapNodesNodeHmPage: typeof import('./../components/HistoryMap/nodes/NodeHmPage.vue')['default']
     IPhListHeart: typeof import('~icons/ph/list-heart')['default']
