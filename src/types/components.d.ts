@@ -7,6 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    copy: typeof import('./../components/SchemaEditor/ViewGraph/Canvas copy.vue')['default']
     ExtractionToolbarExtractionToolbar: typeof import('./../components/ExtractionToolbar/ExtractionToolbar.vue')['default']
     ExtractionToolbarToolIcon: typeof import('./../components/ExtractionToolbar/ToolIcon.vue')['default']
     Header: typeof import('./../components/Header.vue')['default']
@@ -25,6 +26,7 @@ declare module 'vue' {
     SchemaEditorViewBox: typeof import('./../components/SchemaEditor/ViewBox.vue')['default']
     SchemaEditorViewGraph: typeof import('./../components/SchemaEditor/ViewGraph/Index.vue')['default']
     SchemaEditorViewGraphCanvas: typeof import('./../components/SchemaEditor/ViewGraph/Canvas.vue')['default']
+    SchemaEditorViewGraphSigma: typeof import('./../components/SchemaEditor/ViewGraph/Sigma.vue')['default']
     SchemaEditorViewNested: typeof import('./../components/SchemaEditor/ViewNested/Index.vue')['default']
     SessionList: typeof import('./../components/SessionList.vue')['default']
   }
