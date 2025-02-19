@@ -1,4 +1,4 @@
-import { Schema } from "@/types/schema"
+import { Concept, Schema } from "@/types/schema"
 import { useBrowserLocalStorage } from "./useBrowserStorage"
 
 export function useSchemaEditor() {
@@ -26,9 +26,14 @@ export function useSchemaEditor() {
     console.info('schema', schema.value)
   }
 
+  function addConcept(concept: Concept) {
+    schema.value!.nodes.push(concept)
+  }
+
   return {
     ...state,
     openModal,
     setSchema,
+    addConcept,
   }
 }

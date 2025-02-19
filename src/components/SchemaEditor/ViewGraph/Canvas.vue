@@ -20,6 +20,7 @@ watch(schema, () => {
 function getNode(node: Concept): Node {
   return {
     id: node.name,
+    type: 'concept',
     label: node.name,
     position: {
       x: nodePositions.value[node.name]?.x || 0,
@@ -47,8 +48,8 @@ function runLayout() {
     simulation.stop()
   }
 
-  const scaleX = 20
-  const scaleY = 10
+  const scaleX = 12
+  const scaleY = 8
 
   const nodes_ = nodes.value.map((node) => ({
     id: node.id, x: node.position.x / scaleX, y: node.position.y / scaleY,
@@ -78,5 +79,9 @@ function runLayout() {
     w-full h-full
     :nodes="nodes"
     :edges="edges"
-  ></VueFlow>
+  >
+    <template #node-concept="props">
+      <SchemaEditorConceptNode v-bind="props" />
+    </template>
+  </VueFlow>
 </template>

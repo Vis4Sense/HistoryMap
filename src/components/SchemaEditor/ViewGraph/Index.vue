@@ -30,16 +30,15 @@ function handleExtract() {
 </script>
 
 <template>
-  <SchemaEditorViewBox>
-    <template #header>
-      <div>Graph View</div>
-      <el-button @click="handleExtract">
+  <div w-full h-full border rounded flex flex-col overflow-auto>
+    <div shrink-0 bg-gray-1 p-1 flex justify-between items-center>
+      <BasicToolbarIcon @click="handleExtract">
         <div i-material-symbols-light:graph-3 text-lg></div>
-      </el-button>
-    </template>
+      </BasicToolbarIcon>
+    </div>
 
     <SchemaEditorViewGraphCanvas />
-  </SchemaEditorViewBox>
+  </div>
 </template>
 
 <style scoped>
@@ -49,7 +48,7 @@ function handleExtract() {
 }
 
 .el-button.is-text:hover {
-  background-color: #d9d9d9;
+  background-color: #ccc;
 }
 
 .el-button+.el-button {
