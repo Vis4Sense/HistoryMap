@@ -4,6 +4,6 @@
       <slot name="header"></slot>
     </div>
 
-    <slot></slot>
+    <slot flex-1></slot>
   </div>
 </template>

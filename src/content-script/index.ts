@@ -1,6 +1,8 @@
 import type { SchemaType } from '@/types/extraction'
 import Postmate from 'postmate'
 import { onMessage, sendMessage } from 'webext-bridge/content-script'
+import { Readability } from '@mozilla/readability'
+import TurndownService from 'turndown'
 // This import scss file is used to style the iframe that is injected into the page
 import './index.scss'
 
@@ -38,8 +40,14 @@ import './index.scss'
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // console.info('message', message)
   if (message.type === 'fetch-content') {
-    const sourceText = document.body.textContent || ''
-    sendResponse({ sourceText })
+    const docClone = document.implementation.createHTMLDocument('Cloned Document')
+    docClone.body.innerHTML = document.body.innerHTML
+    const article = new Readability(docClone).parse()
+
+    const turndownService = new TurndownService()
+    const markdown = turndownService.turndown(article?.content || '')
+
+    sendResponse({ sourceText: markdown })
   }
   return true
 })

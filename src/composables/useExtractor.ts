@@ -21,16 +21,16 @@ export function useExtractor() {
   function extractNetwork(callback: (output: Output) => void = () => {}) {
     console.info('extracting', input.value)
 
-    const instruction = `Extract a concept network from the source information. Focus on the main concepts and their relationships. Please classify the relationships into categories.
+    const instruction = `Extract main concepts and their relations mentioned in the source information. Make sure the generated concept network is well-structured and easy to understand. Please classify the relationships into categories.
 
 Return format: {
   nodes: [
     { name: 'concept1' },
-    ...
+    // other concepts
   ],
   links: [
     { source: 'concept1', target: 'concept2', category: 'relationship1' },
-    ...
+    // other relationships
   ]
 }
 
@@ -41,11 +41,16 @@ Node names should be unique.`
 Source information: ${input.value.sourceText}`
 
     chatCompletion(prompt, (response) => {
-      output.value = {
-        schema: JSON.parse(response),
+      try {
+        output.value = {
+          schema: JSON.parse(response),
+        }
+        callback(output.value)
+        console.info('output', output.value)
+      } catch (error) {
+        console.error('error', error)
+        console.error('response', response)
       }
-      callback(output.value)
-      console.info('output', output.value)
     })
   }
 

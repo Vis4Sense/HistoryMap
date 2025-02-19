@@ -1,83 +1,115 @@
 <script setup lang="ts">
+import * as d3 from 'd3'
 import { useSchemaEditor } from '@/composables/useSchemaEditor'
 import Graph from 'graphology'
-import forceAtlas2 from 'graphology-layout-forceatlas2'
+import Sigma from 'sigma'
+import { Concept, Relation } from '@/types/schema'
 
 const { schema } = useSchemaEditor()
 
-const nodePositions = ref({} as Record<string, { x: number, y: number }>)
+const sigmaContainer = ref<HTMLDivElement | null>(null)
+let graph = new Graph()
+let simulation = null as d3.Simulation | null
+let renderer = null as Sigma | null
 
-const nodes = computed(() => {
-  if (!schema.value)
-    return []
-  return schema.value.nodes.map((node) => {
-    return {
-      id: node.name,
-      position: {
-        x: node.name in nodePositions.value ? nodePositions.value[node.name].x : Math.random() * 100,
-        y: node.name in nodePositions.value ? nodePositions.value[node.name].y : Math.random() * 100,
-      },
-      data: {
-        label: node.name,
-      }
+const nodePositions = ref<{ [key: string]: { x: number; y: number } }>({})
+
+interface NodeAttributes {
+  label: string
+  x: number
+  y: number
+  size: number
+}
+
+interface EdgeAttributes {
+  label: string
+}
+
+watch(schema, () => {
+  // remove nodes and edges that are not in the schema
+  graph.forEachNode((node) => {
+    if (!schema.value?.nodes.find((n) => n.name === node)) {
+      graph.dropNode(node)
     }
   })
-})
-
-const edges = computed(() => {
-  if (!schema.value)
-    return []
-  return schema.value.links.map((link) => {
-    return {
-      id: `${link.source}_${link.target}`,
-      source: link.source,
-      target: link.target,
-      label: link.category,
+  graph.forEachEdge((edge, attr, source, target) => {
+    if (!schema.value?.links.find((l) => l.source === source && l.target === target)) {
+      graph.dropEdge(edge)
     }
   })
+
+  // update node attributes
+  schema.value?.nodes.forEach((node) => {
+    graph.mergeNode(node.name, getNodeAttributes(node))
+  })
+  schema.value?.links.forEach((link) => {
+    if (graph.hasNode(link.source) && graph.hasNode(link.target))
+      graph.mergeEdge(link.source, link.target, getEdgeAttributes(link))
+  })
+
+  runLayout()
 })
+
+function getNodeAttributes(node: Concept): NodeAttributes {
+  return {
+    label: node.name,
+    x: nodePositions.value[node.name]?.x || 0,
+    y: nodePositions.value[node.name]?.y || 0,
+    size: 5,
+  }
+}
+
+function getEdgeAttributes(edge: Relation): EdgeAttributes {
+  return {
+    label: edge.category,
+  }
+}
 
 function runLayout() {
   console.log('Running layout')
 
-  const graph = new Graph()
-
-  nodes.value.forEach((node) => {
-    try {
-      graph.addNode(node.id, { x: node.position.x, y: node.position.y })
-    } catch (e) {
-      console.error(e)
-    }
-  })
-  edges.value.forEach((edge) => {
-    try {
-      graph.addEdge(edge.source, edge.target)
-    } catch (e) {
-      console.error(e)
-    }
-  })
-
-  const positions = forceAtlas2(graph, {
-    iterations: 100,
-    settings: {
-      adjustSizes: true,
-      gravity: 5,
-    },
-  })
-
-  console.log('Positions', positions)
-
-  for (const node of nodes.value) {
-    nodePositions.value[node.id] = positions[node.id]
+  if (simulation) {
+    simulation.stop()
   }
+
+  const nodes = graph.nodes().map((node) => {
+    return {
+      id: node,
+      x: graph.getNodeAttribute(node, 'x'),
+      y: graph.getNodeAttribute(node, 'y'),
+    }
+  })
+
+  const links = graph.mapEdges((edge, attr, source, target) => {
+    return {
+      source,
+      target,
+    }
+  })
+
+  simulation = d3.forceSimulation(nodes)
+    .force('link', d3.forceLink(links).id((d) => d.id).distance(1))
+    .force('charge', d3.forceManyBody().strength(-10))
+    .force('x', d3.forceX())
+    .force('y', d3.forceY())
+
+  simulation.on('tick', () => {
+    nodes.forEach((node) => {
+      graph.mergeNode(node.id, {
+        x: node.x,
+        y: node.y,
+      })
+    })
+  })
 }
 
-watch(schema, () => {
-  runLayout()
-}, { deep: true })
+onMounted(() => {
+  renderer = new Sigma(graph, sigmaContainer.value!, {
+    allowInvalidContainer: true,
+  })
+})
 </script>
 
 <template>
-  <div w-full h-full>
-  </div>
+  <div ref="sigmaContainer" w-full h-full></div>
 </template>
