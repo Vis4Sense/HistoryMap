@@ -44,11 +44,18 @@ export function useSchemaEditor() {
     }
   }
 
+  function toggleConceptIncluded(name: string) {
+    const concept = getConcept(name)
+    if (!concept) return
+    concept.included = !concept.included
+  }
+
   return {
     ...state,
     openModal,
     setSchema,
     addConcept,
     toggleConceptBookmark,
+    toggleConceptIncluded,
   }
 }

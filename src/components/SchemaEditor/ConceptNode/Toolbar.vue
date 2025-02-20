@@ -13,7 +13,10 @@ defineProps({
   },
 })
 
-const { toggleConceptBookmark } = useSchemaEditor()
+const {
+  toggleConceptBookmark,
+  toggleConceptIncluded,
+} = useSchemaEditor()
 </script>
 
 <template>
@@ -21,6 +24,11 @@ const { toggleConceptBookmark } = useSchemaEditor()
     <BasicToolbarIcon @click="toggleConceptBookmark(id)">
       <div v-if="data.bookmarked" i-carbon-bookmark-filled></div>
       <div v-else i-carbon-bookmark></div>
+    </BasicToolbarIcon>
+    
+    <BasicToolbarIcon @click="toggleConceptIncluded(id)">
+      <div v-if="data.included" i-carbon-checkbox-checked-filled></div>
+      <div v-else i-carbon-checkbox-checked></div>
     </BasicToolbarIcon>
   </div>
 </template>
