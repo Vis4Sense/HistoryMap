@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import * as d3 from 'd3'
 import { useSchemaEditor } from '@/composables/useSchemaEditor'
-import { Edge, Node, VueFlow } from '@vue-flow/core'
+import { Edge, Node, VueFlow, MarkerType } from '@vue-flow/core'
 import { Concept, Relation } from '@/types/schema'
 
 const { schema } = useSchemaEditor()
@@ -11,7 +11,7 @@ let simulation = null as d3.Simulation | null
 const nodePositions = ref<{ [key: string]: { x: number; y: number } }>({})
 
 const nodes = computed(() => schema.value?.nodes.map((node) => getNode(node)) || [])
-const edges = computed(() => schema.value?.links.map((link) => getEdge(link)) || [])
+const edges = computed(() => schema.value?.links.map((link) => getEdge(link)).filter(e => e) || [])
 
 watch(schema, () => {
   runLayout()
@@ -30,7 +30,11 @@ function getNode(node: Concept): Node {
   }
 }
 
-function getEdge(edge: Relation): Edge {
+function getEdge(edge: Relation): Edge | null {
+  if (nodes.value.find((node) => node.id === edge.source) === undefined || nodes.value.find((node) => node.id === edge.target) === undefined) {
+    return null
+  }
+
   return {
     id: `${edge.source}-${edge.target}`,
     type: 'straight',
@@ -38,6 +42,7 @@ function getEdge(edge: Relation): Edge {
     target: edge.target,
     label: edge.category,
     data: edge,
+    markerEnd: MarkerType.ArrowClosed,
   }
 }
 
@@ -75,13 +80,17 @@ function runLayout() {
 </script>
 
 <template>
-  <VueFlow
-    w-full h-full
-    :nodes="nodes"
-    :edges="edges"
-  >
-    <template #node-concept="props">
-      <SchemaEditorConceptNode v-bind="props" />
-    </template>
-  </VueFlow>
+  <div w-full h-full relative>
+    <VueFlow
+      w-full h-full
+      :nodes="nodes"
+      :edges="edges"
+    >
+      <template #node-concept="props">
+        <SchemaEditorConceptNode v-bind="props" />
+      </template>
+    </VueFlow>
+
+    <SchemaEditorViewNested absolute left-1 top-1 />
+  </div>
 </template>

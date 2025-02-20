@@ -9,7 +9,10 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  data: Object as PropType<Concept>,
+  data: {
+    type: Object as PropType<Concept>,
+    required: true,
+  },
   selected: Boolean,
 })
 
@@ -23,26 +26,21 @@ const toolbarVisible = computed(() => {
 </script>
 
 <template>
-  <div
-    w-full h-full
-    border border-rounded
-    bg-white
-    p="x-2 y-1"
-    hover:shadow
-    :class="{
-      'border-2': selected,
-      'border-dashed text-gray-4': !data?.included,
-    }"
-  >
-    <div flex gap-1 items-center text-xs>
-      {{ data?.name }}
-    </div>
+  <div>
+    <SchemaEditorConcept
+      :name="data.name"
+      :selected="selected"
+      :bookmarked="data.bookmarked ?? false"
+      :included="data.included ?? false"
+    />
 
     <NodeToolbar
-      :position="Position.Top"
+      :position="Position.Right"
       :is-visible="toolbarVisible"
     >
-      <SchemaEditorConceptNodeToolbar :id="id" />
+      <SchemaEditorConceptNodeToolbar
+        :id="id" :data="data"
+      />
     </NodeToolbar>
   </div>
 </template>

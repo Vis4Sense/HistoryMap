@@ -13,6 +13,11 @@ export function useSchemaEditor() {
     schema,
   }
 
+  /** utils */
+  function getConcept(name: string) {
+    return schema.value?.nodes.find(c => c.name === name)
+  }
+
   /** actions */
 
   function openModal(id: string) {
@@ -30,10 +35,20 @@ export function useSchemaEditor() {
     schema.value!.nodes.push(concept)
   }
 
+  function toggleConceptBookmark(name: string) {
+    const concept = getConcept(name)
+    if (!concept) return
+    concept.bookmarked = !concept.bookmarked
+    if (concept.bookmarked) {
+      concept.included = true
+    }
+  }
+
   return {
     ...state,
     openModal,
     setSchema,
     addConcept,
+    toggleConceptBookmark,
   }
 }
