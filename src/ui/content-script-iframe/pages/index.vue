@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { SchemaType } from '@/types/extraction'
+import type { SchemaType } from '@/types/extractor'
 import ExtractionToolbar from '@/components/ExtractionToolbar/ExtractionToolbar.vue'
 import Postmate from 'postmate'
 

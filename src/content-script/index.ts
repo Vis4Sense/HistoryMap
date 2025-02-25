@@ -1,10 +1,12 @@
-import type { SchemaType } from '@/types/extraction'
+import type { SchemaType } from '@/types/extractor'
 import Postmate from 'postmate'
 import { onMessage, sendMessage } from 'webext-bridge/content-script'
 import { Readability } from '@mozilla/readability'
 import TurndownService from 'turndown'
 // This import scss file is used to style the iframe that is injected into the page
 import './index.scss'
+
+import './select-element'
 
 // const src = chrome.runtime.getURL('src/ui/content-script-iframe/index.html')
 

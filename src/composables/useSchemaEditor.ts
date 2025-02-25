@@ -1,5 +1,5 @@
-import { Concept, Schema } from "@/types/schema"
-import { useBrowserLocalStorage } from "./useBrowserStorage"
+import type { Concept, Schema } from '@/types/schema'
+import { useBrowserLocalStorage } from './useBrowserStorage'
 
 export function useSchemaEditor() {
   /** define state */
@@ -37,7 +37,8 @@ export function useSchemaEditor() {
 
   function toggleConceptBookmark(name: string) {
     const concept = getConcept(name)
-    if (!concept) return
+    if (!concept)
+      return
     concept.bookmarked = !concept.bookmarked
     if (concept.bookmarked) {
       concept.included = true
@@ -46,7 +47,8 @@ export function useSchemaEditor() {
 
   function toggleConceptIncluded(name: string) {
     const concept = getConcept(name)
-    if (!concept) return
+    if (!concept)
+      return
     concept.included = !concept.included
   }
 

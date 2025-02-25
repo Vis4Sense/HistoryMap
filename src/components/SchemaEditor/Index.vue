@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useExtractor } from '@/composables/useExtractor'
 import { useSchemaEditor } from '@/composables/useSchemaEditor'
-import { SchemaType } from '@/types/extraction'
+import { SchemaType } from '@/types/extractor'
 
 const { setInput, extractNetwork } = useExtractor()
 const { setSchema } = useSchemaEditor()
@@ -19,7 +19,7 @@ function handleExtract() {
         })
         // run extraction
         nextTick(() => {
-          extractNetwork(output => {
+          extractNetwork((output) => {
             setSchema(output.schema)
           })
         })
@@ -32,17 +32,14 @@ function handleExtract() {
 <template>
   <div
     w-full h-full
-    border rounded
     flex flex-col overflow-auto
-    relative
+    gap-2
   >
-    <div shrink-0 bg-gray-1 p-1 flex justify-between items-center>
-      <BasicToolbarIcon @click="handleExtract">
-        <div i-material-symbols-light:graph-3 text-lg></div>
-      </BasicToolbarIcon>
+    <div flex-auto border rounded>
+      <SchemaEditorViewGraph />
     </div>
 
-    <SchemaEditorViewGraph />
+    <Extractor />
   </div>
 </template>
 
