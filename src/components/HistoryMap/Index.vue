@@ -6,13 +6,10 @@ import { VueFlow } from '@vue-flow/core'
 import { compactTreeLayout } from './layout/compact-tree'
 import NodeHmPage from './nodes/HmPageNode.vue'
 
-const { session } = useHistoryMap()
+const { pages } = useHistoryMap()
 
 const edges = computed((): Edge[] => {
-  if (!session.value)
-    return []
-
-  const edges: Edge[] = session.value.pages
+  const edges: Edge[] = pages.value
     .filter(page => page.parentPageId)
     .map(page => ({
       id: `${page.pageId}_${page.parentPageId}`,
@@ -25,9 +22,7 @@ const edges = computed((): Edge[] => {
 })
 
 const nodes = computed((): Node<HmPage>[] => {
-  if (!session.value)
-    return []
-  const nodes = session.value.pages.map((page): Node => ({
+  const nodes = pages.value.map((page): Node => ({
     id: page.pageId,
     type: 'hm-page',
     width: 160,
@@ -45,7 +40,6 @@ const nodes = computed((): Node<HmPage>[] => {
 
   return nodes
 })
-
 </script>
 
 <template>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useHistoryMap } from '@/composables/useHistoryMap'
+import { useSession } from '@/composables/useSession'
 
-const { session, addSession, updateSession } = useHistoryMap()
+const { session, addSession, updateSession } = useSession()
 
 const sessionTitle = ref(null as HTMLDivElement | null)
 
@@ -50,7 +50,7 @@ function updateSessionTitle() {
         @blur="updateSessionTitle"
         @keydown.enter.prevent="(e) => e.target.blur()"
       >
-        {{ session?.title }}
+        {{ session?.title || 'Untitled' }}
       </div>
     </div>
   </div>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useHistoryMap } from '@/composables/useHistoryMap'
+import { useSession } from '@/composables/useSession'
 
-const { sessions, switchSession } = useHistoryMap()
+const { sessions, switchSession } = useSession()
 
 const sessionList = computed(() => {
   return [

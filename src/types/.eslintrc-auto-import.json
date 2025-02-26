@@ -329,6 +329,8 @@
     "watchWithFilter": true,
     "whenever": true,
     "useHistoryMap": true,
+    "useSession": true,
+    "useStore": true,
     "useExtractor": true,
     "useSchemaEditor": true
   }

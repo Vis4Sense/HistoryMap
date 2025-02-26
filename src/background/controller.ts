@@ -4,8 +4,10 @@
 
 import type { HmPage } from '@/types/historymap'
 import { useHistoryMap } from '@/composables/useHistoryMap'
+import { useSession } from '@/composables/useSession'
 
-const { session, switchToDefaultSession, switchToLatestSession, addPage, updatePage } = useHistoryMap()
+const { switchToDefaultSession, switchToLatestSession } = useSession()
+const { pages, addPage, updatePage } = useHistoryMap()
 
 /**
  * handle chrome.tabs.onCreated
@@ -16,7 +18,7 @@ function tabCreationHandler(tab: chrome.tabs.Tab) {
   // console.log('tab created', tab)
   let parent: HmPage | null = null
   if (tab.openerTabId) {
-    parent = session.value?.pages
+    parent = pages.value
       .sort((a, b) => b.timeLastActivated - a.timeLastActivated)
       .find(page => page.tabId === tab.openerTabId)
       || null
@@ -42,7 +44,7 @@ function tabUpdateHandler(tabId: number, changeInfo: Partial<chrome.tabs.Tab>, t
 
   // if the tab is loading
   if (changeInfo.status === 'loading' && changeInfo.url) {
-    page = session.value?.pages.find(
+    page = pages.value.find(
       page => page.tabId === tabId
         && (page.pageObj.status === 'unloaded'
           || page.pageObj.pendingUrl === changeInfo.url),
@@ -55,7 +57,7 @@ function tabUpdateHandler(tabId: number, changeInfo: Partial<chrome.tabs.Tab>, t
     }
     // go back or create a new page
     else {
-      const prior = session.value?.pages.find(
+      const prior = pages.value.find(
         page => page.tabId === tabId
           && page.pageObj.url === changeInfo.url,
       )
@@ -68,7 +70,7 @@ function tabUpdateHandler(tabId: number, changeInfo: Partial<chrome.tabs.Tab>, t
         })
       }
       else {
-        const parent = session.value?.pages
+        const parent = pages.value
           .sort((a, b) => b.timeLastActivated - a.timeLastActivated)
           .find(page => page.tabId === tabId)
           || null
@@ -79,7 +81,7 @@ function tabUpdateHandler(tabId: number, changeInfo: Partial<chrome.tabs.Tab>, t
 
   // title or favicon update
   if (changeInfo.title || changeInfo.favIconUrl) {
-    page = session.value?.pages.find(
+    page = pages.value.find(
       page => page.tabId === tabId
         && page.pageObj.url === tab.url,
     )
@@ -92,7 +94,7 @@ function tabUpdateHandler(tabId: number, changeInfo: Partial<chrome.tabs.Tab>, t
 
   // if a loaded tab is completed
   if (changeInfo.status === 'complete') {
-    page = session.value?.pages.find(
+    page = pages.value.find(
       page => page.tabId === tabId
         && page.pageObj.status === 'loading',
     )
@@ -109,7 +111,7 @@ function tabUpdateHandler(tabId: number, changeInfo: Partial<chrome.tabs.Tab>, t
  * set the activated page as active
  */
 function tabActivateHandler(activeInfo: { tabId: number }) {
-  const pagesIntab = session.value?.pages
+  const pagesIntab = pages.value
     .filter(page => page.tabId === activeInfo.tabId)
     .sort((a, b) => b.timeLastActivated - a.timeLastActivated)
   if (pagesIntab && pagesIntab.length) {
