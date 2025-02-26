@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ElMessageBox, ElMessage, ElMessageBoxOptions, Action } from 'element-plus'
-import Icon from './Icon.vue'
+import type { Action, ElMessageBoxOptions } from 'element-plus'
 import { useHistoryMap } from '@/composables/useHistoryMap'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import Icon from './Icon.vue'
 
 const props = defineProps({
   id: {
@@ -11,13 +12,13 @@ const props = defineProps({
 })
 
 const { id } = toRefs(props)
-const { session, removePage } = useHistoryMap()
+const { pages, removePage } = useHistoryMap()
 
 function onRemove() {
   // check if it has children
-  const children = session.value?.pages
+  const children = pages.value
     .filter(p => p.parentPageId === id?.value)
-  
+
   const options: ElMessageBoxOptions = {
     confirmButtonText: 'Yes',
     showCancelButton: false,
@@ -49,7 +50,8 @@ function onRemove() {
           type: 'success',
           message: 'Page and children deleted',
         })
-      } else {
+      }
+      else {
         ElMessage({
           type: 'info',
           message: 'Deletion canceled',
@@ -61,6 +63,6 @@ function onRemove() {
 
 <template>
   <Icon @click="onRemove">
-    <div i-carbon:trash-can></div>
+    <div i-carbon:trash-can />
   </Icon>
 </template>

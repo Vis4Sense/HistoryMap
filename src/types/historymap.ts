@@ -1,15 +1,3 @@
-export interface HmSessionMetadata {
-  sessionId: number
-  time: number
-  title: string
-  timeCreated: number
-  timeUpdated: number
-}
-
-export interface HmSession extends HmSessionMetadata {
-  pages: HmPage[]
-}
-
 export interface HmPage {
   sessionId: number
   pageId: string

@@ -328,6 +328,8 @@
     "watchTriggerable": true,
     "watchWithFilter": true,
     "whenever": true,
-    "useHistoryMap": true
+    "useHistoryMap": true,
+    "useSession": true,
+    "useStore": true
   }
 }

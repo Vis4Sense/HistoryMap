@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { HmPage } from '@/types/historymap'
-import type { Node } from '@vue-flow/core'
 import { Handle, Position, useVueFlow } from '@vue-flow/core'
 import { NodeToolbar } from '@vue-flow/node-toolbar'
 import HmPageNodeToolbar from './HmPageNodeToolbar.vue'
