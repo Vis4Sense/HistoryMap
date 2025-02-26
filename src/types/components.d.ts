@@ -31,6 +31,10 @@ declare module 'vue' {
     SchemaEditorConceptNodeToolbar: typeof import('./../components/SchemaEditor/ConceptNode/Toolbar.vue')['default']
     SchemaEditorViewGraph: typeof import('./../components/SchemaEditor/ViewGraph.vue')['default']
     SchemaEditorViewNested: typeof import('./../components/SchemaEditor/ViewNested.vue')['default']
+    SchemaList: typeof import('./../components/SchemaList/Index.vue')['default']
+    SchemaListHeader: typeof import('./../components/SchemaList/Header.vue')['default']
+    SchemaTree: typeof import('./../components/SchemaTree/Index.vue')['default']
+    SchemaTreeRoot: typeof import('./../components/SchemaTree/Root.vue')['default']
     SessionList: typeof import('./../components/SessionList.vue')['default']
   }
 }

@@ -130,13 +130,14 @@ export function useHistoryMap() {
         hmPages.value
           .filter(d => d.parentPageId === pageId)
           .forEach(d => removePage(d.pageId, true))
-      } else {
+      }
+      else {
         // connect its children to its parent
         hmPages.value
           .filter(d => d.parentPageId === pageId)
           .forEach(d => d.parentPageId = page.parentPageId)
       }
-      
+
       // remove the page
       const index = hmPages.value.indexOf(page)
       hmPages.value.splice(index, 1)

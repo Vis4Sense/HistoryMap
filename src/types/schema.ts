@@ -1,14 +1,24 @@
 export interface Concept {
-  name: string
+  name: string // unique identifier
   extractedBy?: 'model' | 'user'
-  included?: boolean
-  bookmarked?: boolean
+  parentName?: string // name of the parent concept in the hierarchy
+  // included?: boolean
+  // bookmarked?: boolean
 }
 
 // export interface Excitation {
 //   level?: number
 //   index?: number
 // }
+
+/** hierarchical structure of the schema */
+export interface SchemaTreeNode {
+  name: string // name of the concept
+  children?: SchemaTreeNode[]
+}
+export interface SchemaTree {
+  roots: SchemaTreeNode[]
+}
 
 export interface Relation {
   source: string
