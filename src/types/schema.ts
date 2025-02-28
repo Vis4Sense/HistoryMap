@@ -27,6 +27,17 @@ export interface Relation {
 }
 
 export interface Schema {
+  schemaTree: SchemaTree
   nodes: Concept[]
   links: Relation[]
+}
+
+export interface SchemaNode {
+  sessionId: number
+  uuid: string // sm-uuid
+  schema: Schema
+  sources: string[]
+  timeCreated: number
+  timeUpdated: number
+  isActive: boolean
 }

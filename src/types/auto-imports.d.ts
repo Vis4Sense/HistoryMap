@@ -256,6 +256,7 @@ declare global {
   const useRouter: typeof import('vue-router')['useRouter']
   const useSSRWidth: typeof import('@vueuse/core')['useSSRWidth']
   const useSchemaEditor: typeof import('../composables/useSchemaEditor')['useSchemaEditor']
+  const useSchemaMap: typeof import('../composables/useSchemaMap')['useSchemaMap']
   const useScreenOrientation: typeof import('@vueuse/core')['useScreenOrientation']
   const useScreenSafeArea: typeof import('@vueuse/core')['useScreenSafeArea']
   const useScriptTag: typeof import('@vueuse/core')['useScriptTag']
@@ -588,6 +589,7 @@ declare module 'vue' {
     readonly useRouter: UnwrapRef<typeof import('vue-router')['useRouter']>
     readonly useSSRWidth: UnwrapRef<typeof import('@vueuse/core')['useSSRWidth']>
     readonly useSchemaEditor: UnwrapRef<typeof import('../composables/useSchemaEditor')['useSchemaEditor']>
+    readonly useSchemaMap: UnwrapRef<typeof import('../composables/useSchemaMap')['useSchemaMap']>
     readonly useScreenOrientation: UnwrapRef<typeof import('@vueuse/core')['useScreenOrientation']>
     readonly useScreenSafeArea: UnwrapRef<typeof import('@vueuse/core')['useScreenSafeArea']>
     readonly useScriptTag: UnwrapRef<typeof import('@vueuse/core')['useScriptTag']>

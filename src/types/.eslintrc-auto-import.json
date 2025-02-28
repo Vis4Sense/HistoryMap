@@ -332,6 +332,7 @@
     "useSession": true,
     "useStore": true,
     "useExtractor": true,
-    "useSchemaEditor": true
+    "useSchemaEditor": true,
+    "useSchemaMap": true
   }
 }

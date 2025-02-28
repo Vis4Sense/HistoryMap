@@ -20,7 +20,7 @@ export function useHistoryMap() {
   function newPage(tab: chrome.tabs.Tab, parentPageId: string | null = null): HmPage | null {
     return {
       sessionId: sessionId.value,
-      pageId: uuidv4(),
+      pageId: `hm-${uuidv4()}`,
       tabId: tab.id!,
       timeCreated: Date.now(),
       timeLastActivated: Date.now(),
