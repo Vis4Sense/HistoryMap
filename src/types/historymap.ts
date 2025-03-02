@@ -2,8 +2,9 @@ import type { Schema } from './schema'
 
 export interface HmPage {
   sessionId: number
-  pageId: string // hm-uuid
+  id: string // hm-uuid
   tabId: number
+  type: 'hm-page'
   timeCreated: number
   timeLastActivated: number
   pageObj: chrome.tabs.Tab

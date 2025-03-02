@@ -24,7 +24,7 @@ function tabCreationHandler(tab: chrome.tabs.Tab) {
       || null
   }
 
-  addPage(tab, parent?.pageId || null)
+  addPage(tab, parent?.id || null)
 }
 
 /**
@@ -53,7 +53,7 @@ function tabUpdateHandler(tabId: number, changeInfo: Partial<chrome.tabs.Tab>, t
     if (page) {
       page.pageObj.url = changeInfo.url
       page.pageObj.status = 'loading'
-      updatePage(page.pageId, { pageObj: page.pageObj })
+      updatePage(page.id, { pageObj: page.pageObj })
     }
     // go back or create a new page
     else {
@@ -63,7 +63,7 @@ function tabUpdateHandler(tabId: number, changeInfo: Partial<chrome.tabs.Tab>, t
       )
       if (prior) {
         prior.pageObj.status = 'loading'
-        updatePage(prior.pageId, {
+        updatePage(prior.id, {
           pageObj: prior.pageObj,
           timeLastActivated: Date.now(),
           isActive: true,
@@ -74,7 +74,7 @@ function tabUpdateHandler(tabId: number, changeInfo: Partial<chrome.tabs.Tab>, t
           .sort((a, b) => b.timeLastActivated - a.timeLastActivated)
           .find(page => page.tabId === tabId)
           || null
-        addPage(tab, parent?.pageId || null)
+        addPage(tab, parent?.id || null)
       }
     }
   }
@@ -88,7 +88,7 @@ function tabUpdateHandler(tabId: number, changeInfo: Partial<chrome.tabs.Tab>, t
     if (page) {
       page.pageObj.title = tab.title
       page.pageObj.favIconUrl = tab.favIconUrl
-      updatePage(page.pageId, { pageObj: page.pageObj })
+      updatePage(page.id, { pageObj: page.pageObj })
     }
   }
 
@@ -100,7 +100,7 @@ function tabUpdateHandler(tabId: number, changeInfo: Partial<chrome.tabs.Tab>, t
     )
     if (page) {
       page.pageObj.status = 'complete'
-      updatePage(page.pageId, { pageObj: page.pageObj })
+      updatePage(page.id, { pageObj: page.pageObj })
     }
   }
 }
@@ -116,7 +116,7 @@ function tabActivateHandler(activeInfo: { tabId: number }) {
     .sort((a, b) => b.timeLastActivated - a.timeLastActivated)
   if (pagesIntab && pagesIntab.length) {
     const page = pagesIntab[0]
-    updatePage(page.pageId, {
+    updatePage(page.id, {
       timeLastActivated: Date.now(),
       isActive: true,
     })

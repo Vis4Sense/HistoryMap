@@ -3,6 +3,12 @@ import { v4 as uuidv4 } from 'uuid'
 import { useBrowserLocalStorage } from './useBrowserStorage'
 import { useSession } from './useSession'
 
+function getLinks(pages: HmPage[]) {
+  return pages
+    .filter(d => d.parentPageId)
+    .map(d => ({ source: d.parentPageId!, target: d.id }))
+}
+
 export function useHistoryMap() {
   const { sessionId, session, updateSession } = useSession()
 
@@ -10,9 +16,11 @@ export function useHistoryMap() {
   const { data: hmPages } = useBrowserLocalStorage('hm-pages', [] as HmPage[])
 
   const pages = computed(() => hmPages.value.filter(d => d.sessionId === sessionId.value))
+  const links = computed(() => getLinks(pages.value))
 
   const state = {
     pages,
+    links,
   }
 
   /** utilities */
@@ -20,8 +28,9 @@ export function useHistoryMap() {
   function newPage(tab: chrome.tabs.Tab, parentPageId: string | null = null): HmPage | null {
     return {
       sessionId: sessionId.value,
-      pageId: `hm-${uuidv4()}`,
+      id: `hm-${uuidv4()}`,
       tabId: tab.id!,
+      type: 'hm-page',
       timeCreated: Date.now(),
       timeLastActivated: Date.now(),
       pageObj: tab,
@@ -57,7 +66,7 @@ export function useHistoryMap() {
   }
 
   function updatePage(pageId: string, data: Partial<HmPage>) {
-    const page = hmPages.value.find(d => d.pageId === pageId)
+    const page = hmPages.value.find(d => d.id === pageId)
     if (page) {
       if (data.isActive)
         deactivateAllPages()
@@ -66,13 +75,13 @@ export function useHistoryMap() {
   }
 
   function removePage(pageId: string, removeChildren = false) {
-    const page = hmPages.value.find(d => d.pageId === pageId)
+    const page = hmPages.value.find(d => d.id === pageId)
     if (page) {
       if (removeChildren) {
         // remove its children
         hmPages.value
           .filter(d => d.parentPageId === pageId)
-          .forEach(d => removePage(d.pageId, true))
+          .forEach(d => removePage(d.id, true))
       }
       else {
         // connect its children to its parent

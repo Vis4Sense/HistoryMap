@@ -34,7 +34,8 @@ export interface Schema {
 
 export interface SchemaNode {
   sessionId: number
-  uuid: string // sm-uuid
+  id: string // sm-uuid
+  type: 'schema'
   schema: Schema
   sources: string[]
   timeCreated: number

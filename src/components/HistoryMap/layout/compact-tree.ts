@@ -28,10 +28,10 @@ export function compactTreeLayout({
     layout: CompactTreeLayout
 
   // key functions to bind data
-  const nodeKey = (d: Node<HmPage>) => d.data!.pageId
+  const nodeKey = (d: Node<HmPage>) => d.data!.id
 
   // function to find parent node
-  const parent = (d: Node<HmPage>) => nodes.find(n => n.data!.pageId === d.data!.parentPageId)
+  const parent = (d: Node<HmPage>) => nodes.find(n => n.data!.id === d.data!.parentPageId)
 
   function initialize() {
     dummyContainer = DummyContainer()

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { Action, ElMessageBoxOptions } from 'element-plus'
+import Icon from '@/components/Basic/ToolbarIcon.vue'
 import { useHistoryMap } from '@/composables/useHistoryMap'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import Icon from './Icon.vue'
 
 const props = defineProps({
   id: {

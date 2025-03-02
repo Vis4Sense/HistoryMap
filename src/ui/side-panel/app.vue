@@ -15,7 +15,8 @@ onMounted(() => {
       <Header />
 
       <div p-4 flex-auto>
-        <HistoryMap w-full h-full />
+        <!-- <HistoryMap w-full h-full /> -->
+        <SchemaMap w-full h-full />
       </div>
 
       <SchemaList shrink-0 h-80 border-t="1.5" />

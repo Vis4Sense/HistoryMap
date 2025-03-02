@@ -1,21 +1,28 @@
 import type { SchemaNode } from '@/types/schema'
 import { v4 as uuidv4 } from 'uuid'
-import { useSession } from './useSession'
 import { useHistoryMap } from './useHistoryMap'
+import { useSession } from './useSession'
 
 export function useSchemaMap() {
   const { sessionId } = useSession()
-  const { pages } = useHistoryMap()
+  const { pages, links: hmLinks } = useHistoryMap()
 
   /** define state */
   const { data: allSchemaNodes } = useBrowserLocalStorage('schemas', [] as SchemaNode[])
 
   const schemaNodes = computed(() => allSchemaNodes.value.filter(d => d.sessionId === sessionId.value))
+
   const nodes = computed(() => [...pages.value, ...schemaNodes.value])
+  const links = computed(() => {
+    const schemaLinks = schemaNodes.value
+      .flatMap(d => d.sources.map(src => ({ source: src, target: d.id })))
+    return [...hmLinks.value, ...schemaLinks]
+  })
 
   const state = {
     schemaNodes,
     nodes,
+    links,
   }
 
   /** utilities */
@@ -23,7 +30,8 @@ export function useSchemaMap() {
   function newSchemaNode(): SchemaNode {
     return {
       sessionId: sessionId.value,
-      uuid: `sm-${uuidv4()}`,
+      id: `sm-${uuidv4()}`,
+      type: 'schema',
       schema: {
         schemaTree: {
           roots: [],

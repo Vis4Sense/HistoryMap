@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import ToolRemove from './Toolbar/ToolRemove.vue'
-import ToolSchematise from './Toolbar/ToolSchematise.vue'
+import ToolRemove from '../node-tools/ToolRemove.vue'
+// import ToolSchematise from '../node-tools/ToolSchematise.vue'
 
 defineProps({
   id: {
@@ -12,7 +12,7 @@ defineProps({
 
 <template>
   <div bg-white shadow border p-1 rounded flex>
-    <ToolSchematise :id="id" />
+    <!-- <ToolSchematise :id="id" /> -->
     <ToolRemove :id="id" />
   </div>
 </template>

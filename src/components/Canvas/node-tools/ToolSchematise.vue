@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<!-- <script setup lang="ts">
 import Icon from './Icon.vue'
 import { useSchemaEditor } from '@/composables/useSchemaEditor'
 
@@ -16,4 +16,4 @@ const { openModal } = useSchemaEditor()
   <Icon @click="openModal(id)">
     <div i-carbon:category></div>
   </Icon>
-</template>
+</template> -->

@@ -1,37 +1,39 @@
 <script setup lang="ts">
-import type { HmPage } from '@/types/historymap'
-import type { Edge, Node } from '@vue-flow/core'
-import { useHistoryMap } from '@/composables/useHistoryMap'
+import type { Edge } from '@vue-flow/core'
+import HmPageNode from '@/components/Canvas/nodes/HmPageNode.vue'
+import SchemaNode from '@/components/Canvas/nodes/SchemaNode.vue'
+import { useSchemaMap } from '@/composables/useSchemaMap'
 import { VueFlow } from '@vue-flow/core'
-import NodeHmPage from '../Canvas/nodes/HmPageNode.vue'
-import { compactTreeLayout } from './layout/compact-tree'
+import { compactTreeLayout } from '../HistoryMap/layout/compact-tree'
 
-const { pages, links } = useHistoryMap()
+const { nodes: smNodes, links } = useSchemaMap()
 
-const edges = computed((): Edge[] => links.value
-  .map(link => ({
+const edges = computed((): Edge[] => {
+  return links.value.map(link => ({
     id: `${link.source}_${link.target}`,
     source: link.source,
     target: link.target,
-  })),
-)
+  }))
+})
 
-const nodes = computed((): Node<HmPage>[] => {
-  const nodes = pages.value.map((page): Node => ({
-    id: page.id,
-    type: 'hm-page',
+const nodes = computed(() => {
+  const nodes = smNodes.value.map(node => ({
+    id: node.id,
+    type: node.type,
     width: 160,
     height: 32,
     position: {
       x: 0,
       y: 0,
     },
-    data: page,
+    data: node,
   }))
 
   const layout = compactTreeLayout()
   layout.nodes(nodes).links(edges.value).run()
   layout.close()
+
+  console.log('nodes', nodes)
 
   return nodes
 })
@@ -46,7 +48,11 @@ const nodes = computed((): Node<HmPage>[] => {
       :edges="edges"
     >
       <template #node-hm-page="props">
-        <NodeHmPage v-bind="props" />
+        <HmPageNode v-bind="props" />
+      </template>
+
+      <template #node-schema="props">
+        <SchemaNode v-bind="props" />
       </template>
     </VueFlow>
   </div>

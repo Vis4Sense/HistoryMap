@@ -2,7 +2,7 @@
 import type { HmPage } from '@/types/historymap'
 import { Handle, Position, useVueFlow } from '@vue-flow/core'
 import { NodeToolbar } from '@vue-flow/node-toolbar'
-import HmPageNodeToolbar from './HmPageNodeToolbar.vue'
+import HmPageNodeToolbar from '../node-toolbars/HmPageNodeToolbar.vue'
 
 const props = defineProps({
   id: {
