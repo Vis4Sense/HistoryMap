@@ -257,6 +257,7 @@ declare global {
   const useSSRWidth: typeof import('@vueuse/core')['useSSRWidth']
   const useSchemaEditor: typeof import('../composables/useSchemaEditor')['useSchemaEditor']
   const useSchemaMap: typeof import('../composables/useSchemaMap')['useSchemaMap']
+  const useSchemaTree: typeof import('../composables/useSchemaTree')['useSchemaTree']
   const useScreenOrientation: typeof import('@vueuse/core')['useScreenOrientation']
   const useScreenSafeArea: typeof import('@vueuse/core')['useScreenSafeArea']
   const useScriptTag: typeof import('@vueuse/core')['useScriptTag']

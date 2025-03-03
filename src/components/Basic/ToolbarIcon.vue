@@ -12,6 +12,10 @@ defineProps({
     type: Boolean,
     default: false,
   },
+  plain: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const emit = defineEmits(['click'])
@@ -24,8 +28,12 @@ const emit = defineEmits(['click'])
     :disabled="!enableTooltip"
   >
     <div
-      p-1 hover:bg-gray-3 rounded cursor-pointer
-      :class="{ 'bg-gray-2': bg }"
+      rounded cursor-pointer
+      :class="{
+        'bg-gray-2': bg,
+        'p-1 hover:bg-gray-2': !plain,
+        'hover:op-50': plain,
+      }"
       @click="emit('click')"
     >
       <slot />

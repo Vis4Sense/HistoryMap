@@ -33,7 +33,7 @@ const nodes = computed(() => {
   layout.nodes(nodes).links(edges.value).run()
   layout.close()
 
-  console.log('nodes', nodes)
+  // console.log('nodes', nodes)
 
   return nodes
 })

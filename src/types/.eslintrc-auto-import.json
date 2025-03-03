@@ -333,6 +333,7 @@
     "useStore": true,
     "useExtractor": true,
     "useSchemaEditor": true,
-    "useSchemaMap": true
+    "useSchemaMap": true,
+    "useSchemaTree": true
   }
 }

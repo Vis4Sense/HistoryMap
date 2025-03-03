@@ -1,8 +1,4 @@
 <script setup lang="ts">
-import { useSchemaEditor } from '@/composables/useSchemaEditor'
-
-const { modal: schemaEditorModal } = useSchemaEditor()
-
 onMounted(() => {
   /** connect to background so we know when it is closed */
   chrome.runtime.connect(undefined, { name: 'historymap' })
@@ -19,7 +15,7 @@ onMounted(() => {
         <SchemaMap w-full h-full />
       </div>
 
-      <SchemaList shrink-0 h-80 border-t="1.5" />
+      <SchemaPanel shrink-0 h-80 border-t="1.5" />
 
       <!-- <el-dialog v-model="schemaEditorModal"
         title="Schema Editor"

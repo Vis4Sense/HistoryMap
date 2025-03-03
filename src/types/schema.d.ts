@@ -1,7 +1,6 @@
 export interface Concept {
   name: string // unique identifier
   extractedBy?: 'model' | 'user'
-  parentName?: string // name of the parent concept in the hierarchy
   // included?: boolean
   // bookmarked?: boolean
 }
@@ -28,8 +27,18 @@ export interface Relation {
 
 export interface Schema {
   schemaTree: SchemaTree
-  nodes: Concept[]
-  links: Relation[]
+  concepts: Concept[]
+  relations: Relation[]
+}
+
+export function newSchema(): Schema {
+  return {
+    schemaTree: {
+      roots: [],
+    },
+    concepts: [],
+    relations: [],
+  }
 }
 
 export interface SchemaNode {

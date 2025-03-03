@@ -36,6 +36,7 @@
     "graphology-layout-force": "^0.2.4",
     "graphology-layout-forceatlas2": "^0.10.1",
     "lint-staged": "^15.4.3",
+    "lodash": "^4.17.21",
     "marked": "^15.0.6",
     "notivue": "^2.4.5",
     "pinia": "^2.3.0",

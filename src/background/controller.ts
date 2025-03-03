@@ -149,8 +149,8 @@ export function initialiseController() {
   })
 
   // only for debugging
-  // const clearLocalStorage = true
-  // if (clearLocalStorage) {
-  //   chrome.storage.local.clear()
-  // }
+  const clearLocalStorage = false
+  if (clearLocalStorage) {
+    chrome.storage.local.clear()
+  }
 }

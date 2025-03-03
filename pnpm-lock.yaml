@@ -44,6 +44,9 @@ importers:
       lint-staged:
         specifier: ^15.4.3
         version: 15.4.3
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
       marked:
         specifier: ^15.0.6
         version: 15.0.6
