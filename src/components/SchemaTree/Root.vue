@@ -13,6 +13,7 @@ const props = defineProps({
 /** define emits */
 const emit = defineEmits<{
   addChild: [childName: string, rootName: string]
+  deleteNode: [nodeName: string]
 }>()
 
 const { root } = toRefs(props)
@@ -72,7 +73,7 @@ onClickOutside(newChildEle, () => {
         <BasicToolbarIcon plain @click="startEditing">
           <div i-carbon-add />
         </BasicToolbarIcon>
-        <BasicToolbarIcon plain>
+        <BasicToolbarIcon plain @click="emit('deleteNode', root.name)">
           <div i-carbon-delete />
         </BasicToolbarIcon>
       </div>
@@ -84,6 +85,7 @@ onClickOutside(newChildEle, () => {
         :key="child.name"
         :root="child"
         @add-child="(...args) => emit('addChild', ...args)"
+        @delete-node="(...args) => emit('deleteNode', ...args)"
       />
     </div>
 

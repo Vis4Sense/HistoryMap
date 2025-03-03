@@ -63,6 +63,12 @@ function addRoot(name: string) {
 function addChild(childName: string, parentName: string) {
   schemaEditor.addChild({ name: childName }, { name: parentName })
 }
+
+// delete node
+function deleteNode(name: string) {
+  console.log('delete node', name)
+  schemaEditor.deleteNode({ name })
+}
 </script>
 
 <template>
@@ -83,6 +89,7 @@ function addChild(childName: string, parentName: string) {
         :key="root.name"
         :root="root"
         @add-child="addChild"
+        @delete-node="deleteNode"
       />
     </div>
 
