@@ -109,8 +109,31 @@ export function useSchemaSync() {
     if (!senderNode)
       return
 
-    const srcEditor = useSchemaEditor(sender, senderNode.schema)
-    srcEditor.addChild({ name: childName }, { name: parentName })
+    const provenance: ElementProvenance<Concept> = {
+      sources: [],
+      targets: [],
+      time: Date.now(),
+      elementType: 'concept',
+      changeType: 'add',
+      diff: { old: null, new: null },
+    }
+
+    const pairDict = getSyncPairs(senderNode)
+
+    for (const nodeId in pairDict) {
+      const node = getNode(nodeId)
+      if (!node) {
+        continue
+      }
+
+      const pairs = pairDict[nodeId]
+      const prov = pairs.map(pair => ({
+        ...provenance,
+        ...pair,
+      }))
+      const editor = useSchemaEditor(nodeId, node.schema)
+      editor.addChild({ name: childName }, { name: parentName }, prov)
+    }
   }
 
   function commitDeleteNode(sender: string, name: string) {
@@ -119,8 +142,34 @@ export function useSchemaSync() {
     if (!senderNode)
       return
 
-    const srcEditor = useSchemaEditor(sender, senderNode.schema)
-    srcEditor.deleteNode({ name })
+    const provenance: ElementProvenance<Concept> = {
+      sources: [],
+      targets: [],
+      time: Date.now(),
+      elementType: 'concept',
+      changeType: 'delete',
+      diff: { old: null, new: null },
+    }
+
+    const pairDict = getSyncPairs(senderNode)
+
+    for (const nodeId in pairDict) {
+      const node = getNode(nodeId)
+      if (!node) {
+        continue
+      }
+
+      const pairs = pairDict[nodeId]
+      const prov = pairs.map(pair => ({
+        ...provenance,
+        ...pair,
+      }))
+      const editor = useSchemaEditor(nodeId, node.schema)
+      editor.deleteNode({ name }, prov)
+    }
+
+    // const srcEditor = useSchemaEditor(sender, senderNode.schema)
+    // srcEditor.deleteNode({ name })
   }
 
   return {

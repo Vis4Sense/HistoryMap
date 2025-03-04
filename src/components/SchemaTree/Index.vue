@@ -115,15 +115,15 @@ function deleteNode(name: string) {
         @add-child="addChild"
         @delete-node="deleteNode"
       />
-    </div>
 
-    <div shrink-0
-      v-if="isEditing"
-      ref="newRoot"
-      contenteditable="true"
-      px-1
-      @keydown.enter.prevent="saveRoot"
-      v-text="newConcept"
-    />
+      <div
+        v-if="isEditing"
+        ref="newRoot"
+        contenteditable="true"
+        px-1
+        @keydown.enter.prevent="saveRoot"
+        v-text="newConcept"
+      />
+    </div>
   </div>
 </template>

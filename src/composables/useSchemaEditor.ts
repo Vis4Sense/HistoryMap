@@ -20,15 +20,17 @@ export function useSchemaEditor(id_: string, schema_: Schema | undefined) {
     provenance: ElementProvenance<Concept>[],
   ) {
     const newConcept = { ...concept, parentName: null }
+
+    // update schema
     schema.schemaTree.roots.push({ name: concept.name })
     schema.concepts.push(newConcept)
+
+    // update provenance
     provenance.forEach((d) => {
       d.diff.new = newConcept
     })
-    if (!schema.provenance) {
-      schema.provenance = []
-    }
-    schema.provenance= _.concat(schema.provenance, provenance)
+    schema.provenance= _.concat(schema.provenance ?? [], provenance)
+
     updateSchema(id, schema)
   }
 
@@ -36,39 +38,50 @@ export function useSchemaEditor(id_: string, schema_: Schema | undefined) {
   function addChild(
     child: Partial<Concept> & Pick<Concept, 'name'>,
     parent: Partial<Concept> & Pick<Concept, 'name'>,
+    provenance: ElementProvenance<Concept>[],
   ) {
     const parentNode = nodeDict[parent.name]
     if (!parentNode) {
       console.error('parent not found', parent.name)
       return
     }
-    if (!parentNode.children) {
-      parentNode.children = []
-    }
-    parentNode.children.push({ name: child.name })
 
-    schema.concepts.push({
-      ...child,
-      parentName: parent.name,
+    const newConcept = { ...child, parentName: parent.name }
+
+    // update schema
+    parentNode.children = _.concat(parentNode.children ?? [], { name: child.name })
+    schema.concepts.push(newConcept)
+
+    // update provenance
+    provenance.forEach((d) => {
+      d.diff.new = newConcept
     })
-    schema.relations.push({
-      source: parent.name,
-      target: child.name,
-      category: 'has child',
-    })
+    schema.provenance = _.concat(schema.provenance ?? [], provenance)
 
     updateSchema(id, schema)
   }
 
   // delete node
-  function deleteNode(node: Partial<Concept> & Pick<Concept, 'name'>) {
-    const parentName = nodeParentDict[node.name]
-    const siblings = parentName
-      ? (nodeDict[parentName].children || [])
+  function deleteNode(
+    node: Partial<Concept> & Pick<Concept, 'name'>,
+    provenance: ElementProvenance<Concept>[],
+  ) {
+    const oldConcept = schema.concepts.find(d => d.name === node.name)
+      ?? { name: node.name, parentName: null }
+
+    const siblings = oldConcept.parentName
+      ? (nodeDict[oldConcept.parentName].children || [])
       : schema.schemaTree.roots
     _.remove(siblings, d => d.name === node.name)
 
-    // TODO: update concepts and relations
+    _.remove(schema.concepts, d => d.name === node.name)
+    _.remove(schema.relations, d => d.source === node.name || d.target === node.name)
+
+    // update provenance
+    provenance.forEach((d) => {
+      d.diff.old = oldConcept
+    })
+    schema.provenance = _.concat(schema.provenance ?? [], provenance)
 
     updateSchema(id, schema)
   }

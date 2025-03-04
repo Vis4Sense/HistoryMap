@@ -24,7 +24,7 @@ const container = ref<HTMLElement>()
 
 useResizeObserver(container, () => {
   nextTick(() => {
-    console.log(container.value.clientHeight)
+    // console.log(container.value.clientHeight)
     emit('updateSchemaHeight', container.value?.clientHeight || 0)
   })
 })
@@ -59,6 +59,13 @@ const changedConcepts = computed((): ElementProvenance<Concept>[] => {
         bg-blue-1
       >
         {{ concept.diff.new?.name }}
+      </div>
+      <div v-else-if="concept.changeType === 'delete'"
+        px-2 rounded
+        bg-red-1
+        line-through
+      >
+        {{ concept.diff.old?.name }}
       </div>
     </div>
   </div>
