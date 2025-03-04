@@ -22,30 +22,6 @@ const { schema } = toRefs(props)
 
 const container = ref<HTMLElement>()
 
-// onMounted(() => {
-//   if (container.value) {
-//     // console.log('container', container.value.clientHeight)
-//     nextTick(() => 
-//       emit('updateSchemaHeight', height)
-//     )
-//   }
-// })
-
-// watch(height, (newHeight, oldHeight) => {
-//   if (newHeight !== oldHeight) {
-//     console.log('height changed', newHeight)
-//   }
-// })
-
-// watchEffect(() => {
-//   if (container.value) {
-//     console.log('container', container.value.clientHeight)
-//     nextTick(() => 
-//       emit('updateSchemaHeight', height.value)
-//     )
-//   }
-// })
-
 useResizeObserver(container, () => {
   nextTick(() => {
     console.log(container.value.clientHeight)
