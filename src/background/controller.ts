@@ -5,9 +5,10 @@
 import type { HmPage } from '@/types/historymap'
 import { useHistoryMap } from '@/composables/useHistoryMap'
 import { useSession } from '@/composables/useSession'
+import _ from 'lodash'
 
 const { switchToDefaultSession, switchToLatestSession } = useSession()
-const { pages, addPage, updatePage } = useHistoryMap()
+const { pages, addPage, updatePage, activePage } = useHistoryMap()
 
 /**
  * handle chrome.tabs.onCreated
@@ -15,6 +16,11 @@ const { pages, addPage, updatePage } = useHistoryMap()
  * add a new page to historymap
  */
 function tabCreationHandler(tab: chrome.tabs.Tab) {
+  // if the tab is reopened from historymap
+  if (activePage.value && activePage.value.tabId === tab.id) {
+    return
+  }
+
   // console.log('tab created', tab)
   let parent: HmPage | null = null
   if (tab.openerTabId) {
@@ -65,7 +71,6 @@ function tabUpdateHandler(tabId: number, changeInfo: Partial<chrome.tabs.Tab>, t
         prior.pageObj.status = 'loading'
         updatePage(prior.id, {
           pageObj: prior.pageObj,
-          timeLastActivated: Date.now(),
           isActive: true,
         })
       }
@@ -117,7 +122,6 @@ function tabActivateHandler(activeInfo: { tabId: number }) {
   if (pagesIntab && pagesIntab.length) {
     const page = pagesIntab[0]
     updatePage(page.id, {
-      timeLastActivated: Date.now(),
       isActive: true,
     })
   }
@@ -129,6 +133,41 @@ function tabActivateHandler(activeInfo: { tabId: number }) {
       }
     })
   }
+}
+
+/**
+ * Activate page in response to clicking on historymap
+ */
+function activatePage(page: HmPage) {
+  const pageObj = page.pageObj
+  const url = pageObj.url
+
+  // find the tab with the page url
+  // not using chrome.tabs.query({ url: url }) because it does not work when the url contains query parameters (?)
+  chrome.tabs.query({}, (tabs) => {
+    // find the tab with the page url
+    const targetTabs = tabs.filter(tab =>
+      tab.id === page.tabId
+      && tab.url === url,
+    )
+
+    if (targetTabs.length > 0) { // if tab found, go back to it
+      const { id, windowId } = targetTabs[0]
+      chrome.windows.update(windowId, { focused: true }, () => {
+        chrome.tabs.update(id!, { active: true })
+      })
+    }
+    else { // if tab not found, create a new tab
+      chrome.tabs.create({ url }, (tab) => {
+        updatePage(page.id, {
+          tabId: tab.id,
+          pageObj: tab,
+          isActive: true,
+        })
+        chrome.windows.update(tab.windowId, { focused: true })
+      })
+    }
+  })
 }
 
 export function initialiseController() {
@@ -146,6 +185,14 @@ export function initialiseController() {
         // console.info('switched to default session')
       })
     }
+  })
+
+  /** listen to activate page message */
+  chrome.runtime.onMessage.addListener((message) => {
+    if (message.type === 'activate-page') {
+      activatePage(message.data)
+    }
+    return true
   })
 
   // only for debugging
