@@ -10,7 +10,10 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  data: Object as PropType<HmPage>,
+  data: {
+    type: Object as PropType<HmPage>,
+    required: true,
+  },
   selected: Boolean,
 })
 
@@ -21,6 +24,14 @@ const { getSelectedNodes } = useVueFlow()
 const toolbarVisible = computed(() => {
   return selected.value && getSelectedNodes.value.length === 1
 })
+
+/** send message to controller to open clicked page */
+function sendActivatePage() {
+  chrome.runtime.sendMessage({
+    type: 'activate-page',
+    data: data.value,
+  })
+}
 </script>
 
 <template>
@@ -34,7 +45,13 @@ const toolbarVisible = computed(() => {
       'border-2': selected,
     }"
   >
-    <Header :data="data" />
+    <Header
+      class="nodrag nopan"
+      cursor-pointer
+      hover:text-blue-8
+      :data="data"
+      @click="sendActivatePage()"
+    />
 
     <NodeToolbar
       :position="Position.Top"

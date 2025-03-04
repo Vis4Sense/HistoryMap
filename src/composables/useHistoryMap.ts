@@ -72,8 +72,10 @@ export function useHistoryMap() {
   function updatePage(pageId: string, data: Partial<HmPage>) {
     const page = hmPages.value.find(d => d.id === pageId)
     if (page) {
-      if (data.isActive)
+      if (data.isActive) {
         deactivateAllPages()
+        data.timeLastActivated = Date.now()
+      }
       Object.assign(page, data)
     }
   }
