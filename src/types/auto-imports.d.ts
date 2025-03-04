@@ -258,6 +258,7 @@ declare global {
   const useSchemaEditor: typeof import('../composables/useSchemaEditor')['useSchemaEditor']
   const useSchemaMap: typeof import('../composables/useSchemaMap')['useSchemaMap']
   const useSchemaPanel: typeof import('../composables/useSchemaPanel')['useSchemaPanel']
+  const useSchemaSync: typeof import('../composables/useSchemaSync')['useSchemaSync']
   const useSchemaTree: typeof import('../composables/useSchemaTree')['useSchemaTree']
   const useScreenOrientation: typeof import('@vueuse/core')['useScreenOrientation']
   const useScreenSafeArea: typeof import('@vueuse/core')['useScreenSafeArea']
@@ -593,6 +594,7 @@ declare module 'vue' {
     readonly useSchemaEditor: UnwrapRef<typeof import('../composables/useSchemaEditor')['useSchemaEditor']>
     readonly useSchemaMap: UnwrapRef<typeof import('../composables/useSchemaMap')['useSchemaMap']>
     readonly useSchemaPanel: UnwrapRef<typeof import('../composables/useSchemaPanel')['useSchemaPanel']>
+    readonly useSchemaSync: UnwrapRef<typeof import('../composables/useSchemaSync')['useSchemaSync']>
     readonly useScreenOrientation: UnwrapRef<typeof import('@vueuse/core')['useScreenOrientation']>
     readonly useScreenSafeArea: UnwrapRef<typeof import('@vueuse/core')['useScreenSafeArea']>
     readonly useScriptTag: UnwrapRef<typeof import('@vueuse/core')['useScriptTag']>

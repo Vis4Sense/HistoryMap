@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Schema } from '@/types/schema.d'
-import { useSchemaEditor } from '@/composables/useSchemaEditor'
+import { useSchemaSync } from '@/composables/useSchemaSync'
 import { newSchema } from '@/types/schema.d'
 
 const props = defineProps({
@@ -16,11 +16,23 @@ const props = defineProps({
     type: Object as PropType<Schema>,
     default: newSchema(),
   },
+  sync: {
+    type: Boolean,
+    required: true,
+  },
+  mode: {
+    type: String,
+    default: 'edit',
+  }
 })
 
 const { id, schema } = toRefs(props)
 
-const schemaEditor = useSchemaEditor(id.value, schema.value)
+const {
+  commitAddRoot,
+  commitAddChild,
+  commitDeleteNode,
+} = useSchemaSync()
 
 /** temporary div to support adding new root */
 const newRoot = ref<HTMLDivElement>()
@@ -49,58 +61,63 @@ onClickOutside(newRoot, () => {
   isEditing.value = false
 })
 
-/** update schema editor parameters */
-watch(id, (newVal) => {
-  schemaEditor.id(newVal)
-})
-watch(schema, (newVal) => {
-  schemaEditor.schema(newVal)
-}, { deep: true })
-
 /** handle tree editing */
 
 // add root
 function addRoot(name: string) {
-  schemaEditor.addRoot({ name })
+  commitAddRoot(id.value, name)
 }
 
 // add child
 function addChild(childName: string, parentName: string) {
-  schemaEditor.addChild({ name: childName }, { name: parentName })
+  commitAddChild(id.value, childName, parentName)
 }
 
 // delete node
 function deleteNode(name: string) {
-  console.log('delete node', name)
-  schemaEditor.deleteNode({ name })
+  commitDeleteNode(id.value, name)
 }
 </script>
 
 <template>
-  <div p="x-2 y-1" w-full>
-    <div flex justify-between items-center gap-2>
-      <div flex-auto truncate>
-        <slot :name="type">Schema</slot>
-      </div>
-      <div shrink-0>
-        <BasicToolbarIcon @click="startEditing">
-          <div i-carbon-add />
-        </BasicToolbarIcon>
-      </div>
+  <div p="x-2 y-1" space-y-1 overflow-auto flex flex-col>
+    <div
+      shrink-0
+      max-w="3/4" h-5
+      w-fit
+      p="x-2 y-0.5"
+      bg-gray-1 rounded-lg
+      truncate text-xs
+    >
+      <slot :name="type">
+        Schema
+      </slot>
     </div>
 
-    <div space-y-1>
+    <div shrink-0 flex v-if="mode === 'edit'">
+      <BasicToolbarIcon plain>
+        <div i-material-symbols-light-sync
+          :class="sync ? 'text-green-6' : 'text-gray-3'"
+        />
+      </BasicToolbarIcon>
+      <BasicToolbarIcon plain @click="startEditing">
+        <div i-carbon-add />
+      </BasicToolbarIcon>
+    </div>
+
+    <div flex-auto space-y-1 overflow-auto>
       <SchemaTreeRoot
         v-for="root in schema.schemaTree.roots"
         :id="id"
         :key="root.name"
         :root="root"
+        :mode="mode"
         @add-child="addChild"
         @delete-node="deleteNode"
       />
     </div>
 
-    <div
+    <div shrink-0
       v-if="isEditing"
       ref="newRoot"
       contenteditable="true"

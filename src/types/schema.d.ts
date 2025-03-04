@@ -1,23 +1,10 @@
-/** Provenance of concept & relation change */
-export interface ElementProvenance {
-  sourceId: string // id of the source node
-  targetId: string // id of the target node
-  time: number // time of change
-  changeType: 'add' | 'delete' | 'update'
-}
-
 export interface Concept {
   name: string // unique identifier
+  parentName: string | null // parent in the schema tree
   extractedBy?: 'model' | 'user'
-  provenance?: ElementProvenance[]
   // included?: boolean
   // bookmarked?: boolean
 }
-
-// export interface Excitation {
-//   level?: number
-//   index?: number
-// }
 
 /** hierarchical structure of the schema */
 export interface SchemaTreeNode {
@@ -38,6 +25,7 @@ export interface Schema {
   schemaTree: SchemaTree
   concepts: Concept[]
   relations: Relation[]
+  provenance?: ElementProvenance[]
 }
 
 export function newSchema(): Schema {
@@ -59,4 +47,17 @@ export interface SchemaNode {
   timeCreated: number
   timeUpdated: number
   isActive: boolean
+}
+
+/** Provenance of concept & relation change */
+export interface ElementProvenance<Element> {
+  sources: string[] // id of the source nodes
+  targets: string[] // id of the target nodes
+  time: number // time of change
+  elementType: 'concept' | 'relation'
+  changeType: 'add' | 'delete' | 'update'
+  diff: {
+    old: Element | null
+    new: Element | null
+  }
 }

@@ -16,15 +16,6 @@ onMounted(() => {
       </div>
 
       <SchemaPanel shrink-0 h-80 border-t="1.5" />
-
-      <!-- <el-dialog v-model="schemaEditorModal"
-        title="Schema Editor"
-        width="96%" h="90%" top="5%"
-        class="body-h-full"
-        overflow-auto
-      >
-        <SchemaEditor />
-      </el-dialog> -->
     </div>
   </main>
 </template>

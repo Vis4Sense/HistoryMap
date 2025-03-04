@@ -335,6 +335,7 @@
     "useSchemaEditor": true,
     "useSchemaMap": true,
     "useSchemaTree": true,
-    "useSchemaPanel": true
+    "useSchemaPanel": true,
+    "useSchemaSync": true
   }
 }

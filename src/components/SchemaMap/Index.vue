@@ -1,12 +1,18 @@
 <script setup lang="ts">
 import type { Edge } from '@vue-flow/core'
 import HmPageNode from '@/components/Canvas/nodes/HmPageNode/Index.vue'
-import SchemaNode from '@/components/Canvas/nodes/SchemaNode.vue'
+import SchemaNode from '@/components/Canvas/nodes/SchemaNode/Index.vue'
 import { useSchemaMap } from '@/composables/useSchemaMap'
 import { VueFlow } from '@vue-flow/core'
 import { compactTreeLayout } from '../HistoryMap/layout/compact-tree'
 
 const { nodes: smNodes, links } = useSchemaMap()
+
+const baseSize = {
+  width: 160,
+  height: 32,
+}
+const nodeSizeDict = ref<Record<string, { width: number | null, height: Record<string, number> | null }>>({})
 
 const edges = computed((): Edge[] => {
   return links.value.map(link => ({
@@ -20,8 +26,8 @@ const nodes = computed(() => {
   const nodes = smNodes.value.map(node => ({
     id: node.id,
     type: node.type,
-    width: 160,
-    height: 32,
+    width: getNodeWidth(node.id),
+    height: getNodeHeight(node.id),
     position: {
       x: 0,
       y: 0,
@@ -37,6 +43,31 @@ const nodes = computed(() => {
 
   return nodes
 })
+
+function getNodeWidth(id: string) {
+  return nodeSizeDict.value[id]?.width ?? baseSize.width
+}
+
+function getNodeHeight(id: string): number {
+  let height = baseSize.height
+  const heightDict = nodeSizeDict.value[id]?.height ?? {}
+  for (const key in heightDict) {
+    height += heightDict[key]
+  }
+  return height
+}
+
+function updateNodeHeight(id: string, height: Record<string, number>) {
+  if (!nodeSizeDict.value[id]) {
+    nodeSizeDict.value[id] = {
+      width: null,
+      height,
+    }
+  }
+  else {
+    nodeSizeDict.value[id].height = height
+  }
+}
 </script>
 
 <template>
@@ -48,7 +79,10 @@ const nodes = computed(() => {
       :edges="edges"
     >
       <template #node-hm-page="props">
-        <HmPageNode v-bind="props" />
+        <HmPageNode
+          v-bind="props"
+          @update-height="updateNodeHeight"
+        />
       </template>
 
       <template #node-schema="props">

@@ -1,10 +1,11 @@
-import type { Concept, Schema, SchemaTreeNode } from '@/types/schema'
+import type { Concept, ElementProvenance, Schema, SchemaTreeNode } from '@/types/schema.d'
 import { useSchemaMap } from '@/composables/useSchemaMap'
+import { newSchema } from '@/types/schema.d'
 import _ from 'lodash'
 
-export function useSchemaEditor(id_: string, schema_: Schema) {
+export function useSchemaEditor(id_: string, schema_: Schema | undefined) {
   let id = id_
-  let schema = schema_
+  let schema = schema_ || newSchema()
 
   const nodeDict: Record<string, SchemaTreeNode> = {}
   const nodeParentDict: Record<string, string | null> = {}
@@ -14,9 +15,20 @@ export function useSchemaEditor(id_: string, schema_: Schema) {
   /** Editing actions */
 
   // add root
-  function addRoot(concept: Partial<Concept> & Pick<Concept, 'name'>) {
+  function addRoot(
+    concept: Partial<Concept> & Pick<Concept, 'name'>,
+    provenance: ElementProvenance<Concept>[],
+  ) {
+    const newConcept = { ...concept, parentName: null }
     schema.schemaTree.roots.push({ name: concept.name })
-    schema.concepts.push(concept)
+    schema.concepts.push(newConcept)
+    provenance.forEach((d) => {
+      d.diff.new = newConcept
+    })
+    if (!schema.provenance) {
+      schema.provenance = []
+    }
+    schema.provenance= _.concat(schema.provenance, provenance)
     updateSchema(id, schema)
   }
 
@@ -35,7 +47,10 @@ export function useSchemaEditor(id_: string, schema_: Schema) {
     }
     parentNode.children.push({ name: child.name })
 
-    schema.concepts.push(child)
+    schema.concepts.push({
+      ...child,
+      parentName: parent.name,
+    })
     schema.relations.push({
       source: parent.name,
       target: child.name,

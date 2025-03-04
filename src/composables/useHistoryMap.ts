@@ -3,6 +3,8 @@ import { v4 as uuidv4 } from 'uuid'
 import { useBrowserLocalStorage } from './useBrowserStorage'
 import { useSession } from './useSession'
 
+const { data: hmPages } = useBrowserLocalStorage('hm-pages', [] as HmPage[])
+
 function getLinks(pages: HmPage[]) {
   return pages
     .filter(d => d.parentPageId)
@@ -13,8 +15,6 @@ export function useHistoryMap() {
   const { sessionId, session, updateSession } = useSession()
 
   /** define state */
-  const { data: hmPages } = useBrowserLocalStorage('hm-pages', [] as HmPage[])
-
   const pages = computed(() => hmPages.value.filter(d => d.sessionId === sessionId.value))
   const links = computed(() => getLinks(pages.value))
 

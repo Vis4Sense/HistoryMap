@@ -14,7 +14,7 @@ const sessionList = computed(() => {
 </script>
 
 <template>
-  <div
+  <div v-if="sessions.length"
     flex flex-col gap-1
   >
     <div

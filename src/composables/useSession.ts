@@ -1,9 +1,10 @@
 import type { SessionMetaData } from '@/types/session'
 
+const { data: sessions } = useBrowserLocalStorage('hm-sessions', [] as SessionMetaData[])
+const { data: sessionId } = useBrowserLocalStorage('hm-session-id', -1)
+
 export function useSession() {
   /** define state */
-  const { data: sessions } = useBrowserLocalStorage('hm-sessions', [] as SessionMetaData[])
-  const { data: sessionId } = useBrowserLocalStorage('hm-session-id', -1)
 
   // active session
   const session = computed(() => sessions.value.find(d => d.sessionId === sessionId.value))
@@ -31,6 +32,8 @@ export function useSession() {
     const session_ = newSession(title)
     sessions.value = [...sessions.value, session_]
     sessionId.value = session_.sessionId
+    triggerRef(sessions)
+    triggerRef(sessionId)
   }
 
   function updateSession(id: number, data: Partial<SessionMetaData>) {
@@ -62,8 +65,10 @@ export function useSession() {
   function initialise() {
     // the first session is the background session that captures
     // page history when no specific session is active
-    if (!sessions.value.length)
-      addSession('Default')
+    nextTick(() => {
+      if (!sessions.value.length)
+        addSession('Default')
+    })
   }
 
   initialise()

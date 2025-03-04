@@ -175,17 +175,17 @@ export function initialiseController() {
   chrome.tabs.onUpdated.addListener(tabUpdateHandler)
   chrome.tabs.onActivated.addListener(tabActivateHandler)
 
-  /** switch to default session when historymap is not opened */
-  chrome.runtime.onConnect.addListener((port) => {
-    if (port.name === 'historymap') {
-      // console.info('connected to historymap')
-      switchToLatestSession()
-      port.onDisconnect.addListener(() => {
-        switchToDefaultSession()
-        // console.info('switched to default session')
-      })
-    }
-  })
+  // /** switch to default session when historymap is not opened */
+  // chrome.runtime.onConnect.addListener((port) => {
+  //   if (port.name === 'historymap') {
+  //     // console.info('connected to historymap')
+  //     switchToLatestSession()
+  //     port.onDisconnect.addListener(() => {
+  //       switchToDefaultSession()
+  //       // console.info('switched to default session')
+  //     })
+  //   }
+  // })
 
   /** listen to activate page message */
   chrome.runtime.onMessage.addListener((message) => {
@@ -196,8 +196,8 @@ export function initialiseController() {
   })
 
   // only for debugging
-  const clearLocalStorage = false
-  if (clearLocalStorage) {
-    chrome.storage.local.clear()
-  }
+  // const clearLocalStorage = true
+  // if (clearLocalStorage) {
+  //   chrome.storage.local.clear()
+  // }
 }

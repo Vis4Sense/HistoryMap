@@ -6,15 +6,21 @@ defineProps({
     type: Object as PropType<HmPage>,
     required: true,
   },
+  height: {
+    type: Number,
+    default: null,
+  }
 })
 </script>
 
 <template>
-  <div flex gap-1 items-center text-sm>
+  <div flex gap-1 items-center
+    :style="`height: ${height}px`"
+  >
     <!-- favicon -->
     <img
       v-if="data!.pageObj.favIconUrl"
-      h-5
+      h-full
       :src="data!.pageObj.favIconUrl"
     >
     <div

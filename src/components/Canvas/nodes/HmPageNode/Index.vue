@@ -4,6 +4,7 @@ import { Handle, Position, useVueFlow } from '@vue-flow/core'
 import { NodeToolbar } from '@vue-flow/node-toolbar'
 import HmPageNodeToolbar from '../../node-toolbars/HmPageNodeToolbar.vue'
 import Header from './Header.vue'
+import SchemaDiff from './SchemaDiff.vue'
 
 const props = defineProps({
   id: {
@@ -16,6 +17,10 @@ const props = defineProps({
   },
   selected: Boolean,
 })
+
+const emit = defineEmits<{
+  updateHeight: [id: string, height: Record<string, number>]
+}>()
 
 const { data, selected } = toRefs(props)
 
@@ -47,10 +52,18 @@ function sendActivatePage() {
   >
     <Header
       class="nodrag nopan"
+      text-sm h-5
       cursor-pointer
       hover:text-blue-8
       :data="data"
       @click="sendActivatePage()"
+    />
+
+    <SchemaDiff
+      v-if="data.schema"
+      :id="id"
+      :schema="data.schema"
+      @update-schema-height="(h) => emit('updateHeight', id, { schemaDiff: h })"
     />
 
     <NodeToolbar

@@ -4,13 +4,13 @@ import { v4 as uuidv4 } from 'uuid'
 import { useHistoryMap } from './useHistoryMap'
 import { useSession } from './useSession'
 
+const { data: allSchemaNodes } = useBrowserLocalStorage('schema-nodes', [] as SchemaNode[])
+
 export function useSchemaMap() {
   const { sessionId } = useSession()
   const { pages, links: hmLinks } = useHistoryMap()
 
   /** define state */
-  const { data: allSchemaNodes } = useBrowserLocalStorage('schema-nodes', [newSchemaNode()] as SchemaNode[])
-
   const schemaNodes = computed(() => allSchemaNodes.value.filter(d => d.sessionId === sessionId.value))
 
   // SchemaMap nodes
@@ -59,11 +59,26 @@ export function useSchemaMap() {
 
   /** actions */
 
+  function getNode(id: string) {
+    return nodes.value.find(d => d.id === id)
+  }
+
+  function updateNode(id: string, data: Partial<SchemaNode>) {
+    const node = schemaNodes.value.find(d => d.id === id)
+    if (node) {
+      Object.assign(node, data)
+      node.timeUpdated = Date.now()
+    }
+  }
+
   function updateSchema(id: string, newSchema: Schema) {
-    const schemaNode = schemaNodes.value.find(d => d.id === id)
+    const schemaNode = nodes.value.find(d => d.id === id)
     if (schemaNode) {
       schemaNode.schema = newSchema
-      schemaNode.timeUpdated = Date.now()
+      if (schemaNode.id.startsWith('sm-')) {
+        const node = schemaNode as SchemaNode
+        node.timeUpdated = Date.now()
+      }
       console.info('schema updated', schemaNode)
     }
   }
@@ -83,6 +98,8 @@ export function useSchemaMap() {
 
   return {
     ...state,
+    getNode,
+    updateNode,
     updateSchema,
   }
 }
