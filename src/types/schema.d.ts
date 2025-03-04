@@ -1,6 +1,15 @@
+/** Provenance of concept & relation change */
+export interface ElementProvenance {
+  sourceId: string // id of the source node
+  targetId: string // id of the target node
+  time: number // time of change
+  changeType: 'add' | 'delete' | 'update'
+}
+
 export interface Concept {
   name: string // unique identifier
   extractedBy?: 'model' | 'user'
+  provenance?: ElementProvenance[]
   // included?: boolean
   // bookmarked?: boolean
 }

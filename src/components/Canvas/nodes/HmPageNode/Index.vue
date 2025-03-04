@@ -2,7 +2,8 @@
 import type { HmPage } from '@/types/historymap'
 import { Handle, Position, useVueFlow } from '@vue-flow/core'
 import { NodeToolbar } from '@vue-flow/node-toolbar'
-import HmPageNodeToolbar from '../node-toolbars/HmPageNodeToolbar.vue'
+import HmPageNodeToolbar from '../../node-toolbars/HmPageNodeToolbar.vue'
+import Header from './Header.vue'
 
 const props = defineProps({
   id: {
@@ -33,24 +34,7 @@ const toolbarVisible = computed(() => {
       'border-2': selected,
     }"
   >
-    <div flex gap-1 items-center text-sm>
-      <!-- favicon -->
-      <img
-        v-if="data!.pageObj.favIconUrl"
-        h-5
-        :src="data!.pageObj.favIconUrl"
-      >
-      <div
-        v-else
-        i-carbon-earth-filled
-        text-gray
-      />
-
-      <!-- title -->
-      <span truncate>
-        {{ data!.pageObj.title }}
-      </span>
-    </div>
+    <Header :data="data" />
 
     <NodeToolbar
       :position="Position.Top"

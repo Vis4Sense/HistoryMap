@@ -1,15 +1,20 @@
 <script setup lang="ts">
 import type { Schema } from '@/types/schema.d'
 import { useSchemaEditor } from '@/composables/useSchemaEditor'
+import { newSchema } from '@/types/schema.d'
 
 const props = defineProps({
   id: {
     type: String,
     required: true,
   },
+  type: {
+    type: String,
+    required: true,
+  },
   schema: {
     type: Object as PropType<Schema>,
-    required: true,
+    default: newSchema(),
   },
 })
 
@@ -72,10 +77,12 @@ function deleteNode(name: string) {
 </script>
 
 <template>
-  <div p="x-2 y-1">
-    <div flex justify-between items-center>
-      <div>Schema</div>
-      <div>
+  <div p="x-2 y-1" w-full>
+    <div flex justify-between items-center gap-2>
+      <div flex-auto truncate>
+        <slot :name="type">Schema</slot>
+      </div>
+      <div shrink-0>
         <BasicToolbarIcon @click="startEditing">
           <div i-carbon-add />
         </BasicToolbarIcon>

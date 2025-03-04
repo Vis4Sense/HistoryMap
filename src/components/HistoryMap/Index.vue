@@ -3,7 +3,7 @@ import type { HmPage } from '@/types/historymap'
 import type { Edge, Node } from '@vue-flow/core'
 import { useHistoryMap } from '@/composables/useHistoryMap'
 import { VueFlow } from '@vue-flow/core'
-import NodeHmPage from '../Canvas/nodes/HmPageNode.vue'
+import NodeHmPage from '../Canvas/nodes/HmPageNode/Index.vue'
 import { compactTreeLayout } from './layout/compact-tree'
 
 const { pages, links } = useHistoryMap()

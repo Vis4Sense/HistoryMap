@@ -18,9 +18,13 @@ export function useHistoryMap() {
   const pages = computed(() => hmPages.value.filter(d => d.sessionId === sessionId.value))
   const links = computed(() => getLinks(pages.value))
 
+  // Active page
+  const activePage = computed(() => pages.value.find(d => d.isActive))
+
   const state = {
     pages,
     links,
+    activePage,
   }
 
   /** utilities */

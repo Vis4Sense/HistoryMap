@@ -334,6 +334,7 @@
     "useExtractor": true,
     "useSchemaEditor": true,
     "useSchemaMap": true,
-    "useSchemaTree": true
+    "useSchemaTree": true,
+    "useSchemaPanel": true
   }
 }
