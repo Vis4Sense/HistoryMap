@@ -1,5 +1,3 @@
-import type { Schema } from './schema'
-
 export interface HmPage {
   sessionId: number
   id: string // hm-uuid
@@ -10,5 +8,4 @@ export interface HmPage {
   pageObj: chrome.tabs.Tab
   parentPageId: string | null
   isActive: boolean
-  schema?: Schema
 }
