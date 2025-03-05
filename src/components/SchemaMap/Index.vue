@@ -3,10 +3,12 @@ import type { Edge } from '@vue-flow/core'
 import HmPageNode from '@/components/Canvas/nodes/HmPageNode/Index.vue'
 import SchemaNode from '@/components/Canvas/nodes/SchemaNode/Index.vue'
 import { useSchemaMap } from '@/composables/useSchemaMap'
-import { VueFlow } from '@vue-flow/core'
+import { useVueFlow, VueFlow } from '@vue-flow/core'
 import { compactTreeLayout } from '../HistoryMap/layout/compact-tree'
+import _ from 'lodash'
 
-const { nodes: smNodes, links } = useSchemaMap()
+const { getSelectedNodes } = useVueFlow()
+const { nodes: smNodes, links, setSelectedNodeIds } = useSchemaMap()
 
 const baseSize = {
   width: 160,
@@ -44,6 +46,8 @@ const nodes = computed(() => {
   return nodes
 })
 
+/** get node sizes */
+
 function getNodeWidth(id: string) {
   return nodeSizeDict.value[id]?.width ?? baseSize.width
 }
@@ -57,6 +61,7 @@ function getNodeHeight(id: string): number {
   return height
 }
 
+/** update node height */
 function updateNodeHeight(id: string, height: Record<string, number>) {
   if (!nodeSizeDict.value[id]) {
     nodeSizeDict.value[id] = {
@@ -68,6 +73,13 @@ function updateNodeHeight(id: string, height: Record<string, number>) {
     nodeSizeDict.value[id].height = height
   }
 }
+
+/** report node selection change */
+watch(() => getSelectedNodes.value.map(d => d.id), (newVal, oldVal) => {
+  if (_.isEmpty(_.xor(newVal, oldVal)))
+    return
+  setSelectedNodeIds(newVal)
+})
 </script>
 
 <template>
@@ -102,8 +114,4 @@ function updateNodeHeight(id: string, height: Record<string, number>) {
 
 /* import the default theme, this is optional but generally recommended */
 @import '@vue-flow/core/dist/theme-default.css';
-
-.edge-under .vue-flow__nodes {
-  /* z-index: 10; */
-}
 </style>

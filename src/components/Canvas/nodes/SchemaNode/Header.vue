@@ -11,7 +11,7 @@ defineProps({
 
 <template>
   <div flex gap-1 items-center>
-    <div i-mdi-puzzle text-historymap />
+    <div i-mdi-puzzle text-amber-5 />
     <div>{{ schema?.title ?? 'Schema' }}</div>
   </div>
 </template>

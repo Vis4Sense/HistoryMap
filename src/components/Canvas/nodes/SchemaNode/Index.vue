@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import type { SchemaNode } from '@/types/schema.d'
-import { Handle, Position } from '@vue-flow/core'
+import { Handle, Position, useVueFlow } from '@vue-flow/core'
+import { NodeToolbar } from '@vue-flow/node-toolbar'
 import Header from './Header.vue'
 import Root from './Root.vue'
+import SchemaNodeToolbar from '../../node-toolbars/SchemaNodeToolbar.vue'
 
 const props = defineProps({
   id: {
@@ -13,6 +15,7 @@ const props = defineProps({
     type: Object as PropType<SchemaNode>,
     required: true,
   },
+  selected: Boolean,
 })
 
 const { id } = toRefs(props)
@@ -20,6 +23,14 @@ const { id } = toRefs(props)
 const emit = defineEmits<{
   updateHeight: [id: string, height: Record<string, number>]
 }>()
+
+const { data, selected } = toRefs(props)
+
+/** toolbar visibility */
+const { getSelectedNodes } = useVueFlow()
+const toolbarVisible = computed(() => {
+  return selected.value && getSelectedNodes.value.length === 1
+})
 
 const container = ref<HTMLElement>()
 
@@ -37,6 +48,10 @@ useResizeObserver(container, () => {
     border border-rounded
     p="x-2 y-1"
     bg-white
+    :class="{
+      'border-amber-5': data!.isActive,
+      'border-2 border-historymap': selected,
+    }"
   >
     <Header :schema="data.schema" />
 
@@ -47,6 +62,13 @@ useResizeObserver(container, () => {
         :root="root"
       />
     </div>
+
+    <NodeToolbar
+      :position="Position.Top"
+      :is-visible="toolbarVisible"
+    >
+      <SchemaNodeToolbar :id="id" />
+    </NodeToolbar>
 
     <Handle
       type="source"

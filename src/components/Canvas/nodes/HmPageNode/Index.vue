@@ -47,7 +47,7 @@ function sendActivatePage() {
     bg-white
     hover:shadow
     :class="{
-      'border-red': data!.isActive,
+      'border-blue': data!.isActive,
       'border-2': selected,
     }"
   >

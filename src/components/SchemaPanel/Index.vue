@@ -2,9 +2,17 @@
 import type { HmPage } from '@/types/historymap'
 import PageHeader from '@/components/Canvas/nodes/HmPageNode/Header.vue'
 import { useSchemaPanel } from '@/composables/useSchemaPanel'
+import { useSchemaMap } from '@/composables/useSchemaMap'
 
-const { visibleNodes } = useSchemaPanel()
-const { activePane } = useSchemaPanel()
+const { visibleNodes, activePane } = useSchemaPanel()
+const { selectedNodeIds, updateNode } = useSchemaMap()
+
+watch(selectedNodeIds, (nodes) => {
+  // single selection of schema node
+  if (nodes.length === 1 && nodes[0].startsWith('sm-') && activePane.value === 'extract') {
+    updateNode(nodes[0], { isActive: true })
+  }
+}, { deep: true })
 </script>
 
 <template>

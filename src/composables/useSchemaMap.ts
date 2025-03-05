@@ -5,6 +5,7 @@ import { useHistoryMap } from './useHistoryMap'
 import { useSession } from './useSession'
 
 const { data: allSchemaNodes } = useBrowserLocalStorage('schema-nodes', [] as SchemaNode[])
+const { data: selectedNodeIds } = useBrowserLocalStorage('selected-node-ids', [] as string[])
 
 export function useSchemaMap() {
   const { sessionId } = useSession()
@@ -57,6 +58,7 @@ export function useSchemaMap() {
     nodes,
     links,
     activeSchemaNode,
+    selectedNodeIds,
   }
 
   /** utilities */
@@ -101,8 +103,18 @@ export function useSchemaMap() {
   function updateNode(id: string, data: Partial<SchemaNode>) {
     const node = schemaNodes.value.find(d => d.id === id)
     if (node) {
+      if (data.isActive) {
+        deactivateAllSchemaNodes()
+      }
       Object.assign(node, data)
       node.timeUpdated = Date.now()
+    }
+  }
+
+  function removeNode(id: string) {
+    const idx = allSchemaNodes.value.findIndex(d => d.id === id)
+    if (idx >= 0) {
+      allSchemaNodes.value.splice(idx, 1)
     }
   }
 
@@ -116,6 +128,11 @@ export function useSchemaMap() {
       }
       console.info('schema updated', schemaNode)
     }
+  }
+
+  function setSelectedNodeIds(selection: string[]) {
+    selectedNodeIds.value = [...selection]
+    console.log('selected nodes', selectedNodeIds.value)
   }
 
   /** initialise */
@@ -136,6 +153,8 @@ export function useSchemaMap() {
     getNode,
     addSchemaNode,
     updateNode,
+    removeNode,
     updateSchema,
+    setSelectedNodeIds,
   }
 }
