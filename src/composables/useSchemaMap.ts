@@ -62,6 +62,8 @@ export function useSchemaMap() {
   /** utilities */
 
   function newSchemaNode(): SchemaNode {
+    deactivateAllSchemaNodes()
+
     return {
       sessionId: sessionId.value,
       id: `sm-${uuidv4()}`,
@@ -80,10 +82,20 @@ export function useSchemaMap() {
     }
   }
 
+  function deactivateAllSchemaNodes() {
+    schemaNodes.value.forEach(node => node.isActive = false)
+  }
+
   /** actions */
 
   function getNode(id: string) {
     return nodes.value.find(d => d.id === id)
+  }
+
+  function addSchemaNode(sources: string[] = []) {
+    const newNode = newSchemaNode()
+    newNode.sources = sources
+    allSchemaNodes.value = [...allSchemaNodes.value, newNode]
   }
 
   function updateNode(id: string, data: Partial<SchemaNode>) {
@@ -122,6 +134,7 @@ export function useSchemaMap() {
   return {
     ...state,
     getNode,
+    addSchemaNode,
     updateNode,
     updateSchema,
   }

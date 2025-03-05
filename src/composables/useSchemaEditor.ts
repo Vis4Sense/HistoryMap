@@ -119,7 +119,7 @@ function SchemaEditor(schema_: Schema | undefined) {
 export function useSchemaEditor(nodeId: string) {
   const { sourcePage } = useSchemaPanel()
 
-  const { getNode, updateSchema, updateNode } = useSchemaMap()
+  const { getNode, updateSchema, updateNode, addSchemaNode } = useSchemaMap()
 
   // const nodeId = ref(activeSchemaNode.value?.id)
   const node = computed(() => getNode(nodeId))
@@ -181,10 +181,18 @@ export function useSchemaEditor(nodeId: string) {
     }
   }
 
+  // create new schema
+  function createSchemaNode() {
+    const source = sourcePage.value?.id
+    const sources = source ? [source] : []
+    addSchemaNode(sources)
+  }
+
   return {
     schemaEditor,
     addRoot,
     addChild,
     deleteNode,
+    createSchemaNode,
   }
 }

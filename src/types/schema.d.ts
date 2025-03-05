@@ -22,6 +22,7 @@ export interface Relation {
 }
 
 export interface Schema {
+  title?: string
   schemaTree: SchemaTree
   concepts: Concept[]
   relations: Relation[]

@@ -28,6 +28,11 @@ export default defineConfig({
     }),
   ],
   theme: {
-    colors: { },
+    colors: {
+      historymap: {
+        primary: '#FF7787',
+        DEFAULT: '#FF7787',
+      },
+    },
   },
 })

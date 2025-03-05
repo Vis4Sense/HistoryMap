@@ -41,10 +41,6 @@ useResizeObserver(container, () => {
 //     .filter((p: ElementProvenance<any>) => p.elementType === 'concept')
 //   return provenance
 // })
-
-onMounted(() => {
-  console.log(provenance.value)
-})
 </script>
 
 <template>

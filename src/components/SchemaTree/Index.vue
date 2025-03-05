@@ -60,6 +60,11 @@ onClickOutside(newRoot, () => {
   isEditing.value = false
 })
 
+/** create new schema node */
+function createSchemaNode() {
+  schemaEditor.createSchemaNode()
+}
+
 /** handle tree editing */
 
 // add root
@@ -79,15 +84,28 @@ function deleteNode(name: string) {
 </script>
 
 <template>
-  <div space-y-1 overflow-auto flex flex-col>
+  <div space-y-1 overflow-auto flex flex-col p="x-2 y-1">
     <div
       shrink-0
-      h-6
-      p="x-2 y-1"
+      h-4
       truncate text-xs
     >
       <slot :name="type">
-        Schema
+        <div flex justify-between items-center>
+          <div flex gap-1 items-center>
+            <div i-mdi-puzzle text-historymap />
+            <div>{{ schema?.title ?? 'Schema' }}</div>
+          </div>
+
+          <div>
+            <BasicToolbarIcon
+              plain
+              @click="createSchemaNode()"
+            >
+              <div i-mdi-puzzle-plus-outline />
+            </BasicToolbarIcon>
+          </div>
+        </div>
       </slot>
     </div>
 
