@@ -2,6 +2,8 @@
 import type { Schema } from '@/types/schema.d'
 import { useSchemaEditor } from '@/composables/useSchemaEditor'
 import { newSchema } from '@/types/schema.d'
+import Header from '@/components/Canvas/nodes/SchemaNode/Header.vue'
+import { TargetPosition } from '@/composables/useDnDTree'
 
 const props = defineProps({
   id: {
@@ -81,6 +83,18 @@ function addChild(childName: string, parentName: string) {
 function deleteNode(name: string) {
   schemaEditor.deleteNode({ name })
 }
+
+// move node
+function moveNode(nodeName: string, targetName: string, position: TargetPosition) {
+  console.log('moveNode', nodeName, targetName, position)
+  if (position === 'inside') {
+    schemaEditor.moveNodeInto(nodeName, targetName)
+  } else if (position === 'before') {
+    schemaEditor.moveNodeBefore(nodeName, targetName)
+  } else if (position === 'after') {
+    schemaEditor.moveNodeAfter(nodeName, targetName)
+  }
+}
 </script>
 
 <template>
@@ -92,10 +106,7 @@ function deleteNode(name: string) {
     >
       <slot :name="type">
         <div flex justify-between items-center>
-          <div flex gap-1 items-center>
-            <div i-mdi-puzzle text-historymap />
-            <div>{{ schema?.title ?? 'Schema' }}</div>
-          </div>
+          <Header :schema="schema" />
 
           <div>
             <BasicToolbarIcon
@@ -116,14 +127,16 @@ function deleteNode(name: string) {
     </div>
 
     <div flex-auto space-y-1 overflow-auto>
-      <SchemaTreeRoot
-        v-for="root in schema.schemaTree.roots"
+      <SchemaTreeNode
+        v-for="root, idx in schema.schemaTree.roots"
         :id="id"
         :key="root.name"
-        :root="root"
+        :index="idx"
+        :node="root"
         :mode="mode"
         @add-child="addChild"
         @delete-node="deleteNode"
+        @move-node="moveNode"
       />
 
       <div

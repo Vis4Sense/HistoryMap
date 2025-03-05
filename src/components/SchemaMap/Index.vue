@@ -77,6 +77,7 @@ function updateNodeHeight(id: string, height: Record<string, number>) {
       h-full
       :nodes="nodes"
       :edges="edges"
+      class="edge-under"
     >
       <template #node-hm-page="props">
         <HmPageNode
@@ -86,7 +87,10 @@ function updateNodeHeight(id: string, height: Record<string, number>) {
       </template>
 
       <template #node-schema="props">
-        <SchemaNode v-bind="props" />
+        <SchemaNode
+          v-bind="props"
+          @update-height="updateNodeHeight"
+        />
       </template>
     </VueFlow>
   </div>
@@ -98,4 +102,8 @@ function updateNodeHeight(id: string, height: Record<string, number>) {
 
 /* import the default theme, this is optional but generally recommended */
 @import '@vue-flow/core/dist/theme-default.css';
+
+.edge-under .vue-flow__nodes {
+  /* z-index: 10; */
+}
 </style>

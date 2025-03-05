@@ -44,6 +44,7 @@ function sendActivatePage() {
     w-full h-full
     border border-rounded
     p="x-2 y-1"
+    bg-white
     hover:shadow
     :class="{
       'border-red': data!.isActive,

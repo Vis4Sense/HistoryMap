@@ -57,7 +57,7 @@ export interface ElementProvenance<Element = Concept | Relation> {
   sourcePage?: string
   time: number // time of change
   elementType: 'concept' | 'relation'
-  changeType: 'add' | 'delete' | 'update'
+  changeType: 'add' | 'delete' | 'update' | 'move'
   diff: {
     old: Element | null
     new: Element | null

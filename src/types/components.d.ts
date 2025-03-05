@@ -12,6 +12,7 @@ declare module 'vue' {
     CanvasNodesHmPageNodeHeader: typeof import('./../components/Canvas/nodes/HmPageNode/Header.vue')['default']
     CanvasNodesHmPageNodeSchemaDiff: typeof import('./../components/Canvas/nodes/HmPageNode/SchemaDiff.vue')['default']
     CanvasNodesSchemaNode: typeof import('./../components/Canvas/nodes/SchemaNode/Index.vue')['default']
+    CanvasNodesSchemaNodeHeader: typeof import('./../components/Canvas/nodes/SchemaNode/Header.vue')['default']
     CanvasNodesSchemaNodeRoot: typeof import('./../components/Canvas/nodes/SchemaNode/Root.vue')['default']
     CanvasNodeToolbarsHmPageNodeToolbar: typeof import('./../components/Canvas/node-toolbars/HmPageNodeToolbar.vue')['default']
     CanvasNodeToolsToolRemove: typeof import('./../components/Canvas/node-tools/ToolRemove.vue')['default']
@@ -38,7 +39,7 @@ declare module 'vue' {
     SchemaPanel: typeof import('./../components/SchemaPanel/Index.vue')['default']
     SchemaPanelHeader: typeof import('./../components/SchemaPanel/Header.vue')['default']
     SchemaTree: typeof import('./../components/SchemaTree/Index.vue')['default']
-    SchemaTreeRoot: typeof import('./../components/SchemaTree/Root.vue')['default']
+    SchemaTreeNode: typeof import('./../components/SchemaTree/Node.vue')['default']
     SessionList: typeof import('./../components/SessionList.vue')['default']
   }
 }
