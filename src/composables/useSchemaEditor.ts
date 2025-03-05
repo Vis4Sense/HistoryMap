@@ -1,119 +1,188 @@
-import type { Concept, ElementProvenance, Schema, SchemaTreeNode } from '@/types/schema.d'
+import type { Concept, ElementProvenance, Schema, SchemaNode, SchemaTreeNode } from '@/types/schema.d'
 import { useSchemaMap } from '@/composables/useSchemaMap'
 import { newSchema } from '@/types/schema.d'
 import _ from 'lodash'
+import { useSchemaPanel } from './useSchemaPanel'
 
-export function useSchemaEditor(id_: string, schema_: Schema | undefined) {
-  let id = id_
-  let schema = schema_ || newSchema()
+function SchemaEditor(schema_: Schema | undefined) {
+  const schema = schema_ || newSchema()
+
+  let sourcePage: string | null = null
+  let provenance: ElementProvenance
 
   const nodeDict: Record<string, SchemaTreeNode> = {}
-  const nodeParentDict: Record<string, string | null> = {}
 
-  const { updateSchema } = useSchemaMap()
+  /** utilities */
+
+  function updateProvenance(change: Omit<ElementProvenance, 'time' | 'sourcePage'>) {
+    provenance = {
+      ...change,
+      time: Date.now(),
+    }
+    if (sourcePage) {
+      provenance.sourcePage = sourcePage
+    }
+
+    schema.provenance = _.concat(schema.provenance ?? [], provenance)
+    sourcePage = null
+  }
+
+  /** initialise */
+  function initialise() {
+    // initialise node dict
+    function registerNode(node: SchemaTreeNode) {
+      nodeDict[node.name] = node
+      node.children?.forEach((d) => {
+        registerNode(d)
+      })
+    }
+    Array.from(schema.schemaTree.roots).forEach(d => registerNode(d))
+  }
+  initialise()
+
+  const module = {
+    schema: () => schema,
+    sourcePage: (id: string | null) => {
+      sourcePage = id
+      return module
+    },
+
+    addRoot: (concept: Partial<Concept> & Pick<Concept, 'name'>) => {
+      const newConcept = { ...concept, parentName: null }
+
+      schema.schemaTree.roots.push({ name: concept.name })
+      schema.concepts.push(newConcept)
+
+      updateProvenance({
+        elementType: 'concept',
+        changeType: 'add',
+        diff: { old: null, new: newConcept },
+      })
+
+      return module
+    },
+
+    addChild: (
+      child: Partial<Concept> & Pick<Concept, 'name'>,
+      parentName: string,
+    ) => {
+      const parentNode = nodeDict[parentName]
+
+      if (!parentNode) {
+        module.addRoot(child)
+        return module
+      }
+
+      const newConcept = { ...child, parentName }
+
+      parentNode.children = _.concat(parentNode.children ?? [], { name: child.name })
+      schema.concepts.push(newConcept)
+
+      updateProvenance({
+        elementType: 'concept',
+        changeType: 'add',
+        diff: { old: null, new: newConcept },
+      })
+
+      return module
+    },
+
+    deleteNode: (node: Partial<Concept> & Pick<Concept, 'name'>) => {
+      const oldConcept = schema.concepts.find(d => d.name === node.name)
+
+      if (!oldConcept) {
+        console.error('concept not found', node.name)
+        return
+      }
+
+      const siblings = oldConcept.parentName
+        ? (nodeDict[oldConcept.parentName].children || [])
+        : schema.schemaTree.roots
+      _.remove(siblings, d => d.name === node.name)
+
+      _.remove(schema.concepts, d => d.name === node.name)
+      _.remove(schema.relations, d => d.source === node.name || d.target === node.name)
+
+      updateProvenance({
+        elementType: 'concept',
+        changeType: 'delete',
+        diff: { old: oldConcept, new: null },
+      })
+
+      return module
+    },
+  }
+
+  return module
+}
+
+export function useSchemaEditor(nodeId: string) {
+  const { sourcePage } = useSchemaPanel()
+
+  const { getNode, updateSchema, updateNode } = useSchemaMap()
+
+  // const nodeId = ref(activeSchemaNode.value?.id)
+  const node = computed(() => getNode(nodeId))
+  const schema = ref(node.value?.schema)
+  const schemaEditor = computed(() => SchemaEditor(schema.value))
+
+  /** utilities */
+
+  function getSourcePage(id: string | null = null) {
+    const src = id ?? sourcePage.value?.id ?? null
+    if (src && node.value && node.value.id.startsWith('sm-')) {
+      const sNode = node.value as SchemaNode
+      if (!sNode.sources.includes(src)) {
+        const newSources = [...sNode.sources, src]
+        updateNode(nodeId, { sources: newSources })
+      }
+    }
+    return src
+  }
 
   /** Editing actions */
 
   // add root
   function addRoot(
     concept: Partial<Concept> & Pick<Concept, 'name'>,
-    provenance: ElementProvenance<Concept>[],
+    sourcePageId: string | null = null,
   ) {
-    const newConcept = { ...concept, parentName: null }
-
-    // update schema
-    schema.schemaTree.roots.push({ name: concept.name })
-    schema.concepts.push(newConcept)
-
-    // update provenance
-    provenance.forEach((d) => {
-      d.diff.new = newConcept
-    })
-    schema.provenance= _.concat(schema.provenance ?? [], provenance)
-
-    updateSchema(id, schema)
+    const newSchema = schemaEditor.value
+      .sourcePage(getSourcePage(sourcePageId))
+      .addRoot(concept)
+      .schema()
+    updateSchema(nodeId, newSchema)
   }
 
   // add child
   function addChild(
     child: Partial<Concept> & Pick<Concept, 'name'>,
-    parent: Partial<Concept> & Pick<Concept, 'name'>,
-    provenance: ElementProvenance<Concept>[],
+    parentName: string,
+    sourcePageId: string | null = null,
   ) {
-    const parentNode = nodeDict[parent.name]
-    if (!parentNode) {
-      console.error('parent not found', parent.name)
-      return
-    }
-
-    const newConcept = { ...child, parentName: parent.name }
-
-    // update schema
-    parentNode.children = _.concat(parentNode.children ?? [], { name: child.name })
-    schema.concepts.push(newConcept)
-
-    // update provenance
-    provenance.forEach((d) => {
-      d.diff.new = newConcept
-    })
-    schema.provenance = _.concat(schema.provenance ?? [], provenance)
-
-    updateSchema(id, schema)
+    const newSchema = schemaEditor.value
+      .sourcePage(getSourcePage(sourcePageId))
+      .addChild(child, parentName)
+      .schema()
+    updateSchema(nodeId, newSchema)
   }
 
   // delete node
   function deleteNode(
     node: Partial<Concept> & Pick<Concept, 'name'>,
-    provenance: ElementProvenance<Concept>[],
+    sourcePageId: string | null = null,
   ) {
-    const oldConcept = schema.concepts.find(d => d.name === node.name)
-      ?? { name: node.name, parentName: null }
-
-    const siblings = oldConcept.parentName
-      ? (nodeDict[oldConcept.parentName].children || [])
-      : schema.schemaTree.roots
-    _.remove(siblings, d => d.name === node.name)
-
-    _.remove(schema.concepts, d => d.name === node.name)
-    _.remove(schema.relations, d => d.source === node.name || d.target === node.name)
-
-    // update provenance
-    provenance.forEach((d) => {
-      d.diff.old = oldConcept
-    })
-    schema.provenance = _.concat(schema.provenance ?? [], provenance)
-
-    updateSchema(id, schema)
-  }
-
-  /** initialise */
-  function initialise() {
-    // initialise node dict
-    function registerNode(node: SchemaTreeNode, parent: SchemaTreeNode | null = null) {
-      nodeDict[node.name] = node
-      nodeParentDict[node.name] = parent?.name || null
-      if (node.children) {
-        node.children.forEach((d) => {
-          registerNode(d, node)
-        })
-      }
+    const newSchema = schemaEditor.value
+      .sourcePage(getSourcePage(sourcePageId))
+      .deleteNode(node)
+      ?.schema() ?? null
+    if (newSchema) {
+      updateSchema(nodeId, newSchema)
     }
-    Array.from(schema.schemaTree.roots).forEach(d => registerNode(d))
   }
-  initialise()
 
   return {
-    // update id
-    id(id_: string) {
-      id = id_
-      return this
-    },
-    // update schema
-    schema(schema_: Schema) {
-      schema = schema_
-      initialise()
-      return this
-    },
+    schemaEditor,
     addRoot,
     addChild,
     deleteNode,

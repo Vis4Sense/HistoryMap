@@ -1,5 +1,5 @@
-import type { Schema, SchemaNode } from '@/types/schema'
-import _ from 'lodash'
+import type { HmPage } from '@/types/historymap'
+import type { ElementProvenance, Schema, SchemaNode } from '@/types/schema'
 import { v4 as uuidv4 } from 'uuid'
 import { useHistoryMap } from './useHistoryMap'
 import { useSession } from './useSession'
@@ -13,8 +13,30 @@ export function useSchemaMap() {
   /** define state */
   const schemaNodes = computed(() => allSchemaNodes.value.filter(d => d.sessionId === sessionId.value))
 
+  const pageNodes = computed(() => {
+    const pageProvDict: Record<string, ElementProvenance[]> = {}
+
+    schemaNodes.value.forEach((node) => {
+      const prov = node.schema.provenance ?? []
+      prov.forEach((p) => {
+        const src = p.sourcePage
+        if (src) {
+          if (src in pageProvDict === false) {
+            pageProvDict[src] = []
+          }
+          pageProvDict[src].push(p)
+        }
+      })
+    })
+
+    return pages.value.map((p) => {
+      const prov = pageProvDict[p.id]
+      return prov ? { ...p, embeddedProvenance: prov } : p
+    }) as HmPage[]
+  })
+
   // SchemaMap nodes
-  const nodes = computed(() => [...pages.value, ...schemaNodes.value])
+  const nodes = computed(() => [...pageNodes.value, ...schemaNodes.value])
 
   // SchemaMap links
   const links = computed(() => {
@@ -23,6 +45,7 @@ export function useSchemaMap() {
       .flatMap(d => d.sources
         .map(src => ({ source: src, target: d.id })),
       )
+      .filter(d => nodes.value.find(n => n.id === d.source) && nodes.value.find(n => n.id === d.target))
     return [...hmLinks.value, ...schemaLinks]
   })
 

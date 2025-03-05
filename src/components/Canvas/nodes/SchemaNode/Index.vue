@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {  SchemaNode } from '@/types/schema.d'
+import type { SchemaNode } from '@/types/schema.d'
 import { Handle, Position } from '@vue-flow/core'
 import Root from './Root.vue'
 
@@ -23,7 +23,8 @@ const props = defineProps({
     <div>schema node</div>
 
     <div text-sm ml-2>
-      <Root v-for="root in data.schema.schemaTree.roots"
+      <Root
+        v-for="root in data.schema.schemaTree.roots"
         :key="root.name"
         :root="root"
       />

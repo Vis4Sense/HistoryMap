@@ -6,7 +6,12 @@ export function useSchemaPanel() {
   const { activePage } = useHistoryMap()
   const { activeSchemaNode } = useSchemaMap()
 
+  const activePane = ref('extract')
+
   const nodeSyncState = ref<Record<string, boolean>>({})
+
+  // Source historymap page of the active schema node
+  const sourcePage = computed(() => activePane.value === 'extract' ? activePage.value : null)
 
   // By default, contains active page + active schema node
   const visibleNodes = computed(() => {
@@ -18,7 +23,7 @@ export function useSchemaPanel() {
       nodes.push(activeSchemaNode.value)
     }
 
-    return nodes.map(node => {
+    return nodes.map((node) => {
       if (!nodeSyncState.value[node.id]) {
         nodeSyncState.value[node.id] = true
       }
@@ -27,6 +32,9 @@ export function useSchemaPanel() {
   })
 
   const state = {
+    activePane,
+    activeSchemaNode,
+    sourcePage,
     visibleNodes,
   }
 

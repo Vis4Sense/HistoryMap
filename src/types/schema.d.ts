@@ -50,9 +50,10 @@ export interface SchemaNode {
 }
 
 /** Provenance of concept & relation change */
-export interface ElementProvenance<Element> {
-  sources: string[] // id of the source nodes
-  targets: string[] // id of the target nodes
+export interface ElementProvenance<Element = Concept | Relation> {
+  // sources: string[] // id of the source nodes
+  // targets: string[] // id of the target nodes
+  sourcePage?: string
   time: number // time of change
   elementType: 'concept' | 'relation'
   changeType: 'add' | 'delete' | 'update'

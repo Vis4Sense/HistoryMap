@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Schema } from '@/types/schema.d'
-import { useSchemaSync } from '@/composables/useSchemaSync'
+import { useSchemaEditor } from '@/composables/useSchemaEditor'
 import { newSchema } from '@/types/schema.d'
 
 const props = defineProps({
@@ -23,16 +23,15 @@ const props = defineProps({
   mode: {
     type: String,
     default: 'edit',
-  }
+  },
 })
 
 const { id, schema } = toRefs(props)
 
-const {
-  commitAddRoot,
-  commitAddChild,
-  commitDeleteNode,
-} = useSchemaSync()
+let schemaEditor = useSchemaEditor(id.value)
+watch(id, (newVal) => {
+  schemaEditor = useSchemaEditor(newVal)
+})
 
 /** temporary div to support adding new root */
 const newRoot = ref<HTMLDivElement>()
@@ -65,28 +64,26 @@ onClickOutside(newRoot, () => {
 
 // add root
 function addRoot(name: string) {
-  commitAddRoot(id.value, name)
+  schemaEditor.addRoot({ name })
 }
 
 // add child
 function addChild(childName: string, parentName: string) {
-  commitAddChild(id.value, childName, parentName)
+  schemaEditor.addChild({ name: childName }, parentName)
 }
 
 // delete node
 function deleteNode(name: string) {
-  commitDeleteNode(id.value, name)
+  schemaEditor.deleteNode({ name })
 }
 </script>
 
 <template>
-  <div p="x-2 y-1" space-y-1 overflow-auto flex flex-col>
+  <div space-y-1 overflow-auto flex flex-col>
     <div
       shrink-0
-      max-w="3/4" h-5
-      w-fit
-      p="x-2 y-0.5"
-      bg-gray-1 rounded-lg
+      h-6
+      p="x-2 y-1"
       truncate text-xs
     >
       <slot :name="type">
@@ -94,12 +91,7 @@ function deleteNode(name: string) {
       </slot>
     </div>
 
-    <div shrink-0 flex v-if="mode === 'edit'">
-      <BasicToolbarIcon plain>
-        <div i-material-symbols-light-sync
-          :class="sync ? 'text-green-6' : 'text-gray-3'"
-        />
-      </BasicToolbarIcon>
+    <div v-if="mode === 'edit'" shrink-0 flex>
       <BasicToolbarIcon plain @click="startEditing">
         <div i-carbon-add />
       </BasicToolbarIcon>

@@ -52,8 +52,8 @@ onClickOutside(newChildEle, () => {
 <template>
   <div ml-4>
     <div
-      w-full h-6
-      flex justify-between items-center
+      w-full
+      flex justify-between items-start
       relative
       @mouseover="showToolbar = true"
       @mouseleave="showToolbar = false"
@@ -63,13 +63,20 @@ onClickOutside(newChildEle, () => {
         text-gray-3
       >
         <div v-if="root.children && root.children.length" i-carbon-caret-down />
-        <div v-else i-carbon-dot-mark text="0.6rem" mr-1 />
+        <div v-else i-carbon-dot-mark text="0.6rem" mr-1 mt="1.5" />
       </div>
 
-      <div rounded p="x-1">
+      <div rounded p="x-1" leading-tight>
         {{ root.name }}
       </div>
-      <div v-if="showToolbar" flex>
+
+      <div
+        v-if="showToolbar"
+        flex
+        absolute right-1
+        px-1
+        bg-white bg-op-90
+      >
         <BasicToolbarIcon plain @click="startEditing">
           <div i-carbon-add />
         </BasicToolbarIcon>

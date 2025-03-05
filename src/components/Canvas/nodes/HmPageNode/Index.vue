@@ -60,9 +60,9 @@ function sendActivatePage() {
     />
 
     <SchemaDiff
-      v-if="data.schema"
+      v-if="data.embeddedProvenance"
       :id="id"
-      :schema="data.schema"
+      :provenance="data.embeddedProvenance ?? undefined"
       @update-schema-height="(h) => emit('updateHeight', id, { schemaDiff: h })"
     />
 

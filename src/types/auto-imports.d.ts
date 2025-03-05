@@ -594,7 +594,6 @@ declare module 'vue' {
     readonly useSchemaEditor: UnwrapRef<typeof import('../composables/useSchemaEditor')['useSchemaEditor']>
     readonly useSchemaMap: UnwrapRef<typeof import('../composables/useSchemaMap')['useSchemaMap']>
     readonly useSchemaPanel: UnwrapRef<typeof import('../composables/useSchemaPanel')['useSchemaPanel']>
-    readonly useSchemaSync: UnwrapRef<typeof import('../composables/useSchemaSync')['useSchemaSync']>
     readonly useScreenOrientation: UnwrapRef<typeof import('@vueuse/core')['useScreenOrientation']>
     readonly useScreenSafeArea: UnwrapRef<typeof import('@vueuse/core')['useScreenSafeArea']>
     readonly useScriptTag: UnwrapRef<typeof import('@vueuse/core')['useScriptTag']>

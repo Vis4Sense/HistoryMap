@@ -14,8 +14,8 @@ const props = defineProps({
 <template>
   <div ml-4>
     <div
-      w-full h-6
-      flex justify-between items-center
+      w-full
+      flex justify-between items-start
       relative
     >
       <div
@@ -24,10 +24,10 @@ const props = defineProps({
         text-gray-3
       >
         <div v-if="root.children && root.children.length" i-carbon-caret-down />
-        <div v-else i-carbon-dot-mark text="0.6rem" mr-1 />
+        <div v-else i-carbon-dot-mark text="0.6rem" mr-1 mt="1.5" />
       </div>
 
-      <div rounded p="x-1">
+      <div rounded p="x-1" leading-tight>
         {{ root.name }}
       </div>
     </div>

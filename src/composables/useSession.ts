@@ -51,6 +51,8 @@ export function useSession() {
   }
 
   function switchToLatestSession() {
+    if (!sessions.value)
+      return
     let latestestId = 0
     if (sessions.value.length > 1) {
       const latest = sessions.value
@@ -65,10 +67,8 @@ export function useSession() {
   function initialise() {
     // the first session is the background session that captures
     // page history when no specific session is active
-    nextTick(() => {
-      if (!sessions.value.length)
-        addSession('Default')
-    })
+    if (!sessions.value.length)
+      addSession('Default')
   }
 
   initialise()

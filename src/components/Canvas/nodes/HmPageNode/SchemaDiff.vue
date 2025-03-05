@@ -8,9 +8,9 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  schema: {
-    type: Object as PropType<Schema>,
-    required: true,
+  provenance: {
+    type: Object as PropType<ElementProvenance[]>,
+    default: null,
   },
 })
 
@@ -18,7 +18,7 @@ const emit = defineEmits<{
   updateSchemaHeight: [height: number]
 }>()
 
-const { schema } = toRefs(props)
+const { provenance } = toRefs(props)
 
 const container = ref<HTMLElement>()
 
@@ -29,38 +29,45 @@ useResizeObserver(container, () => {
   })
 })
 
-const changedConcepts = computed((): ElementProvenance<Concept>[] => {
-  if (!schema.value.provenance)
-    return []
-  let provenance = _.cloneDeep(schema.value.provenance)
-  if (typeof provenance === 'object') {
-    provenance = Object.values(provenance)
-  }
-  provenance = provenance
-    .filter((p: ElementProvenance<any>) => p.targets.length)
-    .filter((p: ElementProvenance<any>) => p.elementType === 'concept')
-  return provenance
+// const changedConcepts = computed((): ElementProvenance<Concept>[] => {
+//   if (!provenance.value)
+//     return []
+//   let provenance = _.cloneDeep(schema.value.provenance)
+//   if (typeof provenance === 'object') {
+//     provenance = Object.values(provenance)
+//   }
+//   provenance = provenance
+//     .filter((p: ElementProvenance<any>) => p.targets.length)
+//     .filter((p: ElementProvenance<any>) => p.elementType === 'concept')
+//   return provenance
+// })
+
+onMounted(() => {
+  console.log(provenance.value)
 })
 </script>
 
 <template>
-  <div ref="container"
+  <div
+    ref="container"
     w-full
     text-sm p-1
     flex flex-wrap
     gap-1
   >
     <div
-      v-for="concept, idx in changedConcepts"
+      v-for="concept, idx in provenance"
       :key="idx"
     >
-      <div v-if="concept.changeType === 'add'"
+      <div
+        v-if="concept.changeType === 'add'"
         px-2 rounded
         bg-blue-1
       >
         {{ concept.diff.new?.name }}
       </div>
-      <div v-else-if="concept.changeType === 'delete'"
+      <div
+        v-else-if="concept.changeType === 'delete'"
         px-2 rounded
         bg-red-1
         line-through
