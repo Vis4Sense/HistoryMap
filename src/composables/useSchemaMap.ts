@@ -151,6 +151,7 @@ export function useSchemaMap() {
   return {
     ...state,
     getNode,
+    deactivateAllSchemaNodes,
     addSchemaNode,
     updateNode,
     removeNode,

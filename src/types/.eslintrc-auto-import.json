@@ -338,6 +338,7 @@
     "useSchemaPanel": true,
     "useSchemaSync": true,
     "TargetPosition": true,
-    "useDragAndDropTree": true
+    "useDragAndDropTree": true,
+    "useSchemaSynthesise": true
   }
 }

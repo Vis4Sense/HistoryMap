@@ -260,6 +260,7 @@ declare global {
   const useSchemaMap: typeof import('../composables/useSchemaMap')['useSchemaMap']
   const useSchemaPanel: typeof import('../composables/useSchemaPanel')['useSchemaPanel']
   const useSchemaSync: typeof import('../composables/useSchemaSync')['useSchemaSync']
+  const useSchemaSynthesise: typeof import('../composables/useSchemaSynthesise')['useSchemaSynthesise']
   const useSchemaTree: typeof import('../composables/useSchemaTree')['useSchemaTree']
   const useScreenOrientation: typeof import('@vueuse/core')['useScreenOrientation']
   const useScreenSafeArea: typeof import('@vueuse/core')['useScreenSafeArea']

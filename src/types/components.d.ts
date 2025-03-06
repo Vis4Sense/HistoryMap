@@ -41,6 +41,7 @@ declare module 'vue' {
     SchemaPanel: typeof import('./../components/SchemaPanel/Index.vue')['default']
     SchemaPanelHeader: typeof import('./../components/SchemaPanel/Header.vue')['default']
     SchemaPanelPaneExtract: typeof import('./../components/SchemaPanel/PaneExtract.vue')['default']
+    SchemaPanelPaneSynthesise: typeof import('./../components/SchemaPanel/PaneSynthesise.vue')['default']
     SchemaTree: typeof import('./../components/SchemaTree/Index.vue')['default']
     SchemaTreeNode: typeof import('./../components/SchemaTree/Node.vue')['default']
     SessionList: typeof import('./../components/SessionList.vue')['default']

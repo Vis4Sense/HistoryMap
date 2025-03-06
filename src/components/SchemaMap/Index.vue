@@ -4,8 +4,8 @@ import HmPageNode from '@/components/Canvas/nodes/HmPageNode/Index.vue'
 import SchemaNode from '@/components/Canvas/nodes/SchemaNode/Index.vue'
 import { useSchemaMap } from '@/composables/useSchemaMap'
 import { useVueFlow, VueFlow } from '@vue-flow/core'
-import { compactTreeLayout } from '../HistoryMap/layout/compact-tree'
 import _ from 'lodash'
+import { compactTreeLayout } from '../HistoryMap/layout/compact-tree'
 
 const { getSelectedNodes } = useVueFlow()
 const { nodes: smNodes, links, setSelectedNodeIds } = useSchemaMap()
@@ -34,7 +34,10 @@ const nodes = computed(() => {
       x: 0,
       y: 0,
     },
-    data: node,
+    data: {
+      ...node,
+      // highlighted: true,
+    },
   }))
 
   const layout = compactTreeLayout()

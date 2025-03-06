@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import type { TargetPosition } from '@/composables/useDnDTree'
 import type { Schema } from '@/types/schema.d'
+import Header from '@/components/Canvas/nodes/SchemaNode/Header.vue'
 import { useSchemaEditor } from '@/composables/useSchemaEditor'
 import { newSchema } from '@/types/schema.d'
-import Header from '@/components/Canvas/nodes/SchemaNode/Header.vue'
-import { TargetPosition } from '@/composables/useDnDTree'
 
 const props = defineProps({
   id: {
@@ -17,10 +17,6 @@ const props = defineProps({
   schema: {
     type: Object as PropType<Schema>,
     default: newSchema(),
-  },
-  sync: {
-    type: Boolean,
-    required: true,
   },
   mode: {
     type: String,
@@ -86,12 +82,13 @@ function deleteNode(name: string) {
 
 // move node
 function moveNode(nodeName: string, targetName: string, position: TargetPosition) {
-  console.log('moveNode', nodeName, targetName, position)
   if (position === 'inside') {
     schemaEditor.moveNodeInto(nodeName, targetName)
-  } else if (position === 'before') {
+  }
+  else if (position === 'before') {
     schemaEditor.moveNodeBefore(nodeName, targetName)
-  } else if (position === 'after') {
+  }
+  else if (position === 'after') {
     schemaEditor.moveNodeAfter(nodeName, targetName)
   }
 }
@@ -104,11 +101,11 @@ function moveNode(nodeName: string, targetName: string, position: TargetPosition
       h-4
       truncate text-xs
     >
-      <slot :name="type">
+      <slot name="header">
         <div flex justify-between items-center>
           <Header :schema="schema" />
 
-          <div>
+          <div v-if="mode === 'edit'">
             <BasicToolbarIcon
               plain
               @click="createSchemaNode()"

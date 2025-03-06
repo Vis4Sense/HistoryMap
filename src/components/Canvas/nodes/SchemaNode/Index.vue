@@ -2,9 +2,9 @@
 import type { SchemaNode } from '@/types/schema.d'
 import { Handle, Position, useVueFlow } from '@vue-flow/core'
 import { NodeToolbar } from '@vue-flow/node-toolbar'
+import SchemaNodeToolbar from '../../node-toolbars/SchemaNodeToolbar.vue'
 import Header from './Header.vue'
 import Root from './Root.vue'
-import SchemaNodeToolbar from '../../node-toolbars/SchemaNodeToolbar.vue'
 
 const props = defineProps({
   id: {
@@ -18,11 +18,11 @@ const props = defineProps({
   selected: Boolean,
 })
 
-const { id } = toRefs(props)
-
 const emit = defineEmits<{
   updateHeight: [id: string, height: Record<string, number>]
 }>()
+
+const { id } = toRefs(props)
 
 const { data, selected } = toRefs(props)
 
@@ -37,7 +37,7 @@ const container = ref<HTMLElement>()
 useResizeObserver(container, () => {
   nextTick(() => {
     // console.log(container.value.clientHeight)
-    emit('updateHeight', id.value, { 'schema': container.value?.clientHeight || 0 })
+    emit('updateHeight', id.value, { schema: container.value?.clientHeight || 0 })
   })
 })
 </script>
@@ -55,7 +55,7 @@ useResizeObserver(container, () => {
   >
     <Header :schema="data.schema" />
 
-    <div text-sm ml-2 ref="container">
+    <div ref="container" text-sm ml-2>
       <Root
         v-for="root in data.schema.schemaTree.roots"
         :key="root.name"

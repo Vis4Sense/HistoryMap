@@ -119,41 +119,43 @@ function SchemaEditor(schema_: Schema | undefined) {
     ) => {
       const node = nodeDict[name]
       const oldConcept = schema.concepts.find(d => d.name === name)
-  
+
       if (!oldConcept) {
         console.error('concept not found', name)
         return
       }
-  
+
       const newConcept = { ...oldConcept, parentName }
-  
+
       const oldParent = oldConcept.parentName
         ? nodeDict[oldConcept.parentName]
         : null
       const newParent = parentName ? nodeDict[parentName] : null
-  
+
       if (oldParent) {
         _.remove(oldParent.children ?? [], d => d.name === name)
-      } else {
+      }
+      else {
         _.remove(schema.schemaTree.roots, d => d.name === name)
       }
-  
+
       if (newParent) {
         newParent.children = _.concat(newParent.children ?? [], node)
-      } else {
+      }
+      else {
         schema.schemaTree.roots.push(node)
       }
-  
+
       // replace old concept with new concept
       const idx = schema.concepts.findIndex(d => d.name === node.name)
       schema.concepts.splice(idx, 1, newConcept)
-  
+
       updateProvenance({
         elementType: 'concept',
         changeType: 'move',
         diff: { old: oldConcept, new: newConcept },
       })
-  
+
       return module
     },
 
@@ -169,12 +171,12 @@ function SchemaEditor(schema_: Schema | undefined) {
       const node = nodeDict[name]
       const oldConcept = schema.concepts.find(d => d.name === name)
       const targetConcept = schema.concepts.find(d => d.name === targetName)
-  
+
       if (!oldConcept || !targetConcept) {
         console.error('concept not found', name)
         return
       }
-  
+
       const oldParent = oldConcept.parentName
         ? nodeDict[oldConcept.parentName]
         : null
@@ -186,7 +188,8 @@ function SchemaEditor(schema_: Schema | undefined) {
 
       if (!oldParent) {
         _.remove(schema.schemaTree.roots, d => d.name === name)
-      } else {
+      }
+      else {
         _.remove(oldParent.children ?? [], d => d.name === name)
       }
 
@@ -196,7 +199,8 @@ function SchemaEditor(schema_: Schema | undefined) {
           idx = position === 'after' ? idx + 1 : idx
           schema.schemaTree.roots.splice(idx, 0, node)
         }
-      } else {
+      }
+      else {
         let idx = targetParent.children?.findIndex(d => d.name === targetName)
         if (idx !== undefined && idx >= 0) {
           idx = position === 'after' ? idx + 1 : idx
@@ -215,7 +219,7 @@ function SchemaEditor(schema_: Schema | undefined) {
       })
 
       return module
-    }
+    },
   }
 
   return module
