@@ -5,10 +5,10 @@
  * @see {@link https://serversideup.net/open-source/webext-bridge/docs}
  */
 
+import type { Annotation } from '@/types/historymap'
 import { useHistoryMap } from '@/composables/useHistoryMap'
 import { onMessage } from 'webext-bridge/background'
 import { updateActivePage } from './controller'
-import { Annotation } from '@/types/historymap'
 
 const { activePage, addAnnotation, removeHighlight, highlight, addTag, removeTag } = useHistoryMap()
 
@@ -27,7 +27,8 @@ onMessage('highlight', ({ data }) => {
     let annotation = activePage.value.annotations?.find(d => d.id === id) || null
     if (annotation) {
       highlight(activePage.value.id, id)
-    } else {
+    }
+    else {
       annotation = addAnnotation(
         activePage.value.id,
         id,
@@ -67,8 +68,9 @@ onMessage('annotate', ({ data }) => {
 })
 
 onMessage('add-tag', ({ data }) => {
+  // console.log('add-tag', data)
   if (activePage.value) {
-    const { id, tag } = data as { id: number; tag: string }
+    const { id, tag } = data as { id: number, tag: string }
     const annotation = addTag(activePage.value.id, id, tag)
     return annotation
   }
@@ -77,7 +79,7 @@ onMessage('add-tag', ({ data }) => {
 
 onMessage('remove-tag', ({ data }) => {
   if (activePage.value) {
-    const { id, tag } = data as { id: number; tag: string }
+    const { id, tag } = data as { id: number, tag: string }
     const annotation = removeTag(activePage.value.id, id, tag)
     return annotation
   }
