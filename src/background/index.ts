@@ -1,4 +1,5 @@
 import { initialiseController } from './controller'
+import './annotation'
 // import { initialiseExtractor } from './extractor'
 
 /** open side panel on clicking in toolbar */

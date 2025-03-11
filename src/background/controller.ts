@@ -170,6 +170,23 @@ function activatePage(page: HmPage) {
   })
 }
 
+export function updateActivePage() {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    const tab = tabs[0]
+    const pagesIntab = pages.value
+      .filter(page => page.tabId === tab.id)
+      .sort((a, b) => b.timeLastActivated - a.timeLastActivated)
+    if (pagesIntab) {
+      const page = pagesIntab[0]
+      if (page.id !== activePage.value?.id) {
+        updatePage(page.id, {
+          isActive: true,
+        })
+      }
+    }
+  })
+}
+
 export function initialiseController() {
   chrome.tabs.onCreated.addListener(tabCreationHandler)
   chrome.tabs.onUpdated.addListener(tabUpdateHandler)

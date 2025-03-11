@@ -22,7 +22,9 @@ const emit = defineEmits<{
   updateHeight: [id: string, height: Record<string, number>]
 }>()
 
-const { data, selected } = toRefs(props)
+const { id, data, selected } = toRefs(props)
+
+const highlightContainer = ref<HTMLElement>()
 
 /** toolbar visibility */
 const { getSelectedNodes } = useVueFlow()
@@ -37,6 +39,23 @@ function sendActivatePage() {
     data: data.value,
   })
 }
+
+const highlights = computed(() => {
+  if (data.value.annotations) {
+    return data.value.annotations.filter((anno) => anno.highlighted)
+  }
+  return null
+})
+
+useResizeObserver(highlightContainer, () => {
+  nextTick(() => {
+    if (highlightContainer.value) {
+      emit('updateHeight', id.value, {
+        'highlights': highlightContainer.value.clientHeight,
+      })
+    }
+  })
+})
 </script>
 
 <template>
@@ -66,6 +85,21 @@ function sendActivatePage() {
       :provenance="data.embeddedProvenance ?? undefined"
       @update-schema-height="(h) => emit('updateHeight', id, { schemaDiff: h })"
     />
+
+    <div
+      ref="highlightContainer"
+      v-if="highlights && highlights.length"
+      p-1
+    >
+      <div v-for="highlight in highlights"
+        :key="highlight.id"
+        flex gap-1 text-sm
+      >
+        <div flex-auto truncate bg-yellow-1>
+          {{ highlight.sourceText }}
+        </div>
+      </div>
+    </div>
 
     <NodeToolbar
       :position="Position.Top"

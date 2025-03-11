@@ -133,6 +133,7 @@ declare global {
   const until: typeof import('@vueuse/core')['until']
   const useActiveElement: typeof import('@vueuse/core')['useActiveElement']
   const useAnimate: typeof import('@vueuse/core')['useAnimate']
+  const useAnnotation: typeof import('../composables/useAnnotation')['useAnnotation']
   const useArrayDifference: typeof import('@vueuse/core')['useArrayDifference']
   const useArrayEvery: typeof import('@vueuse/core')['useArrayEvery']
   const useArrayFilter: typeof import('@vueuse/core')['useArrayFilter']
@@ -600,6 +601,7 @@ declare module 'vue' {
     readonly useSchemaEditor: UnwrapRef<typeof import('../composables/useSchemaEditor')['useSchemaEditor']>
     readonly useSchemaMap: UnwrapRef<typeof import('../composables/useSchemaMap')['useSchemaMap']>
     readonly useSchemaPanel: UnwrapRef<typeof import('../composables/useSchemaPanel')['useSchemaPanel']>
+    readonly useSchemaSynthesise: UnwrapRef<typeof import('../composables/useSchemaSynthesise')['useSchemaSynthesise']>
     readonly useScreenOrientation: UnwrapRef<typeof import('@vueuse/core')['useScreenOrientation']>
     readonly useScreenSafeArea: UnwrapRef<typeof import('@vueuse/core')['useScreenSafeArea']>
     readonly useScriptTag: UnwrapRef<typeof import('@vueuse/core')['useScriptTag']>

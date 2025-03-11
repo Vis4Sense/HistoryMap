@@ -12,4 +12,15 @@ export interface HmPage {
   isActive: boolean
   schema?: Schema
   embeddedProvenance?: ElementProvenance[]
+  annotations?: Annotation[]
+}
+
+export interface Annotation {
+  id: number
+  selection: string // serialized selection
+  sourceText: string
+  highlighted: boolean
+  tags?: string[]
+  timeCreated: number
+  timeUpdated: number
 }
