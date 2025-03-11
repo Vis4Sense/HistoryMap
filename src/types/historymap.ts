@@ -8,4 +8,15 @@ export interface HmPage {
   pageObj: chrome.tabs.Tab
   parentPageId: string | null
   isActive: boolean
+  annotations?: Annotation[]
+}
+
+export interface Annotation {
+  id: number
+  selection: string // serialized selection
+  sourceText: string
+  highlighted: boolean
+  tags?: string[]
+  timeCreated: number
+  timeUpdated: number
 }

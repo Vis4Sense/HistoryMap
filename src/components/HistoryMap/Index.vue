@@ -8,6 +8,12 @@ import { compactTreeLayout } from './layout/compact-tree'
 
 const { pages, links } = useHistoryMap()
 
+const baseSize = {
+  width: 160,
+  height: 32,
+}
+const nodeSizeDict = ref<Record<string, { width: number | null, height: Record<string, number> | null }>>({})
+
 const edges = computed((): Edge[] => links.value
   .map(link => ({
     id: `${link.source}_${link.target}`,
@@ -20,8 +26,8 @@ const nodes = computed((): Node<HmPage>[] => {
   const nodes = pages.value.map((page): Node => ({
     id: page.id,
     type: 'hm-page',
-    width: 160,
-    height: 32,
+    width: getNodeWidth(page.id),
+    height: getNodeHeight(page.id),
     position: {
       x: 0,
       y: 0,
@@ -35,6 +41,34 @@ const nodes = computed((): Node<HmPage>[] => {
 
   return nodes
 })
+
+/** get node sizes */
+
+function getNodeWidth(id: string) {
+  return nodeSizeDict.value[id]?.width ?? baseSize.width
+}
+
+function getNodeHeight(id: string): number {
+  let height = baseSize.height
+  const heightDict = nodeSizeDict.value[id]?.height ?? {}
+  for (const key in heightDict) {
+    height += heightDict[key]
+  }
+  return height
+}
+
+/** update node height */
+function updateNodeHeight(id: string, height: Record<string, number>) {
+  if (!nodeSizeDict.value[id]) {
+    nodeSizeDict.value[id] = {
+      width: null,
+      height,
+    }
+  }
+  else {
+    nodeSizeDict.value[id].height = height
+  }
+}
 </script>
 
 <template>
@@ -46,7 +80,10 @@ const nodes = computed((): Node<HmPage>[] => {
       :edges="edges"
     >
       <template #node-hm-page="props">
-        <NodeHmPage v-bind="props" />
+        <NodeHmPage
+          v-bind="props"
+          @update-height="updateNodeHeight"
+        />
       </template>
     </VueFlow>
   </div>

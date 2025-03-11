@@ -71,7 +71,7 @@ export default defineConfig({
       compositionOnly: true,
     }),
 
-    vueDevTools(),
+    // vueDevTools(),
 
     // https://github.com/posva/unplugin-vue-router
     VueRouter({

@@ -7,6 +7,7 @@ import TurndownService from 'turndown'
 import './index.scss'
 
 import './select-element'
+import './annotation'
 
 // const src = chrome.runtime.getURL('src/ui/content-script-iframe/index.html')
 

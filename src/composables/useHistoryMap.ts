@@ -1,4 +1,5 @@
-import type { HmPage } from '~/types/historymap'
+import type { Annotation, HmPage } from '~/types/historymap'
+import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 import { useBrowserLocalStorage } from './useBrowserStorage'
 import { useSession } from './useSession'
@@ -9,12 +10,12 @@ function getLinks(pages: HmPage[]) {
     .map(d => ({ source: d.parentPageId!, target: d.id }))
 }
 
+const { data: hmPages } = useBrowserLocalStorage('hm-pages', [] as HmPage[])
+
 export function useHistoryMap() {
   const { sessionId, session, updateSession } = useSession()
 
   /** define state */
-  const { data: hmPages } = useBrowserLocalStorage('hm-pages', [] as HmPage[])
-
   const pages = computed(() => hmPages.value.filter(d => d.sessionId === sessionId.value))
   const links = computed(() => getLinks(pages.value))
 
@@ -46,6 +47,18 @@ export function useHistoryMap() {
   function deactivateAllPages() {
     hmPages.value.filter(d => d.sessionId === sessionId.value)
       .forEach(page => page.isActive = false)
+  }
+
+  function getPage(id: string) {
+    return hmPages.value.find(d => d.id === id)
+  }
+
+  function isEmptyAnnotation(annotation: Annotation) {
+    if (!annotation.tags)
+      return true
+    if (annotation.tags.length === 0)
+      return true
+    return false
   }
 
   /** actions */
@@ -102,10 +115,68 @@ export function useHistoryMap() {
     }
   }
 
+  function addAnnotation(
+    pageId: string,
+    id: number,
+    selection: string,
+    sourceText: string,
+    highlighted: boolean = false,
+  ) {
+    const page = getPage(pageId)
+    if (!page)
+      return
+    if (!page.annotations)
+      page.annotations = []
+    // const id = _.max(page.annotations.map(d => d.id + 1)) || 0
+    const annotation = {
+      id,
+      selection,
+      sourceText,
+      highlighted,
+      timeCreated: Date.now(),
+      timeUpdated: Date.now(),
+    }
+    page.annotations.push(annotation)
+    console.log('added annotation', annotation)
+    return annotation
+  }
+
+  function removeHighlight(
+    pageId: string,
+    id: number,
+  ) {
+    const page = getPage(pageId)
+    if (!page || !page.annotations)
+      return
+    const index = page.annotations.findIndex(d => d.id === id)
+    if (index !== undefined && index >= 0) {
+      const annotation = page.annotations[index]
+      if (isEmptyAnnotation(annotation)) {
+        page.annotations?.splice(index, 1)
+      }
+      else {
+        annotation.highlighted = false
+      }
+    }
+  }
+
+  function getAnnotation(
+    pageId: string,
+    id: number,
+  ) {
+    const page = getPage(pageId)
+    if (!page)
+      return null
+    return page.annotations?.find(d => d.id === id) || null
+  }
+
   return {
     ...state,
     addPage,
     updatePage,
     removePage,
+    addAnnotation,
+    getAnnotation,
+    removeHighlight,
   }
 }

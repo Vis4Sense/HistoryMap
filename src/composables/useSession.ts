@@ -1,9 +1,10 @@
 import type { SessionMetaData } from '@/types/session'
 
+const { data: sessions } = useBrowserLocalStorage('hm-sessions', [] as SessionMetaData[])
+const { data: sessionId } = useBrowserLocalStorage('hm-session-id', -1)
+
 export function useSession() {
   /** define state */
-  const { data: sessions } = useBrowserLocalStorage('hm-sessions', [] as SessionMetaData[])
-  const { data: sessionId } = useBrowserLocalStorage('hm-session-id', -1)
 
   // active session
   const session = computed(() => sessions.value.find(d => d.sessionId === sessionId.value))

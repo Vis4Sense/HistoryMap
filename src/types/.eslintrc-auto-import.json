@@ -335,6 +335,10 @@
     "useSchemaEditor": true,
     "useSchemaMap": true,
     "useSchemaTree": true,
-    "useSchemaPanel": true
+    "useSchemaPanel": true,
+    "TargetPosition": true,
+    "useDragAndDropTree": true,
+    "useSchemaSynthesise": true,
+    "useAnnotation": true
   }
 }

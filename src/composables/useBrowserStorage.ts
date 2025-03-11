@@ -66,7 +66,8 @@ function useBrowserStorage<T>(key: string, defaultValue: T, storageType: "sync" 
 		(newValue) => {
 			if (!isUpdatingFromStorage) {
 				if (checkType(defaultValue, newValue)) {
-					chrome.storage[storageType].set({ [key]: toRaw(newValue) })
+					// chrome.storage[storageType].set({ [key]: toRaw(newValue) })
+					chrome.storage[storageType].set({ [key]: JSON.parse(JSON.stringify(newValue)) })
 				} else {
 					console.error("not updating " + key + ": type mismatch")
 				}
