@@ -5,6 +5,12 @@ import { useSchemaMap } from '@/composables/useSchemaMap'
 
 const { activePage } = useHistoryMap()
 const { activeSchemaNode } = useSchemaMap()
+
+// watch(activePage, (newVal) => {
+//   if (newVal) {
+//     console.log('activePage', newVal)
+//   }
+// }, { deep: true })
 </script>
 
 <template>
@@ -19,6 +25,7 @@ const { activeSchemaNode } = useSchemaMap()
         :id="activePage.id"
         type="hm-page"
         :schema="activePage.schema ?? undefined"
+        :annotations="activePage.annotations"
       >
         <template #header>
           <PageHeader :data="activePage" :height="16" />

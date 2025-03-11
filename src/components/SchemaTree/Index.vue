@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import type { TargetPosition } from '@/composables/useDnDTree'
+import type { Annotation } from '@/types/historymap'
 import type { Schema } from '@/types/schema.d'
 import Header from '@/components/Canvas/nodes/SchemaNode/Header.vue'
 import { useSchemaEditor } from '@/composables/useSchemaEditor'
 import { newSchema } from '@/types/schema.d'
+import _ from 'lodash'
 
 const props = defineProps({
   id: {
@@ -22,9 +24,13 @@ const props = defineProps({
     type: String,
     default: 'edit',
   },
+  annotations: {
+    type: Array as PropType<Annotation[]>,
+    default: () => [],
+  },
 })
 
-const { id, schema } = toRefs(props)
+const { id, schema, annotations } = toRefs(props)
 
 let schemaEditor = useSchemaEditor(id.value)
 watch(id, (newVal) => {
@@ -92,6 +98,29 @@ function moveNode(nodeName: string, targetName: string, position: TargetPosition
     schemaEditor.moveNodeAfter(nodeName, targetName)
   }
 }
+
+/** add tags to schema tree */
+watch(annotations, (newVal, oldVal) => {
+  const newTags = newVal.map(a => a.tags ?? []).flat()
+  const oldTags = oldVal.map(a => a.tags ?? []).flat()
+
+  const added = _.difference(newTags, oldTags)
+  const removed = _.difference(oldTags, newTags)
+
+  // console.log('added', added)
+  // console.log('removed', removed)
+
+  added.forEach((tag) => {
+    if (schema.value.concepts.find(c => c.name === tag)) {
+      return
+    }
+    schemaEditor.addRoot({ name: tag })
+  })
+
+  removed.forEach((tag) => {
+    schemaEditor.deleteNode({ name: tag })
+  })
+}, { deep: true })
 </script>
 
 <template>

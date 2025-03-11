@@ -90,6 +90,8 @@ export function useHistoryMap() {
         data.timeLastActivated = Date.now()
       }
       Object.assign(page, data)
+      hmPages.value = [...hmPages.value]
+      console.log('page updated', page)
     }
   }
 

@@ -9,7 +9,7 @@ const { data: selectedNodeIds } = useBrowserLocalStorage('selected-node-ids', []
 
 export function useSchemaMap() {
   const { sessionId } = useSession()
-  const { pages, links: hmLinks } = useHistoryMap()
+  const { pages, links: hmLinks, updatePage } = useHistoryMap()
 
   /** define state */
   const schemaNodes = computed(() => allSchemaNodes.value.filter(d => d.sessionId === sessionId.value))
@@ -100,14 +100,19 @@ export function useSchemaMap() {
     allSchemaNodes.value = [...allSchemaNodes.value, newNode]
   }
 
-  function updateNode(id: string, data: Partial<SchemaNode>) {
-    const node = schemaNodes.value.find(d => d.id === id)
-    if (node) {
-      if (data.isActive) {
-        deactivateAllSchemaNodes()
+  function updateNode(id: string, data: Partial<SchemaNode | HmPage>) {
+    if (id.startsWith('sm-')) {
+      const node = allSchemaNodes.value.find(d => d.id === id)
+      if (node) {
+        if (data.isActive) {
+          deactivateAllSchemaNodes()
+        }
+        Object.assign(node, data)
+        node.timeUpdated = Date.now()
       }
-      Object.assign(node, data)
-      node.timeUpdated = Date.now()
+    }
+    else {
+      updatePage(id, data as HmPage)
     }
   }
 
@@ -119,15 +124,7 @@ export function useSchemaMap() {
   }
 
   function updateSchema(id: string, newSchema: Schema) {
-    const schemaNode = nodes.value.find(d => d.id === id)
-    if (schemaNode) {
-      schemaNode.schema = newSchema
-      if (schemaNode.id.startsWith('sm-')) {
-        const node = schemaNode as SchemaNode
-        node.timeUpdated = Date.now()
-      }
-      console.info('schema updated', schemaNode)
-    }
+    updateNode(id, { schema: newSchema })
   }
 
   function setSelectedNodeIds(selection: string[]) {

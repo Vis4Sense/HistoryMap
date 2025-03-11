@@ -5,7 +5,7 @@ import _ from 'lodash'
 import { useSchemaPanel } from './useSchemaPanel'
 
 function SchemaEditor(schema_: Schema | undefined) {
-  const schema = schema_ || newSchema()
+  const schema = _.cloneDeep(schema_) || newSchema()
 
   let sourcePage: string | null = null
   let provenance: ElementProvenance
@@ -89,6 +89,7 @@ function SchemaEditor(schema_: Schema | undefined) {
 
     deleteNode: (node: Partial<Concept> & Pick<Concept, 'name'>) => {
       const oldConcept = schema.concepts.find(d => d.name === node.name)
+      const oldNode = nodeDict[node.name]
 
       if (!oldConcept) {
         console.error('concept not found', node.name)
@@ -96,12 +97,28 @@ function SchemaEditor(schema_: Schema | undefined) {
       }
 
       const siblings = oldConcept.parentName
-        ? (nodeDict[oldConcept.parentName].children || [])
+        ? (nodeDict[oldConcept.parentName]?.children || [])
         : schema.schemaTree.roots
       _.remove(siblings, d => d.name === node.name)
 
       _.remove(schema.concepts, d => d.name === node.name)
       _.remove(schema.relations, d => d.source === node.name || d.target === node.name)
+
+      if (oldNode && oldNode.children) {
+        oldNode.children.forEach((d) => {
+          if (oldConcept.parentName) {
+            const parent = nodeDict[oldConcept.parentName]
+            parent.children = _.concat(parent.children ?? [], d)
+          }
+          else {
+            schema.schemaTree.roots.push(d)
+          }
+          const childConcept = schema.concepts.find(c => c.name === d.name)
+          if (childConcept) {
+            childConcept.parentName = oldConcept.parentName
+          }
+        })
+      }
 
       updateProvenance({
         elementType: 'concept',
@@ -260,6 +277,7 @@ export function useSchemaEditor(nodeId: string) {
       .sourcePage(getSourcePage(sourcePageId))
       .addRoot(concept)
       .schema()
+    console.log('add root', newSchema)
     updateSchema(nodeId, newSchema)
   }
 
