@@ -66,7 +66,10 @@ function SchemaEditor(schema_: Schema | undefined) {
       child: Partial<Concept> & Pick<Concept, 'name'>,
       parentName: string,
     ) => {
+      console.log('add child', child, parentName, nodeDict)
+
       const parentNode = nodeDict[parentName]
+      console.log('parent node', parentNode)
 
       if (!parentNode) {
         module.addRoot(child)
@@ -247,17 +250,13 @@ export function useSchemaEditor(nodeId: string) {
 
   const { getNode, updateSchema, updateNode, addSchemaNode } = useSchemaMap()
 
-  // const nodeId = ref(activeSchemaNode.value?.id)
-  const node = computed(() => getNode(nodeId))
-  const schema = ref(node.value?.schema)
-  const schemaEditor = computed(() => SchemaEditor(schema.value))
-
   /** utilities */
 
   function getSourcePage(id: string | null = null) {
+    const node = getNode(nodeId)
     const src = id ?? sourcePage.value?.id ?? null
-    if (src && node.value && node.value.id.startsWith('sm-')) {
-      const sNode = node.value as SchemaNode
+    if (src && node && node.id.startsWith('sm-')) {
+      const sNode = node as SchemaNode
       if (!sNode.sources.includes(src)) {
         const newSources = [...sNode.sources, src]
         updateNode(nodeId, { sources: newSources })
@@ -273,11 +272,12 @@ export function useSchemaEditor(nodeId: string) {
     concept: Partial<Concept> & Pick<Concept, 'name'>,
     sourcePageId: string | null = null,
   ) {
-    const newSchema = schemaEditor.value
+    const schemaEditor = SchemaEditor(getNode(nodeId).schema)
+    const newSchema = schemaEditor
       .sourcePage(getSourcePage(sourcePageId))
       .addRoot(concept)
       .schema()
-    console.log('add root', newSchema)
+    // console.log('add root', newSchema)
     updateSchema(nodeId, newSchema)
   }
 
@@ -287,7 +287,8 @@ export function useSchemaEditor(nodeId: string) {
     parentName: string,
     sourcePageId: string | null = null,
   ) {
-    const newSchema = schemaEditor.value
+    const schemaEditor = SchemaEditor(getNode(nodeId).schema)
+    const newSchema = schemaEditor
       .sourcePage(getSourcePage(sourcePageId))
       .addChild(child, parentName)
       .schema()
@@ -299,7 +300,8 @@ export function useSchemaEditor(nodeId: string) {
     node: Partial<Concept> & Pick<Concept, 'name'>,
     sourcePageId: string | null = null,
   ) {
-    const newSchema = schemaEditor.value
+    const schemaEditor = SchemaEditor(getNode(nodeId).schema)
+    const newSchema = schemaEditor
       .sourcePage(getSourcePage(sourcePageId))
       .deleteNode(node)
       ?.schema() ?? null
@@ -316,7 +318,8 @@ export function useSchemaEditor(nodeId: string) {
     if (name === parentName) {
       return
     }
-    const newSchema = schemaEditor.value
+    const schemaEditor = SchemaEditor(getNode(nodeId).schema)
+    const newSchema = schemaEditor
       .sourcePage(getSourcePage(sourcePageId))
       .moveNodeInto(name, parentName)
       ?.schema() || null
@@ -333,7 +336,8 @@ export function useSchemaEditor(nodeId: string) {
     if (name === targetName) {
       return
     }
-    const newSchema = schemaEditor.value
+    const schemaEditor = SchemaEditor(getNode(nodeId).schema)
+    const newSchema = schemaEditor
       .sourcePage(getSourcePage(sourcePageId))
       .moveNodeBeforeAfter(name, targetName, 'before')
       ?.schema() || null
@@ -350,7 +354,8 @@ export function useSchemaEditor(nodeId: string) {
     if (name === targetName) {
       return
     }
-    const newSchema = schemaEditor.value
+    const schemaEditor = SchemaEditor(getNode(nodeId).schema)
+    const newSchema = schemaEditor
       .sourcePage(getSourcePage(sourcePageId))
       .moveNodeBeforeAfter(name, targetName, 'after')
       ?.schema() || null
@@ -367,7 +372,7 @@ export function useSchemaEditor(nodeId: string) {
   }
 
   return {
-    schemaEditor,
+    // schemaEditor,
     addRoot,
     addChild,
     deleteNode,

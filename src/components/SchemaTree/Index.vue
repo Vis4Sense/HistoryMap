@@ -156,7 +156,7 @@ watch(annotations, (newVal, oldVal) => {
       <SchemaTreeNode
         v-for="root, idx in schema.schemaTree.roots"
         :id="id"
-        :key="root.name"
+        :key="root && root.name"
         :index="idx"
         :node="root"
         :mode="mode"
