@@ -32,7 +32,7 @@ type Rect = Pick<DOMRect, 'left' | 'top' | 'right' | 'bottom'>
 
 let annotations: Annotation[] = []
 let selectedAnnotation: Annotation | null = null
-let noteboxes: Record<number, Postmate> = {}
+const noteboxes: Record<number, HTMLIFrameElement> = {}
 let toolbar: Postmate
 
 rangy.init()
@@ -68,39 +68,42 @@ function createNoteBox(id: number, rect: Rect) {
   console.log('creating notebox', id, rect)
 
   const src = chrome.runtime.getURL('src/ui/content-script-iframe/index.html#/notebox')
-  const handshake = new Postmate({
-    container: document.body,
-    url: src,
-    classListArray: ['historymap-note-box-iframe'],
-  })
+  const iframe = document.createElement('iframe')
+  iframe.src = `${src}`
+  iframe.classList.add('historymap-note-box-iframe')
+  iframe.removeAttribute('sandbox')
+  document.body.appendChild(iframe)
 
-  handshake.then((child) => {
-    child.call('setId', id)
-    child.call('setTags', annotations.find(d => d.id === id)?.tags || [])
-    child.frame.style.top = `${rect.top + window.scrollY}px`
+  iframe.onload = () => {
+    // FIXME: more robust way to ensure the message is sent?
+    setTimeout(() => {
+      iframe.contentWindow?.postMessage({ type: 'setId', value: id }, '*')
+      iframe.contentWindow?.postMessage({
+        type: 'setTags',
+        value: annotations.find(d => d.id === id)?.tags || [],
+      }, '*')
+    }, 1000)
+    iframe.style.top = `${rect.top + window.scrollY}px`
+  }
 
-    child.on('add-tag', (value: string) => {
-      sendMessage('add-tag', { id, tag: value }, 'background')
-        .then((annotation: Annotation | null) => {
-          if (annotation) {
-            console.log('tag added', annotation)
-            updateAnnotation(annotation)
-          }
-        })
-    })
+  noteboxes[id] = iframe
+}
 
-    child.on('remove-tag', (value: string) => {
-      sendMessage('remove-tag', { id, tag: value }, 'background')
-        .then((annotation: Annotation | null) => {
-          if (annotation) {
-            console.log('tag removed', annotation)
-            updateAnnotation(annotation)
-          }
-        })
-    })
-  })
+function noteChangeHandler(event) {
+  const type = event.data.type
+  if (!type)
+    return
 
-  noteboxes[id] = handshake
+  if (type === 'add-tag' || type === 'remove-tag') {
+    const { tag, id } = event.data
+    sendMessage(type, { id, tag }, 'background')
+      .then((annotation: Annotation | null) => {
+        if (annotation) {
+          updateAnnotation(annotation)
+          // console.log(annotations)
+        }
+      })
+  }
 }
 
 /** text selection listener */
@@ -148,7 +151,8 @@ function highlightHandler() {
       element.classList.add('highlight')
       element.classList.remove('annotate')
     })
-  } else {
+  }
+  else {
     saveAnnotation('highlight')
   }
 }
@@ -158,7 +162,8 @@ function dehighlightHandler() {
   const id = selectedAnnotation?.id
   const annotation = annotations.find(d => d.id === id)
   console.log('dehighlight', id, annotation)
-  if (!annotation) return
+  if (!annotation)
+    return
 
   sendMessage('dehighlight', annotation, 'background')
     .then(() => {
@@ -219,7 +224,8 @@ async function taggingStartHandler() {
   if (!selectedAnnotation) {
     await saveAnnotation('annotate')
   }
-  if (!selectedAnnotation) return
+  if (!selectedAnnotation)
+    return
 
   const rect = getAnnotationBoundingRect(selectedAnnotation.id)
 
@@ -263,7 +269,6 @@ async function setSelectedAnnotation(annotation: Annotation | null) {
     child.call('setAnnotation', annotation)
   })
   selectedAnnotation = annotation
-  return
 }
 
 function getAnnotationBoundingRect(id: number): Rect {
@@ -332,6 +337,7 @@ async function initialise() {
   await loadAnnotations()
 
   initialiseToolbar()
+  window.addEventListener('message', noteChangeHandler)
 }
 
 initialise()
