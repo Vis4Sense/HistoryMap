@@ -28,8 +28,12 @@ import 'rangy/lib/rangy-highlighter'
 import 'rangy/lib/rangy-serializer'
 import 'rangy/lib/rangy-textrange'
 
+type Rect = Pick<DOMRect, 'left' | 'top' | 'right' | 'bottom'>
+
 let annotations: Annotation[] = []
 let selectedAnnotation: Annotation | null = null
+let noteboxes: Record<number, Postmate> = {}
+let toolbar: Postmate
 
 rangy.init()
 const highlighter = rangy.createHighlighter()
@@ -50,25 +54,19 @@ function initialiseToolbar() {
       selectionHandler(event, child)
     })
 
-    // handle click highlight
     child.on('highlight', highlightHandler)
+    child.on('dehighlight', dehighlightHandler)
 
-    // handle click dehighlight
-    child.on('dehighlight', (id: number) => {
-      dehighlightHandler(id)
-    })
-
-    // child.on('tagging-start', () => {
-    //   console.log('tagging-start')
-    //   // const rect = child.frame.getBoundingClientRect()
-    //   const rect = getSelectionRect()
-    //   // const handshake = createNoteBox(rect)
-    // })
+    child.on('tagging-start', taggingStartHandler)
   })
+
+  toolbar = handshake
 }
 
 /** note container iframe */
-function createNoteBox(rect: DOMRect) {
+function createNoteBox(id: number, rect: Rect) {
+  console.log('creating notebox', id, rect)
+
   const src = chrome.runtime.getURL('src/ui/content-script-iframe/index.html#/notebox')
   const handshake = new Postmate({
     container: document.body,
@@ -77,91 +75,89 @@ function createNoteBox(rect: DOMRect) {
   })
 
   handshake.then((child) => {
-    child.frame.style.top = `${rect.top}px`
+    child.call('setId', id)
+    child.call('setTags', annotations.find(d => d.id === id)?.tags || [])
+    child.frame.style.top = `${rect.top + window.scrollY}px`
+
+    child.on('add-tag', (value: string) => {
+      sendMessage('add-tag', { id, tag: value }, 'background')
+        .then((annotation: Annotation | null) => {
+          if (annotation) {
+            console.log('tag added', annotation)
+            updateAnnotation(annotation)
+          }
+        })
+    })
+
+    child.on('remove-tag', (value: string) => {
+      sendMessage('remove-tag', { id, tag: value }, 'background')
+        .then((annotation: Annotation | null) => {
+          if (annotation) {
+            console.log('tag removed', annotation)
+            updateAnnotation(annotation)
+          }
+        })
+    })
   })
 
-  return handshake
+  noteboxes[id] = handshake
 }
 
 /** text selection listener */
-function selectionHandler(event: MouseEvent, toolbar: Postmate.ParentAPI) {
+function selectionHandler(event: MouseEvent) {
   const selection = rangy.getSelection()
-  const frame = toolbar.frame
 
   // if click on marked text, show toolbar
   const target = event.target as HTMLElement
-  if (target.classList.contains('highlight')) {
+  if (target.hasAttribute('hm-annotation')) {
     const id = Number.parseInt(target.getAttribute('annotation-id') ?? '')
     if (Number.isNaN(id))
       return
 
-    const elements = document.querySelectorAll(`[annotation-id="${id}"]`)
-
-    // bounding rect of elements
-    const rects = Array.from(elements).map(element => element.getBoundingClientRect())
-    const rect = rects.reduce((acc, rect) => {
-      acc.left = Math.min(acc.left, rect.left)
-      acc.top = Math.min(acc.top, rect.top)
-      acc.right = Math.max(acc.right, rect.right)
-      acc.bottom = Math.max(acc.bottom, rect.bottom)
-      return acc
-    }, { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity })
-
+    const rect = getAnnotationBoundingRect(id)
     const annotation = annotations.find(d => d.id === id)
     if (annotation) {
-      setSelectedAnnotation(annotation, toolbar)
-      showToolbar(frame, rect)
+      setSelectedAnnotation(annotation)
+      toolbar.then((child) => {
+        showToolbar(child.frame, rect)
+      })
     }
     return
   }
 
   if (selection.isCollapsed) {
-    frame.style.visibility = 'hidden'
-    setSelectedAnnotation(null, toolbar)
+    toolbar.then((child) => {
+      child.frame.style.visibility = 'hidden'
+    })
+    setSelectedAnnotation(null)
     return
   }
+
   const rect = getSelectionRect()
-  showToolbar(frame, rect)
+  toolbar.then((child) => {
+    showToolbar(child.frame, rect)
+  })
 }
 
 /** highlight handler */
 function highlightHandler() {
-  const selection = rangy.getSelection()
-  if (selection.isCollapsed) {
-    return
-  }
-
-  const sourceText = selection.toString()
-  const uuidPattern = /\{([a-f0-9\-]+)\}$/i
-  const serialized = rangy.serializeSelection(selection)
-    .replace(uuidPattern, '')
-
-  const id = _.max(annotations.map(d => d.id + 1)) || 0
-
-  // send message to background
-  sendMessage('highlight', {
-    id,
-    selection: serialized,
-    sourceText,
-  }, 'background')
-    .then((annotation: Annotation | null) => {
-      if (annotation) {
-        annotations.push(annotation)
-        highlighter.addClassApplier(rangy.createClassApplier('highlight', {
-          ignoreWhiteSpace: true,
-          tagNames: ['span', 'a'],
-          elementAttributes: {
-            'annotation-id': id,
-          },
-        }))
-        highlighter.highlightSelection('highlight')
-      }
+  if (selectedAnnotation) {
+    const { id, selection, sourceText } = selectedAnnotation
+    sendMessage('highlight', { id, selection, sourceText }, 'background')
+    document.querySelectorAll(`[annotation-id="${id}"]`).forEach((element) => {
+      element.classList.add('highlight')
+      element.classList.remove('annotate')
     })
+  } else {
+    saveAnnotation('highlight')
+  }
 }
 
 /** dehighlight handler */
-function dehighlightHandler(id: number) {
+function dehighlightHandler() {
+  const id = selectedAnnotation?.id
   const annotation = annotations.find(d => d.id === id)
+  console.log('dehighlight', id, annotation)
   if (!annotation) return
 
   sendMessage('dehighlight', annotation, 'background')
@@ -175,7 +171,7 @@ function dehighlightHandler(id: number) {
     })
 }
 
-/** load highlights */
+/** restore marks */
 function restoreHighlights() {
   // wait for document loading complete
   if (document.readyState !== 'complete') {
@@ -185,26 +181,56 @@ function restoreHighlights() {
     return
   }
 
-  const highlights = annotations.filter(annotation => annotation.highlighted)
-  console.log('restoring highlights', highlights)
+  console.log('restoring highlights')
 
-  highlights.forEach((annotation) => {
+  annotations.forEach((annotation) => {
+    const type = annotation.highlighted ? 'highlight' : 'annotate'
     const selection = rangy.deserializeSelection(annotation.selection)
-    highlighter.addClassApplier(rangy.createClassApplier('highlight', {
+    highlighter.addClassApplier(rangy.createClassApplier(type, {
       ignoreWhiteSpace: true,
       tagNames: ['span', 'a'],
       elementAttributes: {
         'annotation-id': annotation.id,
+        'hm-annotation': true,
       },
     }))
-    highlighter.highlightSelection('highlight')
+    highlighter.highlightSelection(type)
     selection.removeAllRanges()
   })
+
+  // restore noteboxes
+  nextTick(() => {
+    restoreNoteboxes()
+  })
+}
+
+function restoreNoteboxes() {
+  console.log('restoring noteboxes')
+  annotations.forEach((annotation) => {
+    if ('tags' in annotation || !annotation.highlighted) {
+      const rect = getAnnotationBoundingRect(annotation.id)
+      createNoteBox(annotation.id, rect)
+    }
+  })
+}
+
+/** handle start tagging */
+async function taggingStartHandler() {
+  if (!selectedAnnotation) {
+    await saveAnnotation('annotate')
+  }
+  if (!selectedAnnotation) return
+
+  const rect = getAnnotationBoundingRect(selectedAnnotation.id)
+
+  if (selectedAnnotation.id in noteboxes === false) {
+    const handshake = createNoteBox(selectedAnnotation.id, rect)
+  }
 }
 
 /** utilities */
 
-function showToolbar(frame: HTMLIFrameElement, rect: DOMRect) {
+function showToolbar(frame: HTMLIFrameElement, rect: Rect) {
   frame.style.visibility = 'visible'
   frame.style.top = `${rect.top + window.scrollY}px`
   frame.style.left = `${(rect.left + rect.right) / 2}px`
@@ -216,8 +242,78 @@ function getSelectionRect() {
   return range.nativeRange.getBoundingClientRect()
 }
 
-function setSelectedAnnotation(annotation: Annotation | null, toolbar: Postmate.ParentAPI) {
-  toolbar.call('setAnnotation', annotation)
+function updateAnnotation(annotation: Annotation) {
+  const index = annotations.findIndex(d => d.id === annotation.id)
+  if (index >= 0) {
+    annotations[index] = annotation
+  }
+}
+
+function mergeAnnotation(annotation: Annotation) {
+  if (annotations.find(d => d.id === annotation.id)) {
+    updateAnnotation(annotation)
+  }
+  else {
+    annotations.push(annotation)
+  }
+}
+
+async function setSelectedAnnotation(annotation: Annotation | null) {
+  await toolbar.then((child) => {
+    child.call('setAnnotation', annotation)
+  })
+  selectedAnnotation = annotation
+  return
+}
+
+function getAnnotationBoundingRect(id: number): Rect {
+  const elements = document.querySelectorAll(`[annotation-id="${id}"]`)
+  const rects = Array.from(elements).map(element => element.getBoundingClientRect())
+  return rects.reduce((acc, rect) => {
+    acc.left = Math.min(acc.left, rect.left)
+    acc.top = Math.min(acc.top, rect.top)
+    acc.right = Math.max(acc.right, rect.right)
+    acc.bottom = Math.max(acc.bottom, rect.bottom)
+    return acc
+  }, { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity })
+}
+
+async function saveAnnotation(type: 'highlight' | 'annotate' = 'highlight') {
+  const selection = rangy.getSelection()
+  if (selection.isCollapsed) {
+    return
+  }
+
+  const sourceText = selection.toString()
+  const uuidPattern = /\{([a-f0-9\-]+)\}$/i
+  const serialized = rangy.serializeSelection(selection)
+    .replace(uuidPattern, '')
+
+  const id = _.max(annotations.map(d => d.id + 1)) || 0
+
+  // send message to background
+  const annotation = await sendMessage(type, {
+    id,
+    selection: serialized,
+    sourceText,
+  }, 'background') as Annotation | null
+
+  if (annotation) {
+    console.log('annotation', annotation)
+    mergeAnnotation(annotation)
+    highlighter.addClassApplier(rangy.createClassApplier(type, {
+      ignoreWhiteSpace: true,
+      tagNames: ['span', 'a'],
+      elementAttributes: {
+        'annotation-id': id,
+        'hm-annotation': true,
+      },
+    }))
+    highlighter.highlightSelection(type)
+    await setSelectedAnnotation(annotation)
+  }
+
+  return annotation
 }
 
 /** load stored annotations */

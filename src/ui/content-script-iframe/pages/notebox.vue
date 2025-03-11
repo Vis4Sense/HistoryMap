@@ -1,19 +1,29 @@
 <script setup lang="ts">
 import Postmate from 'postmate'
 
-const handshake = new Postmate.Model({})
+const id = ref<number>()
+const tags = ref<string[]>()
 
-function onClickTag() {
+const handshake = new Postmate.Model({
+  setId: (value: number) => {
+    id.value = value
+  },
+  setTags: (value: string[]) => {
+    tags.value = value
+  },
+})
+
+function onAddTag(value: string) {
   handshake.then((parent) => {
-    parent.emit('tagging-start')
+    parent.emit('add-tag', value)
   })
 }
 
-onMounted(() => {
-  console.log('note box mounted')
-})
-
-const tags = ref<string[]>()
+function removeTag(value: string) {
+  handshake.then((parent) => {
+    parent.emit('remove-tag', value)
+  })
+}
 </script>
 
 <template>
@@ -22,6 +32,8 @@ const tags = ref<string[]>()
       bg-transparent
       v-model="tags"
       placeholder="Enter tags"
+      @add-tag="onAddTag"
+      @remove-tag="removeTag"
     />
   </div>
 </template>

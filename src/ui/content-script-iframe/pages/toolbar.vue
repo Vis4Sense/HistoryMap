@@ -7,7 +7,6 @@ const annotation = ref<Annotation | null>(null)
 const handshake = new Postmate.Model({
   setAnnotation: (value: Annotation) => {
     annotation.value = value
-    console.log('setAnnotation', value)
   },
 })
 
@@ -20,7 +19,7 @@ function onHighlight() {
 function onDehighlight() {
   handshake.then((parent) => {
     if (annotation.value) {
-      parent.emit('dehighlight', annotation.value.id)
+      parent.emit('dehighlight')
     }
   })
 }

@@ -40,13 +40,6 @@ function sendActivatePage() {
   })
 }
 
-const highlights = computed(() => {
-  if (data.value.annotations) {
-    return data.value.annotations.filter((anno) => anno.highlighted)
-  }
-  return null
-})
-
 useResizeObserver(highlightContainer, () => {
   nextTick(() => {
     if (highlightContainer.value) {
@@ -88,15 +81,20 @@ useResizeObserver(highlightContainer, () => {
 
     <div
       ref="highlightContainer"
-      v-if="highlights && highlights.length"
+      v-if="data.annotations && data.annotations.length"
       p-1
+      space-y-1
     >
-      <div v-for="highlight in highlights"
-        :key="highlight.id"
-        flex gap-1 text-sm
+      <div v-for="annotation in data.annotations"
+        :key="annotation.id"
+        text-xs
+        space-y="0.5"
       >
-        <div flex-auto truncate bg-yellow-1>
-          {{ highlight.sourceText }}
+        <div v-if="annotation.highlighted" flex-auto truncate bg-yellow-1>
+          {{ annotation.sourceText }}
+        </div>
+        <div v-if="annotation.tags && annotation.tags.length" flex flex-nowrap px="1">
+          <span v-for="tag in annotation.tags" px-1 bg-gray-1 rounded-lg>{{ tag }}</span>
         </div>
       </div>
     </div>
