@@ -124,7 +124,7 @@ export function useHistoryMap() {
   ) {
     const page = getPage(pageId)
     if (!page)
-      return
+      return null
     if (!page.annotations)
       page.annotations = []
     // const id = _.max(page.annotations.map(d => d.id + 1)) || 0
@@ -139,6 +139,16 @@ export function useHistoryMap() {
     page.annotations.push(annotation)
     console.log('added annotation', annotation)
     return annotation
+  }
+
+  function highlight(pageId: string, id: number) {
+    const page = getPage(pageId)
+    if (!page || !page.annotations)
+      return
+    const annotation = page.annotations.find(d => d.id === id)
+    if (annotation) {
+      annotation.highlighted = true
+    }
   }
 
   function removeHighlight(
@@ -160,6 +170,33 @@ export function useHistoryMap() {
     }
   }
 
+  function addTag(pageId: string, id: number, value: string) {
+    const page = getPage(pageId)
+    if (!page)
+      return
+    const annotation = page.annotations?.find(d => d.id === id)
+    if (annotation) {
+      if (!annotation.tags)
+        annotation.tags = []
+      annotation.tags.push(value)
+    }
+    return annotation
+  }
+
+  function removeTag(pageId: string, id: number, value: string) {
+    const page = getPage(pageId)
+    if (!page)
+      return
+    const annotation = page.annotations?.find(d => d.id === id)
+    if (annotation && annotation.tags) {
+      const index = annotation.tags.indexOf(value)
+      if (index >= 0) {
+        annotation.tags.splice(index, 1)
+      }
+    }
+    return annotation
+  }
+
   function getAnnotation(
     pageId: string,
     id: number,
@@ -177,6 +214,9 @@ export function useHistoryMap() {
     removePage,
     addAnnotation,
     getAnnotation,
+    highlight,
     removeHighlight,
+    addTag,
+    removeTag,
   }
 }
