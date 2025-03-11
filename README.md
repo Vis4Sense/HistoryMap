@@ -9,7 +9,7 @@ An ongoing rebuild of HistoryMap ([old branch](https://github.com/Vis4Sense/Hist
 | Feature | Status | Note |
 | --- | --- | --- |
 | Capture page history | 🔄 In Progress | MVP done ✅ |
-| Curate information (e.g., highlight & tagging) | ⏳ Planned | |
+| Curate information (e.g., highlight & tagging) |  🔄 In Progress | Highlight is supported ✅ |
 
 ## Usage
 
