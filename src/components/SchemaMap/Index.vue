@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { Edge } from '@vue-flow/core'
-import HmPageNode from '@/components/Canvas/nodes/HmPageNode/Index.vue'
-import SchemaNode from '@/components/Canvas/nodes/SchemaNode/Index.vue'
+// import HmPageNode from '@/components/Canvas/nodes/HmPageNode/Index.vue'
+// import SchemaNode from '@/components/Canvas/nodes/SchemaNode/Index.vue'
+import SchemaMapNode from '@/components/Canvas/nodes/SchemaMapNode/Index.vue'
 import { useSchemaMap } from '@/composables/useSchemaMap'
 import { useVueFlow, VueFlow } from '@vue-flow/core'
 import _ from 'lodash'
@@ -27,7 +28,7 @@ const edges = computed((): Edge[] => {
 const nodes = computed(() => {
   const nodes = smNodes.value.map(node => ({
     id: node.id,
-    type: node.type,
+    type: 'schemamap',
     width: getNodeWidth(node.id),
     height: getNodeHeight(node.id),
     position: {
@@ -66,14 +67,16 @@ function getNodeHeight(id: string): number {
 
 /** update node height */
 function updateNodeHeight(id: string, height: Record<string, number>) {
-  if (!nodeSizeDict.value[id]) {
+  if (!nodeSizeDict.value[id] || !nodeSizeDict.value[id].height) {
     nodeSizeDict.value[id] = {
       width: null,
       height,
     }
   }
   else {
-    nodeSizeDict.value[id].height = height
+    for (const key in height) {
+      nodeSizeDict.value[id].height[key] = height[key]
+    }
   }
 }
 
@@ -94,15 +97,8 @@ watch(() => getSelectedNodes.value.map(d => d.id), (newVal, oldVal) => {
       :edges="edges"
       class="edge-under"
     >
-      <template #node-hm-page="props">
-        <HmPageNode
-          v-bind="props"
-          @update-height="updateNodeHeight"
-        />
-      </template>
-
-      <template #node-schema="props">
-        <SchemaNode
+      <template #node-schemamap="props">
+        <SchemaMapNode
           v-bind="props"
           @update-height="updateNodeHeight"
         />

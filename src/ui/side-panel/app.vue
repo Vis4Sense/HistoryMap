@@ -15,7 +15,7 @@ onMounted(() => {
         <SchemaMap w-full h-full />
       </div>
 
-      <SchemaPanel shrink-0 h-80 border-t="1.5" />
+      <!-- <SchemaPanel shrink-0 h-80 border-t="1.5" /> -->
     </div>
   </main>
 </template>

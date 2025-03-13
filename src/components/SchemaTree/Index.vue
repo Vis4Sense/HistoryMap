@@ -2,17 +2,12 @@
 import type { TargetPosition } from '@/composables/useDnDTree'
 import type { Annotation } from '@/types/historymap'
 import type { Schema } from '@/types/schema.d'
-import Header from '@/components/Canvas/nodes/SchemaNode/Header.vue'
 import { useSchemaEditor } from '@/composables/useSchemaEditor'
 import { newSchema } from '@/types/schema.d'
 import _ from 'lodash'
 
 const props = defineProps({
   id: {
-    type: String,
-    required: true,
-  },
-  type: {
     type: String,
     required: true,
   },
@@ -30,7 +25,23 @@ const props = defineProps({
   },
 })
 
+const emit = defineEmits<{
+  updateSchemaTreeHeight: [height: number]
+}>()
+
 const { id, schema, annotations } = toRefs(props)
+
+const container = ref<HTMLElement>()
+
+useResizeObserver(container, () => {
+  nextTick(() => {
+    emit('updateSchemaTreeHeight', container.value?.clientHeight || 0)
+    nextTick(() => {
+      emit('updateSchemaTreeHeight', container.value?.clientHeight || 0)
+      console.log('schema tree height', container.value?.clientHeight)
+    })
+  })
+})
 
 let schemaEditor = useSchemaEditor(id.value)
 watch(id, (newVal) => {
@@ -110,22 +121,28 @@ watch(annotations, (newVal, oldVal) => {
   // console.log('added', added)
   // console.log('removed', removed)
 
-  added.forEach((tag) => {
-    if (schema.value.concepts.find(c => c.name === tag)) {
-      return
-    }
-    schemaEditor.addRoot({ name: tag })
-  })
+  nextTick(() => {
+    added.forEach((tag) => {
+      if (schema.value.concepts.find(c => c.name === tag)) {
+        return
+      }
+      schemaEditor.addRoot({ name: tag })
+    })
 
-  removed.forEach((tag) => {
-    schemaEditor.deleteNode({ name: tag })
+    removed.forEach((tag) => {
+      schemaEditor.deleteNode({ name: tag })
+    })
   })
 }, { deep: true })
 </script>
 
 <template>
-  <div space-y-1 overflow-auto flex flex-col p="x-2 y-1">
-    <div
+  <div
+    ref="container"
+    space-y-1 flex flex-col p="x-2 y-1"
+    h-fit
+  >
+    <!-- <div
       shrink-0
       h-4
       truncate text-xs
@@ -144,7 +161,7 @@ watch(annotations, (newVal, oldVal) => {
           </div>
         </div>
       </slot>
-    </div>
+    </div> -->
 
     <div v-if="mode === 'edit'" shrink-0 flex>
       <BasicToolbarIcon plain @click="startEditing">

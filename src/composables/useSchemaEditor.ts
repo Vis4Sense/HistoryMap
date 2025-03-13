@@ -254,7 +254,8 @@ export function useSchemaEditor(nodeId: string) {
 
   function getSourcePage(id: string | null = null) {
     const node = getNode(nodeId)
-    const src = id ?? sourcePage.value?.id ?? null
+    // const src = id ?? sourcePage.value?.id ?? null
+    const src = id
     if (src && node && node.id.startsWith('sm-')) {
       const sNode = node as SchemaNode
       if (!sNode.sources.includes(src)) {

@@ -68,8 +68,8 @@ onMessage('annotate', ({ data }) => {
 })
 
 onMessage('add-tag', ({ data }) => {
-  // console.log('add-tag', data)
   if (activePage.value) {
+    console.log('add-tag', data)
     const { id, tag } = data as { id: number, tag: string }
     const annotation = addTag(activePage.value.id, id, tag)
     return annotation
