@@ -135,9 +135,9 @@ export function useSchemaMap() {
   /** initialise */
   function initialise() {
     // initial schema node
-    if (schemaNodes.value.length === 0) {
-      allSchemaNodes.value = [...allSchemaNodes.value, newSchemaNode()]
-    }
+    // if (schemaNodes.value.length === 0) {
+    //   allSchemaNodes.value = [...allSchemaNodes.value, newSchemaNode()]
+    // }
   }
 
   initialise()
