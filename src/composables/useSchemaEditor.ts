@@ -137,12 +137,13 @@ function SchemaEditor(schema_: Schema | undefined) {
       name: string,
       parentName: string,
     ) => {
-      const node = nodeDict[name]
-      const oldConcept = schema.concepts.find(d => d.name === name)
+      let node = nodeDict[name]
 
+      let oldConcept: Concept = schema.concepts.find(d => d.name === name)
       if (!oldConcept) {
-        console.error('concept not found', name)
-        return
+        node = { name }
+        oldConcept = { name, parentName: null }
+        schema.concepts.push(oldConcept)
       }
 
       const newConcept = { ...oldConcept, parentName }
@@ -188,12 +189,18 @@ function SchemaEditor(schema_: Schema | undefined) {
         return
       }
 
-      const node = nodeDict[name]
-      const oldConcept = schema.concepts.find(d => d.name === name)
-      const targetConcept = schema.concepts.find(d => d.name === targetName)
+      let node = nodeDict[name]
 
-      if (!oldConcept || !targetConcept) {
-        console.error('concept not found', name)
+      let oldConcept: Concept = schema.concepts.find(d => d.name === name)
+      if (!oldConcept) {
+        node = { name }
+        oldConcept = { name, parentName: null }
+        schema.concepts.push(oldConcept)
+      }
+
+      const targetConcept = schema.concepts.find(d => d.name === targetName)
+      if (!targetConcept) {
+        console.error('target concept not found', name)
         return
       }
 

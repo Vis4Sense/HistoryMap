@@ -5,6 +5,10 @@ import Node from './Node.vue'
 import { TargetPosition, useDragAndDropTree } from '@/composables/useDnDTree'
 
 const props = defineProps({
+  id: {
+    type: String, // id of the schema node or hm page node
+    required: true,
+  },
   index: {
     type: Number,
     required: true,
@@ -19,31 +23,49 @@ const props = defineProps({
 const emit = defineEmits<{
   addChild: [childName: string, rootName: string]
   deleteNode: [nodeName: string]
-  moveNode: [node: string, targetName: string, position: TargetPosition]
+  moveNode: [
+    sourceId: string,
+    sourceName: string,
+    targetId: string,
+    targetName: string,
+    position: TargetPosition
+  ]
 }>()
 
 /** props */
-const { node } = toRefs(props)
+const { id, node } = toRefs(props)
 
 /** drag and drop states and handlers */
-const { draggedData, draggedOverData, onDragStart, onDragOver, onDragLeave, onDragEnd } = useDragAndDropTree()
-const dragged = computed(() => draggedData.value?.name === node.value?.name)
-const draggedOver = computed(() =>
-  draggedOverData.value?.data.name === node.value?.name
-  && draggedOverData.value?.position === 'inside'
+const { sourceData, targetData, onDragStart, onDragOver, onDragLeave, onDragEnd } = useDragAndDropTree()
+const dragged = computed(() =>
+  sourceData.value?.id === id.value
+  && sourceData.value?.treeNode.name === node.value?.name
 )
-const draggedOverBefore = computed(() => {
-  return draggedOverData.value?.data.name === node.value?.name
-  && draggedOverData.value?.position === 'before'
-})
+const draggedOver = computed(() =>
+  targetData.value?.id === id.value
+  && targetData.value?.treeNode?.name === node.value?.name
+  && targetData.value?.position === 'inside'
+)
+const draggedOverBefore = computed(() =>
+  targetData.value?.id === id.value
+    && targetData.value?.treeNode?.name === node.value?.name
+    && targetData.value?.position === 'before'
+)
 const draggedOverAfter = computed(() =>
-  draggedOverData.value?.data.name === node.value?.name
-  && draggedOverData.value?.position === 'after'
+  targetData.value?.id === id.value
+    && targetData.value?.treeNode?.name === node.value?.name
+    && targetData.value?.position === 'after'
 )
 
 function onDrop(position: TargetPosition = 'inside') {
-  if (draggedData.value && draggedOverData.value) {
-    emit('moveNode', draggedData.value.name, draggedOverData.value.data.name, position)
+  if (sourceData.value && targetData.value) {
+    emit('moveNode',
+      sourceData.value.id,
+      sourceData.value.treeNode.name,
+      targetData.value.id,
+      targetData.value.treeNode!.name,
+      position
+    )
   }
 }
 
@@ -87,7 +109,7 @@ onClickOutside(newChildEle, () => {
           'border-transparent': !draggedOverBefore,
           'border-historymap': draggedOverBefore,
         }"
-        @dragover.prevent="onDragOver(node, 'before')"
+        @dragover.prevent="onDragOver(id, node, 'before')"
         @dragleave.prevent="onDragLeave()"
         @drop="onDrop('before')"
       />
@@ -104,8 +126,8 @@ onClickOutside(newChildEle, () => {
         }"
         @mouseover="showToolbar = true"
         @mouseleave="showToolbar = false"
-        @dragstart="onDragStart(node)"
-        @dragover.prevent="onDragOver(node)"
+        @dragstart="onDragStart(id, node)"
+        @dragover.prevent="onDragOver(id, node)"
         @dragleave.prevent="onDragLeave"
         @drop="onDrop()"
         @dragend="onDragEnd"
@@ -144,7 +166,7 @@ onClickOutside(newChildEle, () => {
           'border-transparent': !draggedOverAfter,
           'border-historymap': draggedOverAfter,
         }"
-        @dragover.prevent="onDragOver(node, 'after')"
+        @dragover.prevent="onDragOver(id, node, 'after')"
         @dragleave.prevent="onDragLeave()"
         @drop="onDrop('after')"
       />
@@ -154,6 +176,7 @@ onClickOutside(newChildEle, () => {
       <Node
         v-for="child, idx in node.children"
         :key="child.name"
+        :id="id"
         :index="idx"
         :node="child"
         @add-child="(...args) => emit('addChild', ...args)"

@@ -1,38 +1,9 @@
 <script setup lang="ts">
-// import Postmate from 'postmate'
-
-// const id = ref<number>()
-// const tags = ref<string[]>()
-
-// const handshake = new Postmate.Model({
-//   setId: (value: number) => {
-//     id.value = value
-//   },
-//   setTags: (value: string[]) => {
-//     tags.value = value
-//   },
-// })
-
-// function onAddTag(value: string) {
-//   handshake.then((parent) => {
-//     parent.emit('add-tag', value)
-//   })
-// }
-
-// function removeTag(value: string) {
-//   handshake.then((parent) => {
-//     parent.emit('remove-tag', value)
-//   })
-// }
-
 const id = ref<number>()
 const tags = ref<string[]>()
 
-// 监听来自父页面的消息
 window.addEventListener('message', (event) => {
-  console.log('event', event)
-  // if (event.origin !== window.location.origin)
-  //   return // 确保是可信来源
+  // console.log('event', event)
 
   const { type, value } = event.data
 
@@ -46,7 +17,6 @@ window.addEventListener('message', (event) => {
   }
 })
 
-// 发送 `add-tag` 和 `remove-tag` 事件到 `parent`
 function onAddTag(value: string) {
   console.log('onAddTag', value)
   window.parent.postMessage({ type: 'add-tag', tag: value, id: id.value }, '*')

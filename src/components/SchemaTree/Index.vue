@@ -36,10 +36,6 @@ const container = ref<HTMLElement>()
 useResizeObserver(container, () => {
   nextTick(() => {
     emit('updateSchemaTreeHeight', container.value?.clientHeight || 0)
-    nextTick(() => {
-      emit('updateSchemaTreeHeight', container.value?.clientHeight || 0)
-      console.log('schema tree height', container.value?.clientHeight)
-    })
   })
 })
 
@@ -75,11 +71,6 @@ onClickOutside(newRoot, () => {
   isEditing.value = false
 })
 
-/** create new schema node */
-function createSchemaNode() {
-  schemaEditor.createSchemaNode()
-}
-
 /** handle tree editing */
 
 // add root
@@ -98,15 +89,19 @@ function deleteNode(name: string) {
 }
 
 // move node
-function moveNode(nodeName: string, targetName: string, position: TargetPosition) {
+function moveNode(
+  sourceId: string, sourceName: string,
+  targetId: string, targetName: string,
+  position: TargetPosition
+) {
   if (position === 'inside') {
-    schemaEditor.moveNodeInto(nodeName, targetName)
+    schemaEditor.moveNodeInto(sourceName, targetName, sourceId)
   }
   else if (position === 'before') {
-    schemaEditor.moveNodeBefore(nodeName, targetName)
+    schemaEditor.moveNodeBefore(sourceName, targetName, sourceId)
   }
   else if (position === 'after') {
-    schemaEditor.moveNodeAfter(nodeName, targetName)
+    schemaEditor.moveNodeAfter(sourceName, targetName, sourceId)
   }
 }
 
@@ -142,27 +137,6 @@ watch(annotations, (newVal, oldVal) => {
     space-y-1 flex flex-col p="x-2 y-1"
     h-fit
   >
-    <!-- <div
-      shrink-0
-      h-4
-      truncate text-xs
-    >
-      <slot name="header">
-        <div flex justify-between items-center>
-          <Header :schema="schema" />
-
-          <div v-if="mode === 'edit'">
-            <BasicToolbarIcon
-              plain
-              @click="createSchemaNode()"
-            >
-              <div i-mdi-puzzle-plus-outline />
-            </BasicToolbarIcon>
-          </div>
-        </div>
-      </slot>
-    </div> -->
-
     <div v-if="mode === 'edit'" shrink-0 flex>
       <BasicToolbarIcon plain @click="startEditing">
         <div i-carbon-add />

@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import type { Edge } from '@vue-flow/core'
-// import HmPageNode from '@/components/Canvas/nodes/HmPageNode/Index.vue'
-// import SchemaNode from '@/components/Canvas/nodes/SchemaNode/Index.vue'
 import SchemaMapNode from '@/components/Canvas/nodes/SchemaMapNode/Index.vue'
 import { useSchemaMap } from '@/composables/useSchemaMap'
 import { useVueFlow, VueFlow } from '@vue-flow/core'

@@ -2,41 +2,51 @@ import { SchemaTreeNode } from "@/types/schema"
 
 export type TargetPosition = 'before' | 'after' | 'inside'
 
-interface DropTarget {
-  data: SchemaTreeNode
+interface SourceData {
+  id: string // id of the source node
+  treeNode: SchemaTreeNode
+}
+
+interface TargetData {
+  id: string
+  treeNode: SchemaTreeNode | null
   position: TargetPosition
 }
 
 const state = {
-  draggedData: ref<SchemaTreeNode | null>(null),
-  draggedOverData: ref<DropTarget | null>(null),
+  sourceData: ref<SourceData | null>(null),
+  targetData: ref<TargetData | null>(null),
   isDragging: ref(false),
 }
 
 export function useDragAndDropTree() {
 
   const {
-    draggedData,
-    draggedOverData,
+    sourceData,
+    targetData,
     isDragging,
   } = state
 
-  function onDragStart(data: SchemaTreeNode) {
-    draggedData.value = data
+  function onDragStart(id: string, data: SchemaTreeNode) {
+    sourceData.value = { id, treeNode: data }
     isDragging.value = true
   }
 
-  function onDragOver(data: SchemaTreeNode, position: TargetPosition = 'inside') {
-    draggedOverData.value = { data, position }
+  function onDragOver(
+    id: string,
+    data: SchemaTreeNode,
+    position: TargetPosition = 'inside'
+  ) {
+    targetData.value = { id, treeNode: data, position }
   }
 
   function onDragLeave() {
-    draggedOverData.value = null
+    targetData.value = null
   }
 
   function onDragEnd() {
-    draggedData.value = null
-    draggedOverData.value = null
+    sourceData.value = null
+    targetData.value = null
     isDragging.value = false
   }
 

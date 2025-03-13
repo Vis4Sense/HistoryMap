@@ -48,7 +48,6 @@ useResizeObserver(highlightContainer, () => {
       emit('updateHeight', id.value, {
         highlights: highlightContainer.value.clientHeight,
       })
-      console.log('highlight height', highlightContainer.value.clientHeight)
     }
   })
 })
@@ -127,6 +126,7 @@ const showSchemaTree = computed(() => {
       :schema="data.schema"
       :annotations="'annotations' in data ? data.annotations : undefined"
       @update-schema-tree-height="(h) => emit('updateHeight', id, { schemaTree: h })"
+      class="nodrag"
       overflow-visible
     />
 

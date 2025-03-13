@@ -1,5 +1,5 @@
 import type { HmPage } from '@/types/historymap'
-import type { ElementProvenance, Schema, SchemaNode } from '@/types/schema'
+import type { ElementProvenance, Schema, SchemaNode } from '@/types/schema.d'
 import { v4 as uuidv4 } from 'uuid'
 import { useHistoryMap } from './useHistoryMap'
 import { useSession } from './useSession'
