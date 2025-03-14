@@ -2,12 +2,15 @@
 import type { Edge } from '@vue-flow/core'
 import SchemaMapNode from '@/components/Canvas/nodes/SchemaMapNode/Index.vue'
 import { useSchemaMap } from '@/composables/useSchemaMap'
+import { Controls } from '@vue-flow/controls'
 import { useVueFlow, VueFlow } from '@vue-flow/core'
 import _ from 'lodash'
 import { compactTreeLayout } from '../HistoryMap/layout/compact-tree'
 
-const { getSelectedNodes } = useVueFlow()
-const { nodes: smNodes, links, setSelectedNodeIds } = useSchemaMap()
+const { getSelectedNodes, addSelectedNodes, removeSelectedNodes, elementsSelectable } = useVueFlow()
+const { nodes: smNodes, links, setSelectedNodeIds, addSchemaNode } = useSchemaMap()
+
+const selectionMode = ref<'single' | 'multiple'>('single')
 
 const baseSize = {
   width: 160,
@@ -84,6 +87,36 @@ watch(() => getSelectedNodes.value.map(d => d.id), (newVal, oldVal) => {
     return
   setSelectedNodeIds(newVal)
 })
+
+/** overwrite default selection behaviour */
+onMounted(() => {
+  elementsSelectable.value = false
+})
+function onNodeClick({ event, node }) {
+  if (selectionMode.value === 'single') {
+    removeSelectedNodes(getSelectedNodes.value)
+    addSelectedNodes([node])
+  }
+  else {
+    if (getSelectedNodes.value.includes(node)) {
+      removeSelectedNodes([node])
+    }
+    else {
+      addSelectedNodes([...getSelectedNodes.value, node])
+    }
+  }
+}
+
+/** handle creating new schema */
+function onAddSchemaNode() {
+  // addSchemaNode()
+  if (getSelectedNodes.value.length) {
+    addSchemaNode(
+      getSelectedNodes.value.map(node => node.data.id),
+      'merge'
+    )
+  }
+}
 </script>
 
 <template>
@@ -94,6 +127,7 @@ watch(() => getSelectedNodes.value.map(d => d.id), (newVal, oldVal) => {
       :nodes="nodes"
       :edges="edges"
       class="edge-under"
+      @node-click="onNodeClick"
     >
       <template #node-schemamap="props">
         <SchemaMapNode
@@ -101,6 +135,32 @@ watch(() => getSelectedNodes.value.map(d => d.id), (newVal, oldVal) => {
           @update-height="updateNodeHeight"
         />
       </template>
+
+      <Controls
+        position="bottom-center"
+        flex m-1 bg-white
+        :show-zoom="false"
+        :show-fit-view="false"
+        :show-interactive="false"
+      >
+        <BasicToolbarIcon
+          :bg="selectionMode === 'single'"
+          @click="selectionMode = 'single'"
+        >
+          <div i-mdi-cursor-default-outline />
+        </BasicToolbarIcon>
+        <BasicToolbarIcon
+          :bg="selectionMode === 'multiple'"
+          @click="selectionMode = 'multiple'"
+        >
+          <div i-mdi-vector-selection />
+        </BasicToolbarIcon>
+        <BasicToolbarIcon
+          @click="onAddSchemaNode"
+        >
+          <div i-mdi-puzzle-plus-outline />
+        </BasicToolbarIcon>
+      </Controls>
     </VueFlow>
   </div>
 </template>
@@ -111,4 +171,5 @@ watch(() => getSelectedNodes.value.map(d => d.id), (newVal, oldVal) => {
 
 /* import the default theme, this is optional but generally recommended */
 @import '@vue-flow/core/dist/theme-default.css';
+@import '@vue-flow/controls/dist/style.css';
 </style>

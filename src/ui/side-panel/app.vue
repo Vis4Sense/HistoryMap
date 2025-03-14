@@ -10,7 +10,7 @@ onMounted(() => {
     <div w-full h-full overflow-auto flex flex-col>
       <Header />
 
-      <div p-4 flex-auto>
+      <div p-2 flex-auto>
         <!-- <HistoryMap w-full h-full /> -->
         <SchemaMap w-full h-full />
       </div>

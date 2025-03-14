@@ -90,9 +90,11 @@ function deleteNode(name: string) {
 
 // move node
 function moveNode(
-  sourceId: string, sourceName: string,
-  targetId: string, targetName: string,
-  position: TargetPosition
+  sourceId: string,
+  sourceName: string,
+  targetId: string,
+  targetName: string,
+  position: TargetPosition,
 ) {
   if (position === 'inside') {
     schemaEditor.moveNodeInto(sourceName, targetName, sourceId)
@@ -108,7 +110,16 @@ function moveNode(
 /** add tags to schema tree */
 watch(annotations, (newVal, oldVal) => {
   const newTags = newVal.map(a => a.tags ?? []).flat()
-  const oldTags = oldVal.map(a => a.tags ?? []).flat()
+  let oldTags = oldVal.map(a => a.tags ?? []).flat()
+
+  // FIXME: when adding the first tag, the changes is not captured by vue
+  // Here we manually set oldTags to empty array. What would be a better way?
+  if (oldTags.length === 1 && newTags.length > 0) {
+    oldTags = []
+  }
+
+  // console.log('newTags', newTags)
+  // console.log('oldTags', oldTags)
 
   const added = _.difference(newTags, oldTags)
   const removed = _.difference(oldTags, newTags)

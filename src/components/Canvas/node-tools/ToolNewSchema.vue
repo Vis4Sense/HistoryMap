@@ -12,7 +12,7 @@ const { addSchemaNode } = useSchemaMap()
 </script>
 
 <template>
-  <BasicToolbarIcon @click="addSchemaNode([id])">
-    <div i-mdi-puzzle-plus-outline></div>
+  <BasicToolbarIcon @click="addSchemaNode([id], 'copy')">
+    <div i-mdi-puzzle-plus-outline />
   </BasicToolbarIcon>
 </template>

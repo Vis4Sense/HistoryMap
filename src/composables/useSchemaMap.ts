@@ -63,20 +63,22 @@ export function useSchemaMap() {
 
   /** utilities */
 
-  function newSchemaNode(): SchemaNode {
+  function newSchemaNode(schema: Schema | null = null): SchemaNode {
     deactivateAllSchemaNodes()
+
+    const schema_ = schema ?? {
+      schemaTree: {
+        roots: [],
+      },
+      concepts: [],
+      relations: [],
+    }
 
     return {
       sessionId: sessionId.value,
       id: `sm-${uuidv4()}`,
       type: 'schema',
-      schema: {
-        schemaTree: {
-          roots: [],
-        },
-        concepts: [],
-        relations: [],
-      },
+      schema: schema_,
       sources: [],
       timeCreated: Date.now(),
       timeUpdated: Date.now(),
@@ -94,8 +96,17 @@ export function useSchemaMap() {
     return nodes.value.find(d => d.id === id)
   }
 
-  function addSchemaNode(sources: string[] = []) {
-    const newNode = newSchemaNode()
+  function addSchemaNode(
+    sources: string[] = [],
+    initialise: 'empty' | 'copy' | 'merge' = 'empty',
+  ) {
+    let newNode = newSchemaNode()
+
+    if (initialise === 'copy' && sources.length > 0) {
+      const srcNode = getNode(sources[0])
+      newNode = newSchemaNode(srcNode?.schema ?? null)
+    }
+
     newNode.sources = sources
     allSchemaNodes.value = [...allSchemaNodes.value, newNode]
   }

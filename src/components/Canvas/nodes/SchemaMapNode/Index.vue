@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import type { HmPage } from '@/types/historymap'
+import type { SchemaNode } from '@/types/schema'
 import { Handle, Position, useVueFlow } from '@vue-flow/core'
 import { NodeToolbar } from '@vue-flow/node-toolbar'
-import HmPageNodeToolbar from '../../node-toolbars/HmPageNodeToolbar.vue'
+import SchemaMapNodeToolbar from '../../node-toolbars/SchemaMapNodeToolbar.vue'
 import HmPageNodeHeader from '../HmPageNode/Header.vue'
 import SchemaNodeHeader from '../SchemaNode/Header.vue'
-import { SchemaNode } from '@/types/schema'
-import SchemaMapNodeToolbar from '../../node-toolbars/SchemaMapNodeToolbar.vue'
 
 const props = defineProps({
   id: {
@@ -59,12 +58,13 @@ const showSchemaTree = computed(() => {
       return true
     }
     if (data.value.annotations) {
-      const tags = data.value.annotations.map((a) => a.tags ?? []).flat()
+      const tags = data.value.annotations.map(a => a.tags ?? []).flat()
       if (tags.length) {
         return true
       }
     }
-  } else if (data.value.type === 'schema') {
+  }
+  else if (data.value.type === 'schema') {
     return true
   }
   return false
@@ -80,7 +80,7 @@ const showSchemaTree = computed(() => {
     hover:shadow
     :class="{
       'border-blue': data!.isActive,
-      'border-2': selected,
+      'border-1.5 border-historymap': selected,
     }"
   >
     <HmPageNodeHeader
@@ -98,15 +98,16 @@ const showSchemaTree = computed(() => {
     />
 
     <div
-      ref="highlightContainer"
       v-if="data.type === 'hm-page'
         && data.annotations
         && data.annotations.filter(d => d.highlighted).length
       "
+      ref="highlightContainer"
       p-1
       space-y-1
     >
-      <div v-for="annotation in data.annotations"
+      <div
+        v-for="annotation in data.annotations"
         :key="annotation.id"
         text-xs
         space-y="0.5"
@@ -125,9 +126,10 @@ const showSchemaTree = computed(() => {
       :id="id"
       :schema="data.schema"
       :annotations="'annotations' in data ? data.annotations : undefined"
-      @update-schema-tree-height="(h) => emit('updateHeight', id, { schemaTree: h })"
       class="nodrag"
       overflow-visible
+      text-sm
+      @update-schema-tree-height="(h) => emit('updateHeight', id, { schemaTree: h })"
     />
 
     <NodeToolbar
