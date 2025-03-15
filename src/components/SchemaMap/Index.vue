@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { HmPage } from '@/types/historymap'
+import type { SchemaNode } from '@/types/schema'
 import type { Edge } from '@vue-flow/core'
 import SchemaMapNode from '@/components/Canvas/nodes/SchemaMapNode/Index.vue'
 import { useSchemaMap } from '@/composables/useSchemaMap'
@@ -30,7 +32,7 @@ const nodes = computed(() => {
   const nodes = smNodes.value.map(node => ({
     id: node.id,
     type: 'schemamap',
-    width: getNodeWidth(node.id),
+    width: getNodeWidth(node),
     height: getNodeHeight(node.id),
     position: {
       x: 0,
@@ -53,8 +55,15 @@ const nodes = computed(() => {
 
 /** get node sizes */
 
-function getNodeWidth(id: string) {
-  return nodeSizeDict.value[id]?.width ?? baseSize.width
+function getNodeWidth(node: HmPage | SchemaNode): number {
+  if (nodeSizeDict.value[node.id]?.width) {
+    return nodeSizeDict.value[node.id].width!
+  }
+  if (node.schema || node.annotations) {
+    return baseSize.width * 1.5
+  }
+  return baseSize.width
+  // return nodeSizeDict.value[id]?.width ?? baseSize.width
 }
 
 function getNodeHeight(id: string): number {
@@ -113,7 +122,7 @@ function onAddSchemaNode() {
   if (getSelectedNodes.value.length) {
     addSchemaNode(
       getSelectedNodes.value.map(node => node.data.id),
-      'merge'
+      'merge',
     )
   }
 }

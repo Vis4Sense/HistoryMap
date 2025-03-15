@@ -144,6 +144,9 @@ importers:
       '@types/rangy':
         specifier: ^0.0.38
         version: 0.0.38
+      '@types/turndown':
+        specifier: ^5.0.5
+        version: 5.0.5
       '@types/webextension-polyfill':
         specifier: ^0.12.1
         version: 0.12.1
@@ -1886,6 +1889,9 @@ packages:
 
   '@types/rangy@0.0.38':
     resolution: {integrity: sha512-KMybA3NQLSc5Fl5VOyLVSZ10AMSY6anQqLxP8dxgNsui3dScPIB7smywq69gwJkud2ODVTIImMNN3RtHcFKYgA==}
+
+  '@types/turndown@5.0.5':
+    resolution: {integrity: sha512-TL2IgGgc7B5j78rIccBtlYAnkuv8nUQqhQc+DSYV5j9Be9XOcm/SKOVRuA47xAVI3680Tk9B1d8flK2GWT2+4w==}
 
   '@types/unist@3.0.3':
     resolution: {integrity: sha512-ko/gIFJRv177XgZsZcBwnqJN5x/Gien8qNOn0D5bQU/zAzVf9Zt3BlcUiLqhV9y4ARk0GbT3tnUiPNgnTXzc/Q==}
@@ -7834,6 +7840,8 @@ snapshots:
   '@types/postmate@1.5.4': {}
 
   '@types/rangy@0.0.38': {}
+
+  '@types/turndown@5.0.5': {}
 
   '@types/unist@3.0.3': {}
 

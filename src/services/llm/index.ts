@@ -8,6 +8,7 @@ export async function chatCompletion(
 ) {
   const options = getOptions(message)
   try {
+    // console.info('fetching', message)
     fetch(API_URL, options)
       .then(response => response.json())
       .then(result => {
@@ -22,7 +23,33 @@ export async function chatCompletion(
   }
 }
 
-function getOptions(message: string) {
+export async function chatCompletionText(
+  message: string,
+  maxRetries: number = 3,
+): Promise<string> {
+  const options = getOptions(message, 'text')
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      console.info('fetching', message)
+      const response = await fetch(API_URL, options)
+      const result = await response.json()
+      return result.choices[0].message.content
+    } catch (error) {
+      console.error('Error:', error, `retrying... ${maxRetries - attempt} times left`)
+      if (attempt === maxRetries) {
+        throw new Error('Max retries reached')
+      }
+    }
+  }
+
+  throw new Error('Unexpected error in chatCompletionText')
+}
+
+function getOptions(
+  message: string,
+  response_format: 'json_object' | 'text' = 'json_object',
+) {
   return {
     method: 'POST',
     headers: {
@@ -47,7 +74,8 @@ function getOptions(message: string) {
       max_tokens: 4096,
       stop: ['null'],
       response_format: {
-        type: 'json_object',
+        // type: 'json_object',
+        type: response_format,
       },
     }),
   }

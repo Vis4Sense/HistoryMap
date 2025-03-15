@@ -27,14 +27,15 @@
 .historymap-selection-toolbar-iframe {
   position: absolute;
   transform: translateX(-50%) translateY(-100%);
-  width: 6rem;
+  width: 8rem;
   height: 3rem;
 }
 
 .historymap-note-box-iframe {
   position: absolute;
-  width: 10rem;
-  height: 5rem;
+  width: 15rem;
+  min-height: 5rem;
+  max-height: 20rem;
   right: 1rem;
 }
 

@@ -6,11 +6,13 @@
  */
 
 import type { Annotation } from '@/types/historymap'
+import type { Schema } from '@/types/schema'
 import { useHistoryMap } from '@/composables/useHistoryMap'
+import { chatCompletionText } from '@/services/llm'
 import { onMessage } from 'webext-bridge/background'
 import { updateActivePage } from './controller'
 
-const { activePage, addAnnotation, removeHighlight, highlight, addTag, removeTag } = useHistoryMap()
+const { activePage, addAnnotation, updateAnnotation, removeHighlight, highlight, addTag, removeTag } = useHistoryMap()
 
 onMessage('fetch-annotations', () => {
   updateActivePage()
@@ -85,3 +87,124 @@ onMessage('remove-tag', ({ data }) => {
   }
   return null
 })
+
+onMessage('extract-outline', async ({ data }) => {
+  if (activePage.value) {
+    let annotation: Annotation | null = null
+    const pageId = activePage.value.id
+    const { id, sourceText } = data as { id: number, sourceText: string }
+
+    const instruction = `Extract a hierarchical outline of the following content. Each item in the outline should include a unique name and a short description.
+
+Format the outline in markdown. Use * for bullet points. Each item should be:
+* {name}: description
+
+Example response format:
+<outline>
+* Fruit: A sweet or savory edible plant product
+  * Apple: A type of fruit that is red or green
+  * Banana: A type of fruit that is yellow
+* Vegetable: A savory edible plant product
+</outline>`
+
+    const prompt = `${instruction}\n\nSource content:\n${sourceText}`
+
+    const response = await chatCompletionText(prompt)
+
+    try {
+      // console.log('response', response)
+      const match = response.match(/<outline>([\s\S]*?)<\/outline>/)
+      const markdown = match ? match[1] : response
+      const outline = parseMarkdownToSchema(markdown)
+      annotation = updateAnnotation(pageId, id, { schema: outline })
+      // console.log('annotation', annotation)
+    }
+    catch (error) {
+      console.error('error', error)
+    }
+
+    return annotation
+  }
+  return null
+})
+
+function parseMarkdownToSchema(markdown: string) {
+  const lines = markdown.trim().split('\n')
+  const stack = [{ name: 'root', children: [] }]
+
+  const schema: Schema = {
+    schemaTree: {
+      roots: [],
+    },
+    concepts: [],
+    relations: [],
+  }
+
+  for (const line of lines) {
+    const match = line.match(/^(\s*)\* (.*)/)
+    if (!match)
+      continue
+
+    const indent = match[1].length
+    const content = match[2]
+
+    const parts = content.split(':')
+
+    if (parts.length < 2)
+      continue
+
+    const name = parts[0].trim().replace(/\*\*/g, '')
+    const description = parts.slice(1).join(':').trim()
+
+    const item = { name, description, children: [] }
+
+    while (stack.length > 1 && stack[stack.length - 1].indent >= indent) {
+      stack.pop()
+    }
+
+    stack[stack.length - 1].children.push(item)
+    stack.push({ ...item, indent })
+  }
+
+  function parseNode(node: Array | object, parentName: string | null = null) {
+    if (Array.isArray(node)) {
+      node.forEach(n => parseNode(n, parentName))
+    }
+    else {
+      schema.concepts.push({
+        name: node.name,
+        parentName,
+        description: node.description,
+      })
+      if (node.children && node.children.length === 0) {
+        delete node.children
+      }
+      else if (node.children) {
+        node.children.forEach(n => parseNode(n, node.name))
+      }
+      delete node.description
+    }
+    return node
+  }
+
+  schema.schemaTree.roots = parseNode(stack[0].children)
+  // console.log('schema', schema)
+
+  return schema
+}
+
+// const markdownText = `
+// * **Physical Characteristics**: Distinctive physical features associated with Apert syndrome
+// * **Skull and Facial Structure**: Tall skull, high prominent forehead, underdeveloped upper jaw
+//   * **Eye and Nose Features**: Prominent eyes, widely spaced apart, bulging eyes, and bulbus nose
+// * **Limbs and Fingers**: Fused toes
+// * **Developmental Delays**: Slower mental development due to abnormal skull growth
+// * **Oral Complications**: Cleft palate
+// * **Sensory Related Issues**: Vision problems
+// * **Ear and Respiratory Issues**: Recurrent ear infections, hearing loss, difficulty breathing
+// * **Gastrointestinal and Dermatological Issues**
+// * **Sleep Related**: Increased perspiration while asleep
+// * **Skin Related**: Acne, especially during puberty
+// `
+
+// console.log(JSON.stringify(parseMarkdownToSchema(markdownText), null, 2))

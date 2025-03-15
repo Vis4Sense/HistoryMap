@@ -21,6 +21,7 @@ export interface Annotation {
   sourceText: string
   highlighted: boolean
   tags?: string[]
+  schema?: Schema
   timeCreated: number
   timeUpdated: number
 }

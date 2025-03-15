@@ -199,6 +199,22 @@ export function useHistoryMap() {
     return annotation
   }
 
+  function updateAnnotation(
+    pageId: string,
+    id: number,
+    data: Partial<Annotation>,
+  ) {
+    const page = getPage(pageId)
+    if (!page)
+      return null
+    const annotation = page.annotations?.find(d => d.id === id) ?? null
+    if (annotation) {
+      Object.assign(annotation, data)
+      annotation.timeUpdated = Date.now()
+    }
+    return annotation
+  }
+
   function getAnnotation(
     pageId: string,
     id: number,
@@ -215,6 +231,7 @@ export function useHistoryMap() {
     updatePage,
     removePage,
     addAnnotation,
+    updateAnnotation,
     getAnnotation,
     highlight,
     removeHighlight,

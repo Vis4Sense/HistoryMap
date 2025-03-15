@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import type { Schema } from '@/types/schema'
+
 const id = ref<number>()
 const tags = ref<string[]>()
+const schema = ref<Schema>()
 
 window.addEventListener('message', (event) => {
   // console.log('event', event)
@@ -13,6 +16,9 @@ window.addEventListener('message', (event) => {
       break
     case 'setTags':
       tags.value = value
+      break
+    case 'setSchema':
+      schema.value = value
       break
   }
 })
@@ -29,6 +35,8 @@ function removeTag(value: string) {
 
 <template>
   <div w-full rounded shadow bg-blue-1 p="x-2 y-1">
+    <VSchemaTree v-if="schema" text-xs :schema="schema" />
+
     <el-input-tag
       v-model="tags"
       bg-transparent

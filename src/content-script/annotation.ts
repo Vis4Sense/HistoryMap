@@ -21,6 +21,7 @@ import type { Annotation } from '@/types/historymap'
 import _ from 'lodash'
 import Postmate from 'postmate'
 import rangy from 'rangy'
+import TurndownService from 'turndown'
 import { sendMessage } from 'webext-bridge/content-script'
 import 'rangy/lib/rangy-selectionsaverestore'
 import 'rangy/lib/rangy-classapplier'
@@ -58,6 +59,8 @@ function initialiseToolbar() {
     child.on('dehighlight', dehighlightHandler)
 
     child.on('tagging-start', taggingStartHandler)
+
+    child.on('extract-outline', extractOutlineHandler)
   })
 
   toolbar = handshake
@@ -81,6 +84,10 @@ function createNoteBox(id: number, rect: Rect) {
       iframe.contentWindow?.postMessage({
         type: 'setTags',
         value: annotations.find(d => d.id === id)?.tags || [],
+      }, '*')
+      iframe.contentWindow?.postMessage({
+        type: 'setSchema',
+        value: annotations.find(d => d.id === id)?.schema || null,
       }, '*')
     }, 1000)
     iframe.style.top = `${rect.top + window.scrollY}px`
@@ -234,6 +241,25 @@ async function taggingStartHandler() {
   }
 }
 
+/** handle extracting outline */
+async function extractOutlineHandler() {
+  if (!selectedAnnotation) {
+    await saveAnnotation('annotate')
+  }
+  if (!selectedAnnotation)
+    return
+
+  const text = selectedAnnotation.sourceText
+  console.log('extracting outline', text)
+
+  const annotation = await sendMessage('extract-outline', selectedAnnotation, 'background') as Annotation
+  noteboxes[selectedAnnotation.id]?.contentWindow?.postMessage({
+    type: 'setSchema',
+    value: annotation.schema,
+  }, '*')
+  console.log('extracted outline', annotation)
+}
+
 /** utilities */
 
 function showToolbar(frame: HTMLIFrameElement, rect: Rect) {
@@ -283,13 +309,26 @@ function getAnnotationBoundingRect(id: number): Rect {
   }, { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity })
 }
 
+function selection2markdown(selection: RangySelection) {
+  const range = selection.getRangeAt(0)
+  const clonedDoc = document.implementation.createHTMLDocument()
+  clonedDoc.body.appendChild(range.cloneContents())
+
+  const turndownService = new TurndownService()
+  return turndownService.turndown(clonedDoc.body.innerHTML)
+}
+
 async function saveAnnotation(type: 'highlight' | 'annotate' = 'highlight') {
   const selection = rangy.getSelection()
   if (selection.isCollapsed) {
     return
   }
 
-  const sourceText = selection.toString()
+  let sourceText = selection.toString()
+  try {
+    sourceText = selection2markdown(selection)
+  } catch {}
+
   const uuidPattern = /\{([a-f0-9\-]+)\}$/i
   const serialized = rangy.serializeSelection(selection)
     .replace(uuidPattern, '')

@@ -100,7 +100,6 @@ const showSchemaTree = computed(() => {
     <div
       v-if="data.type === 'hm-page'
         && data.annotations
-        && data.annotations.filter(d => d.highlighted).length
       "
       ref="highlightContainer"
       p-1
@@ -115,6 +114,11 @@ const showSchemaTree = computed(() => {
         <div v-if="annotation.highlighted" flex-auto truncate bg-yellow-1>
           {{ annotation.sourceText }}
         </div>
+        <VSchemaTree
+          v-if="annotation.schema"
+          border-0.5 rounded
+          :schema="annotation.schema"
+        />
         <!-- <div v-if="annotation.tags && annotation.tags.length" flex flex-nowrap px="1">
           <span v-for="tag in annotation.tags" px-1 bg-gray-1 rounded-lg>{{ tag }}</span>
         </div> -->

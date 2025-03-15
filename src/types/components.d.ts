@@ -48,5 +48,7 @@ declare module 'vue' {
     SchemaTree: typeof import('./../components/SchemaTree/Index.vue')['default']
     SchemaTreeNode: typeof import('./../components/SchemaTree/Node.vue')['default']
     SessionList: typeof import('./../components/SessionList.vue')['default']
+    VSchemaTree: typeof import('./../components/VSchemaTree/Index.vue')['default']
+    VSchemaTreeNode: typeof import('./../components/VSchemaTree/Node.vue')['default']
   }
 }

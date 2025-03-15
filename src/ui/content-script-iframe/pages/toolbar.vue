@@ -29,6 +29,12 @@ function onClickTag() {
     parent.emit('tagging-start')
   })
 }
+
+function onExtractOutline() {
+  handshake.then((parent) => {
+    parent.emit('extract-outline')
+  })
+}
 </script>
 
 <template>
@@ -50,6 +56,9 @@ function onClickTag() {
         </BasicToolbarIcon>
         <BasicToolbarIcon @click="onClickTag()">
           <div i-ph-tag />
+        </BasicToolbarIcon>
+        <BasicToolbarIcon @click="onExtractOutline()">
+          <div i-mdi-format-list-bulleted />
         </BasicToolbarIcon>
       </div>
     </div>
