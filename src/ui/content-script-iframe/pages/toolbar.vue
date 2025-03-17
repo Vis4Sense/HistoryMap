@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Annotation } from '@/types/historymap'
+import type { Annotation } from '@/types/historymap'
 import Postmate from 'postmate'
 
 const annotation = ref<Annotation | null>(null)
@@ -35,6 +35,12 @@ function onExtractOutline() {
     parent.emit('extract-outline')
   })
 }
+
+function onDelete() {
+  handshake.then((parent) => {
+    parent.emit('delete')
+  })
+}
 </script>
 
 <template>
@@ -50,7 +56,8 @@ function onExtractOutline() {
             i-mdi-brush-off
             @click="onDehighlight()"
           />
-          <div v-else i-ph-paint-brush
+          <div
+            v-else i-ph-paint-brush
             @click="onHighlight()"
           />
         </BasicToolbarIcon>
@@ -59,6 +66,9 @@ function onExtractOutline() {
         </BasicToolbarIcon>
         <BasicToolbarIcon @click="onExtractOutline()">
           <div i-mdi-format-list-bulleted />
+        </BasicToolbarIcon>
+        <BasicToolbarIcon @click="onDelete()">
+          <div i-carbon-close-outline />
         </BasicToolbarIcon>
       </div>
     </div>

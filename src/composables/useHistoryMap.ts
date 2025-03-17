@@ -143,6 +143,18 @@ export function useHistoryMap() {
     return annotation
   }
 
+  function removeAnnotation(pageId: string, id: number) {
+    const page = getPage(pageId)
+    if (!page || !page.annotations)
+      return
+    const index = page.annotations.findIndex(d => d.id === id)
+    if (index >= 0) {
+      page.annotations.splice(index, 1)
+      if (page.annotations.length === 0)
+        delete page.annotations
+    }
+  }
+
   function highlight(pageId: string, id: number) {
     const page = getPage(pageId)
     if (!page || !page.annotations)
@@ -232,6 +244,7 @@ export function useHistoryMap() {
     removePage,
     addAnnotation,
     updateAnnotation,
+    removeAnnotation,
     getAnnotation,
     highlight,
     removeHighlight,

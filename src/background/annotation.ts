@@ -12,11 +12,18 @@ import { chatCompletionText } from '@/services/llm'
 import { onMessage } from 'webext-bridge/background'
 import { updateActivePage } from './controller'
 
-const { activePage, addAnnotation, updateAnnotation, removeHighlight, highlight, addTag, removeTag } = useHistoryMap()
+const { activePage, addAnnotation, updateAnnotation, removeAnnotation, removeHighlight, highlight, addTag, removeTag } = useHistoryMap()
 
 onMessage('fetch-annotations', () => {
   updateActivePage()
   return activePage.value?.annotations || []
+})
+
+onMessage('delete', ({ data }) => {
+  if (activePage.value) {
+    const { id } = data as { id: number }
+    removeAnnotation(activePage.value.id, id)
+  }
 })
 
 onMessage('highlight', ({ data }) => {

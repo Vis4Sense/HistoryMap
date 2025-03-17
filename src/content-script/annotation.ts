@@ -61,6 +61,8 @@ function initialiseToolbar() {
     child.on('tagging-start', taggingStartHandler)
 
     child.on('extract-outline', extractOutlineHandler)
+
+    child.on('delete', deleteHandler)
   })
 
   toolbar = handshake
@@ -149,6 +151,26 @@ function selectionHandler(event: MouseEvent) {
   })
 }
 
+/** deletion handler */
+function deleteHandler() {
+  if (selectedAnnotation) {
+    const { id } = selectedAnnotation
+    sendMessage('delete', { id }, 'background')
+      .then(() => {
+        annotations = annotations.filter(d => d.id !== id)
+        noteboxes[id].remove()
+
+        const el = document.querySelector(`[annotation-id="${id}"]`)
+        if (el) {
+          const highlight = highlighter.getHighlightForElement(el)
+          if (highlight) {
+            highlight.unapply()
+          }
+        }
+      })
+  }
+}
+
 /** highlight handler */
 function highlightHandler() {
   if (selectedAnnotation) {
@@ -178,6 +200,8 @@ function dehighlightHandler() {
       if (el) {
         const highlight = highlighter.getHighlightForElement(el)
         highlight.unapply()
+
+        // FIXME: there may be tags/schema, should not remove annotation directly
         annotations = annotations.filter(d => d.id !== annotation.id)
       }
     })
@@ -327,7 +351,8 @@ async function saveAnnotation(type: 'highlight' | 'annotate' = 'highlight') {
   let sourceText = selection.toString()
   try {
     sourceText = selection2markdown(selection)
-  } catch {}
+  }
+  catch {}
 
   const uuidPattern = /\{([a-f0-9\-]+)\}$/i
   const serialized = rangy.serializeSelection(selection)
