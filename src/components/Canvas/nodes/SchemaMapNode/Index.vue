@@ -104,6 +104,8 @@ const showSchemaTree = computed(() => {
       ref="highlightContainer"
       p-1
       space-y-1
+      max-h-40 overflow-auto
+      class="nowheel"
     >
       <div
         v-for="annotation in data.annotations"
