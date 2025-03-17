@@ -9,6 +9,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     BasicToolbarIcon: typeof import('./../components/Basic/ToolbarIcon.vue')['default']
     CanvasNodesHmPageNode: typeof import('./../components/Canvas/nodes/HmPageNode/Index.vue')['default']
+    CanvasNodesHmPageNodeAnnotation: typeof import('./../components/Canvas/nodes/HmPageNode/Annotation.vue')['default']
     CanvasNodesHmPageNodeHeader: typeof import('./../components/Canvas/nodes/HmPageNode/Header.vue')['default']
     CanvasNodesHmPageNodeSchemaDiff: typeof import('./../components/Canvas/nodes/HmPageNode/SchemaDiff.vue')['default']
     CanvasNodesSchemaMapNode: typeof import('./../components/Canvas/nodes/SchemaMapNode/Index.vue')['default']

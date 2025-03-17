@@ -1,4 +1,4 @@
-import { SchemaTreeNode } from "@/types/schema"
+import type { SchemaTreeNode } from '@/types/schema'
 
 export type TargetPosition = 'before' | 'after' | 'inside'
 
@@ -20,7 +20,6 @@ const state = {
 }
 
 export function useDragAndDropTree() {
-
   const {
     sourceData,
     targetData,
@@ -35,7 +34,7 @@ export function useDragAndDropTree() {
   function onDragOver(
     id: string,
     data: SchemaTreeNode,
-    position: TargetPosition = 'inside'
+    position: TargetPosition = 'inside',
   ) {
     targetData.value = { id, treeNode: data, position }
   }

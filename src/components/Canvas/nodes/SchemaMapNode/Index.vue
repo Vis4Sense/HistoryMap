@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import type { HmPage } from '@/types/historymap'
-import type { SchemaNode } from '@/types/schema'
+import type { Schema, SchemaNode } from '@/types/schema'
+import { useSchemaMap } from '@/composables/useSchemaMap'
+import { newSchema } from '@/types/schema.d'
 import { Handle, Position, useVueFlow } from '@vue-flow/core'
 import { NodeToolbar } from '@vue-flow/node-toolbar'
 import SchemaMapNodeToolbar from '../../node-toolbars/SchemaMapNodeToolbar.vue'
+import HmPageNodeAnnotation from '../HmPageNode/Annotation.vue'
 import HmPageNodeHeader from '../HmPageNode/Header.vue'
 import SchemaNodeHeader from '../SchemaNode/Header.vue'
 
@@ -69,6 +72,19 @@ const showSchemaTree = computed(() => {
   }
   return false
 })
+
+/** handle title update */
+function onTitleUpdate(title: string) {
+  const { updateNode } = useSchemaMap()
+  let schema: Schema
+  if (data.value.schema) {
+    schema = { ...data.value.schema, title }
+  }
+  else {
+    schema = { ...newSchema(), title }
+  }
+  updateNode(data.value.id, { schema })
+}
 </script>
 
 <template>
@@ -95,6 +111,7 @@ const showSchemaTree = computed(() => {
     <SchemaNodeHeader
       v-else
       :schema="data.schema"
+      @update-title="onTitleUpdate"
     />
 
     <div
@@ -105,26 +122,14 @@ const showSchemaTree = computed(() => {
       p-1
       space-y-1
       max-h-40 overflow-auto
-      class="nowheel"
+      class="nowheel nodrag"
     >
-      <div
+      <HmPageNodeAnnotation
         v-for="annotation in data.annotations"
+        :id="id"
         :key="annotation.id"
-        text-xs
-        space-y="0.5"
-      >
-        <div v-if="annotation.highlighted" flex-auto truncate bg-yellow-1>
-          {{ annotation.sourceText }}
-        </div>
-        <VSchemaTree
-          v-if="annotation.schema"
-          border-0.5 rounded
-          :schema="annotation.schema"
-        />
-        <!-- <div v-if="annotation.tags && annotation.tags.length" flex flex-nowrap px="1">
-          <span v-for="tag in annotation.tags" px-1 bg-gray-1 rounded-lg>{{ tag }}</span>
-        </div> -->
-      </div>
+        :annotation="annotation"
+      />
     </div>
 
     <SchemaTree

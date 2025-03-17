@@ -35,7 +35,7 @@ function removeTag(value: string) {
 
 <template>
   <div w-full rounded shadow bg-blue-1 p="x-2 y-1">
-    <VSchemaTree v-if="schema" text-xs :schema="schema" />
+    <!-- <VSchemaTree v-if="schema" text-xs :schema="schema" /> -->
 
     <el-input-tag
       v-model="tags"
