@@ -4,6 +4,10 @@
 
 import type { Concept } from '@/types/schema'
 
+interface TreeConcept extends Concept {
+  included?: boolean
+}
+
 export class TreeNode {
   name: string
   parentName: string | null
@@ -11,11 +15,13 @@ export class TreeNode {
   parent?: TreeNode | null
   children?: TreeNode[]
   virtual?: boolean
+  included?: boolean
 
-  constructor(data: Concept, isVirtual = false) {
+  constructor(data: TreeConcept, isVirtual = false) {
     this.name = data.name
     this.parentName = data.parentName
     this.description = data.description ?? null
+    this.included = data.included ?? false
     if (isVirtual) {
       this.virtual = true
     }
@@ -23,6 +29,9 @@ export class TreeNode {
 
   rename(name: string) {
     this.name = name
+    this.children?.forEach((child) => {
+      child.parentName = name
+    })
   }
 
   addChild(child: TreeNode) {

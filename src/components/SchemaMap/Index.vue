@@ -40,9 +40,19 @@ const nodes = computed(() => {
     },
     data: {
       ...node,
+      targets: [] as SchemaNode[],
       // highlighted: true,
     },
   }))
+
+  smNodes.value.forEach((node) => {
+    if (node.type === 'schema') {
+      node.sources.forEach((source) => {
+        const sourceNode = nodes.find(n => n.id === source)
+        sourceNode?.data.targets.push(node)
+      })
+    }
+  })
 
   const layout = compactTreeLayout()
   layout.nodes(nodes).links(edges.value).run()

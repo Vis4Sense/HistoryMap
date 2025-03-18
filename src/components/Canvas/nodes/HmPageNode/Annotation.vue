@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { Annotation } from '@/types/historymap'
+import type { Schema } from '@/types/schema.d'
 import { useHistoryMap } from '@/composables/useHistoryMap'
-import { Schema } from '@/types/schema.d'
-import { useDragAndDropTree } from '@/composables/useDnDTree'
 
 const props = defineProps({
   id: {
@@ -12,6 +11,10 @@ const props = defineProps({
   annotation: {
     type: Object as PropType<Annotation>,
     required: true,
+  },
+  targetConcepts: {
+    type: Array as PropType<string[]>,
+    default: () => [],
   },
 })
 
@@ -41,6 +44,7 @@ function onUpdateSchema(schema: Schema) {
       v-if="annotation.schema"
       :id="id"
       :schema="annotation.schema"
+      :target-concepts="targetConcepts"
       @update-schema="onUpdateSchema"
     />
     <!-- <div v-if="annotation.tags && annotation.tags.length" flex flex-nowrap px="1">

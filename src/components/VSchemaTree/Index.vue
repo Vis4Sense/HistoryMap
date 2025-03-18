@@ -14,21 +14,35 @@ const props = defineProps({
     type: Object as PropType<Schema>,
     required: true,
   },
+  targetConcepts: {
+    type: Array as PropType<string[]>,
+    default: () => [],
+  },
 })
 
 const emit = defineEmits<{
   updateSchema: [schema: Schema]
+  addSource: [sourceId: string]
 }>()
 
-const { id, schema } = toRefs(props)
+const { id, schema, targetConcepts } = toRefs(props)
 
 const { onDragStart, onDragEnd, sourceData } = useDragAndDropTree()
 
 /** convert schema to tree for vis and edit */
-const tree = ref(new Tree(schema.value.concepts))
-watch(schema, (newVal) => {
-  tree.value = new Tree(newVal.concepts)
+const tree = ref(createTree())
+watch(schema, () => {
+  tree.value = createTree()
 }, { deep: true })
+
+function createTree() {
+  const concepts = schema.value.concepts
+    .map(c => ({
+      ...c,
+      included: targetConcepts.value.includes(c.name),
+    }))
+  return new Tree(concepts)
+}
 
 /** emit tree edit */
 function onEdit(provenance: Provenance) {
@@ -73,6 +87,7 @@ function onDrop(node: TreeNode, position: 'inside' | 'before' | 'after') {
   }
   else {
     provenance.sourcePage = sourceData.value.id
+    emit('addSource', sourceData.value.id)
   }
 
   if (position === 'inside') {

@@ -5,6 +5,7 @@ import { useSchemaMap } from '@/composables/useSchemaMap'
 import { newSchema } from '@/types/schema.d'
 import { Handle, Position, useVueFlow } from '@vue-flow/core'
 import { NodeToolbar } from '@vue-flow/node-toolbar'
+import _ from 'lodash'
 import SchemaMapNodeToolbar from '../../node-toolbars/SchemaMapNodeToolbar.vue'
 import HmPageNodeAnnotation from '../HmPageNode/Annotation.vue'
 import HmPageNodeHeader from '../HmPageNode/Header.vue'
@@ -77,6 +78,19 @@ function onTitleUpdate(title: string) {
   }
   updateNode(data.value.id, { schema })
 }
+
+/** concepts that are included in target schemas */
+const targetConcepts = computed(() => {
+  const targetNodes = data.value.targets as SchemaNode[]
+  if (targetNodes) {
+    return _.uniq(targetNodes.flatMap(node => node.schema?.concepts.map(c => c.name) ?? []))
+  }
+  return []
+})
+
+onMounted(() => {
+  console.log(targetConcepts.value)
+})
 </script>
 
 <template>
@@ -121,6 +135,7 @@ function onTitleUpdate(title: string) {
         :id="id"
         :key="annotation.id"
         :annotation="annotation"
+        :target-concepts="targetConcepts"
       />
     </div>
 
@@ -135,6 +150,7 @@ function onTitleUpdate(title: string) {
       <SchemaNodeTree
         :id="id"
         :schema="data.schema"
+        :target-concepts="targetConcepts"
       />
     </div>
 

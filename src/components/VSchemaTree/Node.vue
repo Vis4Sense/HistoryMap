@@ -192,8 +192,12 @@ function updateName() {
           <span
             ref="conceptNameEle"
             rounded-lg p="x-1"
-            bg-gray-1 mr-1 font-medium
+            mr-1 font-medium
             contenteditable
+            :class="{
+              'bg-blue-1': node.included,
+              'bg-gray-1': !node.included,
+            }"
             @blur="updateName"
             @keydown.enter.prevent="(e) => e.target?.blur()"
           >

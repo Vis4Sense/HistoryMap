@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import ToolNewSchema from '../node-tools/ToolNewSchema.vue'
 import ToolRemove from '../node-tools/ToolRemove.vue'
-import ToolRemoveSchema from '../node-tools/ToolRemoveSchema.vue';
-import ToolNewSchema from '../node-tools/ToolNewSchema.vue';
+import ToolRemoveSchema from '../node-tools/ToolRemoveSchema.vue'
 
 defineProps({
   id: {
@@ -11,7 +11,7 @@ defineProps({
   type: {
     type: String as PropType<'schema' | 'hm-page'>,
     required: true,
-  }
+  },
 })
 </script>
 
@@ -20,7 +20,7 @@ defineProps({
     <!-- <ToolSchematise :id="id" /> -->
     <ToolRemove v-if="type === 'hm-page'" :id="id" />
     <ToolRemoveSchema v-else :id="id" />
-    
+
     <ToolNewSchema :id="id" />
   </div>
 </template>

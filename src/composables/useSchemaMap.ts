@@ -143,6 +143,15 @@ export function useSchemaMap() {
     console.log('selected nodes', selectedNodeIds.value)
   }
 
+  function addSourceToNode(nodeId: string, sourceId: string) {
+    const node = allSchemaNodes.value.find(d => d.id === nodeId)
+    if (node) {
+      if (node.sources.includes(sourceId) === false) {
+        node.sources.push(sourceId)
+      }
+    }
+  }
+
   /** initialise */
   function initialise() {
     // initial schema node
@@ -165,5 +174,6 @@ export function useSchemaMap() {
     removeNode,
     updateSchema,
     setSelectedNodeIds,
+    addSourceToNode,
   }
 }
