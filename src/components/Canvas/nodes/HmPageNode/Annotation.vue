@@ -2,6 +2,7 @@
 import type { Annotation } from '@/types/historymap'
 import { useHistoryMap } from '@/composables/useHistoryMap'
 import { Schema } from '@/types/schema.d'
+import { useDragAndDropTree } from '@/composables/useDnDTree'
 
 const props = defineProps({
   id: {
@@ -16,7 +17,6 @@ const props = defineProps({
 
 const { id, annotation } = toRefs(props)
 
-const toolbarVisible = ref(false)
 const draggable = ref(false)
 
 function onUpdateSchema(schema: Schema) {
@@ -27,42 +27,19 @@ function onUpdateSchema(schema: Schema) {
 
 <template>
   <div
+    relative
     border-0.5 rounded
     text-xs
     space-y="0.5"
     :draggable="draggable"
     @click="e => e.stopPropagation()"
   >
-    <div
-      cursor-auto
-      @mouseenter="toolbarVisible = true"
-      @mouseleave="toolbarVisible = false"
-    >
-      <div v-if="!toolbarVisible" h-0.25 />
-      <div v-else flex gap-1 text="0.6rem" p-1>
-        <div
-          bg-gray-1 rounded-full
-          hover:bg-gray-3
-          cursor-pointer
-          @mouseenter="draggable = true"
-          @mouseleave="draggable = false"
-        >
-          <div i-mdi-arrow-all />
-        </div>
-        <!-- <div
-          bg-gray-1 rounded-full text-transparent
-          hover:bg-green hover:text-black cursor-pointer
-        >
-          <div i-carbon-checkmark />
-        </div> -->
-      </div>
-    </div>
-
     <div v-if="annotation.highlighted" flex-auto truncate bg-yellow-1>
       {{ annotation.sourceText }}
     </div>
     <VSchemaTree
       v-if="annotation.schema"
+      :id="id"
       :schema="annotation.schema"
       @update-schema="onUpdateSchema"
     />

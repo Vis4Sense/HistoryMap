@@ -128,7 +128,9 @@ function onTitleUpdate(title: string) {
       v-if="data.type === 'schema'"
       ref="schemaContainer"
       max-h-40 overflow-auto
+      text-xs
       class="nowheel nodrag"
+      @click="e => e.stopPropagation()"
     >
       <SchemaNodeTree
         :id="id"

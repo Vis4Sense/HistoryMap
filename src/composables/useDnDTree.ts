@@ -1,10 +1,10 @@
-import type { SchemaTreeNode } from '@/types/schema'
+import type { Concept, SchemaTreeNode } from '@/types/schema'
 
 export type TargetPosition = 'before' | 'after' | 'inside'
 
 interface SourceData {
   id: string // id of the source node
-  treeNode: SchemaTreeNode
+  concepts: Concept[]
 }
 
 interface TargetData {
@@ -26,8 +26,8 @@ export function useDragAndDropTree() {
     isDragging,
   } = state
 
-  function onDragStart(id: string, data: SchemaTreeNode) {
-    sourceData.value = { id, treeNode: data }
+  function onDragStart(id: string, data: Concept[]) {
+    sourceData.value = { id, concepts: data }
     isDragging.value = true
   }
 

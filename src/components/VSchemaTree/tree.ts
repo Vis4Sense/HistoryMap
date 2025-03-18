@@ -27,7 +27,26 @@ export class TreeNode {
     }
     this.children.push(child)
     child.parent = this
+    child.parentName = this.virtual ? null : this.name
     return child
+  }
+
+  insertBefore(node: TreeNode) {
+    if (this.parent) {
+      const index = this.parent.children!.indexOf(this)
+      this.parent.children!.splice(index, 0, node)
+      node.parent = this.parent
+      node.parentName = this.parent.name
+    }
+  }
+
+  insertAfter(node: TreeNode) {
+    if (this.parent) {
+      const index = this.parent.children!.indexOf(this)
+      this.parent.children!.splice(index + 1, 0, node)
+      node.parent = this.parent
+      node.parentName = this.parent.name
+    }
   }
 
   remove() {
@@ -64,30 +83,42 @@ export class TreeNode {
 
 export class Tree {
   root: TreeNode
+  nodeDict: Record<string, TreeNode>
 
   constructor(data: Concept[]) {
+    this.nodeDict = {}
     this.root = new TreeNode({
-      name: 'root',
+      name: '',
       parentName: null,
     }, true)
 
-    const map: Record<string, TreeNode> = {}
     data.forEach(d => {
-      map[d.name] = new TreeNode(d)
+      this.nodeDict[d.name] = new TreeNode(d)
     })
 
     data.forEach(d => {
+      let parent = null
       if (d.parentName) {
-        const parent = map[d.parentName]
-        parent.addChild(map[d.name])
+        parent = this.nodeDict[d.parentName]
+      }
+
+      if (parent) {
+        parent.addChild(this.nodeDict[d.name])
       }
       else {
-        this.root.addChild(map[d.name])
+        this.root.addChild(this.nodeDict[d.name])
       }
     })
   }
 
   toConcepts(): Concept[] {
     return this.root.toConcepts()
+  }
+
+  removeConcept(name: string) {
+    const node = this.nodeDict[name]
+    if (node) {
+      node.remove()
+    }
   }
 }

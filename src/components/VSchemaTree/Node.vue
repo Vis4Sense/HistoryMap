@@ -8,11 +8,18 @@ const props = defineProps({
     type: Object as PropType<TreeNode>,
     required: true,
   },
+  index: {
+    type: Number,
+    default: 0,
+  },
 })
 
 const emit = defineEmits<{
   addNode: [provenance: Provenance]
   removeNode: [provenance: Provenance]
+  dragStart: [node: TreeNode]
+  dragEnd: []
+  dropNode: [node: TreeNode, position: 'inside' | 'before' | 'after']
 }>()
 
 const { node } = toRefs(props)
@@ -24,8 +31,22 @@ const isEditing = ref(false)
 /** show toolbar of node or not */
 const showToolbar = ref(false)
 
+const dragButtonVisible = ref(false)
+
+/** dragged over state */
+const draggedOver = ref(false)
+const draggedOverBefore = ref(false)
+const draggedOverAfter = ref(false)
+const draggedOverVirtual = ref(false)
+
+function clearDraggedOver() {
+  draggedOver.value = false
+  draggedOverBefore.value = false
+  draggedOverAfter.value = false
+  draggedOverVirtual.value = false
+}
+
 function startEditing() {
-  console.log('start editing')
   isEditing.value = true
   nextTick(() => {
     newNode.value?.focus()
@@ -67,32 +88,89 @@ function removeNode() {
 </script>
 
 <template>
-  <div :ml="node.virtual ? 0 : 2">
+  <div :ml="node.virtual ? 0 : 2"
+    relative
+    @mouseenter="dragButtonVisible = true"
+    @mouseleave="dragButtonVisible = false"
+  >
     <div
-      v-if="!node.virtual"
-      w-full
-      flex justify-between items-start
       relative
-      cursor-pointer
       draggable="true"
-      py="0.5"
-      @mouseenter="showToolbar = true"
-      @mouseleave="showToolbar = false"
+      @dragstart="(e) => {
+        e.stopPropagation()
+        emit('dragStart', node)
+      }"
+      @dragend="() => {
+        clearDraggedOver()
+        emit('dragEnd')
+      }"
     >
       <div
-        absolute left-0 translate-x="-100%"
-        text-gray-3
+        v-show="node.virtual
+          && node.children
+          && node.children.length
+          && dragButtonVisible
+        "
+        absolute right-0 top-0
+        translate-x-1
+        text-gray-5
+        bg-gray-1 rounded
+        hover:bg-gray-3
+        hover:text-gray-8
+        z-12
+        cursor-pointer
       >
-        <div v-if="node.children && node.children.length" i-carbon-caret-down />
-        <div v-else i-carbon-dot-mark text="0.5rem" mt="0.5" />
-      </div>
-
-      <div leading-tight text-ellipsis line-clamp-2>
-        <span rounded-lg p="x-1" bg-gray-1 mr-1 font-medium>{{ node.name }} </span>
-        <span v-if="node.description" text-gray-5>{{ node.description }}</span>
+        <div i-carbon-draggable></div>
       </div>
 
       <div
+        v-if="!node.virtual && index === 0"
+        border-1 border-dashed
+        :class="{
+          'border-transparent': !draggedOverBefore,
+          'border-historymap': draggedOverBefore,
+        }"
+        @dragover.prevent="draggedOverBefore = true"
+        @dragleave.prevent="draggedOverBefore = false"
+        @drop="() => {
+          clearDraggedOver()
+          emit('dropNode', node, 'before')
+        }"
+      />
+
+      <div
+        v-if="!node.virtual"
+        w-full
+        flex justify-between items-start
+        relative
+        cursor-pointer
+        py="0.5"
+        :class="{
+          'bg-historymap bg-op-10': draggedOver,
+        }"
+        @mouseenter="showToolbar = true"
+        @mouseleave="showToolbar = false"
+        @dragover.prevent="draggedOver = true"
+        @dragleave.prevent="draggedOver = false"
+        @drop="() => {
+          clearDraggedOver()
+          emit('dropNode', node, 'inside')
+        }"
+      >
+        <div
+          absolute left-0 translate-x="-100%"
+          text-gray-3
+        >
+          <div v-if="node.children && node.children.length" i-carbon-caret-down />
+          <div v-else i-carbon-dot-mark text="0.5rem" mt="0.5" />
+        </div>
+
+        <div leading-tight text-ellipsis line-clamp-2>
+          <span rounded-lg p="x-1" bg-gray-1 mr-1 font-medium>{{ node.name }} </span>
+          <span v-if="node.description" text-gray-5>{{ node.description }}</span>
+        </div>
+
+        <div
           v-if="showToolbar"
           flex
           absolute right-1
@@ -106,27 +184,48 @@ function removeNode() {
             <div i-carbon-delete />
           </BasicToolbarIcon>
         </div>
-    </div>
-
-    <div v-if="node.children || isEditing">
-      <Node
-        v-for="child, idx in node.children"
-        :key="child.name"
-        :node="child"
-        @add-node="emit('addNode', $event)"
-      />
+      </div>
 
       <div
-        v-if="isEditing"
-        ref="newNode"
-        w-full
-        h-5
-        mt-1 mb-1
-        :ml="node.virtual ? 0 : 2"
-        contenteditable
-        @blur="saveNewNode"
-        @keydown.enter.prevent="(e) => e.target?.blur()"
+        v-if="!node.virtual && index === 0"
+        border-1 border-dashed
+        :class="{
+          'border-transparent': !draggedOverAfter,
+          'border-historymap': draggedOverAfter,
+        }"
+        @dragover.prevent="draggedOverAfter = true"
+        @dragleave.prevent="draggedOverAfter = false"
+        @drop="() => {
+          clearDraggedOver()
+          emit('dropNode', node, 'after')
+        }"
       />
+
+      <div v-if="node.children || isEditing">
+        <Node
+          v-for="child, idx in node.children"
+          :key="child.name"
+          :node="child"
+          :index="idx"
+          @add-node="emit('addNode', $event)"
+          @remove-node="emit('removeNode', $event)"
+          @drag-start="emit('dragStart', $event)"
+          @drag-end="emit('dragEnd')"
+          @drop-node="(node, pos) => emit('dropNode', node, pos)"
+        />
+
+        <div
+          v-if="isEditing"
+          ref="newNode"
+          w-full
+          h-5
+          mt-1 mb-1
+          :ml="node.virtual ? 0 : 2"
+          contenteditable
+          @blur="saveNewNode"
+          @keydown.enter.prevent="(e) => e.target?.blur()"
+        />
+      </div>
     </div>
 
     <div
@@ -136,7 +235,20 @@ function removeNode() {
       text-gray
       hover:text-gray-7 hover:border-gray
       cursor-pointer
+      :class="{
+        'border-historymap text-historymap bg-historymap bg-opacity-10': draggedOverVirtual,
+      }"
       @click.prevent="startEditing"
+      @dragover.prevent="draggedOverVirtual = true"
+      @dragleave.prevent="draggedOverVirtual = false"
+      @dragend="() => {
+        clearDraggedOver()
+        emit('dragEnd')
+      }"
+      @drop="() => {
+        clearDraggedOver()
+        emit('dropNode', node, 'inside')
+      }"
     >
       <div i-carbon-add-large></div>
     </div>    

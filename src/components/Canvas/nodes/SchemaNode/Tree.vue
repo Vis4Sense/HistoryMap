@@ -23,6 +23,7 @@ function onUpdateSchema(newSchema: Schema) {
 
 <template>
   <VSchemaTree
+    :id="id"
     :schema="schema"
     @update-schema="onUpdateSchema"
   />
