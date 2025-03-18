@@ -137,14 +137,10 @@ Example response format:
 
 function parseMarkdownToSchema(markdown: string) {
   const lines = markdown.trim().split('\n')
-  const stack = [{ name: 'root', children: [] }]
+  const stack = [{ name: null as null | string, indent: -1 }]
 
   const schema: Schema = {
-    schemaTree: {
-      roots: [],
-    },
     concepts: [],
-    relations: [],
   }
 
   for (const line of lines) {
@@ -163,39 +159,19 @@ function parseMarkdownToSchema(markdown: string) {
     const name = parts[0].trim().replace(/\*\*/g, '')
     const description = parts.slice(1).join(':').trim()
 
-    const item = { name, description, children: [] }
-
     while (stack.length > 1 && stack[stack.length - 1].indent >= indent) {
       stack.pop()
     }
 
-    stack[stack.length - 1].children.push(item)
-    stack.push({ ...item, indent })
-  }
-
-  function parseNode(node: Array | object, parentName: string | null = null) {
-    if (Array.isArray(node)) {
-      node.forEach(n => parseNode(n, parentName))
+    const item = {
+      name,
+      description,
+      parentName: stack[stack.length - 1].name,
     }
-    else {
-      schema.concepts.push({
-        name: node.name,
-        parentName,
-        description: node.description,
-      })
-      if (node.children && node.children.length === 0) {
-        delete node.children
-      }
-      else if (node.children) {
-        node.children.forEach(n => parseNode(n, node.name))
-      }
-      delete node.description
-    }
-    return node
-  }
 
-  schema.schemaTree.roots = parseNode(stack[0].children)
-  // console.log('schema', schema)
+    schema.concepts.push(item)
+    stack.push({ name, indent })
+  }
 
   return schema
 }

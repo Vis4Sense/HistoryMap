@@ -24,10 +24,10 @@ export interface Relation {
 
 export interface Schema {
   title?: string
-  schemaTree: SchemaTree
+  // schemaTree: SchemaTree
   concepts: Concept[]
-  relations: Relation[]
-  provenance?: ElementProvenance[]
+  // relations: Relation[]
+  provenance?: Provenance[]
 }
 
 export function newSchema(): Schema {
@@ -52,15 +52,24 @@ export interface SchemaNode {
 }
 
 /** Provenance of concept & relation change */
-export interface ElementProvenance<Element = Concept | Relation> {
-  // sources: string[] // id of the source nodes
-  // targets: string[] // id of the target nodes
+// export interface ElementProvenance<Element = Concept | Relation> {
+//   // sources: string[] // id of the source nodes
+//   // targets: string[] // id of the target nodes
+//   sourcePage?: string
+//   time: number // time of change
+//   elementType: 'concept' | 'relation'
+//   changeType: 'add' | 'delete' | 'update' | 'move'
+//   diff: {
+//     old: Element | null
+//     new: Element | null
+//   }
+// }
+export interface Provenance {
   sourcePage?: string
   time: number // time of change
-  elementType: 'concept' | 'relation'
-  changeType: 'add' | 'delete' | 'update' | 'move'
+  changeType: 'add' | 'delete' | 'move'
   diff: {
-    old: Element | null
-    new: Element | null
+    old: Concept | Concept[] | null
+    new: Concept | Concept[] | null
   }
 }

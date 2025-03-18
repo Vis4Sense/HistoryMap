@@ -1,33 +1,83 @@
 <script setup lang="ts">
-import type { SchemaTreeNode } from '@/types/schema'
+import { Provenance } from '@/types/schema.d'
 import Node from './Node.vue'
-
-export interface TreeNode extends SchemaTreeNode {
-  description?: string
-}
+import { TreeNode } from './tree'
 
 const props = defineProps({
   node: {
     type: Object as PropType<TreeNode>,
     required: true,
   },
-  virtualRoot: {
-    type: Boolean,
-    default: false,
-  },
 })
+
+const emit = defineEmits<{
+  addNode: [provenance: Provenance]
+  removeNode: [provenance: Provenance]
+}>()
+
+const { node } = toRefs(props)
+
+/** temporary div to support adding child node */
+const newNode = ref<HTMLDivElement>()
+const isEditing = ref(false)
+
+/** show toolbar of node or not */
+const showToolbar = ref(false)
+
+function startEditing() {
+  console.log('start editing')
+  isEditing.value = true
+  nextTick(() => {
+    newNode.value?.focus()
+  })
+}
+
+function saveNewNode() {
+  const newValue = newNode.value?.textContent?.trim()
+  if (newValue) {
+    const newNode = node.value.addChild(new TreeNode({
+      name: newValue,
+      parentName: node.value.virtual ? null : node.value.name,
+    }))
+    const provenance: Provenance = {
+      time: Date.now(),
+      changeType: 'add',
+      diff: {
+        old: null,
+        new: newNode.toConcept(),
+      }
+    }
+    emit('addNode', provenance)
+  }
+  isEditing.value = false
+}
+
+function removeNode() {
+  const provenance: Provenance = {
+    time: Date.now(),
+    changeType: 'delete',
+    diff: {
+      old: node.value.toConcepts(),
+      new: null,
+    }
+  }
+  node.value.remove()
+  emit('removeNode', provenance)
+}
 </script>
 
 <template>
-  <div :ml="virtualRoot ? 0 : 2">
+  <div :ml="node.virtual ? 0 : 2">
     <div
-      v-if="!virtualRoot"
+      v-if="!node.virtual"
       w-full
       flex justify-between items-start
       relative
       cursor-pointer
       draggable="true"
       py="0.5"
+      @mouseenter="showToolbar = true"
+      @mouseleave="showToolbar = false"
     >
       <div
         absolute left-0 translate-x="-100%"
@@ -42,7 +92,7 @@ const props = defineProps({
         <span v-if="node.description" text-gray-5>{{ node.description }}</span>
       </div>
 
-      <!-- <div
+      <div
           v-if="showToolbar"
           flex
           absolute right-1
@@ -52,18 +102,43 @@ const props = defineProps({
           <BasicToolbarIcon plain @click="startEditing">
             <div i-carbon-add />
           </BasicToolbarIcon>
-          <BasicToolbarIcon plain @click="emit('deleteNode', node.name)">
+          <BasicToolbarIcon plain @click="removeNode">
             <div i-carbon-delete />
           </BasicToolbarIcon>
-        </div> -->
+        </div>
     </div>
 
-    <div v-if="node.children">
+    <div v-if="node.children || isEditing">
       <Node
         v-for="child, idx in node.children"
         :key="child.name"
         :node="child"
+        @add-node="emit('addNode', $event)"
+      />
+
+      <div
+        v-if="isEditing"
+        ref="newNode"
+        w-full
+        h-5
+        mt-1 mb-1
+        :ml="node.virtual ? 0 : 2"
+        contenteditable
+        @blur="saveNewNode"
+        @keydown.enter.prevent="(e) => e.target?.blur()"
       />
     </div>
+
+    <div
+      v-if="node.virtual"
+      border border-dashed rounded flex justify-center
+      mt-1 
+      text-gray
+      hover:text-gray-7 hover:border-gray
+      cursor-pointer
+      @click.prevent="startEditing"
+    >
+      <div i-carbon-add-large></div>
+    </div>    
   </div>
 </template>

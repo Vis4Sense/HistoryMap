@@ -9,6 +9,7 @@ import SchemaMapNodeToolbar from '../../node-toolbars/SchemaMapNodeToolbar.vue'
 import HmPageNodeAnnotation from '../HmPageNode/Annotation.vue'
 import HmPageNodeHeader from '../HmPageNode/Header.vue'
 import SchemaNodeHeader from '../SchemaNode/Header.vue'
+import SchemaNodeTree from '../SchemaNode/Tree.vue'
 
 const props = defineProps({
   id: {
@@ -29,6 +30,7 @@ const emit = defineEmits<{
 const { id, data, selected } = toRefs(props)
 
 const highlightContainer = ref<HTMLElement>()
+const schemaContainer = ref<HTMLElement>()
 
 /** toolbar visibility */
 const { getSelectedNodes } = useVueFlow()
@@ -53,24 +55,14 @@ useResizeObserver(highlightContainer, () => {
     }
   })
 })
-
-/** whether to show schema tree */
-const showSchemaTree = computed(() => {
-  if (data.value.type === 'hm-page') {
-    if (data.value.schema && data.value.schema.schemaTree.roots.length) {
-      return true
+useResizeObserver(schemaContainer, () => {
+  nextTick(() => {
+    if (schemaContainer.value) {
+      emit('updateHeight', id.value, {
+        schemaTree: schemaContainer.value.clientHeight,
+      })
     }
-    if (data.value.annotations) {
-      const tags = data.value.annotations.map(a => a.tags ?? []).flat()
-      if (tags.length) {
-        return true
-      }
-    }
-  }
-  else if (data.value.type === 'schema') {
-    return true
-  }
-  return false
+  })
 })
 
 /** handle title update */
@@ -132,16 +124,17 @@ function onTitleUpdate(title: string) {
       />
     </div>
 
-    <SchemaTree
-      v-if="showSchemaTree"
-      :id="id"
-      :schema="data.schema"
-      :annotations="'annotations' in data ? data.annotations : undefined"
-      class="nodrag"
-      overflow-visible
-      text-sm
-      @update-schema-tree-height="(h) => emit('updateHeight', id, { schemaTree: h })"
-    />
+    <div
+      v-if="data.type === 'schema'"
+      ref="schemaContainer"
+      max-h-40 overflow-auto
+      class="nowheel nodrag"
+    >
+      <SchemaNodeTree
+        :id="id"
+        :schema="data.schema"
+      />
+    </div>
 
     <NodeToolbar
       :position="Position.Top"

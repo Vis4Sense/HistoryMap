@@ -16,6 +16,7 @@ declare module 'vue' {
     CanvasNodesSchemaNode: typeof import('./../components/Canvas/nodes/SchemaNode/Index.vue')['default']
     CanvasNodesSchemaNodeHeader: typeof import('./../components/Canvas/nodes/SchemaNode/Header.vue')['default']
     CanvasNodesSchemaNodeRoot: typeof import('./../components/Canvas/nodes/SchemaNode/Root.vue')['default']
+    CanvasNodesSchemaNodeTree: typeof import('./../components/Canvas/nodes/SchemaNode/Tree.vue')['default']
     CanvasNodeToolbarsHmPageNodeToolbar: typeof import('./../components/Canvas/node-toolbars/HmPageNodeToolbar.vue')['default']
     CanvasNodeToolbarsSchemaMapNodeToolbar: typeof import('./../components/Canvas/node-toolbars/SchemaMapNodeToolbar.vue')['default']
     CanvasNodeToolbarsSchemaNodeToolbar: typeof import('./../components/Canvas/node-toolbars/SchemaNodeToolbar.vue')['default']

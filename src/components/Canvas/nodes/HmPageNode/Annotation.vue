@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { Annotation } from '@/types/historymap'
+import { useHistoryMap } from '@/composables/useHistoryMap'
+import { Schema } from '@/types/schema.d'
 
 const props = defineProps({
   id: {
@@ -12,8 +14,15 @@ const props = defineProps({
   },
 })
 
+const { id, annotation } = toRefs(props)
+
 const toolbarVisible = ref(false)
 const draggable = ref(false)
+
+function onUpdateSchema(schema: Schema) {
+  const { updateAnnotation } = useHistoryMap()
+  updateAnnotation(id.value, annotation.value.id, { schema })
+}
 </script>
 
 <template>
@@ -22,6 +31,7 @@ const draggable = ref(false)
     text-xs
     space-y="0.5"
     :draggable="draggable"
+    @click="e => e.stopPropagation()"
   >
     <div
       cursor-auto
@@ -54,6 +64,7 @@ const draggable = ref(false)
     <VSchemaTree
       v-if="annotation.schema"
       :schema="annotation.schema"
+      @update-schema="onUpdateSchema"
     />
     <!-- <div v-if="annotation.tags && annotation.tags.length" flex flex-nowrap px="1">
           <span v-for="tag in annotation.tags" px-1 bg-gray-1 rounded-lg>{{ tag }}</span>

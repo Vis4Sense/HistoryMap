@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { Schema } from '@/types/schema'
-import type { TreeNode } from './Node'
+import type { Provenance, Schema } from '@/types/schema'
 import _ from 'lodash'
+import { Tree } from './tree'
 
 const props = defineProps({
   schema: {
@@ -10,24 +10,25 @@ const props = defineProps({
   },
 })
 
+const emit = defineEmits<{
+  updateSchema: [schema: Schema]
+}>()
+
 const { schema } = toRefs(props)
 
-const virtualRoot = computed(() => {
-  const root = {
-    name: '',
-    children: _.cloneDeep(schema.value.schemaTree.roots) as TreeNode[],
+const tree = ref(new Tree(schema.value.concepts))
+watch(schema, (newVal) => {
+  tree.value = new Tree(newVal.concepts)
+}, { deep: true })
+
+function onEdit(provenance: Provenance) {
+  const newSchema = {
+    ...schema.value,
+    concepts: tree.value.toConcepts(),
+    provenance: [...(schema.value.provenance ?? []), provenance],
   }
-  function addDescription(node: TreeNode): TreeNode {
-    if (node.children) {
-      node.children.forEach((child) => {
-        addDescription(child)
-      })
-    }
-    node.description = schema.value.concepts.find(concept => concept.name === node.name)?.description
-  }
-  addDescription(root)
-  return root
-})
+  emit('updateSchema', newSchema)
+}
 </script>
 
 <template>
@@ -35,8 +36,9 @@ const virtualRoot = computed(() => {
     space-y-1 flex flex-col p="x-2 y-1"
   >
     <VSchemaTreeNode
-      :node="virtualRoot"
-      :virtual-root="true"
+      :node="tree.root"
+      @add-node="onEdit($event)"
+      @remove-node="onEdit($event)"
     />
   </div>
 </template>

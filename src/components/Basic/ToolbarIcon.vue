@@ -34,7 +34,7 @@ const emit = defineEmits(['click'])
         'p-1 hover:bg-gray-2': !plain,
         'hover:op-50': plain,
       }"
-      @click="emit('click')"
+      @click="emit('click', $event)"
     >
       <slot />
     </div>
