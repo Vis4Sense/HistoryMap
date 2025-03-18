@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Provenance } from '@/types/schema.d'
+import type { Provenance } from '@/types/schema.d'
 import Node from './Node.vue'
 import { TreeNode } from './tree'
 
@@ -17,6 +17,7 @@ const props = defineProps({
 const emit = defineEmits<{
   addNode: [provenance: Provenance]
   removeNode: [provenance: Provenance]
+  updateNode: [provenance: Provenance]
   dragStart: [node: TreeNode]
   dragEnd: []
   dropNode: [node: TreeNode, position: 'inside' | 'before' | 'after']
@@ -27,6 +28,10 @@ const { node } = toRefs(props)
 /** temporary div to support adding child node */
 const newNode = ref<HTMLDivElement>()
 const isEditing = ref(false)
+
+/** div of concept name and description */
+const conceptNameEle = ref<HTMLElement>()
+const conceptDescEle = ref<HTMLElement>()
 
 /** show toolbar of node or not */
 const showToolbar = ref(false)
@@ -66,7 +71,7 @@ function saveNewNode() {
       diff: {
         old: null,
         new: newNode.toConcept(),
-      }
+      },
     }
     emit('addNode', provenance)
   }
@@ -80,15 +85,33 @@ function removeNode() {
     diff: {
       old: node.value.toConcepts(),
       new: null,
-    }
+    },
   }
   node.value.remove()
   emit('removeNode', provenance)
 }
+
+function updateName() {
+  const newName = conceptNameEle.value?.textContent?.trim()
+  if (newName && newName !== node.value.name) {
+    const provenance: Provenance = {
+      time: Date.now(),
+      changeType: 'rename',
+      diff: {
+        old: node.value.toConcept(),
+        new: null,
+      },
+    }
+    node.value.rename(newName)
+    provenance.diff.new = node.value.toConcept()
+    emit('updateNode', provenance)
+  }
+}
 </script>
 
 <template>
-  <div :ml="node.virtual ? 0 : 2"
+  <div
+    :ml="node.virtual ? 0 : 2"
     relative
     @mouseenter="dragButtonVisible = true"
     @mouseleave="dragButtonVisible = false"
@@ -120,7 +143,7 @@ function removeNode() {
         z-12
         cursor-pointer
       >
-        <div i-carbon-draggable></div>
+        <div i-carbon-draggable />
       </div>
 
       <div
@@ -166,8 +189,23 @@ function removeNode() {
         </div>
 
         <div leading-tight text-ellipsis line-clamp-2>
-          <span rounded-lg p="x-1" bg-gray-1 mr-1 font-medium>{{ node.name }} </span>
-          <span v-if="node.description" text-gray-5>{{ node.description }}</span>
+          <span
+            ref="conceptNameEle"
+            rounded-lg p="x-1"
+            bg-gray-1 mr-1 font-medium
+            contenteditable
+            @blur="updateName"
+            @keydown.enter.prevent="(e) => e.target?.blur()"
+          >
+            {{ node.name }}
+          </span>
+          <span
+            v-if="node.description"
+            ref="conceptDescEle"
+            text-gray-5
+          >
+            {{ node.description }}
+          </span>
         </div>
 
         <div
@@ -209,6 +247,7 @@ function removeNode() {
           :index="idx"
           @add-node="emit('addNode', $event)"
           @remove-node="emit('removeNode', $event)"
+          @update-node="emit('updateNode', $event)"
           @drag-start="emit('dragStart', $event)"
           @drag-end="emit('dragEnd')"
           @drop-node="(node, pos) => emit('dropNode', node, pos)"
@@ -231,7 +270,7 @@ function removeNode() {
     <div
       v-if="node.virtual"
       border border-dashed rounded flex justify-center
-      mt-1 
+      mt-1
       text-gray
       hover:text-gray-7 hover:border-gray
       cursor-pointer
@@ -250,7 +289,7 @@ function removeNode() {
         emit('dropNode', node, 'inside')
       }"
     >
-      <div i-carbon-add-large></div>
-    </div>    
+      <div i-carbon-add-large />
+    </div>
   </div>
 </template>

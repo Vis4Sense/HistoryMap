@@ -2,7 +2,7 @@
 // Source: https://github.com/ParadeTo/vue-tree-list/blob/master/src/Tree.js
 // Modified with additional changes
 
-import { Concept } from "@/types/schema"
+import type { Concept } from '@/types/schema'
 
 export class TreeNode {
   name: string
@@ -19,6 +19,10 @@ export class TreeNode {
     if (isVirtual) {
       this.virtual = true
     }
+  }
+
+  rename(name: string) {
+    this.name = name
   }
 
   addChild(child: TreeNode) {
@@ -73,7 +77,7 @@ export class TreeNode {
       concepts.push(this.toConcept())
     }
     if (this.children) {
-      this.children.forEach(child => {
+      this.children.forEach((child) => {
         concepts.push(...child.toConcepts())
       })
     }
@@ -92,11 +96,11 @@ export class Tree {
       parentName: null,
     }, true)
 
-    data.forEach(d => {
+    data.forEach((d) => {
       this.nodeDict[d.name] = new TreeNode(d)
     })
 
-    data.forEach(d => {
+    data.forEach((d) => {
       let parent = null
       if (d.parentName) {
         parent = this.nodeDict[d.parentName]

@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { Provenance, Schema } from '@/types/schema'
-import _ from 'lodash'
-import { Tree, TreeNode } from './tree'
+import type { TreeNode } from './tree'
 import { useDragAndDropTree } from '@/composables/useDnDTree'
+import _ from 'lodash'
+import { Tree } from './tree'
 
 const props = defineProps({
   id: {
@@ -36,7 +37,6 @@ function onEdit(provenance: Provenance) {
     concepts: tree.value.toConcepts(),
     provenance: [...(schema.value.provenance ?? []), provenance],
   }
-  console.log('onEdit', newSchema)
   emit('updateSchema', newSchema)
 }
 
@@ -48,42 +48,45 @@ function dragStart(node: TreeNode) {
 
 /** handle drop node */
 function onDrop(node: TreeNode, position: 'inside' | 'before' | 'after') {
-  console.log('onDrop', node, position)
-
-  if (!sourceData.value) return
+  if (!sourceData.value)
+    return
   const sourceNodes = new Tree(sourceData.value.concepts).root.children ?? []
 
   const provenance: Provenance = {
     time: Date.now(),
     changeType: sourceData.value.id === id.value
-      ? 'move' : 'add',
+      ? 'move'
+      : 'add',
     diff: {
       old: sourceData.value.id === id.value
         ? sourceData.value.concepts
         : null,
       new: null,
-    }
+    },
   }
 
   // remove original node if moved within the same tree
   if (sourceData.value.id === id.value) {
-    sourceNodes.forEach(node => {
+    sourceNodes.forEach((node) => {
       tree.value.removeConcept(node.name)
     })
-  } else {
+  }
+  else {
     provenance.sourcePage = sourceData.value.id
   }
 
   if (position === 'inside') {
-    sourceNodes.forEach(d => {
+    sourceNodes.forEach((d) => {
       node.addChild(d)
     })
-  } else if (position === 'before') {
-    sourceNodes.forEach(d => {
+  }
+  else if (position === 'before') {
+    sourceNodes.forEach((d) => {
       node.insertBefore(d)
     })
-  } else if (position === 'after') {
-    sourceNodes.forEach(d => {
+  }
+  else if (position === 'after') {
+    sourceNodes.forEach((d) => {
       node.insertAfter(d)
     })
   }
@@ -103,6 +106,7 @@ function onDrop(node: TreeNode, position: 'inside' | 'before' | 'after') {
       :node="tree.root"
       @add-node="onEdit($event)"
       @remove-node="onEdit($event)"
+      @update-node="onEdit($event)"
       @drag-start="dragStart"
       @drag-end="onDragEnd"
       @drop-node="onDrop"
