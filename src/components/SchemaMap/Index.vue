@@ -10,7 +10,7 @@ import _ from 'lodash'
 import { compactTreeLayout } from '../HistoryMap/layout/compact-tree'
 
 const { getSelectedNodes, addSelectedNodes, removeSelectedNodes, elementsSelectable } = useVueFlow()
-const { nodes: smNodes, links, setSelectedNodeIds, addSchemaNode } = useSchemaMap()
+const { nodes: smNodes, links, setSelectedNodeIds, addSchemaNode, updateNode } = useSchemaMap()
 
 const selectionMode = ref<'single' | 'multiple'>('single')
 
@@ -33,7 +33,7 @@ const nodes = computed(() => {
     id: node.id,
     type: 'schemamap',
     width: getNodeWidth(node),
-    height: getNodeHeight(node.id),
+    height: getNodeHeight(node),
     position: {
       x: 0,
       y: 0,
@@ -66,6 +66,9 @@ const nodes = computed(() => {
 /** get node sizes */
 
 function getNodeWidth(node: HmPage | SchemaNode): number {
+  if (node.width) {
+    return node.width
+  }
   if (nodeSizeDict.value[node.id]?.width) {
     return nodeSizeDict.value[node.id].width!
   }
@@ -76,9 +79,12 @@ function getNodeWidth(node: HmPage | SchemaNode): number {
   // return nodeSizeDict.value[id]?.width ?? baseSize.width
 }
 
-function getNodeHeight(id: string): number {
+function getNodeHeight(node: HmPage | SchemaNode): number {
+  if (node.height) {
+    return node.height
+  }
   let height = baseSize.height
-  const heightDict = nodeSizeDict.value[id]?.height ?? {}
+  const heightDict = nodeSizeDict.value[node.id]?.height ?? {}
   for (const key in heightDict) {
     height += heightDict[key]
   }
@@ -152,6 +158,7 @@ function onAddSchemaNode() {
         <SchemaMapNode
           v-bind="props"
           @update-height="updateNodeHeight"
+          @resize="(width, height) => updateNode(props.id, { width, height })"
         />
       </template>
 
@@ -191,4 +198,5 @@ function onAddSchemaNode() {
 /* import the default theme, this is optional but generally recommended */
 @import '@vue-flow/core/dist/theme-default.css';
 @import '@vue-flow/controls/dist/style.css';
+@import '@vue-flow/node-resizer/dist/style.css';
 </style>

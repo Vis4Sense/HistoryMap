@@ -4,6 +4,7 @@ import type { Schema, SchemaNode } from '@/types/schema'
 import { useSchemaMap } from '@/composables/useSchemaMap'
 import { newSchema } from '@/types/schema.d'
 import { Handle, Position, useVueFlow } from '@vue-flow/core'
+import { NodeResizer } from '@vue-flow/node-resizer'
 import { NodeToolbar } from '@vue-flow/node-toolbar'
 import _ from 'lodash'
 import SchemaMapNodeToolbar from '../../node-toolbars/SchemaMapNodeToolbar.vue'
@@ -26,6 +27,7 @@ const props = defineProps({
 
 const emit = defineEmits<{
   updateHeight: [id: string, height: Record<string, number>]
+  resize: [width: number, height: number]
 }>()
 
 const { id, data, selected } = toRefs(props)
@@ -87,10 +89,6 @@ const targetConcepts = computed(() => {
   }
   return []
 })
-
-onMounted(() => {
-  console.log(targetConcepts.value)
-})
 </script>
 
 <template>
@@ -103,11 +101,18 @@ onMounted(() => {
     :class="{
       'border-blue': data!.isActive,
       'border-1.5 border-historymap': selected,
+      'flex flex-col': data.height,
     }"
   >
+    <NodeResizer
+      v-if="selected"
+      @resize-end="(e) => emit('resize', e.params.width, e.params.height)"
+    />
+
     <HmPageNodeHeader
       v-if="data.type === 'hm-page'"
       class="nodrag nopan"
+      shrink-0
       text-sm h-5
       cursor-pointer
       hover:text-blue-8
@@ -127,7 +132,11 @@ onMounted(() => {
       ref="highlightContainer"
       p-1
       space-y-1
-      max-h-40 overflow-auto
+      overflow-auto
+      :class="{
+        'max-h-40': !data.height,
+        'flex-auto': data.height
+      }"
       class="nowheel nodrag"
     >
       <HmPageNodeAnnotation
@@ -142,9 +151,13 @@ onMounted(() => {
     <div
       v-if="data.type === 'schema'"
       ref="schemaContainer"
-      max-h-40 overflow-auto
+      overflow-auto
       text-xs
       class="nowheel nodrag"
+      :class="{
+        'max-h-40': !data.height,
+        'flex-auto': data.height
+      }"
       @click="e => e.stopPropagation()"
     >
       <SchemaNodeTree

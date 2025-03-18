@@ -1,4 +1,4 @@
-import type { ElementProvenance, Schema } from './schema'
+import type { Schema } from './schema'
 
 export interface HmPage {
   sessionId: number
@@ -11,8 +11,9 @@ export interface HmPage {
   parentPageId: string | null
   isActive: boolean
   schema?: Schema
-  embeddedProvenance?: ElementProvenance[]
   annotations?: Annotation[]
+  width?: number
+  height?: number
 }
 
 export interface Annotation {

@@ -26,6 +26,9 @@ importers:
       '@vue-flow/core':
         specifier: ^1.42.1
         version: 1.42.1(vue@3.5.13(typescript@5.7.3))
+      '@vue-flow/node-resizer':
+        specifier: ^1.4.0
+        version: 1.4.0(@vue-flow/core@1.42.1(vue@3.5.13(typescript@5.7.3)))(vue@3.5.13(typescript@5.7.3))
       '@vue-flow/node-toolbar':
         specifier: ^1.1.0
         version: 1.1.0(@vue-flow/core@1.42.1(vue@3.5.13(typescript@5.7.3)))
@@ -1293,16 +1296,12 @@ packages:
     resolution: {integrity: sha512-NAmhw1l/llM0HZRpagR/ChJTNymW4ll6/4EDSJML5c8L5Hl/+k6UyF8EIgE6DeHpfheQujkSRngauViHqq6jJQ==}
     engines: {node: '>= 16'}
 
-  '@intlify/message-compiler@11.0.0-rc.1':
-    resolution: {integrity: sha512-TGw2uBfuTFTegZf/BHtUQBEKxl7Q/dVGLoqRIdw8lFsp9g/53sYn5iD+0HxIzdYjbWL6BTJMXCPUHp9PxDTRPw==}
-    engines: {node: '>= 16'}
-
   '@intlify/message-compiler@11.0.1':
     resolution: {integrity: sha512-5RFH8x+Mn3mbjcHXnb6KCXGiczBdiQkWkv99iiA0JpKrNuTAQeW59Pjq/uObMB0eR0shnKYGTkIJxum+DbL3sw==}
     engines: {node: '>= 16'}
 
-  '@intlify/shared@11.0.0-rc.1':
-    resolution: {integrity: sha512-8tR1xe7ZEbkabTuE/tNhzpolygUn9OaYp9yuYAF4MgDNZg06C3Qny80bes2/e9/Wm3aVkPUlCw6WgU7mQd0yEg==}
+  '@intlify/message-compiler@12.0.0-alpha.1':
+    resolution: {integrity: sha512-rS1Lc99D2uaGqWxlrpGPWdgkq2Jox8xxOS9gdIRhuF2CsuJISWQmwd/TjMnWNhwv9olE0aPEBh1323a61Tfp+g==}
     engines: {node: '>= 16'}
 
   '@intlify/shared@11.0.1':
@@ -1311,6 +1310,10 @@ packages:
 
   '@intlify/shared@11.1.2':
     resolution: {integrity: sha512-dF2iMMy8P9uKVHV/20LA1ulFLL+MKSbfMiixSmn6fpwqzvix38OIc7ebgnFbBqElvghZCW9ACtzKTGKsTGTWGA==}
+    engines: {node: '>= 16'}
+
+  '@intlify/shared@12.0.0-alpha.1':
+    resolution: {integrity: sha512-ZZ5rtlUcEnhhFS+MTrl0V1UoN3yRninGawP3f1YituJN9217xJvpqCSLa9t8NLaVwVIxsRcq4lQe48D0SigmBg==}
     engines: {node: '>= 16'}
 
   '@intlify/unplugin-vue-i18n@6.0.3':
@@ -2144,6 +2147,12 @@ packages:
   '@vue-flow/core@1.42.1':
     resolution: {integrity: sha512-QzzTxMAXfOeETKc+N3XMp5XpiPxKBHK5kq98avgTsE6MXyeU2E8EkANwwgSB/hvJ/k36RjU0Y7BOwCHiqiI1tw==}
     peerDependencies:
+      vue: ^3.3.0
+
+  '@vue-flow/node-resizer@1.4.0':
+    resolution: {integrity: sha512-S52MRcSpd6asza8Cl0bKM2sHGrbq7vBydKHDuPdoTD+cvjNX6XF4LSiPZOuzExePI6b+O6dg2EZ1378oOLGFpA==}
+    peerDependencies:
+      '@vue-flow/core': ^1.23.0
       vue: ^3.3.0
 
   '@vue-flow/node-toolbar@1.1.0':
@@ -7242,8 +7251,8 @@ snapshots:
 
   '@intlify/bundle-utils@10.0.0(vue-i18n@11.0.1(vue@3.5.13(typescript@5.7.3)))':
     dependencies:
-      '@intlify/message-compiler': 11.0.0-rc.1
-      '@intlify/shared': 11.0.0-rc.1
+      '@intlify/message-compiler': 12.0.0-alpha.1
+      '@intlify/shared': 12.0.0-alpha.1
       acorn: 8.14.0
       escodegen: 2.1.0
       estree-walker: 2.0.2
@@ -7259,21 +7268,21 @@ snapshots:
       '@intlify/message-compiler': 11.0.1
       '@intlify/shared': 11.0.1
 
-  '@intlify/message-compiler@11.0.0-rc.1':
-    dependencies:
-      '@intlify/shared': 11.0.0-rc.1
-      source-map-js: 1.2.1
-
   '@intlify/message-compiler@11.0.1':
     dependencies:
       '@intlify/shared': 11.0.1
       source-map-js: 1.2.1
 
-  '@intlify/shared@11.0.0-rc.1': {}
+  '@intlify/message-compiler@12.0.0-alpha.1':
+    dependencies:
+      '@intlify/shared': 12.0.0-alpha.1
+      source-map-js: 1.2.1
 
   '@intlify/shared@11.0.1': {}
 
   '@intlify/shared@11.1.2': {}
+
+  '@intlify/shared@12.0.0-alpha.1': {}
 
   '@intlify/unplugin-vue-i18n@6.0.3(@vue/compiler-dom@3.5.13)(eslint@9.17.0(jiti@2.4.2))(rollup@4.29.1)(typescript@5.7.3)(vue-i18n@11.0.1(vue@3.5.13(typescript@5.7.3)))(vue@3.5.13(typescript@5.7.3))':
     dependencies:
@@ -8229,6 +8238,13 @@ snapshots:
       vue: 3.5.13(typescript@5.7.3)
     transitivePeerDependencies:
       - '@vue/composition-api'
+
+  '@vue-flow/node-resizer@1.4.0(@vue-flow/core@1.42.1(vue@3.5.13(typescript@5.7.3)))(vue@3.5.13(typescript@5.7.3))':
+    dependencies:
+      '@vue-flow/core': 1.42.1(vue@3.5.13(typescript@5.7.3))
+      d3-drag: 3.0.0
+      d3-selection: 3.0.0
+      vue: 3.5.13(typescript@5.7.3)
 
   '@vue-flow/node-toolbar@1.1.0(@vue-flow/core@1.42.1(vue@3.5.13(typescript@5.7.3)))':
     dependencies:

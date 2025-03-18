@@ -49,6 +49,8 @@ export interface SchemaNode {
   timeCreated: number
   timeUpdated: number
   isActive: boolean
+  width?: number
+  height?: number
 }
 
 /** Provenance of concept & relation change */
