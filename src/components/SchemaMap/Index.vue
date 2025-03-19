@@ -199,4 +199,17 @@ function onAddSchemaNode() {
 @import '@vue-flow/core/dist/theme-default.css';
 @import '@vue-flow/controls/dist/style.css';
 @import '@vue-flow/node-resizer/dist/style.css';
+
+.vue-flow__resize-control.line.left {
+  border-left-width: 0;
+}
+.vue-flow__resize-control.line.right {
+  border-right-width: 0;
+}
+.vue-flow__resize-control.line.top {
+  border-top-width: 0;
+}
+.vue-flow__resize-control.line.bottom {
+  border-bottom-width: 0;
+}
 </style>

@@ -197,6 +197,7 @@ function updateName() {
             :class="{
               'bg-blue-1': node.included,
               'bg-gray-1': !node.included,
+              'bg-historymap-100': node.highlighted,
             }"
             @blur="updateName"
             @keydown.enter.prevent="(e) => e.target?.blur()"

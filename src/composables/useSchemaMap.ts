@@ -1,5 +1,6 @@
 import type { HmPage } from '@/types/historymap'
-import type { ElementProvenance, Schema, SchemaNode } from '@/types/schema.d'
+import type { Concept, Schema, SchemaNode } from '@/types/schema.d'
+import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 import { useHistoryMap } from './useHistoryMap'
 import { useSession } from './useSession'
@@ -14,30 +15,10 @@ export function useSchemaMap() {
   /** define state */
   const schemaNodes = computed(() => allSchemaNodes.value.filter(d => d.sessionId === sessionId.value))
 
-  const pageNodes = computed(() => {
-    const pageProvDict: Record<string, ElementProvenance[]> = {}
-
-    schemaNodes.value.forEach((node) => {
-      const prov = node.schema.provenance ?? []
-      prov.forEach((p) => {
-        const src = p.sourcePage
-        if (src) {
-          if (src in pageProvDict === false) {
-            pageProvDict[src] = []
-          }
-          pageProvDict[src].push(p)
-        }
-      })
-    })
-
-    return pages.value.map((p) => {
-      const prov = pageProvDict[p.id]
-      return prov ? { ...p, embeddedProvenance: prov } : p
-    }) as HmPage[]
-  })
-
   // SchemaMap nodes
-  const nodes = computed(() => [...pageNodes.value, ...schemaNodes.value])
+  const rawNodes = computed(() => [...pages.value, ...schemaNodes.value])
+  const nodes = computed(() => linkConcepts(rawNodes.value))
+  // const nodes = computed(() => rawNodes.value)
 
   // SchemaMap links
   const links = computed(() => {
@@ -55,6 +36,7 @@ export function useSchemaMap() {
 
   const state = {
     schemaNodes,
+    rawNodes,
     nodes,
     links,
     activeSchemaNode,
@@ -176,4 +158,208 @@ export function useSchemaMap() {
     setSelectedNodeIds,
     addSourceToNode,
   }
+}
+
+export function useLinkMap() {
+  // map nodes to sources and targets
+  const sourceMap = new Map<string, string[]>()
+  const targetMap = new Map<string, string[]>()
+
+  const { rawNodes } = useSchemaMap()
+
+  function addValue(map: Map<string, string[]>, key: string, value: string) {
+    if (map.has(key)) {
+      map.set(key, [...map.get(key)!, value])
+    }
+    else {
+      map.set(key, [value])
+    }
+  }
+
+  rawNodes.value.forEach((node) => {
+    if (node.type === 'hm-page') {
+      if (node.parentPageId) {
+        addValue(sourceMap, node.id, node.parentPageId)
+        addValue(targetMap, node.parentPageId, node.id)
+      }
+    }
+    else if (node.type === 'schema') {
+      node.sources.forEach((source) => {
+        addValue(sourceMap, node.id, source)
+        addValue(targetMap, source, node.id)
+      })
+    }
+  })
+
+  function hasPath(sourceId: string, targetId: string) {
+    function dfs(source: string, target: string, visited: Set<string> = new Set()): boolean {
+      if (source === target)
+        return true
+
+      if (visited.has(source))
+        return false
+
+      visited.add(source)
+
+      const neighbors = targetMap.get(source) || []
+
+      for (const neighbor of neighbors) {
+        if (dfs(neighbor, target, visited)) {
+          return true
+        }
+      }
+
+      return false
+    }
+    return dfs(sourceId, targetId)
+  }
+
+  return {
+    sourceMap,
+    targetMap,
+    hasPath,
+  }
+}
+
+function useConceptMap() {
+  // which nodes include the concept
+  const conceptMap = function() {
+    const map = new Map<string, string[]>()
+
+    return {
+      set: (key: string, value: string) => {
+        addValue(map, key.toLowerCase(), value)
+      },
+      get: (key: string) => {
+        return map.get(key.toLowerCase())
+      },
+      has: (key: string) => {
+        return map.has(key.toLowerCase())
+      }
+    }
+  }()
+
+  const { rawNodes } = useSchemaMap()
+
+  function addValue(map: Map<string, string[]>, key: string, value: string) {
+    if (map.has(key)) {
+      map.set(key, _.uniq([...map.get(key)!, value]))
+    }
+    else {
+      map.set(key, [value])
+    }
+  }
+
+  rawNodes.value.forEach((node) => {
+    if (node.type === 'schema') {
+      node.schema.concepts.forEach((concept) => {
+        conceptMap.set(concept.name, node.id)
+      })
+    }
+    else if (node.type === 'hm-page' && node.annotations) {
+      node.annotations
+        .filter(d => d.schema)
+        .forEach((annotation) => {
+          annotation.schema!.concepts.forEach((concept) => {
+            conceptMap.set(concept.name, node.id)
+          })
+        })
+    }
+  })
+
+  return {
+    conceptMap,
+  }
+}
+
+function linkConcepts(nodes: (HmPage | SchemaNode)[]) {
+  const { activePage } = useHistoryMap()
+  const { hasPath, targetMap } = useLinkMap()
+  const { conceptMap } = useConceptMap()
+
+  const processedNodes = _.cloneDeep(nodes)
+  function getNode(id: string) {
+    return processedNodes.find(d => d.id === id)
+  }
+
+  function forEachConcept(node: HmPage | SchemaNode, callback: (concept: Concept) => void) {
+    if (node.type === 'hm-page' && node.annotations) {
+      node.annotations.forEach((annotation) => {
+        if (!annotation.schema) return
+        annotation.schema.concepts.forEach(callback)
+      })
+    }
+    else if (node.type === 'schema') {
+      node.schema.concepts.forEach(callback)
+    }
+  }
+
+  function highlightConcept(node: HmPage | SchemaNode, conceptName: string, attr: 'highlighted' | 'included' = 'highlighted') {
+    forEachConcept(node, (concept) => {
+      if (concept.name.toLowerCase() === conceptName.toLowerCase()) {
+        concept[attr] = true
+      }
+    })
+  }
+
+  function highlightRelatedConcepts(node: HmPage | SchemaNode, conceptName: string) {
+    const relatedNodeIds = conceptMap.get(conceptName)
+    if (relatedNodeIds) {
+      relatedNodeIds.forEach((relatedId) => {
+        if (hasPath(node.id, relatedId) || hasPath(relatedId, node.id)) return
+        const relatedNode = getNode(relatedId)
+        if (relatedNode) {
+          highlightConcept(node, conceptName)
+          highlightConcept(relatedNode, conceptName)
+        }
+      })
+    }
+  }
+
+  // if concept is included in its target node
+  processedNodes.forEach((node) => {
+    forEachConcept(node, (concept) => {
+      const targets = targetMap.get(node.id) || []
+      const includes = conceptMap.get(concept.name) || []
+      if (_.intersection(targets, includes).length > 0) {
+        highlightConcept(node, concept.name, 'included')
+      }
+    })
+  })
+
+  // if no nodes are selected, suggest concepts related to the active page node
+  if (selectedNodeIds.value.length === 0 && activePage.value) {
+    const activeNode = getNode(activePage.value.id) as HmPage
+    if (activeNode) {
+      forEachConcept(activeNode, (concept) => {
+        highlightRelatedConcepts(activeNode, concept.name)
+      })
+    }
+  }
+
+  // if a single node is selected, suggest concepts related to the selected node
+  else if (selectedNodeIds.value.length === 1) {
+    const selectedNode = getNode(selectedNodeIds.value[0])
+    if (selectedNode) {
+      forEachConcept(selectedNode, (concept) => {
+        highlightRelatedConcepts(selectedNode, concept.name)
+      })
+    }
+  }
+
+  // if multiple nodes are selected, highlight their common concepts
+  else if (selectedNodeIds.value.length > 1) {
+    selectedNodeIds.value.forEach((id) => {
+      const node = getNode(id)
+      if (!node) return
+      forEachConcept(node, (concept) => {
+        const relatedNodeIds = conceptMap.get(concept.name) 
+        if (_.intersection(selectedNodeIds.value, relatedNodeIds).length > 1) {
+          highlightConcept(node, concept.name)
+        }
+      })
+    })
+  }
+
+  return processedNodes
 }

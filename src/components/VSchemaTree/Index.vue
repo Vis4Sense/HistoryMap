@@ -14,10 +14,6 @@ const props = defineProps({
     type: Object as PropType<Schema>,
     required: true,
   },
-  targetConcepts: {
-    type: Array as PropType<string[]>,
-    default: () => [],
-  },
 })
 
 const emit = defineEmits<{
@@ -25,7 +21,7 @@ const emit = defineEmits<{
   addSource: [sourceId: string]
 }>()
 
-const { id, schema, targetConcepts } = toRefs(props)
+const { id, schema } = toRefs(props)
 
 const { onDragStart, onDragEnd, sourceData } = useDragAndDropTree()
 
@@ -36,12 +32,7 @@ watch(schema, () => {
 }, { deep: true })
 
 function createTree() {
-  const concepts = schema.value.concepts
-    .map(c => ({
-      ...c,
-      included: targetConcepts.value.includes(c.name),
-    }))
-  return new Tree(concepts)
+  return new Tree(schema.value.concepts)
 }
 
 /** emit tree edit */

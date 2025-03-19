@@ -11,10 +11,6 @@ const props = defineProps({
     type: Object as PropType<Schema>,
     required: true,
   },
-  targetConcepts: {
-    type: Array as PropType<string[]>,
-    default: () => [],
-  },
 })
 
 const { id } = toRefs(props)
@@ -34,7 +30,6 @@ function addSource(sourceId: string) {
   <VSchemaTree
     :id="id"
     :schema="schema"
-    :target-concepts="targetConcepts"
     @update-schema="onUpdateSchema"
     @add-source="addSource"
   />

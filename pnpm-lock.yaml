@@ -14,6 +14,12 @@ importers:
       '@iconify-json/material-symbols-light':
         specifier: ^1.2.14
         version: 1.2.14
+      '@intlify/message-compiler':
+        specifier: 11.0.0-rc.1
+        version: 11.0.0-rc.1
+      '@intlify/shared':
+        specifier: 11.0.0-rc.1
+        version: 11.0.0-rc.1
       '@maxgraph/core':
         specifier: ^0.15.1
         version: 0.15.1
@@ -1296,12 +1302,20 @@ packages:
     resolution: {integrity: sha512-NAmhw1l/llM0HZRpagR/ChJTNymW4ll6/4EDSJML5c8L5Hl/+k6UyF8EIgE6DeHpfheQujkSRngauViHqq6jJQ==}
     engines: {node: '>= 16'}
 
+  '@intlify/message-compiler@11.0.0-rc.1':
+    resolution: {integrity: sha512-TGw2uBfuTFTegZf/BHtUQBEKxl7Q/dVGLoqRIdw8lFsp9g/53sYn5iD+0HxIzdYjbWL6BTJMXCPUHp9PxDTRPw==}
+    engines: {node: '>= 16'}
+
   '@intlify/message-compiler@11.0.1':
     resolution: {integrity: sha512-5RFH8x+Mn3mbjcHXnb6KCXGiczBdiQkWkv99iiA0JpKrNuTAQeW59Pjq/uObMB0eR0shnKYGTkIJxum+DbL3sw==}
     engines: {node: '>= 16'}
 
   '@intlify/message-compiler@12.0.0-alpha.1':
     resolution: {integrity: sha512-rS1Lc99D2uaGqWxlrpGPWdgkq2Jox8xxOS9gdIRhuF2CsuJISWQmwd/TjMnWNhwv9olE0aPEBh1323a61Tfp+g==}
+    engines: {node: '>= 16'}
+
+  '@intlify/shared@11.0.0-rc.1':
+    resolution: {integrity: sha512-8tR1xe7ZEbkabTuE/tNhzpolygUn9OaYp9yuYAF4MgDNZg06C3Qny80bes2/e9/Wm3aVkPUlCw6WgU7mQd0yEg==}
     engines: {node: '>= 16'}
 
   '@intlify/shared@11.0.1':
@@ -7251,8 +7265,8 @@ snapshots:
 
   '@intlify/bundle-utils@10.0.0(vue-i18n@11.0.1(vue@3.5.13(typescript@5.7.3)))':
     dependencies:
-      '@intlify/message-compiler': 12.0.0-alpha.1
-      '@intlify/shared': 12.0.0-alpha.1
+      '@intlify/message-compiler': 11.0.0-rc.1
+      '@intlify/shared': 11.0.0-rc.1
       acorn: 8.14.0
       escodegen: 2.1.0
       estree-walker: 2.0.2
@@ -7268,6 +7282,11 @@ snapshots:
       '@intlify/message-compiler': 11.0.1
       '@intlify/shared': 11.0.1
 
+  '@intlify/message-compiler@11.0.0-rc.1':
+    dependencies:
+      '@intlify/shared': 11.0.0-rc.1
+      source-map-js: 1.2.1
+
   '@intlify/message-compiler@11.0.1':
     dependencies:
       '@intlify/shared': 11.0.1
@@ -7277,6 +7296,8 @@ snapshots:
     dependencies:
       '@intlify/shared': 12.0.0-alpha.1
       source-map-js: 1.2.1
+
+  '@intlify/shared@11.0.0-rc.1': {}
 
   '@intlify/shared@11.0.1': {}
 

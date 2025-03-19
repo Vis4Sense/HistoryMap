@@ -12,10 +12,6 @@ const props = defineProps({
     type: Object as PropType<Annotation>,
     required: true,
   },
-  targetConcepts: {
-    type: Array as PropType<string[]>,
-    default: () => [],
-  },
 })
 
 const { id, annotation } = toRefs(props)
@@ -44,7 +40,6 @@ function onUpdateSchema(schema: Schema) {
       v-if="annotation.schema"
       :id="id"
       :schema="annotation.schema"
-      :target-concepts="targetConcepts"
       @update-schema="onUpdateSchema"
     />
     <!-- <div v-if="annotation.tags && annotation.tags.length" flex flex-nowrap px="1">

@@ -80,15 +80,6 @@ function onTitleUpdate(title: string) {
   }
   updateNode(data.value.id, { schema })
 }
-
-/** concepts that are included in target schemas */
-const targetConcepts = computed(() => {
-  const targetNodes = data.value.targets as SchemaNode[]
-  if (targetNodes) {
-    return _.uniq(targetNodes.flatMap(node => node.schema?.concepts.map(c => c.name) ?? []))
-  }
-  return []
-})
 </script>
 
 <template>
@@ -144,7 +135,6 @@ const targetConcepts = computed(() => {
         :id="id"
         :key="annotation.id"
         :annotation="annotation"
-        :target-concepts="targetConcepts"
       />
     </div>
 
@@ -163,7 +153,6 @@ const targetConcepts = computed(() => {
       <SchemaNodeTree
         :id="id"
         :schema="data.schema"
-        :target-concepts="targetConcepts"
       />
     </div>
 

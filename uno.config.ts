@@ -30,6 +30,8 @@ export default defineConfig({
   theme: {
     colors: {
       historymap: {
+        100: '#ffe5e8',
+        200: '#ffccd2',
         primary: '#FF7787',
         DEFAULT: '#FF7787',
       },

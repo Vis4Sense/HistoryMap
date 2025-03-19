@@ -3,6 +3,8 @@ export interface Concept {
   parentName: string | null // parent in the schema tree
   extractedBy?: 'model' | 'user'
   description?: string
+  included?: boolean
+  highlighted?: boolean
   // included?: boolean
   // bookmarked?: boolean
 }
