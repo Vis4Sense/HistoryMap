@@ -221,7 +221,7 @@ export function useLinkMap() {
   }
 }
 
-function useConceptMap() {
+function createConceptMap(nodes: (HmPage | SchemaNode)[] = []) {
   // which nodes include the concept
   const conceptMap = function() {
     const map = new Map<string, string[]>()
@@ -250,10 +250,12 @@ function useConceptMap() {
     }
   }
 
-  rawNodes.value.forEach((node) => {
+  nodes.forEach((node) => {
     if (node.type === 'schema') {
       node.schema.concepts.forEach((concept) => {
-        conceptMap.set(concept.name, node.id)
+        if (!concept.included) {
+          conceptMap.set(concept.name, node.id)
+        }
       })
     }
     else if (node.type === 'hm-page' && node.annotations) {
@@ -261,7 +263,9 @@ function useConceptMap() {
         .filter(d => d.schema)
         .forEach((annotation) => {
           annotation.schema!.concepts.forEach((concept) => {
-            conceptMap.set(concept.name, node.id)
+            if (!concept.included) {
+              conceptMap.set(concept.name, node.id)
+            }
           })
         })
     }
@@ -275,7 +279,6 @@ function useConceptMap() {
 function linkConcepts(nodes: (HmPage | SchemaNode)[]) {
   const { activePage } = useHistoryMap()
   const { hasPath, targetMap } = useLinkMap()
-  const { conceptMap } = useConceptMap()
 
   const processedNodes = _.cloneDeep(nodes)
   function getNode(id: string) {
@@ -316,16 +319,20 @@ function linkConcepts(nodes: (HmPage | SchemaNode)[]) {
     }
   }
 
+  let { conceptMap } = createConceptMap(nodes)
+
   // if concept is included in its target node
   processedNodes.forEach((node) => {
     forEachConcept(node, (concept) => {
       const targets = targetMap.get(node.id) || []
       const includes = conceptMap.get(concept.name) || []
-      if (_.intersection(targets, includes).length > 0) {
+      if (_.intersection(targets, includes).length > 0 || targets.length === 0) {
         highlightConcept(node, concept.name, 'included')
       }
     })
   })
+
+  conceptMap = createConceptMap(processedNodes).conceptMap
 
   // if no nodes are selected, suggest concepts related to the active page node
   if (selectedNodeIds.value.length === 0 && activePage.value) {

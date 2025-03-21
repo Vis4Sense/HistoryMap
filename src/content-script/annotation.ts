@@ -243,7 +243,7 @@ function restoreHighlights() {
 function restoreNoteboxes() {
   console.log('restoring noteboxes')
   annotations.forEach((annotation) => {
-    if ('tags' in annotation || !annotation.highlighted) {
+    if ('tags' in annotation && annotation.tags!.length > 0) {
       const rect = getAnnotationBoundingRect(annotation.id)
       createNoteBox(annotation.id, rect)
     }

@@ -195,8 +195,8 @@ function updateName() {
             mr-1 font-medium
             contenteditable
             :class="{
-              'bg-blue-1': node.included,
-              'bg-gray-1': !node.included,
+              'bg-blue-1': !node.included,
+              'bg-gray-1': node.included,
               'bg-historymap-100': node.highlighted,
             }"
             @blur="updateName"
