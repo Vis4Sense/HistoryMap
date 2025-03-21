@@ -22,7 +22,7 @@ import _ from 'lodash'
 import Postmate from 'postmate'
 import rangy from 'rangy'
 import TurndownService from 'turndown'
-import { sendMessage } from 'webext-bridge/content-script'
+import { sendMessage, onMessage } from 'webext-bridge/content-script'
 import 'rangy/lib/rangy-selectionsaverestore'
 import 'rangy/lib/rangy-classapplier'
 import 'rangy/lib/rangy-highlighter'
@@ -64,6 +64,13 @@ function initialiseToolbar() {
 
     child.on('delete', deleteHandler)
   })
+
+  // or the messages could be from context menu
+  onMessage('highlight', highlightHandler)
+  onMessage('dehighlight', dehighlightHandler)
+  onMessage('tagging-start', taggingStartHandler)
+  onMessage('extract-outline', extractOutlineHandler)
+  onMessage('delete', deleteHandler)
 
   toolbar = handshake
 }
@@ -158,7 +165,8 @@ function deleteHandler() {
     sendMessage('delete', { id }, 'background')
       .then(() => {
         annotations = annotations.filter(d => d.id !== id)
-        noteboxes[id].remove()
+        if (id in noteboxes)
+          noteboxes[id].remove()
 
         const el = document.querySelector(`[annotation-id="${id}"]`)
         if (el) {

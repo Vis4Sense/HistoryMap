@@ -9,7 +9,7 @@ import type { Annotation } from '@/types/historymap'
 import type { Schema } from '@/types/schema'
 import { useHistoryMap } from '@/composables/useHistoryMap'
 import { chatCompletionText } from '@/services/llm'
-import { onMessage } from 'webext-bridge/background'
+import { onMessage, sendMessage } from 'webext-bridge/background'
 import { updateActivePage } from './controller'
 
 const { activePage, addAnnotation, updateAnnotation, removeAnnotation, removeHighlight, highlight, addTag, removeTag } = useHistoryMap()
@@ -191,3 +191,55 @@ function parseMarkdownToSchema(markdown: string) {
 // `
 
 // console.log(JSON.stringify(parseMarkdownToSchema(markdownText), null, 2))
+
+/** create context menus */
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.contextMenus.create({
+    id: 'parent',
+    title: 'Annotate',
+    contexts: ['selection'],
+  })
+
+  chrome.contextMenus.create({
+    id: 'highlight',
+    parentId: 'parent',
+    title: 'Highlight text',
+    contexts: ['selection'],
+  })
+
+  chrome.contextMenus.create({
+    id: 'dehighlight',
+    parentId: 'parent',
+    title: 'Remove highlight',
+    contexts: ['selection'],
+  })
+
+  chrome.contextMenus.create({
+    id: 'tagging-start',
+    parentId: 'parent',
+    title: 'Add tags',
+    contexts: ['selection'],
+  })
+
+  chrome.contextMenus.create({
+    id: 'extract-outline',
+    parentId: 'parent',
+    title: 'Extract outline',
+    contexts: ['selection'],
+  })
+
+  chrome.contextMenus.create({
+    id: 'delete',
+    parentId: 'parent',
+    title: 'Remove annotation',
+    contexts: ['selection'],
+  })
+
+  chrome.contextMenus.onClicked.addListener((info, tab) => {
+    // "content-script@"+tabs[0].id
+
+    const { menuItemId } = info
+
+    sendMessage(menuItemId.toString(), {}, 'content-script@' + tab.id)
+  })
+})

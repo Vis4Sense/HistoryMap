@@ -41,7 +41,7 @@ export default {
   options_page: "src/ui/options-page/index.html",
   offline_enabled: true,
   host_permissions: [],
-  permissions: ["storage", "tabs", "background", "sidePanel", "scripting"],
+  permissions: ["storage", "tabs", "background", "sidePanel", "scripting", "contextMenus"],
   web_accessible_resources: [],
   icons: {
     16: "src/assets/icon-128.png",
