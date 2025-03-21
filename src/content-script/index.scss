@@ -42,8 +42,13 @@
 
 .annotate {
   text-decoration: underline;
-  text-decoration-color: #FF7787;
+  // text-decoration-color: #FF7787;
+  text-decoration-color: rgba($color: #FF7787, $alpha: 0.5);
   text-decoration-style: dashed;
+}
+
+.highlight {
+  background-color: rgba($color: #FFB900, $alpha: 0.4);
 }
 
 iframe {
