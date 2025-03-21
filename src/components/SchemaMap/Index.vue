@@ -142,6 +142,11 @@ function onAddSchemaNode() {
     )
   }
 }
+
+/** open new tab */
+function openNewTab() {
+  chrome.tabs.create({ url: 'chrome://newtab/' })
+}
 </script>
 
 <template>
@@ -169,6 +174,11 @@ function onAddSchemaNode() {
         :show-fit-view="false"
         :show-interactive="false"
       >
+        <BasicToolbarIcon
+          @click="openNewTab"
+        >
+          <div i-carbon-earth-filled />
+        </BasicToolbarIcon>
         <BasicToolbarIcon
           :bg="selectionMode === 'single'"
           @click="selectionMode = 'single'"
