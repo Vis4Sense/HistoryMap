@@ -16,8 +16,8 @@ function updateSessionTitle() {
 </script>
 
 <template>
-  <div w-full p="x-2 y-1" flex text-lg bg-gray-1>
-    <div shrink-0>
+  <div w-full p="x-2 y-1" flex text-lg border-b items-center>
+    <div shrink-0 flex>
       <el-popover
         trigger="click"
         :show-arrow="false"
@@ -46,12 +46,17 @@ function updateSessionTitle() {
     <div flex-auto flex justify-center>
       <div
         ref="sessionTitle" max-w-40 truncate
+        font-medium
         contenteditable
         @blur="updateSessionTitle"
         @keydown.enter.prevent="(e) => e.target.blur()"
       >
         {{ session?.title || 'Untitled' }}
       </div>
+    </div>
+
+    <div shrink-0>
+      <Export />
     </div>
   </div>
 </template>

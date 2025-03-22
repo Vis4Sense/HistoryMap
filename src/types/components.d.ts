@@ -23,6 +23,7 @@ declare module 'vue' {
     CanvasNodeToolsToolNewSchema: typeof import('./../components/Canvas/node-tools/ToolNewSchema.vue')['default']
     CanvasNodeToolsToolRemove: typeof import('./../components/Canvas/node-tools/ToolRemove.vue')['default']
     CanvasNodeToolsToolRemoveSchema: typeof import('./../components/Canvas/node-tools/ToolRemoveSchema.vue')['default']
+    Export: typeof import('./../components/Export.vue')['default']
     Header: typeof import('./../components/Header.vue')['default']
     HistoryMap: typeof import('./../components/HistoryMap/Index.vue')['default']
     IPhListHeart: typeof import('~icons/ph/list-heart')['default']

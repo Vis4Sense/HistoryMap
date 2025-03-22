@@ -38,12 +38,16 @@ export function useSession() {
 
   function updateSession(id: number, data: Partial<SessionMetaData>) {
     const session_ = sessions.value.find(d => d.sessionId === id)
-    if (session_)
+    if (session_) {
       Object.assign(session_, data)
+      session_.timeUpdated = Date.now()
+    }
   }
 
   function switchSession(id: number) {
     sessionId.value = id
+    // TODO: this is actually last opened time, not updated time
+    updateSession(id, {})
   }
 
   function switchToDefaultSession() {

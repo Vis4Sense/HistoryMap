@@ -28,7 +28,7 @@ const emit = defineEmits(['click'])
     :disabled="!enableTooltip"
   >
     <div
-      rounded cursor-pointer
+      rounded cursor-pointer text-gray-5
       :class="{
         'bg-gray-2': bg,
         'p-1 hover:bg-gray-2': !plain,
