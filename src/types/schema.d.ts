@@ -4,6 +4,7 @@ export interface Concept {
   extractedBy?: 'model' | 'user'
   description?: string
   included?: boolean
+  unincluded?: boolean
   highlighted?: boolean
   // included?: boolean
   // bookmarked?: boolean

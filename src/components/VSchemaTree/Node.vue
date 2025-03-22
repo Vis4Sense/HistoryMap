@@ -15,7 +15,7 @@ const props = defineProps({
   lod: {
     type: String as PropType<Schema['lod']>,
     default: 'detail',
-  }
+  },
 })
 
 const emit = defineEmits<{
@@ -192,9 +192,10 @@ function updateName() {
           <div v-else i-carbon-dot-mark text="0.5rem" mt="0.5" />
         </div>
 
-        <div leading-tight text-ellipsis
+        <div
+          leading-tight text-ellipsis
           :class="{
-            'line-clamp-1': lod === 'summary'
+            'line-clamp-1': lod === 'summary',
           }"
         >
           <span
@@ -203,8 +204,8 @@ function updateName() {
             mr-1 font-medium
             contenteditable
             :class="{
-              'bg-blue-1': !node.included,
-              'bg-gray-1': node.included,
+              'bg-blue-1': node.unincluded,
+              'bg-gray-1': !node.unincluded,
               'bg-historymap-100': node.highlighted,
             }"
             @blur="updateName"
@@ -252,7 +253,8 @@ function updateName() {
         }"
       />
 
-      <div v-if="node.children || isEditing"
+      <div
+        v-if="node.children || isEditing"
         :class="{
           'flex flex-nowrap whitespace-nowrap overflow-auto items-center': lod === 'concept' && node.hasNoBranch(),
         }"

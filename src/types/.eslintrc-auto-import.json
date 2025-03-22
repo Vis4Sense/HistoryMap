@@ -339,6 +339,7 @@
     "watchTriggerable": true,
     "watchWithFilter": true,
     "whenever": true,
-    "useLinkMap": true
+    "useLinkMap": true,
+    "getCurrentConcepts": true
   }
 }

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { Annotation } from '@/types/historymap'
 import type { Schema } from '@/types/schema.d'
-import { useHistoryMap } from '@/composables/useHistoryMap'
 import { useDragAndDropTree } from '@/composables/useDnDTree'
+import { useHistoryMap } from '@/composables/useHistoryMap'
 
 const props = defineProps({
   id: {
@@ -45,6 +45,7 @@ function onUpdateSchema(schema: Schema) {
     <div v-if="annotation.tags && annotation.tags.length" flex flex-nowrap p-1>
       <span
         v-for="tag in annotation.tags"
+        :key="tag"
         px-1 bg-gray-1 rounded-lg
         hover:bg-gray-2
         draggable="true"

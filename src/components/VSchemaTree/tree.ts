@@ -12,6 +12,7 @@ export class TreeNode {
   children?: TreeNode[]
   virtual?: boolean
   included?: boolean
+  unincluded?: boolean
   highlighted?: boolean
 
   constructor(data: Concept, isVirtual = false) {
@@ -19,6 +20,7 @@ export class TreeNode {
     this.parentName = data.parentName
     this.description = data.description ?? null
     this.included = data.included ?? false
+    this.unincluded = data.unincluded ?? false
     this.highlighted = data.highlighted ?? false
     if (isVirtual) {
       this.virtual = true
@@ -40,6 +42,22 @@ export class TreeNode {
     child.parent = this
     child.parentName = this.virtual ? null : this.name
     return child
+  }
+
+  merge(node: TreeNode) {
+    if (node.name !== this.name)
+      return
+    if (node.children) {
+      node.children.forEach((child) => {
+        const exist = this.children?.find(c => c.name === child.name)
+        if (exist) {
+          exist.merge(child)
+        }
+        else {
+          this.addChild(child)
+        }
+      })
+    }
   }
 
   insertBefore(node: TreeNode) {
@@ -92,10 +110,12 @@ export class TreeNode {
   }
 
   hasNoBranch(): boolean {
-    if (!this.children) return true
+    if (!this.children)
+      return true
     if (this.children) {
       for (const child of this.children) {
-        if (child.children && child.children.length > 0) return false
+        if (child.children && child.children.length > 0)
+          return false
       }
     }
     return true

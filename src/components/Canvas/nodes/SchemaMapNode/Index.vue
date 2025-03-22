@@ -6,7 +6,6 @@ import { newSchema } from '@/types/schema.d'
 import { Handle, Position, useVueFlow } from '@vue-flow/core'
 import { NodeResizer } from '@vue-flow/node-resizer'
 import { NodeToolbar } from '@vue-flow/node-toolbar'
-import _ from 'lodash'
 import SchemaMapNodeToolbar from '../../node-toolbars/SchemaMapNodeToolbar.vue'
 import HmPageNodeAnnotation from '../HmPageNode/Annotation.vue'
 import HmPageNodeHeader from '../HmPageNode/Header.vue'
@@ -126,7 +125,7 @@ function onTitleUpdate(title: string) {
       overflow-auto
       :class="{
         'max-h-40': !data.height,
-        'flex-auto': data.height
+        'flex-auto': data.height,
       }"
       class="nowheel nodrag"
     >
@@ -146,7 +145,7 @@ function onTitleUpdate(title: string) {
       class="nowheel nodrag"
       :class="{
         'max-h-40': !data.height,
-        'flex-auto': data.height
+        'flex-auto': data.height,
       }"
       @click="e => e.stopPropagation()"
     >

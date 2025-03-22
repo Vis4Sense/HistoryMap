@@ -6,9 +6,11 @@
  */
 
 import type { Annotation } from '@/types/historymap'
-import { newSchema, type Schema } from '@/types/schema.d'
+import type { Schema } from '@/types/schema.d'
 import { useHistoryMap } from '@/composables/useHistoryMap'
+import { getCurrentConcepts } from '@/composables/useSchemaMap'
 import { chatCompletionText } from '@/services/llm'
+import { newSchema } from '@/types/schema.d'
 import { onMessage, sendMessage } from 'webext-bridge/background'
 import { updateActivePage } from './controller'
 
@@ -104,8 +106,11 @@ onMessage('extract-outline', async ({ data }) => {
     updateAnnotation(pageId, 0, { schema: newSchema() })
 
     const { id, sourceText } = data as { id: number, sourceText: string }
+    const exampleConcepts = getCurrentConcepts()
+      // TODO: better strategy to choose example concepts when there are many
+      .slice(0, 200)
 
-    const instruction = `Extract a hierarchical outline of the following content. Each item should include a unique concept name and a short description. Format the outline in markdown. Use * for bullet points.
+    const instruction = `Extract a hierarchical outline of the following content. Each item should include a unique concept name and a short description. Use the same name as existing concepts if possible. Format the outline in markdown. Use * for bullet points.
 
 Response format:
 <outline>
@@ -115,7 +120,7 @@ Response format:
 * Vegetable: A savory edible plant product
 </outline>`
 
-    const prompt = `${instruction}\n\nSource content:\n${sourceText}`
+    const prompt = `${instruction}\n\nExisting concepts:\n${exampleConcepts}\n\nSource content:\n${sourceText}`
 
     const response = await chatCompletionText(prompt)
 
@@ -241,6 +246,6 @@ chrome.runtime.onInstalled.addListener(() => {
 
     const { menuItemId } = info
 
-    sendMessage(menuItemId.toString(), {}, 'content-script@' + tab.id)
+    sendMessage(menuItemId.toString(), {}, `content-script@${tab.id}`)
   })
 })

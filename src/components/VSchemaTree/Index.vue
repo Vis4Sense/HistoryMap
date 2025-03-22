@@ -2,7 +2,7 @@
 import type { Provenance, Schema } from '@/types/schema'
 import type { TreeNode } from './tree'
 import { useDragAndDropTree } from '@/composables/useDnDTree'
-import _ from 'lodash'
+import { newSchema } from '@/types/schema.d'
 import { Tree } from './tree'
 
 const props = defineProps({
@@ -12,7 +12,7 @@ const props = defineProps({
   },
   schema: {
     type: Object as PropType<Schema>,
-    required: true,
+    default: () => newSchema(),
   },
 })
 
@@ -91,7 +91,12 @@ function onDrop(node: TreeNode, position: 'inside' | 'before' | 'after') {
 
   if (position === 'inside') {
     sourceNodes.forEach((d) => {
-      node.addChild(d)
+      if (d.name === node.name) {
+        node.merge(d)
+      }
+      else {
+        node.addChild(d)
+      }
     })
   }
   else if (position === 'before') {
@@ -116,24 +121,26 @@ function onDrop(node: TreeNode, position: 'inside' | 'before' | 'after') {
   <div
     space-y-1 flex flex-col p="x-2 y-1"
   >
-    <div flex gap-1 text-transparent hover:text-gray-6>
+    <div
+      flex gap-1 text-transparent hover:text-gray-6
+    >
       <BasicButtonCircular
         :bg="lod === 'concept'"
         @click="emit('updateSchema', { ...schema, lod: 'concept' })"
       >
-        <div i-mdi-label-outline></div>
+        <div i-mdi-label-outline />
       </BasicButtonCircular>
       <BasicButtonCircular
         :bg="lod === 'summary'"
         @click="emit('updateSchema', { ...schema, lod: 'summary' })"
       >
-        <div i-mdi-format-list-bulleted></div>
+        <div i-mdi-format-list-bulleted />
       </BasicButtonCircular>
       <BasicButtonCircular
         :bg="lod === 'detail'"
         @click="emit('updateSchema', { ...schema, lod: 'detail' })"
       >
-        <div i-mdi-format-list-text></div>
+        <div i-mdi-format-list-text />
       </BasicButtonCircular>
     </div>
 

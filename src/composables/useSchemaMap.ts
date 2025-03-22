@@ -18,7 +18,6 @@ export function useSchemaMap() {
   // SchemaMap nodes
   const rawNodes = computed(() => [...pages.value, ...schemaNodes.value])
   const nodes = computed(() => linkConcepts(rawNodes.value))
-  // const nodes = computed(() => rawNodes.value)
 
   // SchemaMap links
   const links = computed(() => {
@@ -221,10 +220,32 @@ export function useLinkMap() {
   }
 }
 
-function createConceptMap(nodes: (HmPage | SchemaNode)[] = []) {
+function forEachConcept(node: HmPage | SchemaNode, callback: (concept: Concept) => void) {
+  if (node.type === 'hm-page' && node.annotations) {
+    node.annotations.forEach((annotation) => {
+      if (!annotation.schema)
+        return
+      annotation.schema.concepts.forEach(callback)
+    })
+  }
+  else if (node.type === 'schema') {
+    node.schema.concepts.forEach(callback)
+  }
+}
+
+function createConceptMap(nodes: (HmPage | SchemaNode)[] = [], exclude: 'included' | 'unincluded' | null = null) {
   // which nodes include the concept
-  const conceptMap = function() {
+  const conceptMap = (function () {
     const map = new Map<string, string[]>()
+
+    function addValue(map: Map<string, string[]>, key: string, value: string) {
+      if (map.has(key)) {
+        map.set(key, _.uniq([...map.get(key)!, value]))
+      }
+      else {
+        map.set(key, [value])
+      }
+    }
 
     return {
       set: (key: string, value: string) => {
@@ -235,38 +256,22 @@ function createConceptMap(nodes: (HmPage | SchemaNode)[] = []) {
       },
       has: (key: string) => {
         return map.has(key.toLowerCase())
-      }
+      },
+      keys: () => {
+        return map.keys()
+      },
     }
-  }()
-
-  function addValue(map: Map<string, string[]>, key: string, value: string) {
-    if (map.has(key)) {
-      map.set(key, _.uniq([...map.get(key)!, value]))
-    }
-    else {
-      map.set(key, [value])
-    }
-  }
+  }())
 
   nodes.forEach((node) => {
-    if (node.type === 'schema') {
-      node.schema.concepts.forEach((concept) => {
-        if (!concept.included) {
-          conceptMap.set(concept.name, node.id)
+    forEachConcept(node, (concept) => {
+      if (exclude) {
+        if (concept[exclude]) {
+          return
         }
-      })
-    }
-    else if (node.type === 'hm-page' && node.annotations) {
-      node.annotations
-        .filter(d => d.schema)
-        .forEach((annotation) => {
-          annotation.schema!.concepts.forEach((concept) => {
-            if (!concept.included) {
-              conceptMap.set(concept.name, node.id)
-            }
-          })
-        })
-    }
+      }
+      conceptMap.set(concept.name, node.id)
+    })
   })
 
   return {
@@ -278,24 +283,14 @@ function linkConcepts(nodes: (HmPage | SchemaNode)[]) {
   const { activePage } = useHistoryMap()
   const { hasPath, targetMap } = useLinkMap()
 
+  let { conceptMap } = createConceptMap(nodes)
+
   const processedNodes = _.cloneDeep(nodes)
   function getNode(id: string) {
     return processedNodes.find(d => d.id === id)
   }
 
-  function forEachConcept(node: HmPage | SchemaNode, callback: (concept: Concept) => void) {
-    if (node.type === 'hm-page' && node.annotations) {
-      node.annotations.forEach((annotation) => {
-        if (!annotation.schema) return
-        annotation.schema.concepts.forEach(callback)
-      })
-    }
-    else if (node.type === 'schema') {
-      node.schema.concepts.forEach(callback)
-    }
-  }
-
-  function highlightConcept(node: HmPage | SchemaNode, conceptName: string, attr: 'highlighted' | 'included' = 'highlighted') {
+  function highlightConcept(node: HmPage | SchemaNode, conceptName: string, attr: 'highlighted' | 'included' | 'unincluded' = 'highlighted') {
     forEachConcept(node, (concept) => {
       if (concept.name.toLowerCase() === conceptName.toLowerCase()) {
         concept[attr] = true
@@ -307,7 +302,8 @@ function linkConcepts(nodes: (HmPage | SchemaNode)[]) {
     const relatedNodeIds = conceptMap.get(conceptName)
     if (relatedNodeIds) {
       relatedNodeIds.forEach((relatedId) => {
-        if (hasPath(node.id, relatedId) || hasPath(relatedId, node.id)) return
+        if (hasPath(node.id, relatedId) || hasPath(relatedId, node.id))
+          return
         const relatedNode = getNode(relatedId)
         if (relatedNode) {
           highlightConcept(node, conceptName)
@@ -317,20 +313,21 @@ function linkConcepts(nodes: (HmPage | SchemaNode)[]) {
     }
   }
 
-  let { conceptMap } = createConceptMap(nodes)
-
   // if concept is included in its target node
   processedNodes.forEach((node) => {
     forEachConcept(node, (concept) => {
       const targets = targetMap.get(node.id) || []
       const includes = conceptMap.get(concept.name) || []
-      if (_.intersection(targets, includes).length > 0 || targets.length === 0) {
+      if (_.intersection(targets, includes).length > 0) {
         highlightConcept(node, concept.name, 'included')
+      }
+      else if (targets.length > 0) {
+        highlightConcept(node, concept.name, 'unincluded')
       }
     })
   })
 
-  conceptMap = createConceptMap(processedNodes).conceptMap
+  conceptMap = createConceptMap(processedNodes, 'included').conceptMap
 
   // if no nodes are selected, suggest concepts related to the active page node
   if (selectedNodeIds.value.length === 0 && activePage.value) {
@@ -356,9 +353,10 @@ function linkConcepts(nodes: (HmPage | SchemaNode)[]) {
   else if (selectedNodeIds.value.length > 1) {
     selectedNodeIds.value.forEach((id) => {
       const node = getNode(id)
-      if (!node) return
+      if (!node)
+        return
       forEachConcept(node, (concept) => {
-        const relatedNodeIds = conceptMap.get(concept.name) 
+        const relatedNodeIds = conceptMap.get(concept.name)
         if (_.intersection(selectedNodeIds.value, relatedNodeIds).length > 1) {
           highlightConcept(node, concept.name)
         }
@@ -367,4 +365,12 @@ function linkConcepts(nodes: (HmPage | SchemaNode)[]) {
   }
 
   return processedNodes
+}
+
+export function getCurrentConcepts() {
+  const { nodes } = useSchemaMap()
+  const currentNodes = nodes.value.filter(d => !d.isMinimised)
+  const { conceptMap } = createConceptMap(currentNodes, 'unincluded')
+  const concepts = Array.from(conceptMap.keys())
+  return concepts
 }
