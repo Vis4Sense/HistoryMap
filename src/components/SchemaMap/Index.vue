@@ -2,6 +2,7 @@
 import type { HmPage } from '@/types/historymap'
 import type { SchemaNode } from '@/types/schema'
 import type { Edge } from '@vue-flow/core'
+import MinimisedNode from '@/components/Canvas/nodes/MinimisedNode/Index.vue'
 import SchemaMapNode from '@/components/Canvas/nodes/SchemaMapNode/Index.vue'
 import { useSchemaMap } from '@/composables/useSchemaMap'
 import { Controls } from '@vue-flow/controls'
@@ -18,6 +19,10 @@ const baseSize = {
   width: 160,
   height: 32,
 }
+const minimisedSize = {
+  width: 16,
+  height: 16,
+}
 const nodeSizeDict = ref<Record<string, { width: number | null, height: Record<string, number> | null }>>({})
 
 const edges = computed((): Edge[] => {
@@ -31,7 +36,7 @@ const edges = computed((): Edge[] => {
 const nodes = computed(() => {
   const nodes = smNodes.value.map(node => ({
     id: node.id,
-    type: 'schemamap',
+    type: node.isMinimised ? 'minimised' : 'schemamap',
     width: getNodeWidth(node),
     height: getNodeHeight(node),
     position: {
@@ -66,6 +71,9 @@ const nodes = computed(() => {
 /** get node sizes */
 
 function getNodeWidth(node: HmPage | SchemaNode): number {
+  if (node.isMinimised) {
+    return minimisedSize.width
+  }
   if (node.width) {
     return node.width
   }
@@ -80,6 +88,9 @@ function getNodeWidth(node: HmPage | SchemaNode): number {
 }
 
 function getNodeHeight(node: HmPage | SchemaNode): number {
+  if (node.isMinimised) {
+    return minimisedSize.height
+  }
   if (node.height) {
     return node.height
   }
@@ -165,6 +176,10 @@ function openNewTab() {
           @update-height="updateNodeHeight"
           @resize="(width, height) => updateNode(props.id, { width, height })"
         />
+      </template>
+
+      <template #node-minimised="props">
+        <MinimisedNode v-bind="props" />
       </template>
 
       <Controls

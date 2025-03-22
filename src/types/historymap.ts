@@ -14,6 +14,7 @@ export interface HmPage {
   annotations?: Annotation[]
   width?: number
   height?: number
+  isMinimised?: boolean
 }
 
 export interface Annotation {

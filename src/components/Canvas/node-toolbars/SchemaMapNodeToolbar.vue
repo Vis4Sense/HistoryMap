@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ToolMinimise from '../node-tools/ToolMinimise.vue'
 import ToolNewSchema from '../node-tools/ToolNewSchema.vue'
 import ToolRemove from '../node-tools/ToolRemove.vue'
 import ToolRemoveSchema from '../node-tools/ToolRemoveSchema.vue'
@@ -20,6 +21,8 @@ defineProps({
     <!-- <ToolSchematise :id="id" /> -->
     <ToolRemove v-if="type === 'hm-page'" :id="id" />
     <ToolRemoveSchema v-else :id="id" />
+
+    <ToolMinimise :id="id" />
 
     <ToolNewSchema :id="id" />
   </div>
