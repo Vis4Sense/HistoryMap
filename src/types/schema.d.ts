@@ -26,6 +26,7 @@ export interface Relation {
 
 export interface Schema {
   title?: string
+  lod?: 'concept' | 'summary' | 'detail'
   // schemaTree: SchemaTree
   concepts: Concept[]
   // relations: Relation[]

@@ -7,6 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    BasicButtonCircular: typeof import('./../components/Basic/ButtonCircular.vue')['default']
     BasicToolbarIcon: typeof import('./../components/Basic/ToolbarIcon.vue')['default']
     CanvasNodesHmPageNode: typeof import('./../components/Canvas/nodes/HmPageNode/Index.vue')['default']
     CanvasNodesHmPageNodeAnnotation: typeof import('./../components/Canvas/nodes/HmPageNode/Annotation.vue')['default']
@@ -48,6 +49,7 @@ declare module 'vue' {
     SchemaTreeNode: typeof import('./../components/SchemaTree/Node.vue')['default']
     SessionList: typeof import('./../components/SessionList.vue')['default']
     VSchemaTree: typeof import('./../components/VSchemaTree/Index.vue')['default']
+    VSchemaTreeControlLOD: typeof import('./../components/VSchemaTree/ControlLOD.vue')['default']
     VSchemaTreeNode: typeof import('./../components/VSchemaTree/Node.vue')['default']
   }
 }

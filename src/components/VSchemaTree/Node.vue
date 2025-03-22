@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Provenance } from '@/types/schema.d'
+import type { Provenance, Schema } from '@/types/schema.d'
 import Node from './Node.vue'
 import { TreeNode } from './tree'
 
@@ -12,6 +12,10 @@ const props = defineProps({
     type: Number,
     default: 0,
   },
+  lod: {
+    type: String as PropType<Schema['lod']>,
+    default: 'detail',
+  }
 })
 
 const emit = defineEmits<{
@@ -188,7 +192,11 @@ function updateName() {
           <div v-else i-carbon-dot-mark text="0.5rem" mt="0.5" />
         </div>
 
-        <div leading-tight text-ellipsis line-clamp-2>
+        <div leading-tight text-ellipsis
+          :class="{
+            'line-clamp-1': lod === 'summary'
+          }"
+        >
           <span
             ref="conceptNameEle"
             rounded-lg p="x-1"
@@ -205,7 +213,7 @@ function updateName() {
             {{ node.name }}
           </span>
           <span
-            v-if="node.description"
+            v-if="node.description && lod !== 'concept'"
             ref="conceptDescEle"
             text-gray-5
           >
@@ -244,12 +252,17 @@ function updateName() {
         }"
       />
 
-      <div v-if="node.children || isEditing">
+      <div v-if="node.children || isEditing"
+        :class="{
+          'flex flex-nowrap whitespace-nowrap overflow-auto items-center': lod === 'concept' && node.hasNoBranch(),
+        }"
+      >
         <Node
           v-for="child, idx in node.children"
           :key="child.name"
           :node="child"
           :index="idx"
+          :lod="lod"
           @add-node="emit('addNode', $event)"
           @remove-node="emit('removeNode', $event)"
           @update-node="emit('updateNode', $event)"

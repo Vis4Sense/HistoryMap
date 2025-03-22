@@ -22,6 +22,7 @@ const emit = defineEmits<{
 }>()
 
 const { id, schema } = toRefs(props)
+const lod = computed(() => schema.value.lod ?? 'summary')
 
 const { onDragStart, onDragEnd, sourceData } = useDragAndDropTree()
 
@@ -108,8 +109,33 @@ function onDrop(node: TreeNode, position: 'inside' | 'before' | 'after') {
   <div
     space-y-1 flex flex-col p="x-2 y-1"
   >
+    <div flex gap-1 text-transparent hover:text-gray-6>
+      <BasicButtonCircular
+        :bg="lod === 'concept'"
+        @click="emit('updateSchema', { ...schema, lod: 'concept' })"
+      >
+        <div i-mdi-label-outline></div>
+      </BasicButtonCircular>
+      <BasicButtonCircular
+        :bg="lod === 'summary'"
+        @click="emit('updateSchema', { ...schema, lod: 'summary' })"
+      >
+        <div i-mdi-format-list-bulleted></div>
+      </BasicButtonCircular>
+      <BasicButtonCircular
+        :bg="lod === 'detail'"
+        @click="emit('updateSchema', { ...schema, lod: 'detail' })"
+      >
+        <div i-mdi-format-list-text></div>
+      </BasicButtonCircular>
+    </div>
+
     <VSchemaTreeNode
+      :class="{
+        'max-h-16 overflow-auto': lod === 'concept',
+      }"
       :node="tree.root"
+      :lod="lod"
       @add-node="onEdit($event)"
       @remove-node="onEdit($event)"
       @update-node="onEdit($event)"

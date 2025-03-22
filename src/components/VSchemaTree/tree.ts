@@ -90,6 +90,16 @@ export class TreeNode {
     }
     return concepts
   }
+
+  hasNoBranch(): boolean {
+    if (!this.children) return true
+    if (this.children) {
+      for (const child of this.children) {
+        if (child.children && child.children.length > 0) return false
+      }
+    }
+    return true
+  }
 }
 
 export class Tree {
