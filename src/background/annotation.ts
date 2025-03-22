@@ -6,7 +6,7 @@
  */
 
 import type { Annotation } from '@/types/historymap'
-import type { Schema } from '@/types/schema'
+import { newSchema, type Schema } from '@/types/schema.d'
 import { useHistoryMap } from '@/composables/useHistoryMap'
 import { chatCompletionText } from '@/services/llm'
 import { onMessage, sendMessage } from 'webext-bridge/background'
@@ -99,14 +99,15 @@ onMessage('extract-outline', async ({ data }) => {
   if (activePage.value) {
     let annotation: Annotation | null = null
     const pageId = activePage.value.id
+
+    // initialise schema
+    updateAnnotation(pageId, 0, { schema: newSchema() })
+
     const { id, sourceText } = data as { id: number, sourceText: string }
 
-    const instruction = `Extract a hierarchical outline of the following content. Each item in the outline should include a unique name and a short description.
+    const instruction = `Extract a hierarchical outline of the following content. Each item should include a unique concept name and a short description. Format the outline in markdown. Use * for bullet points.
 
-Format the outline in markdown. Use * for bullet points. Each item should be:
-* {name}: description
-
-Example response format:
+Response format:
 <outline>
 * Fruit: A sweet or savory edible plant product
   * Apple: A type of fruit that is red or green

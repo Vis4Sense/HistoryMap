@@ -239,8 +239,6 @@ function createConceptMap(nodes: (HmPage | SchemaNode)[] = []) {
     }
   }()
 
-  const { rawNodes } = useSchemaMap()
-
   function addValue(map: Map<string, string[]>, key: string, value: string) {
     if (map.has(key)) {
       map.set(key, _.uniq([...map.get(key)!, value]))

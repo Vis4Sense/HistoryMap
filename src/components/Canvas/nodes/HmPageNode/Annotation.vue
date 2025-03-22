@@ -2,6 +2,7 @@
 import type { Annotation } from '@/types/historymap'
 import type { Schema } from '@/types/schema.d'
 import { useHistoryMap } from '@/composables/useHistoryMap'
+import { useDragAndDropTree } from '@/composables/useDnDTree'
 
 const props = defineProps({
   id: {
@@ -16,7 +17,7 @@ const props = defineProps({
 
 const { id, annotation } = toRefs(props)
 
-const draggable = ref(false)
+const { onDragStart, onDragEnd } = useDragAndDropTree()
 
 function onUpdateSchema(schema: Schema) {
   const { updateAnnotation } = useHistoryMap()
@@ -30,7 +31,6 @@ function onUpdateSchema(schema: Schema) {
     border-0.5 rounded
     text-xs
     space-y="0.5"
-    :draggable="draggable"
     @click="e => e.stopPropagation()"
   >
     <div v-if="annotation.highlighted" flex-auto truncate bg-yellow-1>
@@ -42,8 +42,18 @@ function onUpdateSchema(schema: Schema) {
       :schema="annotation.schema"
       @update-schema="onUpdateSchema"
     />
-    <!-- <div v-if="annotation.tags && annotation.tags.length" flex flex-nowrap px="1">
-          <span v-for="tag in annotation.tags" px-1 bg-gray-1 rounded-lg>{{ tag }}</span>
-        </div> -->
+    <div v-if="annotation.tags && annotation.tags.length" flex flex-nowrap p-1>
+      <span
+        v-for="tag in annotation.tags"
+        px-1 bg-gray-1 rounded-lg
+        hover:bg-gray-2
+        draggable="true"
+        cursor-pointer
+        @dragstart="onDragStart(id, [{ name: tag, parentName: null }])"
+        @dragend="onDragEnd"
+      >
+        {{ tag }}
+      </span>
+    </div>
   </div>
 </template>

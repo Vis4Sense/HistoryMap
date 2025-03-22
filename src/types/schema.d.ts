@@ -34,11 +34,7 @@ export interface Schema {
 
 export function newSchema(): Schema {
   return {
-    schemaTree: {
-      roots: [],
-    },
     concepts: [],
-    relations: [],
   }
 }
 

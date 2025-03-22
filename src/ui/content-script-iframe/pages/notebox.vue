@@ -34,13 +34,12 @@ function removeTag(value: string) {
 </script>
 
 <template>
-  <div w-full rounded shadow bg-blue-1 p="x-2 y-1">
-    <!-- <VSchemaTree v-if="schema" text-xs :schema="schema" /> -->
-
+  <div rounded shadow bg-gray-1 border-2 p="x-2 y-1">
     <el-input-tag
       v-model="tags"
       bg-transparent
       placeholder="Enter tags"
+      tag-effect="plain"
       @add-tag="onAddTag"
       @remove-tag="removeTag"
     />
