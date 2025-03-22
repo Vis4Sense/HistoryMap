@@ -220,7 +220,7 @@ export function useLinkMap() {
   }
 }
 
-function forEachConcept(node: HmPage | SchemaNode, callback: (concept: Concept) => void) {
+export function forEachConcept(node: HmPage | SchemaNode, callback: (concept: Concept) => void) {
   if (node.type === 'hm-page' && node.annotations) {
     node.annotations.forEach((annotation) => {
       if (!annotation.schema)

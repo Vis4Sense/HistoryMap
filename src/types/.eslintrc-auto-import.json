@@ -340,6 +340,7 @@
     "watchWithFilter": true,
     "whenever": true,
     "useLinkMap": true,
-    "getCurrentConcepts": true
+    "getCurrentConcepts": true,
+    "forEachConcept": true
   }
 }

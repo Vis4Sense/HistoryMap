@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { HmPage } from '@/types/historymap'
 import type { Schema, SchemaNode } from '@/types/schema'
-import { useSchemaMap } from '@/composables/useSchemaMap'
+import { forEachConcept, useSchemaMap } from '@/composables/useSchemaMap'
 import { newSchema } from '@/types/schema.d'
 import { Handle, Position, useVueFlow } from '@vue-flow/core'
 import { NodeResizer } from '@vue-flow/node-resizer'
@@ -38,6 +38,17 @@ const schemaContainer = ref<HTMLElement>()
 const { getSelectedNodes } = useVueFlow()
 const toolbarVisible = computed(() => {
   return selected.value && getSelectedNodes.value.length === 1
+})
+
+/** highlight node if it has highlighted concepts */
+const highlighted = computed(() => {
+  let hasHighlighted = false
+  forEachConcept(data.value, (concept) => {
+    if (concept.highlighted) {
+      hasHighlighted = true
+    }
+  })
+  return hasHighlighted
 })
 
 /** send message to controller to open clicked page */
@@ -90,7 +101,8 @@ function onTitleUpdate(title: string) {
     hover:shadow
     :class="{
       'border-blue': data!.isActive,
-      'border-1.5 border-historymap': selected,
+      'border-2': selected,
+      'border-historymap': highlighted || selected,
       'flex flex-col': data.height,
     }"
   >
