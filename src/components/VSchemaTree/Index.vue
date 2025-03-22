@@ -56,7 +56,14 @@ function dragStart(node: TreeNode) {
 function onDrop(node: TreeNode, position: 'inside' | 'before' | 'after') {
   if (!sourceData.value)
     return
-  const sourceNodes = new Tree(sourceData.value.concepts).root.children ?? []
+  const sourceTree = new Tree(sourceData.value.concepts)
+  const sourceNodes = sourceTree.root.children ?? []
+
+  if (sourceData.value.id === id.value
+    && sourceTree.toConcepts().some(d => d.name === node.name)
+  ) {
+    return
+  }
 
   const provenance: Provenance = {
     time: Date.now(),
