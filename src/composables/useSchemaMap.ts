@@ -7,6 +7,7 @@ import { useSession } from './useSession'
 
 const { data: allSchemaNodes } = useBrowserLocalStorage('schema-nodes', [] as SchemaNode[])
 const { data: selectedNodeIds } = useBrowserLocalStorage('selected-node-ids', [] as string[])
+const { data: selectedConcept } = useBrowserLocalStorage('selected-concept', null as string | null)
 
 export function useSchemaMap() {
   const { sessionId } = useSession()
@@ -159,6 +160,31 @@ export function useSchemaMap() {
   }
 }
 
+export function useSelectionState() {
+  function selectConcept(concept: Concept) {
+    selectedConcept.value = concept.name
+  }
+  
+  function deselectConcept() {
+    selectedConcept.value = null
+  }
+
+  function toggleConcept(concept: Concept) {
+    if (selectedConcept.value === concept.name) {
+      selectedConcept.value = null
+    }
+    else {
+      selectedConcept.value = concept.name
+    }
+  }
+
+  return {
+    selectConcept,
+    deselectConcept,
+    toggleConcept,
+  }
+}
+
 export function useLinkMap() {
   // map nodes to sources and targets
   const sourceMap = new Map<string, string[]>()
@@ -290,7 +316,7 @@ function linkConcepts(nodes: (HmPage | SchemaNode)[]) {
     return processedNodes.find(d => d.id === id)
   }
 
-  function highlightConcept(node: HmPage | SchemaNode, conceptName: string, attr: 'highlighted' | 'included' | 'unincluded' = 'highlighted') {
+  function highlightConcept(node: HmPage | SchemaNode, conceptName: string, attr: 'highlighted' | 'included' | 'unincluded' | 'selected' = 'highlighted') {
     forEachConcept(node, (concept) => {
       if (concept.name.toLowerCase() === conceptName.toLowerCase()) {
         concept[attr] = true
@@ -326,6 +352,17 @@ function linkConcepts(nodes: (HmPage | SchemaNode)[]) {
       }
     })
   })
+
+  // highlight selected concept
+  if (selectedConcept.value) {
+    processedNodes.forEach((node) => {
+      forEachConcept(node, (concept) => {
+        if (concept.name.toLowerCase() === selectedConcept.value?.toLowerCase()) {
+          highlightConcept(node, concept.name, 'selected')
+        }
+      })
+    })
+  }
 
   conceptMap = createConceptMap(processedNodes, 'included').conceptMap
 

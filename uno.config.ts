@@ -32,6 +32,8 @@ export default defineConfig({
       historymap: {
         100: '#ffe5e8',
         200: '#ffccd2',
+        300: '#ffb3bb',
+        400: '#ff99a5',
         primary: '#FF7787',
         DEFAULT: '#FF7787',
       },

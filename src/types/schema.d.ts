@@ -6,6 +6,7 @@ export interface Concept {
   included?: boolean
   unincluded?: boolean
   highlighted?: boolean
+  selected?: boolean
   // included?: boolean
   // bookmarked?: boolean
 }

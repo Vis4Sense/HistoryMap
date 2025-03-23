@@ -14,6 +14,7 @@ export class TreeNode {
   included?: boolean
   unincluded?: boolean
   highlighted?: boolean
+  selected?: boolean
 
   constructor(data: Concept, isVirtual = false) {
     this.name = data.name
@@ -22,6 +23,7 @@ export class TreeNode {
     this.included = data.included ?? false
     this.unincluded = data.unincluded ?? false
     this.highlighted = data.highlighted ?? false
+    this.selected = data.selected ?? false
     if (isVirtual) {
       this.virtual = true
     }

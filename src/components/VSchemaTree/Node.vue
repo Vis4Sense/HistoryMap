@@ -25,6 +25,7 @@ const emit = defineEmits<{
   dragStart: [node: TreeNode]
   dragEnd: []
   dropNode: [node: TreeNode, position: 'inside' | 'before' | 'after']
+  toggleNode: [node: TreeNode]
 }>()
 
 const { node } = toRefs(props)
@@ -187,6 +188,9 @@ function updateDesc() {
           clearDraggedOver()
           emit('dropNode', node, 'inside')
         }"
+        @click="emit('toggleNode', node)"
+        hover:bg-gray-1
+        class="group"
       >
         <div
           absolute left-0 translate-x="-100%"
@@ -208,13 +212,21 @@ function updateDesc() {
             mr-1 font-medium
             contenteditable
             cursor-text
+            :bg="
+              node.selected
+                ? 'historymap-400'
+                : node.highlighted
+                  ? 'historymap-100'
+                  : node.unincluded
+                    ? 'blue-1'
+                    : 'gray-1'
+            "
             :class="{
-              'bg-blue-1': node.unincluded,
-              'bg-gray-1': !node.unincluded,
-              'bg-historymap-100': node.highlighted,
+              'text-white': node.selected
             }"
             @blur="updateName"
             @keydown.enter.prevent="(e) => e.target?.blur()"
+            @click="e => e.stopPropagation()"
           >
             {{ node.name }}
           </span>
@@ -230,6 +242,7 @@ function updateDesc() {
             @focus="startEditingDesc"
             @blur="updateDesc"
             @keydown.enter.prevent="(e) => e.target?.blur()"
+            @click="e => e.stopPropagation()"
           >
             {{ node.description }}
           </span>
@@ -292,6 +305,7 @@ function updateDesc() {
           @drag-start="emit('dragStart', $event)"
           @drag-end="emit('dragEnd')"
           @drop-node="(node, pos) => emit('dropNode', node, pos)"
+          @toggle-node="emit('toggleNode', $event)"
         />
 
         <div

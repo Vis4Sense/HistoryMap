@@ -4,6 +4,7 @@ import type { TreeNode } from './tree'
 import { useDragAndDropTree } from '@/composables/useDnDTree'
 import { newSchema } from '@/types/schema.d'
 import { Tree } from './tree'
+import { useSelectionState } from '@/composables/useSchemaMap'
 
 const props = defineProps({
   id: {
@@ -163,6 +164,10 @@ function onDrop(node: TreeNode, position: 'inside' | 'before' | 'after') {
       @drag-start="dragStart"
       @drag-end="onDragEnd"
       @drop-node="onDrop"
+      @toggle-node="(node: TreeNode) => {
+        const { toggleConcept } = useSelectionState()
+        toggleConcept(node.toConcept())
+      }"
     />
   </div>
 </template>

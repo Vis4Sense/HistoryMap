@@ -37,7 +37,7 @@ const toolbarVisible = computed(() => {
 })
 
 /** highlight node if it has highlighted concepts */
-const highlighted = computed(() => {
+const hasHighlighted = computed(() => {
   let hasHighlighted = false
   forEachConcept(data.value, (concept) => {
     if (concept.highlighted) {
@@ -45,6 +45,15 @@ const highlighted = computed(() => {
     }
   })
   return hasHighlighted
+})
+const hasSelected = computed(() => {
+  let hasSelected = false
+  forEachConcept(data.value, (concept) => {
+    if (concept.selected) {
+      hasSelected = true
+    }
+  })
+  return hasSelected
 })
 
 useResizeObserver(bodyContainer, () => {
@@ -68,8 +77,9 @@ useResizeObserver(bodyContainer, () => {
     :class="{
       'border-blue': data!.isActive,
       'border-2': selected,
-      'border-historymap': highlighted || selected,
+      'border-historymap': hasHighlighted || selected || hasSelected,
       'flex flex-col': data.height,
+      'border-dashed': hasHighlighted && !selected && !hasSelected,
     }"
   >
     <NodeResizer
