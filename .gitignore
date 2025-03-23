@@ -26,3 +26,4 @@ dist-ssr
 .env
 
 auto-imports.d.ts
+.eslintrc-auto-import.json
