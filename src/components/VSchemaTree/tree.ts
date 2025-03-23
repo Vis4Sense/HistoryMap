@@ -34,6 +34,10 @@ export class TreeNode {
     })
   }
 
+  updateDescription(description: string | undefined) {
+    this.description = description
+  }
+
   addChild(child: TreeNode) {
     if (!this.children) {
       this.children = []

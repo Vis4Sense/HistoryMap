@@ -32,6 +32,7 @@ const { node } = toRefs(props)
 /** temporary div to support adding child node */
 const newNode = ref<HTMLDivElement>()
 const isEditing = ref(false)
+const isEditingDesc = ref(false)
 
 /** div of concept name and description */
 const conceptNameEle = ref<HTMLElement>()
@@ -39,8 +40,6 @@ const conceptDescEle = ref<HTMLElement>()
 
 /** show toolbar of node or not */
 const showToolbar = ref(false)
-
-const dragButtonVisible = ref(false)
 
 /** dragged over state */
 const draggedOver = ref(false)
@@ -59,6 +58,13 @@ function startEditing() {
   isEditing.value = true
   nextTick(() => {
     newNode.value?.focus()
+  })
+}
+
+function startEditingDesc() {
+  isEditingDesc.value = true
+  nextTick(() => {
+    conceptDescEle.value?.focus()
   })
 }
 
@@ -111,14 +117,30 @@ function updateName() {
     emit('updateNode', provenance)
   }
 }
+
+function updateDesc() {
+  const newDesc = conceptDescEle.value?.textContent?.trim()
+  if (newDesc !== node.value.description) {
+    const provenance: Provenance = {
+      time: Date.now(),
+      changeType: 'update',
+      diff: {
+        old: node.value.toConcept(),
+        new: null,
+      },
+    }
+    node.value.updateDescription(newDesc)
+    provenance.diff.new = node.value.toConcept()
+    emit('updateNode', provenance)
+  }
+  isEditingDesc.value = false
+}
 </script>
 
 <template>
   <div
     :ml="node.virtual ? 0 : 2"
     relative
-    @mouseenter="dragButtonVisible = true"
-    @mouseleave="dragButtonVisible = false"
   >
     <div
       relative
@@ -132,24 +154,6 @@ function updateName() {
         emit('dragEnd')
       }"
     >
-      <div
-        v-show="node.virtual
-          && node.children
-          && node.children.length
-          && dragButtonVisible
-        "
-        absolute right-0 top-0
-        translate-x-1
-        text-gray-5
-        bg-gray-1 rounded
-        hover:bg-gray-3
-        hover:text-gray-8
-        z-12
-        cursor-pointer
-      >
-        <div i-carbon-draggable />
-      </div>
-
       <div
         v-if="!node.virtual && index === 0"
         border-1 border-dashed
@@ -195,7 +199,7 @@ function updateName() {
         <div
           leading-tight text-ellipsis
           :class="{
-            'line-clamp-1': lod === 'summary',
+            'line-clamp-1': lod === 'summary' && !isEditingDesc,
           }"
         >
           <span
@@ -203,6 +207,7 @@ function updateName() {
             rounded-lg p="x-1"
             mr-1 font-medium
             contenteditable
+            cursor-text
             :class="{
               'bg-blue-1': node.unincluded,
               'bg-gray-1': !node.unincluded,
@@ -214,11 +219,27 @@ function updateName() {
             {{ node.name }}
           </span>
           <span
-            v-if="node.description && lod !== 'concept'"
+            v-if="lod !== 'concept'"
             ref="conceptDescEle"
             text-gray-5
+            contenteditable
+            cursor-text
+            :class="{
+              'px-1': isEditingDesc,
+            }"
+            @focus="startEditingDesc"
+            @blur="updateDesc"
+            @keydown.enter.prevent="(e) => e.target?.blur()"
           >
             {{ node.description }}
+          </span>
+          <span
+            v-if="!node.description && !isEditingDesc"
+            inline-block
+            text-gray-3 hover:text-gray-5
+            @click="startEditingDesc"
+          >
+            <div translate-y-0.5 i-mdi-text-box-plus-outline />
           </span>
         </div>
 

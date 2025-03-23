@@ -70,7 +70,7 @@ export interface SchemaNode {
 export interface Provenance {
   sourcePage?: string
   time: number // time of change
-  changeType: 'add' | 'delete' | 'move' | 'rename'
+  changeType: 'add' | 'delete' | 'move' | 'rename' | 'update'
   diff: {
     old: Concept | Concept[] | null
     new: Concept | Concept[] | null

@@ -120,28 +120,35 @@ function onDrop(node: TreeNode, position: 'inside' | 'before' | 'after') {
 <template>
   <div
     space-y-1 flex flex-col p="x-2 y-1"
+    draggable="true"
   >
-    <div
-      flex gap-1 text-transparent hover:text-gray-6
-    >
-      <BasicButtonCircular
-        :bg="lod === 'concept'"
-        @click="emit('updateSchema', { ...schema, lod: 'concept' })"
+    <div flex justify-between items-center>
+      <div
+        flex gap-1 text-transparent hover:text-gray-6
       >
-        <div i-mdi-label-outline />
-      </BasicButtonCircular>
-      <BasicButtonCircular
-        :bg="lod === 'summary'"
-        @click="emit('updateSchema', { ...schema, lod: 'summary' })"
-      >
-        <div i-mdi-format-list-bulleted />
-      </BasicButtonCircular>
-      <BasicButtonCircular
-        :bg="lod === 'detail'"
-        @click="emit('updateSchema', { ...schema, lod: 'detail' })"
-      >
-        <div i-mdi-format-list-text />
-      </BasicButtonCircular>
+        <BasicButtonCircular
+          :bg="lod === 'concept'"
+          @click="emit('updateSchema', { ...schema, lod: 'concept' })"
+        >
+          <div i-mdi-label-outline />
+        </BasicButtonCircular>
+        <BasicButtonCircular
+          :bg="lod === 'summary'"
+          @click="emit('updateSchema', { ...schema, lod: 'summary' })"
+        >
+          <div i-mdi-format-list-bulleted />
+        </BasicButtonCircular>
+        <BasicButtonCircular
+          :bg="lod === 'detail'"
+          @click="emit('updateSchema', { ...schema, lod: 'detail' })"
+        >
+          <div i-mdi-format-list-text />
+        </BasicButtonCircular>
+      </div>
+
+      <BasicToolbarIcon plain>
+        <div i-carbon-draggable />
+      </BasicToolbarIcon>
     </div>
 
     <VSchemaTreeNode
