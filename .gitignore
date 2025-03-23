@@ -24,3 +24,5 @@ dist-ssr
 *.sw?
 
 .env
+
+auto-imports.d.ts
