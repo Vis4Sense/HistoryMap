@@ -4,6 +4,7 @@ import type { SchemaNode } from '@/types/schema'
 import type { Edge } from '@vue-flow/core'
 import MinimisedNode from '@/components/Canvas/nodes/MinimisedNode/Index.vue'
 import SchemaMapNode from '@/components/Canvas/nodes/SchemaMapNode/Index.vue'
+import SchemaMapNodePinned from '@/components/Canvas/nodes/SchemaMapNode/Pinned.vue'
 import { useSchemaMap } from '@/composables/useSchemaMap'
 import { Controls } from '@vue-flow/controls'
 import { useVueFlow, VueFlow } from '@vue-flow/core'
@@ -161,7 +162,7 @@ function openNewTab() {
 </script>
 
 <template>
-  <div>
+  <div relative>
     <VueFlow
       w-full
       h-full
@@ -213,6 +214,14 @@ function openNewTab() {
         </BasicToolbarIcon>
       </Controls>
     </VueFlow>
+
+    <SchemaMapNodePinned
+      v-for="node in nodes.filter(node => node.data.isPinned)"
+      :id="node.id"
+      :key="node.id"
+      :data="node.data"
+      class-name-handle="pinned-node-handle"
+    />
   </div>
 </template>
 
@@ -236,5 +245,73 @@ function openNewTab() {
 }
 .vue-flow__resize-control.line.bottom {
   border-bottom-width: 0;
+}
+
+@import "vue-draggable-resizable/style.css";
+
+.pinned-node-handle {
+  position: absolute;
+  background-color: #777;
+  border: 1px solid white;
+  border-radius: 50%;
+  width: 6px;
+  height: 6px;
+  transition: all 0.3s ease;
+}
+
+.pinned-node-handle-tl {
+  top: 0;
+  left: 0;
+  transform: translate(-50%, -50%);
+  cursor: nwse-resize;
+}
+
+.pinned-node-handle-tm {
+  top: 0;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  cursor: ns-resize;
+}
+
+.pinned-node-handle-tr {
+  top: 0;
+  right: 0;
+  transform: translate(50%, -50%);
+  cursor: nesw-resize;
+}
+
+.pinned-node-handle-mr {
+  top: 50%;
+  right: 0;
+  transform: translate(50%, -50%);
+  cursor: ew-resize;
+}
+
+.pinned-node-handle-br {
+  bottom: 0;
+  right: 0;
+  transform: translate(50%, 50%);
+  cursor: nwse-resize;
+}
+
+.pinned-node-handle-bm {
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, 50%);
+  cursor: ns-resize;
+}
+
+.pinned-node-handle-bl {
+  bottom: 0;
+  left: 0;
+  transform: translate(-50%, 50%);
+  cursor: nesw-resize;
+}
+
+.pinned-node-handle-ml {
+  top: 50%;
+  left: 0;
+  transform: translate(-50%, -50%);
+  cursor: ew-resize;
 }
 </style>

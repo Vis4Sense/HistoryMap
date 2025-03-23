@@ -52,6 +52,7 @@ export interface SchemaNode {
   width?: number
   height?: number
   isMinimised?: boolean
+  isPinned?: boolean
 }
 
 /** Provenance of concept & relation change */

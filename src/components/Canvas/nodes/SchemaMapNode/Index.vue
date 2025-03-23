@@ -1,16 +1,13 @@
 <script setup lang="ts">
 import type { HmPage } from '@/types/historymap'
-import type { Schema, SchemaNode } from '@/types/schema'
-import { forEachConcept, useSchemaMap } from '@/composables/useSchemaMap'
-import { newSchema } from '@/types/schema.d'
+import type { SchemaNode } from '@/types/schema'
+import { forEachConcept } from '@/composables/useSchemaMap'
 import { Handle, Position, useVueFlow } from '@vue-flow/core'
 import { NodeResizer } from '@vue-flow/node-resizer'
 import { NodeToolbar } from '@vue-flow/node-toolbar'
 import SchemaMapNodeToolbar from '../../node-toolbars/SchemaMapNodeToolbar.vue'
-import HmPageNodeAnnotation from '../HmPageNode/Annotation.vue'
-import HmPageNodeHeader from '../HmPageNode/Header.vue'
-import SchemaNodeHeader from '../SchemaNode/Header.vue'
-import SchemaNodeTree from '../SchemaNode/Tree.vue'
+import Body from './Body.vue'
+import Header from './Header.vue'
 
 const props = defineProps({
   id: {
@@ -31,8 +28,7 @@ const emit = defineEmits<{
 
 const { id, data, selected } = toRefs(props)
 
-const highlightContainer = ref<HTMLElement>()
-const schemaContainer = ref<HTMLElement>()
+const bodyContainer = ref<HTMLElement>()
 
 /** toolbar visibility */
 const { getSelectedNodes } = useVueFlow()
@@ -51,45 +47,15 @@ const highlighted = computed(() => {
   return hasHighlighted
 })
 
-/** send message to controller to open clicked page */
-function sendActivatePage() {
-  chrome.runtime.sendMessage({
-    type: 'activate-page',
-    data: data.value,
-  })
-}
-
-useResizeObserver(highlightContainer, () => {
+useResizeObserver(bodyContainer, () => {
   nextTick(() => {
-    if (highlightContainer.value) {
+    if (bodyContainer.value && bodyContainer.value.clientHeight) {
       emit('updateHeight', id.value, {
-        highlights: highlightContainer.value.clientHeight,
+        body: bodyContainer.value.clientHeight,
       })
     }
   })
 })
-useResizeObserver(schemaContainer, () => {
-  nextTick(() => {
-    if (schemaContainer.value) {
-      emit('updateHeight', id.value, {
-        schemaTree: schemaContainer.value.clientHeight,
-      })
-    }
-  })
-})
-
-/** handle title update */
-function onTitleUpdate(title: string) {
-  const { updateNode } = useSchemaMap()
-  let schema: Schema
-  if (data.value.schema) {
-    schema = { ...data.value.schema, title }
-  }
-  else {
-    schema = { ...newSchema(), title }
-  }
-  updateNode(data.value.id, { schema })
-}
 </script>
 
 <template>
@@ -111,59 +77,22 @@ function onTitleUpdate(title: string) {
       @resize-end="(e) => emit('resize', e.params.width, e.params.height)"
     />
 
-    <HmPageNodeHeader
-      v-if="data.type === 'hm-page'"
-      class="nodrag nopan"
-      shrink-0
-      text-sm h-5
-      cursor-pointer
-      hover:text-blue-8
+    <Header
+      :id="id"
       :data="data"
-      @click="sendActivatePage()"
     />
-    <SchemaNodeHeader
-      v-else
-      :schema="data.schema"
-      @update-title="onTitleUpdate"
-    />
-
     <div
-      v-if="data.type === 'hm-page'
-        && data.annotations
-      "
-      ref="highlightContainer"
-      p-1
-      space-y-1
-      overflow-auto
+      ref="bodyContainer"
       :class="{
         'max-h-40': !data.height,
         'flex-auto': data.height,
       }"
-      class="nowheel nodrag"
-    >
-      <HmPageNodeAnnotation
-        v-for="annotation in data.annotations"
-        :id="id"
-        :key="annotation.id"
-        :annotation="annotation"
-      />
-    </div>
-
-    <div
-      v-if="data.type === 'schema'"
-      ref="schemaContainer"
       overflow-auto
-      text-xs
       class="nowheel nodrag"
-      :class="{
-        'max-h-40': !data.height,
-        'flex-auto': data.height,
-      }"
-      @click="e => e.stopPropagation()"
     >
-      <SchemaNodeTree
+      <Body
         :id="id"
-        :schema="data.schema"
+        :data="data"
       />
     </div>
 

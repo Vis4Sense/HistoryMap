@@ -1,0 +1,60 @@
+<script setup lang="ts">
+import type { HmPage } from '@/types/historymap'
+import type { Schema, SchemaNode } from '@/types/schema'
+import { useSchemaMap } from '@/composables/useSchemaMap'
+import { newSchema } from '@/types/schema.d'
+import HmPageNodeHeader from '../HmPageNode/Header.vue'
+import SchemaNodeHeader from '../SchemaNode/Header.vue'
+
+const props = defineProps({
+  id: {
+    type: String,
+    required: true,
+  },
+  data: {
+    type: Object as PropType<HmPage | SchemaNode>,
+    required: true,
+  },
+})
+
+const { data } = toRefs(props)
+
+/** send message to controller to open clicked page */
+function sendActivatePage() {
+  chrome.runtime.sendMessage({
+    type: 'activate-page',
+    data: data.value,
+  })
+}
+
+/** handle title update */
+function onTitleUpdate(title: string) {
+  const { updateNode } = useSchemaMap()
+  let schema: Schema
+  if (data.value.schema) {
+    schema = { ...data.value.schema, title }
+  }
+  else {
+    schema = { ...newSchema(), title }
+  }
+  updateNode(data.value.id, { schema })
+}
+</script>
+
+<template>
+  <HmPageNodeHeader
+    v-if="data.type === 'hm-page'"
+    class="nodrag nopan"
+    shrink-0
+    text-sm h-5
+    cursor-pointer
+    hover:text-blue-8
+    :data="data"
+    @click="sendActivatePage()"
+  />
+  <SchemaNodeHeader
+    v-else
+    :schema="data.schema"
+    @update-title="onTitleUpdate"
+  />
+</template>
