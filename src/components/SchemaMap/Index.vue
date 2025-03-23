@@ -159,6 +159,9 @@ function onAddSchemaNode() {
 function openNewTab() {
   chrome.tabs.create({ url: 'chrome://newtab/' })
 }
+
+/** active pinned node */
+const activePinnedNode = ref<string | null>(null)
 </script>
 
 <template>
@@ -221,6 +224,10 @@ function openNewTab() {
       :key="node.id"
       :data="node.data"
       class-name-handle="pinned-node-handle"
+      @mousedown="activePinnedNode = node.id"
+      :style="{
+        'z-index': activePinnedNode === node.id ? 100 : 0,
+      }"
     />
   </div>
 </template>
