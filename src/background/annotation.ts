@@ -162,7 +162,8 @@ function parseMarkdownToSchema(markdown: string) {
     if (parts.length < 2)
       continue
 
-    const name = parts[0].trim().replace(/\*\*/g, '')
+    // const name = parts[0].trim().replace(/\*\*/g, '')
+    const name = parts[0].trim().replace(/^[^a-zA-Z]+|[^a-zA-Z]+$/g, '')
     const description = parts.slice(1).join(':').trim()
 
     while (stack.length > 1 && stack[stack.length - 1].indent >= indent) {

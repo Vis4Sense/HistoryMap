@@ -203,10 +203,10 @@ export function useLinkMap() {
 
   rawNodes.value.forEach((node) => {
     if (node.type === 'hm-page') {
-      if (node.parentPageId) {
-        addValue(sourceMap, node.id, node.parentPageId)
-        addValue(targetMap, node.parentPageId, node.id)
-      }
+      // if (node.parentPageId) {
+      //   addValue(sourceMap, node.id, node.parentPageId)
+      //   addValue(targetMap, node.parentPageId, node.id)
+      // }
     }
     else if (node.type === 'schema') {
       node.sources.forEach((source) => {

@@ -75,11 +75,13 @@ useResizeObserver(bodyContainer, () => {
     bg-white
     hover:shadow
     :class="{
-      'border-blue': data!.isActive,
+      'border-blue': data!.isActive && data.type === 'hm-page',
       'border-2': selected,
       'border-historymap': hasHighlighted || selected || hasSelected,
       'flex flex-col': data.height,
       'border-dashed': hasHighlighted && !selected && !hasSelected,
+      'border-gray-600': data.type === 'schema',
+      'border-gray-300': data.type === 'hm-page',
     }"
   >
     <NodeResizer
