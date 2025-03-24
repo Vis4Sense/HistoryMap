@@ -406,7 +406,7 @@ function linkConcepts(nodes: (HmPage | SchemaNode)[]) {
 
 export function getCurrentConcepts() {
   const { nodes } = useSchemaMap()
-  const currentNodes = nodes.value.filter(d => !d.isMinimised)
+  const currentNodes = nodes.value.filter(d => d.type === 'schema' && !d.isMinimised)
   const { conceptMap } = createConceptMap(currentNodes, 'unincluded')
   const concepts = Array.from(conceptMap.keys())
   return concepts

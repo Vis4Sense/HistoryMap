@@ -110,7 +110,11 @@ onMessage('extract-outline', async ({ data }) => {
     // initialise schema
     updateAnnotation(pageId, id, { schema: newSchema() })
 
-    const instruction = `Extract a hierarchical outline of the following content. Each item should include a unique concept name and a short description. Use the same name as existing concepts if possible. Format the outline in markdown. Use * for bullet points.
+    const instruction = `Extract a hierarchical outline of the following content. Each item should include a unique concept name and a short description. 
+
+You will be provided with a list of existing concepts. If you identify a concept that is the same as one of the given existing concepts, use the existing name. Do not include concepts or information that are irrelevant to the content.
+
+Format the outline in markdown. Use * for bullet points.
 
 Response format:
 <outline>
