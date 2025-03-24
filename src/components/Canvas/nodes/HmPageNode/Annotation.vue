@@ -50,7 +50,7 @@ function onUpdateSchema(schema: Schema) {
         hover:bg-gray-2
         draggable="true"
         cursor-pointer
-        @dragstart="onDragStart(id, [{ name: tag, parentName: null }])"
+        @dragstart="onDragStart(id, [{ name: tag, parentName: null, description: annotation.sourceText }])"
         @dragend="onDragEnd"
       >
         {{ tag }}
