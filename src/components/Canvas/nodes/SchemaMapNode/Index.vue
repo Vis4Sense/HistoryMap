@@ -81,7 +81,7 @@ useResizeObserver(bodyContainer, () => {
       'flex flex-col': data.height,
       'border-dashed': hasHighlighted && !selected && !hasSelected,
       'border-gray-600': data.type === 'schema',
-      'border-gray-300': data.type === 'hm-page',
+      'border-gray-300': data.type === 'hm-page' && !data.isActive,
     }"
   >
     <NodeResizer
