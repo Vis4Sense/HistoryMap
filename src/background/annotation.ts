@@ -102,13 +102,13 @@ onMessage('extract-outline', async ({ data }) => {
     let annotation: Annotation | null = null
     const pageId = activePage.value.id
 
-    // initialise schema
-    updateAnnotation(pageId, 0, { schema: newSchema() })
-
     const { id, sourceText } = data as { id: number, sourceText: string }
     const exampleConcepts = getCurrentConcepts()
       // TODO: better strategy to choose example concepts when there are many
       .slice(0, 200)
+
+    // initialise schema
+    updateAnnotation(pageId, id, { schema: newSchema() })
 
     const instruction = `Extract a hierarchical outline of the following content. Each item should include a unique concept name and a short description. Use the same name as existing concepts if possible. Format the outline in markdown. Use * for bullet points.
 
