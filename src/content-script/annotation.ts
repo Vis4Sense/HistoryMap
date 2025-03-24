@@ -275,7 +275,9 @@ async function taggingStartHandler() {
 
 /** handle extracting outline */
 async function extractOutlineHandler() {
-  if (!selectedAnnotation) {
+  const selection = rangy.getSelection()
+  if (!selection.isCollapsed && selection.rangeCount > 0) {
+  // if (!selectedAnnotation) {
     await saveAnnotation('annotate')
   }
   if (!selectedAnnotation)
@@ -285,10 +287,6 @@ async function extractOutlineHandler() {
   console.log('extracting outline', text)
 
   const annotation = await sendMessage('extract-outline', selectedAnnotation, 'background') as Annotation
-  noteboxes[selectedAnnotation.id]?.contentWindow?.postMessage({
-    type: 'setSchema',
-    value: annotation.schema,
-  }, '*')
   console.log('extracted outline', annotation)
 }
 
