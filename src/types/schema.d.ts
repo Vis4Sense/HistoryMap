@@ -54,6 +54,11 @@ export interface SchemaNode {
   height?: number
   isMinimised?: boolean
   isPinned?: boolean
+  relativePosition?: {
+    relativeTo: string
+    x: number
+    y: number
+  }
 }
 
 /** Provenance of concept & relation change */

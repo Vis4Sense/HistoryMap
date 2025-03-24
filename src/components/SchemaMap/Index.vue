@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { HmPage } from '@/types/historymap'
 import type { SchemaNode } from '@/types/schema'
-import type { Edge } from '@vue-flow/core'
+import type { Edge, Node } from '@vue-flow/core'
 import MinimisedNode from '@/components/Canvas/nodes/MinimisedNode/Index.vue'
 import SchemaMapNode from '@/components/Canvas/nodes/SchemaMapNode/Index.vue'
 import SchemaMapNodePinned from '@/components/Canvas/nodes/SchemaMapNode/Pinned.vue'
@@ -51,20 +51,19 @@ const nodes = computed(() => {
     },
   }))
 
-  smNodes.value.forEach((node) => {
-    if (node.type === 'schema') {
-      node.sources.forEach((source) => {
-        const sourceNode = nodes.find(n => n.id === source)
-        sourceNode?.data.targets.push(node)
-      })
-    }
-  })
-
   const layout = compactTreeLayout()
   layout.nodes(nodes).links(edges.value).run()
   layout.close()
 
-  // console.log('nodes', nodes)
+  nodes.forEach((node) => {
+    if ('relativePosition' in node.data) {
+      const sourceNode = nodes.find(n => n.id === node.data.relativePosition.relativeTo)
+      if (sourceNode) {
+        node.position.x = sourceNode.position.x + node.data.relativePosition.x
+        node.position.y = sourceNode.position.y + node.data.relativePosition.y
+      }
+    }
+  })
 
   return nodes
 })
@@ -162,6 +161,47 @@ function openNewTab() {
 
 /** active pinned node */
 const activePinnedNode = ref<string | null>(null)
+
+/** update node position on drag stop */
+function onNodeDragStop({ nodes: draggedNodes }: { nodes: Node<HmPage | SchemaNode>[] }) {
+  function findSourcePageNode(
+    node: Node<SchemaNode>,
+    visited: Set<string> = new Set(),
+  ): string | null {
+    if (visited.has(node.id)) {
+      return null
+    }
+    if (node.data?.sources && node.data.sources.length > 0) {
+      const sourceNode = nodes.value.find(n => n.id === node.data?.sources[0])
+      if (!sourceNode)
+        return null
+      if (sourceNode.data.type === 'hm-page')
+        return sourceNode.id
+      visited.add(node.id)
+      return findSourcePageNode(sourceNode, visited)
+    }
+    return null
+  }
+
+  const schemaNodes = draggedNodes
+    .filter(node => node.data?.type === 'schema')
+
+  schemaNodes.forEach((node) => {
+    const sourcePageNodeId = findSourcePageNode(node)
+    if (sourcePageNodeId) {
+      const sourcePageNode = nodes.value.find(n => n.id === sourcePageNodeId)
+      if (sourcePageNode) {
+        updateNode(node.id, {
+          relativePosition: {
+            relativeTo: sourcePageNodeId,
+            x: node.position.x - sourcePageNode.position.x,
+            y: node.position.y - sourcePageNode.position.y,
+          },
+        })
+      }
+    }
+  })
+}
 </script>
 
 <template>
@@ -173,6 +213,7 @@ const activePinnedNode = ref<string | null>(null)
       :edges="edges"
       class="edge-under"
       @node-click="onNodeClick"
+      @node-drag-stop="onNodeDragStop"
     >
       <template #node-schemamap="props">
         <SchemaMapNode
@@ -224,10 +265,10 @@ const activePinnedNode = ref<string | null>(null)
       :key="node.id"
       :data="node.data"
       class-name-handle="pinned-node-handle"
-      @mousedown="activePinnedNode = node.id"
       :style="{
         'z-index': activePinnedNode === node.id ? 100 : 0,
       }"
+      @mousedown="activePinnedNode = node.id"
     />
   </div>
 </template>
