@@ -53,6 +53,7 @@ function onEdit(provenance: Provenance) {
 /** handle drag start */
 function dragStart(node: TreeNode) {
   const concepts = node.toConcepts()
+  console.log(concepts)
   onDragStart(id.value, concepts)
 }
 
@@ -125,6 +126,8 @@ function onDrop(node: TreeNode, position: 'inside' | 'before' | 'after') {
   <div
     space-y-1 flex flex-col p="x-2 y-1"
     draggable="true"
+    @dragstart="dragStart(tree.root)"
+    @dragend="onDragEnd"
   >
     <div flex justify-between items-center>
       <div
