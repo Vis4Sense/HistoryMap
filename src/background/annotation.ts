@@ -13,6 +13,7 @@ import { chatCompletionText } from '@/services/llm'
 import { newSchema } from '@/types/schema.d'
 import { onMessage, sendMessage } from 'webext-bridge/background'
 import { updateActivePage } from './controller'
+import _ from 'lodash'
 
 const { activePage, addAnnotation, updateAnnotation, removeAnnotation, removeHighlight, highlight, addTag, removeTag } = useHistoryMap()
 
@@ -184,6 +185,7 @@ function parseMarkdownToSchema(markdown: string) {
     stack.push({ name, indent })
   }
 
+  schema.concepts = _.uniqBy(schema.concepts, 'name')
   return schema
 }
 

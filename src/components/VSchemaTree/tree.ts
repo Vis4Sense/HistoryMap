@@ -3,6 +3,7 @@
 // Modified with additional changes
 
 import type { Concept } from '@/types/schema'
+import _ from 'lodash'
 
 export class TreeNode {
   name: string
@@ -112,7 +113,7 @@ export class TreeNode {
         concepts.push(...child.toConcepts())
       })
     }
-    return concepts
+    return _.uniqBy(concepts, 'name')
   }
 
   hasNoBranch(): boolean {
@@ -138,6 +139,9 @@ export class Tree {
       name: '',
       parentName: null,
     }, true)
+
+    // one concept can only appear once
+    data = _.uniqBy(data, 'name')
 
     data.forEach((d) => {
       this.nodeDict[d.name] = new TreeNode(d)
