@@ -25,6 +25,9 @@ const emit = defineEmits<{
 const { id, schema } = toRefs(props)
 const lod = computed(() => schema.value.lod ?? 'summary')
 
+const modeOptions = ['view', 'edit']
+const modeIndex = ref(0)
+
 const { onDragStart, onDragEnd, sourceData } = useDragAndDropTree()
 
 /** convert schema to tree for vis and edit */
@@ -147,9 +150,15 @@ function onDrop(node: TreeNode, position: 'inside' | 'before' | 'after') {
         </BasicButtonCircular>
       </div>
 
-      <BasicToolbarIcon plain>
-        <div i-carbon-draggable />
-      </BasicToolbarIcon>
+      <div flex gap-1>
+        <BasicToolbarIcon plain @click="() => modeIndex = (modeIndex + 1) % modeOptions.length">
+          <div v-if="modeOptions[modeIndex] === 'view'" i-mdi-eye-outline />
+          <div v-else i-mdi-pencil-outline />
+        </BasicToolbarIcon>
+        <BasicToolbarIcon plain>
+          <div i-carbon-draggable />
+        </BasicToolbarIcon>
+      </div>
     </div>
 
     <VSchemaTreeNode
@@ -158,6 +167,7 @@ function onDrop(node: TreeNode, position: 'inside' | 'before' | 'after') {
       }"
       :node="tree.root"
       :lod="lod"
+      :mode="modeOptions[modeIndex]!"
       @add-node="onEdit($event)"
       @remove-node="onEdit($event)"
       @update-node="onEdit($event)"

@@ -16,6 +16,10 @@ const props = defineProps({
     type: String as PropType<Schema['lod']>,
     default: 'detail',
   },
+  mode: {
+    type: String as PropType<'view' | 'edit'>,
+    default: 'view',
+  }
 })
 
 const emit = defineEmits<{
@@ -210,8 +214,7 @@ function updateDesc() {
             ref="conceptNameEle"
             rounded-lg p="x-1"
             mr-1 font-medium
-            contenteditable
-            cursor-text
+            :contenteditable="mode === 'edit'"
             :bg="
               node.selected
                 ? 'historymap-400'
@@ -222,7 +225,8 @@ function updateDesc() {
                     : 'gray-1'
             "
             :class="{
-              'text-white': node.selected
+              'text-white': node.selected,
+              'cursor-text': mode === 'edit',
             }"
             @blur="updateName"
             @keydown.enter.prevent="(e) => e.target?.blur()"
@@ -234,10 +238,10 @@ function updateDesc() {
             v-if="lod !== 'concept'"
             ref="conceptDescEle"
             text-gray-5
-            contenteditable
-            cursor-text
+            :contenteditable="mode === 'edit'"
             :class="{
               'px-1': isEditingDesc,
+              'cursor-text': mode === 'edit',
             }"
             @focus="startEditingDesc"
             @blur="updateDesc"
@@ -262,6 +266,7 @@ function updateDesc() {
           absolute right-1
           px-1
           bg-white bg-op-90
+          @click="e => e.stopPropagation()"
         >
           <BasicToolbarIcon plain @click="startEditing">
             <div i-carbon-add />
@@ -299,6 +304,7 @@ function updateDesc() {
           :node="child"
           :index="idx"
           :lod="lod"
+          :mode="mode"
           @add-node="emit('addNode', $event)"
           @remove-node="emit('removeNode', $event)"
           @update-node="emit('updateNode', $event)"
