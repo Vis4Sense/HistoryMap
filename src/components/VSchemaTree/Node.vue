@@ -278,7 +278,7 @@ function updateDesc() {
       </div>
 
       <div
-        v-if="!node.virtual && index === 0"
+        v-if="!node.virtual"
         border-1 border-dashed
         :class="{
           'border-transparent': !draggedOverAfter,
