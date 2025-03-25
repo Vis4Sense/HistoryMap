@@ -230,9 +230,9 @@ function updateDesc() {
             }"
             @blur="updateName"
             @keydown.enter.prevent="(e) => e.target?.blur()"
-            @click="() => {
+            @click="(e) => {
               if (mode === 'edit') {
-                e => e.stopPropagation()
+                e.stopPropagation()
               }
             }"
           >
@@ -250,9 +250,9 @@ function updateDesc() {
             @focus="startEditingDesc"
             @blur="updateDesc"
             @keydown.enter.prevent="(e) => e.target?.blur()"
-            @click="() => {
+            @click="(e) => {
               if (mode === 'edit') {
-                e => e.stopPropagation()
+                e.stopPropagation()
               }
             }"
           >
