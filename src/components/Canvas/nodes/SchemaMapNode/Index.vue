@@ -70,16 +70,16 @@ useResizeObserver(bodyContainer, () => {
 <template>
   <div
     w-full h-full
-    border border-rounded
     p="x-2 y-1"
     bg-white
     hover:shadow
+    class="border border-rounded"
     :class="{
       'border-blue': data!.isActive && data.type === 'hm-page',
       'border-2': selected,
-      'border-historymap': hasHighlighted || selected || hasSelected,
+      'border-historymap': (hasHighlighted || selected || hasSelected) && !(data!.isActive && data.type === 'hm-page'),
       'flex flex-col': data.height,
-      'border-dashed': hasHighlighted && !selected && !hasSelected,
+      'border-dashed': hasHighlighted && !selected && !hasSelected && !(data!.isActive && data.type === 'hm-page'),
       'border-gray-600': data.type === 'schema',
       'border-gray-400': data.type === 'hm-page' && !data.isActive,
     }"
