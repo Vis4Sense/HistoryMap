@@ -262,7 +262,10 @@ function updateDesc() {
             v-if="!node.description && !isEditingDesc && mode === 'edit'"
             inline-block
             text-gray-3 hover:text-gray-5
-            @click="startEditingDesc"
+            @click="(e) => {
+              startEditingDesc()
+              e.stopPropagation()
+            }"
           >
             <div translate-y-0.5 i-mdi-text-box-plus-outline />
           </span>
