@@ -259,7 +259,7 @@ function updateDesc() {
             {{ node.description }}
           </span>
           <span
-            v-if="!node.description && !isEditingDesc"
+            v-if="!node.description && !isEditingDesc && mode === 'edit'"
             inline-block
             text-gray-3 hover:text-gray-5
             @click="startEditingDesc"
