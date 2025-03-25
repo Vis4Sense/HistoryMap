@@ -7,7 +7,7 @@ import SchemaMapNode from '@/components/Canvas/nodes/SchemaMapNode/Index.vue'
 import SchemaMapNodePinned from '@/components/Canvas/nodes/SchemaMapNode/Pinned.vue'
 import { useSchemaMap } from '@/composables/useSchemaMap'
 import { Controls } from '@vue-flow/controls'
-import { useVueFlow, VueFlow } from '@vue-flow/core'
+import { MarkerType, useVueFlow, VueFlow } from '@vue-flow/core'
 import _ from 'lodash'
 import { compactTreeLayout } from '../HistoryMap/layout/compact-tree'
 
@@ -31,6 +31,11 @@ const edges = computed((): Edge[] => {
     id: `${link.source}_${link.target}`,
     source: link.source,
     target: link.target,
+    markerEnd: MarkerType.ArrowClosed,
+    type: link.isSchemaLink ? 'default' : 'smoothstep',
+    style: {
+      strokeWidth: 1.5,
+    },
   }))
 })
 

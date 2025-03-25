@@ -9,7 +9,7 @@ import { CompactTreeLayout, Graph } from '@maxgraph/core'
 import { DummyContainer } from './utils'
 
 export function compactTreeLayout({
-  levelDistance = 30,
+  levelDistance = 48,
   nodeDistance = 5,
 } = {}) {
   let module: {

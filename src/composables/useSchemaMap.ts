@@ -25,7 +25,7 @@ export function useSchemaMap() {
     const schemaLinks = schemaNodes.value
       .filter(d => d.sources.length > 0) // using map on empty array will turn it into an object
       .flatMap(d => d.sources
-        .map(src => ({ source: src, target: d.id })),
+        .map(src => ({ source: src, target: d.id, isSchemaLink: true })),
       )
       .filter(d => nodes.value.find(n => n.id === d.source) && nodes.value.find(n => n.id === d.target))
     return [...hmLinks.value, ...schemaLinks]
