@@ -33,7 +33,10 @@ function onUpdateSchema(schema: Schema) {
     space-y="0.5"
     @click="e => e.stopPropagation()"
   >
-    <div v-if="annotation.highlighted" flex-auto truncate bg-yellow-1>
+    <div
+      v-if="annotation.highlighted || annotation.tags" flex-auto truncate
+      :class="{ 'bg-yellow-1': annotation.highlighted }"
+    >
       {{ annotation.sourceText }}
     </div>
     <VSchemaTree

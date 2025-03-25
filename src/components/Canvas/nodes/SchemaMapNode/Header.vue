@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import type { HmPage } from '@/types/historymap'
-import type { Schema, SchemaNode } from '@/types/schema'
-import { useSchemaMap } from '@/composables/useSchemaMap'
-import { newSchema } from '@/types/schema.d'
+import type { SchemaNode } from '@/types/schema'
 import HmPageNodeHeader from '../HmPageNode/Header.vue'
-import SchemaNodeHeader from '../SchemaNode/Header.vue'
 
 const props = defineProps({
   id: {
@@ -26,19 +23,6 @@ function sendActivatePage() {
     data: data.value,
   })
 }
-
-/** handle title update */
-function onTitleUpdate(title: string) {
-  const { updateNode } = useSchemaMap()
-  let schema: Schema
-  if (data.value.schema) {
-    schema = { ...data.value.schema, title }
-  }
-  else {
-    schema = { ...newSchema(), title }
-  }
-  updateNode(data.value.id, { schema })
-}
 </script>
 
 <template>
@@ -51,10 +35,5 @@ function onTitleUpdate(title: string) {
     hover:text-blue-8
     :data="data"
     @click="sendActivatePage()"
-  />
-  <SchemaNodeHeader
-    v-else
-    :schema="data.schema"
-    @update-title="onTitleUpdate"
   />
 </template>

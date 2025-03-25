@@ -164,7 +164,7 @@ export function useSelectionState() {
   function selectConcept(concept: Concept) {
     selectedConcept.value = concept.name
   }
-  
+
   function deselectConcept() {
     selectedConcept.value = null
   }

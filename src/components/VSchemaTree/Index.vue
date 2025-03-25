@@ -2,9 +2,9 @@
 import type { Provenance, Schema } from '@/types/schema'
 import type { TreeNode } from './tree'
 import { useDragAndDropTree } from '@/composables/useDnDTree'
+import { useSelectionState } from '@/composables/useSchemaMap'
 import { newSchema } from '@/types/schema.d'
 import { Tree } from './tree'
-import { useSelectionState } from '@/composables/useSchemaMap'
 
 const props = defineProps({
   id: {
@@ -23,6 +23,7 @@ const emit = defineEmits<{
 }>()
 
 const { id, schema } = toRefs(props)
+const schemaTitle = ref(null as HTMLDivElement | null)
 const lod = computed(() => schema.value.lod ?? 'summary')
 
 const modeOptions = ['view', 'edit']
@@ -40,6 +41,16 @@ function createTree() {
   return new Tree(schema.value.concepts)
 }
 
+/** handle schema title update */
+function updateSchemaTitle() {
+  if (schemaTitle.value) {
+    const title = schemaTitle.value.textContent?.trim() || ''
+    if (title) {
+      emit('updateSchema', { ...schema.value, title })
+    }
+  }
+}
+
 /** emit tree edit */
 function onEdit(provenance: Provenance) {
   const newSchema = {
@@ -53,7 +64,6 @@ function onEdit(provenance: Provenance) {
 /** handle drag start */
 function dragStart(node: TreeNode) {
   const concepts = node.toConcepts()
-  console.log(concepts)
   onDragStart(id.value, concepts)
 }
 
@@ -151,6 +161,21 @@ function onDrop(node: TreeNode, position: 'inside' | 'before' | 'after') {
         >
           <div i-mdi-format-list-text />
         </BasicButtonCircular>
+      </div>
+
+      <div
+        ref="schemaTitle"
+        contenteditable
+        cursor-auto
+        class="nodrag"
+        :class="{
+          'text-gray-3': !schema.title,
+          'font-medium text-base': schema.title,
+        }"
+        @blur="updateSchemaTitle"
+        @keydown.enter.prevent="(e) => e.target.blur()"
+      >
+        {{ schema?.title ?? 'Schema' }}
       </div>
 
       <div flex gap-1>
