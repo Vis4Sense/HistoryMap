@@ -339,11 +339,22 @@ function linkConcepts(nodes: (HmPage | SchemaNode)[]) {
     }
   }
 
+  // clear highlights
+  processedNodes.forEach((node) => {
+    forEachConcept(node, (concept) => {
+      delete concept.highlighted
+      delete concept.included
+      delete concept.unincluded
+      delete concept.selected
+    })
+  })
+
   // if concept is included in its target node
   processedNodes.forEach((node) => {
     forEachConcept(node, (concept) => {
       const targets = targetMap.get(node.id) || []
       const includes = conceptMap.get(concept.name) || []
+
       if (_.intersection(targets, includes).length > 0) {
         highlightConcept(node, concept.name, 'included')
       }
