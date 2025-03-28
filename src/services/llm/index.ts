@@ -1,3 +1,5 @@
+import { useLocale } from '@/composables/useLocale'
+
 const API_URL = 'https://api.siliconflow.cn/v1/chat/completions'
 const API_KEY = import.meta.env.VITE_SF_API_KEY
 
@@ -11,11 +13,12 @@ export async function chatCompletion(
     // console.info('fetching', message)
     fetch(API_URL, options)
       .then(response => response.json())
-      .then(result => {
+      .then((result) => {
         const content = result.choices[0].message.content
         onResponse(content)
       })
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Error:', error, `retrying...${maxRetries}times left`)
     if (maxRetries > 0) {
       chatCompletion(message, onResponse, maxRetries - 1)
@@ -35,7 +38,8 @@ export async function chatCompletionText(
       const response = await fetch(API_URL, options)
       const result = await response.json()
       return result.choices[0].message.content
-    } catch (error) {
+    }
+    catch (error) {
       console.error('Error:', error, `retrying... ${maxRetries - attempt} times left`)
       if (attempt === maxRetries) {
         throw new Error('Max retries reached')
@@ -50,6 +54,8 @@ function getOptions(
   message: string,
   response_format: 'json_object' | 'text' = 'json_object',
 ) {
+  const locale = useLocale()
+  const model = locale.value === 'zh' ? 'deepseek-ai/DeepSeek-V3' : 'meta-llama/Meta-Llama-3.1-8B-Instruct'
   return {
     method: 'POST',
     headers: {
@@ -58,6 +64,7 @@ function getOptions(
       'authorization': `Bearer ${API_KEY}`,
     },
     body: JSON.stringify({
+      // model,
       model: 'meta-llama/Meta-Llama-3.1-8B-Instruct', // 'Qwen/Qwen2-7B-Instruct',
       messages: [
         {

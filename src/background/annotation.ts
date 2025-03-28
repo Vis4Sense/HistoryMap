@@ -8,12 +8,13 @@
 import type { Annotation } from '@/types/historymap'
 import type { Schema } from '@/types/schema.d'
 import { useHistoryMap } from '@/composables/useHistoryMap'
+import { useLocale } from '@/composables/useLocale'
 import { getCurrentConcepts } from '@/composables/useSchemaMap'
 import { chatCompletionText } from '@/services/llm'
 import { newSchema } from '@/types/schema.d'
+import _ from 'lodash'
 import { onMessage, sendMessage } from 'webext-bridge/background'
 import { updateActivePage } from './controller'
-import _ from 'lodash'
 
 const { activePage, addAnnotation, updateAnnotation, removeAnnotation, removeHighlight, highlight, addTag, removeTag } = useHistoryMap()
 
@@ -111,9 +112,10 @@ onMessage('extract-outline', async ({ data }) => {
     // initialise schema
     updateAnnotation(pageId, id, { schema: newSchema() })
 
-    const instruction = `Extract a hierarchical outline of the following content. Each item should include a unique concept name and a short description. 
+    const locale = useLocale()
+    const instructionEn = `Extract a hierarchical outline of the following content. Each item should include a unique concept name and a short description. 
 
-You will be provided with a list of existing concepts. If you identify a concept that is the same as one of the given existing concepts, use the existing name. Do not include concepts or information that are irrelevant to the content.
+You will be provided with a list of existing concepts. If you identify a concept that is the same as one of the given existing concepts, use the existing name. Do not include concepts or information that are irrelevant to the given content.
 
 Format the outline in markdown. Use * for bullet points.
 
@@ -124,6 +126,21 @@ Response format:
   * Banana: A type of fruit that is yellow
 * Vegetable: A savory edible plant product
 </outline>`
+    const instructionZn = `提取以下内容提及的主要概念并组织成层次大纲。每项应包含唯一概念名称和简短描述。
+
+如果你发现某个概念与给定的已有概念列表中的某个概念相同，请使用已有的名称。不要包括与给定内容无关的概念或信息。
+
+格式要求：
+* 使用 * 来表示项目符号。
+
+返回格式示例：
+<outline>
+* 水果：一种甜或咸的可食用植物产品
+  * 苹果：一种红色或绿色的水果
+  * 香蕉：一种黄色的水果
+* 蔬菜：一种咸味可食用植物产品
+</outline>`
+    const instruction = locale.value === 'zh' ? instructionZn : instructionEn
 
     const prompt = `${instruction}\n\nExisting concepts:\n${exampleConcepts}\n\nSource content:\n${sourceText}`
 
@@ -162,13 +179,15 @@ function parseMarkdownToSchema(markdown: string) {
     const indent = match[1].length
     const content = match[2]
 
-    const parts = content.split(':')
+    // const parts = content.split(':')
+    const parts = content.split(/[:：]/)
 
     if (parts.length < 2)
       continue
 
     // const name = parts[0].trim().replace(/\*\*/g, '')
-    const name = parts[0].trim().replace(/^[^a-zA-Z]+|[^a-zA-Z]+$/g, '')
+    // const name = parts[0].trim().replace(/^[^a-z]+|[^a-z]+$/gi, '')
+    const name = parts[0].trim().replace(/^[*_-]+|[*_-]+$/g, '')
     const description = parts.slice(1).join(':').trim()
 
     while (stack.length > 1 && stack[stack.length - 1].indent >= indent) {

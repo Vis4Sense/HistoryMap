@@ -55,7 +55,8 @@ function updateSessionTitle() {
       </div>
     </div>
 
-    <div shrink-0>
+    <div shrink-0 flex items-center>
+      <Locale />
       <Export />
     </div>
   </div>

@@ -33,6 +33,7 @@ declare module 'vue' {
     IPhListHeart: typeof import('~icons/ph/list-heart')['default']
     IPhPresentationChart: typeof import('~icons/ph/presentation-chart')['default']
     IPhRocketLaunch: typeof import('~icons/ph/rocket-launch')['default']
+    Locale: typeof import('./../components/Locale.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SchemaMap: typeof import('./../components/SchemaMap/Index.vue')['default']
