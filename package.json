@@ -93,7 +93,7 @@
     "sass": "^1.83.1",
     "tailwindcss": "^3.4.17",
     "terser": "^5.37.0",
-    "tsx": "^4.19.2",
+    "tsx": "^4.21.0",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.19.1",
     "unocss": "^65.4.3",
