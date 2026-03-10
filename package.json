@@ -31,7 +31,7 @@
     "@vue-flow/core": "^1.42.1",
     "@vue-flow/node-toolbar": "^1.1.0",
     "d3": "^7.9.0",
-    "element-plus": "^2.9.3",
+    "element-plus": "^2.13.5",
     "graphology": "^0.26.0",
     "graphology-layout-force": "^0.2.4",
     "graphology-layout-forceatlas2": "^0.10.1",
